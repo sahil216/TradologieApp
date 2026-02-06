@@ -1,0 +1,22 @@
+# Flutter/Dart/Pub related
+.dart_tool/
+.packages
+.pub/
+.pub-cache/
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter-plugins-dependencies
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+coverage/
+
+# Flutter build outputs
+**/doc/api/
+.flutter-plugins-dependencies
+.flutter-plugins
+.flutter-plugins-dependencies
+
+
