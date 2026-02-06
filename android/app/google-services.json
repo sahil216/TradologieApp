@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "135753122403",
+    "project_id": "tradologie-app",
+    "storage_bucket": "tradologie-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:135753122403:android:22f44f9a6097c16bf8ee56",
+        "android_client_info": {
+          "package_name": "com.tradologie.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfux8U-5uB5bccMBWRBP4yGmXXQ5OkSac"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

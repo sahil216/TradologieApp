@@ -1,0 +1,58 @@
+import 'package:tradologie_app/features/negotiation/domain/entities/negotiation_result.dart';
+
+class NegotiationResultModel extends NegotiationResult {
+  const NegotiationResultModel({
+    super.auctionId,
+    super.auctionCode,
+    super.auctionName,
+    super.customerId,
+    super.customerName,
+    super.totalQuantity,
+    super.minQuantity,
+    super.participateQuantity,
+    super.totalOrderQuantity,
+    super.poNo,
+    super.auctionCharge,
+    super.acceptanceStatus,
+    super.counterStatus,
+    super.orderStatus,
+    super.remarks,
+    super.isStarted,
+    super.isclosed,
+    super.deliveryLastDate,
+    super.startDate,
+    super.endDate,
+    super.preferredDate,
+    super.navigateUrl,
+    super.navigateViewUrl,
+    super.linkType,
+  });
+
+  factory NegotiationResultModel.fromJson(Map<String, dynamic> json) =>
+      NegotiationResultModel(
+        auctionId: json["AuctionID"].toString(),
+        auctionCode: json["AuctionCode"].toString(),
+        auctionName: json["AuctionName"].toString(),
+        customerId: json["CustomerID"].toString(),
+        customerName: json["CustomerName"].toString(),
+        totalQuantity: json["TotalQuantity"].toString(),
+        minQuantity: json["MinQuantity"].toString(),
+        participateQuantity: json["ParticipateQuantity"].toString(),
+        totalOrderQuantity: json["TotalOrderQuantity"].toString(),
+        poNo: json["PONo"].toString(),
+        auctionCharge: json["AuctionCharge"].toString(),
+        acceptanceStatus: json["AcceptanceStatus"].toString(),
+        counterStatus: json["CounterStatus"].toString(),
+        orderStatus: json["OrderStatus"].toString(),
+        remarks: json["Remarks"].toString(),
+        isStarted: json["IsStarted"],
+        isclosed: json["Isclosed"],
+        deliveryLastDate: json["DeliveryLastDate"].toString(),
+        startDate: json["StartDate"].toString(),
+        endDate: json["EndDate"].toString(),
+        preferredDate: json["PreferredDate"].toString(),
+        navigateUrl: json["NavigateUrl"].toString(),
+        navigateViewUrl: json["NavigateViewUrl"].toString(),
+        linkType: json["LinkType"].toString(),
+      );
+}
