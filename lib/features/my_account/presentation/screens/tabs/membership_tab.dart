@@ -246,7 +246,7 @@ class _MembershipTabState extends State<MembershipTab> {
         ),
         const SizedBox(height: 12),
         DropdownButtonFormField<String>(
-          value: "Yearly Subscription (1 Year)",
+          // value: "Yearly Subscription (1 Year)",
           decoration: const InputDecoration(
             labelText: "Membership Plan",
             border: OutlineInputBorder(),

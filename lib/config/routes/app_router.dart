@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
+import 'package:tradologie_app/features/app/presentation/screens/main_screen.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/send_otp_usecase.dart';
 import 'package:tradologie_app/features/contact_us/contact_us.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_dashboard_screen.dart';
@@ -9,7 +10,6 @@ import 'package:tradologie_app/features/negotiation/presentation/screens/buyer_n
 import 'package:tradologie_app/features/negotiation/presentation/screens/negotiation_screen.dart';
 
 import '../../core/utils/app_strings.dart';
-import '../../features/app/presentation/screens/main_screen.dart';
 import '../../features/app/presentation/screens/onboarding_screen.dart';
 import '../../features/app/presentation/screens/splash_screen.dart';
 import '../../features/app/presentation/screens/terms_screen.dart';
@@ -44,6 +44,7 @@ class Routes {
 
   //! webView
   static const String webViewRoute = '/webView';
+  static const String inAppWebViewRoute = '/inAppWebView';
 
   //! Dashboard
   static const String dashboardRoute = '/dashboard';
@@ -71,7 +72,7 @@ class AppRoutes {
         });
       case Routes.mainRoute:
         return CupertinoPageRoute(builder: (context) {
-          return const MainScreen();
+          return MainScreen();
         });
       case Routes.onboardingRoute:
         return CupertinoPageRoute(builder: (context) {
@@ -105,6 +106,13 @@ class AppRoutes {
         return CupertinoPageRoute(builder: (context) {
           final data = routeSettings.arguments as WebviewParams;
           return WebViewScreen(
+            params: data,
+          );
+        });
+      case Routes.inAppWebViewRoute:
+        return CupertinoPageRoute(builder: (context) {
+          final data = routeSettings.arguments as WebviewParams;
+          return InAppWebViewScreen(
             params: data,
           );
         });

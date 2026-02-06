@@ -2,12 +2,10 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../../../../core/utils/extensions.dart';
 import '../../../../../../../core/utils/app_colors.dart';
-import '../../../../../../core/utils/assets_manager.dart';
 import 'custom_text/text_style_constants.dart';
 
 class ChooseFileImagesBottomSheet extends StatelessWidget {
@@ -81,12 +79,9 @@ class ChooseFileImagesBottomSheet extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            SvgPicture.asset(
-                              VectorAssets.gallery,
-                              colorFilter: ColorFilter.mode(
-                                  AppColors.primary, BlendMode.srcIn),
-                              height: 25,
-                              width: 25,
+                            Icon(
+                              Icons.browse_gallery,
+                              size: 24,
                             ),
                           ],
                         ),
@@ -114,12 +109,9 @@ class ChooseFileImagesBottomSheet extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            SvgPicture.asset(
-                              VectorAssets.camera,
-                              colorFilter: ColorFilter.mode(
-                                  AppColors.primary, BlendMode.srcIn),
-                              height: 25,
-                              width: 25,
+                            Icon(
+                              Icons.camera_alt,
+                              size: 24,
                             ),
                           ],
                         ),
@@ -159,12 +151,9 @@ class ChooseFileImagesBottomSheet extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            SvgPicture.asset(
-                              VectorAssets.gallery,
-                              colorFilter: ColorFilter.mode(
-                                  AppColors.primary, BlendMode.srcIn),
-                              height: 25,
-                              width: 25,
+                            Icon(
+                              Icons.file_copy,
+                              size: 24,
                             ),
                           ],
                         ),

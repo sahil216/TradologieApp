@@ -94,6 +94,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final totalPages = _totalPages(context);
     return MultiBlocListener(
       listeners: [
         BlocListener<DashboardCubit, DashboardState>(
@@ -153,23 +154,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
             return SafeArea(
               child: Column(
                 children: [
-                  Expanded(child: dashboardBody()),
+                  Expanded(child: dashboardBody(totalPages)),
                 ],
               ),
             );
           },
         ),
+        bottomNavigationBar: _pageDots(totalPages),
       ),
     );
   }
 
-  Widget dashboardBody() {
+  Widget dashboardBody(int totalPages) {
     Responsive responsive = Responsive(context);
     if (dashboardData == null) {
       return CommonLoader();
     }
-
-    final totalPages = _totalPages(context);
 
     return Column(
       children: [
@@ -177,7 +177,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
           child: SizedBox(
-            height: responsive.screenHeight * 0.75,
+            height: responsive.screenHeight * 0.7,
             child: PageView.builder(
                 controller: _pageController,
                 itemCount: totalPages,
@@ -218,8 +218,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 }),
           ),
         ),
-        const SizedBox(height: 12),
-        _pageDots(totalPages),
       ],
     );
   }

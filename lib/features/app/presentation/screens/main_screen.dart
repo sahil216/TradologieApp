@@ -1,15 +1,26 @@
+import 'dart:io';
+import 'dart:ui';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tradologie_app/core/api/end_points.dart';
+import 'package:tradologie_app/core/utils/app_strings.dart';
+import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 
-import 'package:flutter_svg/svg.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
-import 'package:tradologie_app/core/widgets/custom_icon_button.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
+import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_dashboard_screen.dart';
+import 'package:tradologie_app/features/dashboard/presentation/screens/dashboard_screen.dart';
+import 'package:tradologie_app/features/my_account/presentation/screens/my_account_screen.dart';
+import 'package:tradologie_app/features/negotiation/presentation/screens/buyer_negotiation_screen.dart';
+import 'package:tradologie_app/features/negotiation/presentation/screens/negotiation_screen.dart';
+import 'package:tradologie_app/features/webview/presentation/screens/in_app_webview_screen.dart';
+import 'package:tradologie_app/features/webview/presentation/screens/viewmodel/webview_params.dart';
+import 'package:tradologie_app/features/webview/presentation/screens/webview_screen.dart';
 
-import '../../../../config/routes/app_router.dart';
 import '../../../../core/utils/app_colors.dart';
-import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/constants.dart';
 import '../cubit/app_cubit.dart';
 import '../view_model/tab_view_model.dart';
@@ -21,42 +32,88 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen>
+    with SingleTickerProviderStateMixin {
   late AppCubit _appCubit;
 
-  final _firstListTab = [
-    TabViewModel(
-      icon: VectorAssets.home,
-      name: 'home',
-      height: 26,
-      page: Container(), // const HomePage(),
-    ),
-    TabViewModel(
-      icon: VectorAssets.orders,
-      name: 'my_requests',
-      height: 20,
-      page: Container(), // const OrdersScreen(),
-    ),
-  ];
-  final _secondListTab = [
-    TabViewModel(
-      icon: VectorAssets.cars,
-      name: 'my_cars',
-      height: 26,
-      page: Container(), //const Cars(),
-    ),
-    TabViewModel(
-      icon: VectorAssets.trolley,
-      name: 'my_purchases',
-      height: 20,
-      page: Container(), // const MyPurchasesPage(),
-    ),
-  ];
+  String? token;
+
+  List<TabViewModel> get _firstListTab {
+    if (token == null) {
+      return []; // or loader
+    }
+    return [
+      TabViewModel(
+        icon: Icon(Icons.dashboard_outlined),
+        name: 'Dashboard',
+        height: 26,
+        page: Constants.isBuyer == true
+            ? const BuyerDashboardScreen()
+            : const DashboardScreen(),
+      ),
+      TabViewModel(
+        icon: Icon(Icons.article_outlined),
+        name: 'Negotiations',
+        height: 20,
+        page: Constants.isBuyer == true
+            ? const BuyerNegotiationScreen()
+            : const NegotiationScreen(),
+      ),
+      TabViewModel(
+        icon: Icon(Icons.person),
+        name: 'My Account',
+        height: 20,
+        page: Constants.isBuyer == true
+            ? Constants.isAndroid14OrBelow && Platform.isAndroid
+                ? InAppWebViewScreen(
+                    params: WebviewParams(
+                        url:
+                            "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
+                        canPop: true,
+                        isAppBar: true,
+                        isShowDrawer: true,
+                        isShowNotification: true))
+                : WebViewScreen(
+                    params: WebviewParams(
+                        url:
+                            "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
+                        canPop: true,
+                        isAppBar: true,
+                        isShowDrawer: true,
+                        isShowNotification: true)) // const OrdersScreen(),
+            : MyAccountScreen(),
+      ),
+    ];
+  }
+
+  Future<void> _loadToken() async {
+    final secureStorage = SecureStorageService();
+    final value = await secureStorage.read(AppStrings.apiVerificationCode);
+
+    if (!mounted) return;
+
+    setState(() {
+      token = value ?? "";
+    });
+  }
+
+  late final AnimationController _navAnimController;
 
   @override
   void initState() {
     _appCubit = BlocProvider.of<AppCubit>(context);
+    _loadToken();
+    _navAnimController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+    )..forward();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _navAnimController.dispose();
+    super.dispose();
   }
 
   @override
@@ -74,208 +131,127 @@ class _MainScreenState extends State<MainScreen> {
           },
           child: AdaptiveScaffold(
             appBar: Constants.appBar(context, height: 0, boxShadow: []),
-            bottomNavigationBar: Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.topCenter,
+            body: Stack(
               children: [
-                Container(
-                  height: 100,
-                  padding: EdgeInsets.only(left: 27, right: 27, bottom: 18),
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(27),
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 20,
-                        spreadRadius: 0,
-                        offset: const Offset(-5, 0),
-                        color: AppColors.black.withValues(alpha: 0.07),
-                      ),
-                    ],
-                  ),
-                  child: InkWell(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        ..._firstListTab.mapIndexed(
-                          (index, item) => GestureDetector(
-                            onTap: () {
-                              // if (_appCubit.bottomNavIndex != index) {
-                              //   if (item.page is OrdersScreen &&
-                              //       !Constants.isLogin) {
-                              //     Constants.showWarningDialog(
-                              //       context: context,
-                              //       msg: context
-                              //           .translate("this_step_requires_login"),
-                              //       onClickYes: () {
-                              //         Navigator.pop(context);
-                              //         Navigator.pushNamed(
-                              //             context, Routes.authRoute);
-                              //       },
-                              //     );
-                              //     return;
-                              //   }
-                              //   _appCubit.changeTab(index);
-                              // }
-                            },
-                            child: Container(
-                              color: Colors.transparent,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SvgPicture.asset(
-                                    item.icon,
-                                    height: 29,
-                                    colorFilter: ColorFilter.mode(
-                                      _appCubit.bottomNavIndex == index
-                                          ? AppColors.primary
-                                          : AppColors.grayText,
-                                      BlendMode.srcIn,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 3,
-                                  ),
-                                  Text(
-                                    (item.name),
-                                    style: TextStyleConstants.medium(
-                                      context,
-                                      fontSize: 11,
-                                      color: _appCubit.bottomNavIndex == index
-                                          ? AppColors.black
-                                          : AppColors.grayText,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 50,
-                        ),
-                        ..._secondListTab.mapIndexed(
-                          (index, item) => GestureDetector(
-                            onTap: () {
-                              if (_appCubit.bottomNavIndex !=
-                                  index + _firstListTab.length) {
-                                if (!Constants.isLogin) {
-                                  Constants.showWarningDialog(
-                                    context: context,
-                                    msg: "this_step_requires_login",
-                                    onClickYes: () {
-                                      Navigator.pop(context);
-                                      Navigator.pushNamed(
-                                          context, Routes.signinRoute);
-                                    },
-                                  );
-                                  return;
-                                }
-
-                                _appCubit
-                                    .changeTab(index + _firstListTab.length);
-                              }
-                            },
-                            child: Container(
-                              color: AppColors.white,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SvgPicture.asset(
-                                    item.icon,
-                                    height: 29,
-                                    colorFilter: ColorFilter.mode(
-                                      _appCubit.bottomNavIndex ==
-                                              index + _firstListTab.length
-                                          ? AppColors.primary
-                                          : AppColors.grayText,
-                                      BlendMode.srcIn,
-                                    ),
-                                  ),
-                                  Text(
-                                    (item.name),
-                                    style: TextStyleConstants.medium(
-                                      context,
-                                      fontSize: 11,
-                                      color: _appCubit.bottomNavIndex ==
-                                              index + _firstListTab.length
-                                          ? AppColors.black
-                                          : AppColors.grayText,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: -18,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      CustomIconButton(
-                        onPressed: () {
-                          // if (!Constants.isLogin) {
-                          //   Constants.showWarningDialog(
-                          //     context: context,
-                          //     msg:
-                          //          ("this_step_requires_login"),
-                          //     onClickYes: () {
-                          //       Navigator.pop(context);
-                          //       Navigator.pushNamed(context, Routes.authRoute);
-                          //     },
-                          //   );
-                          // } else {
-                          //   Navigator.pushNamed(
-                          //       context, Routes.partsPricingServiceRoute);
-                          // }
-                        },
-                        height: 60,
-                        width: 60,
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 20,
-                            spreadRadius: 0,
-                            offset: const Offset(0, -30),
-                            color: AppColors.black.withValues(alpha: 0.03),
-                          ),
-                        ],
-                        border: Border.all(
-                          width: 4,
-                          color: AppColors.white,
-                        ),
-                        icon: VectorAssets.plus,
-                        shape: BoxShape.circle,
-                        backgroundColor: AppColors.primary,
-                      ),
-                      Text(
-                        ("new_request"),
-                        style: TextStyleConstants.medium(
-                          context,
-                          fontSize: 11,
-                          color: AppColors.grayText,
-                        ),
-                      ),
-                    ],
-                  ),
+                PageView(
+                  controller: _appCubit.controller,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: [
+                    ..._firstListTab.map((e) => e.page),
+                  ],
                 ),
               ],
             ),
-            body: PageView(
-              controller: _appCubit.controller,
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                ..._firstListTab.map((e) => e.page),
-                ..._secondListTab.map((e) => e.page),
-              ],
+            bottomNavigationBar: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                child: SizedBox(
+                  height: 96,
+                  child: Center(
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0, 1),
+                        end: Offset.zero,
+                      ).animate(
+                        CurvedAnimation(
+                          parent: _navAnimController,
+                          curve: Curves.easeOut,
+                        ),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(40),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(
+                            sigmaX: 12,
+                            sigmaY: 12,
+                          ),
+                          child: Container(
+                            height: 76,
+                            padding: const EdgeInsets.symmetric(horizontal: 28),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.85),
+                              borderRadius: BorderRadius.circular(40),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.08),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
+                            ),
+                            child: buildAnimatedTabs(), // icons + bubble
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
         );
       },
     );
+  }
+
+  Widget buildAnimatedTabs() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        ..._firstListTab.asMap().entries.map((entry) {
+          final index = entry.key;
+          final item = entry.value;
+          final isActive = _appCubit.bottomNavIndex == index;
+
+          return Expanded(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                if (isActive) return;
+                HapticFeedback.lightImpact();
+                _appCubit.changeTab(index);
+              },
+              child: AnimatedScale(
+                scale: isActive ? 1.1 : 1.0,
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOut,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Hero(
+                      tag: 'tab_${item.name}',
+                      child: Icon(
+                        (item.icon as Icon).icon,
+                        size: 26,
+                        color:
+                            isActive ? AppColors.primary : AppColors.grayText,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 220),
+                      curve: Curves.easeOut,
+                      style: TextStyleConstants.medium(
+                        context,
+                        fontSize: isActive ? 13 : 12,
+                        color:
+                            isActive ? AppColors.primary : AppColors.grayText,
+                      ),
+                      child: Text(item.name),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  double _bubbleAlignmentX(int index, int count) {
+    if (count <= 1) return 0;
+    return -1 + (2 / (count - 1)) * index;
   }
 }

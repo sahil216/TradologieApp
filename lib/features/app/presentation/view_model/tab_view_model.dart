@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class TabViewModel {
   final double height;
-  final String icon;
+  final Widget icon;
   final String name;
   final Widget page;
 

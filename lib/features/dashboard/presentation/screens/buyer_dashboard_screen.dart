@@ -18,7 +18,7 @@ import 'package:tradologie_app/core/widgets/custom_button.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text_field.dart';
-import 'package:tradologie_app/features/app/presentation/screens/buyer_drawer.dart';
+import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/all_list_detail.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/attribute_list.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/commodity_list.dart';
@@ -193,7 +193,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
       child: GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: AdaptiveScaffold(
-          drawer: const BuyerTradologieDrawer(),
+          drawer: const TradologieDrawer(),
           appBar: Constants.appBar(context,
               title: 'Post your Requirements',
               centerTitle: true,
@@ -408,58 +408,58 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                               ),
                               const SizedBox(height: 20),
 
-                              CommonButton(
-                                onPressed: () async {
-                                  SecureStorageService secureStorage =
-                                      SecureStorageService();
+                              // CommonButton(
+                              //   onPressed: () async {
+                              //     SecureStorageService secureStorage =
+                              //         SecureStorageService();
 
-                                  if (selectedCommodity != null &&
-                                      selectedSubCommodity != null &&
-                                      selectedAttribute1 != null &&
-                                      selectedAttribute2 != null &&
-                                      selectedUnit != null &&
-                                      qtyController.text.isNotEmpty &&
-                                      messageController.text.isNotEmpty) {
-                                    final params = AddCustomerRequirementParams(
-                                        token: await secureStorage.read(
-                                                AppStrings
-                                                    .apiVerificationCode) ??
-                                            "",
-                                        commodityID:
-                                            selectedCommodity?.groupId ?? "",
-                                        subCommodityID:
-                                            selectedSubCommodity?.categoryId ??
-                                                "",
-                                        attribute1: selectedAttribute1
-                                                ?.attributeValueId ??
-                                            "",
-                                        attribute2: selectedAttribute2
-                                                ?.attributeValueId ??
-                                            "",
-                                        quantity: qtyController.text,
-                                        quantityUnit:
-                                            selectedUnit?.unitName ?? "",
-                                        otherSpecifications:
-                                            messageController.text,
-                                        userId: await secureStorage
-                                                .read(AppStrings.customerId) ??
-                                            "");
+                              //     if (selectedCommodity != null &&
+                              //         selectedSubCommodity != null &&
+                              //         selectedAttribute1 != null &&
+                              //         selectedAttribute2 != null &&
+                              //         selectedUnit != null &&
+                              //         qtyController.text.isNotEmpty &&
+                              //         messageController.text.isNotEmpty) {
+                              //       final params = AddCustomerRequirementParams(
+                              //           token: await secureStorage.read(
+                              //                   AppStrings
+                              //                       .apiVerificationCode) ??
+                              //               "",
+                              //           commodityID:
+                              //               selectedCommodity?.groupId ?? "",
+                              //           subCommodityID:
+                              //               selectedSubCommodity?.categoryId ??
+                              //                   "",
+                              //           attribute1: selectedAttribute1
+                              //                   ?.attributeValueId ??
+                              //               "",
+                              //           attribute2: selectedAttribute2
+                              //                   ?.attributeValueId ??
+                              //               "",
+                              //           quantity: qtyController.text,
+                              //           quantityUnit:
+                              //               selectedUnit?.unitName ?? "",
+                              //           otherSpecifications:
+                              //               messageController.text,
+                              //           userId: await secureStorage
+                              //                   .read(AppStrings.customerId) ??
+                              //               "");
 
-                                    dashboardCubit
-                                        .addCustomerRequirement(params);
-                                  } else {
-                                    Constants.showErrorToast(
-                                        context: context,
-                                        msg: CommonStrings.enterAllDetails);
-                                  }
-                                },
-                                text: "Submit",
-                                textStyle: TextStyleConstants.medium(
-                                  context,
-                                  fontSize: 16,
-                                  color: AppColors.white,
-                                ),
-                              ),
+                              //       dashboardCubit
+                              //           .addCustomerRequirement(params);
+                              //     } else {
+                              //       Constants.showErrorToast(
+                              //           context: context,
+                              //           msg: CommonStrings.enterAllDetails);
+                              //     }
+                              //   },
+                              //   text: "Submit",
+                              //   textStyle: TextStyleConstants.medium(
+                              //     context,
+                              //     fontSize: 16,
+                              //     color: AppColors.white,
+                              //   ),
+                              // ),
 
                               /// Submit Button
                             ],
@@ -497,6 +497,49 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                 ],
               );
             },
+          ),
+          bottomNavigationBar: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+            ),
+            child: CommonButton(
+              onPressed: () async {
+                SecureStorageService secureStorage = SecureStorageService();
+
+                if (selectedCommodity != null &&
+                    selectedSubCommodity != null &&
+                    selectedAttribute1 != null &&
+                    selectedAttribute2 != null &&
+                    selectedUnit != null &&
+                    qtyController.text.isNotEmpty &&
+                    messageController.text.isNotEmpty) {
+                  final params = AddCustomerRequirementParams(
+                      token: await secureStorage
+                              .read(AppStrings.apiVerificationCode) ??
+                          "",
+                      commodityID: selectedCommodity?.groupId ?? "",
+                      subCommodityID: selectedSubCommodity?.categoryId ?? "",
+                      attribute1: selectedAttribute1?.attributeValueId ?? "",
+                      attribute2: selectedAttribute2?.attributeValueId ?? "",
+                      quantity: qtyController.text,
+                      quantityUnit: selectedUnit?.unitName ?? "",
+                      otherSpecifications: messageController.text,
+                      userId: await secureStorage.read(AppStrings.customerId) ??
+                          "");
+
+                  dashboardCubit.addCustomerRequirement(params);
+                } else {
+                  Constants.showErrorToast(
+                      context: context, msg: CommonStrings.enterAllDetails);
+                }
+              },
+              text: "Submit",
+              textStyle: TextStyleConstants.medium(
+                context,
+                fontSize: 16,
+                color: AppColors.white,
+              ),
+            ),
           ),
         ),
       ),

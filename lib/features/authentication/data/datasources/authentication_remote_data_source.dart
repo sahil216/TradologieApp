@@ -2,7 +2,6 @@ import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/delete_account_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/verify_otp_usecase.dart';
-import 'package:tradologie_app/features/authentication/presentation/cubit/authentication_cubit.dart';
 
 import '../../../../core/api/api_consumer.dart';
 import '../../../../core/api/end_points.dart';

@@ -9,6 +9,7 @@ import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
+import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
 import 'package:tradologie_app/features/webview/presentation/screens/viewmodel/webview_params.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
@@ -103,10 +104,24 @@ class _WebViewScreenState extends State<WebViewScreen> {
       child: PopScope(
         canPop: widget.params.canPop ?? false,
         child: AdaptiveScaffold(
+          drawer:
+              widget.params.isShowDrawer == true ? TradologieDrawer() : null,
           appBar: widget.params.isAppBar == true
               ? Constants.appBar(context,
                   elevation: 0,
+                  centerTitle: true,
                   boxShadow: [],
+                  actions: [
+                    widget.params.isShowNotification == true
+                        ? IconButton(
+                            onPressed: () {
+                              Navigator.pushNamed(
+                                  context, Routes.notificationScreen);
+                            },
+                            icon: Icon(Icons.notifications))
+                        : SizedBox.shrink(),
+                    SizedBox(width: 10),
+                  ],
                   titleWidget: Image.asset(ImgAssets.companyLogo, height: 40))
               : null,
           body: SafeArea(

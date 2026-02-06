@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter_svg/svg.dart';
-
-import '../utils/assets_manager.dart';
-
 class CustomIconButton extends StatelessWidget {
-  final String? icon;
+  final Widget? icon;
 
   final bool flipX;
   final bool flipY;
@@ -82,19 +78,7 @@ class CustomIconButton extends StatelessWidget {
           minWidth: width ?? 0,
         ),
         splashRadius: splashRadius,
-        icon: widget ??
-            Transform.flip(
-              flipX: flipX,
-              flipY: flipY,
-              child: SvgPicture.asset(
-                icon ?? VectorAssets.iosArrowDown,
-                height: iconHeight,
-                width: iconWidth,
-                colorFilter: iconColor != null
-                    ? ColorFilter.mode(iconColor!, BlendMode.srcIn)
-                    : null,
-              ),
-            ),
+        icon: widget ?? Transform.flip(flipX: flipX, flipY: flipY, child: icon),
       ),
     );
   }

@@ -30,7 +30,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         DeviceOrientation.portraitDown,
         DeviceOrientation.portraitUp,
       ]);
+      nameUpdate();
     });
+  }
+
+  Future<void> nameUpdate() async {
+    SecureStorageService secureStorage = SecureStorageService();
+    Constants.name = Constants.isBuyer == true
+        ? await secureStorage.read(AppStrings.customerName) ?? ""
+        : await secureStorage.read(AppStrings.vendorName) ?? "";
   }
 
   @override

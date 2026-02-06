@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/api/end_points.dart';
@@ -10,6 +12,7 @@ import 'package:tradologie_app/core/widgets/common_no_record_widget.dart';
 import 'package:tradologie_app/core/widgets/common_single_child_scroll_view.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
+import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
 import 'package:tradologie_app/features/negotiation/domain/entities/negotiation_result.dart';
 import 'package:tradologie_app/features/negotiation/presentation/cubit/negotiation_cubit.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
@@ -23,7 +26,9 @@ import '../../domain/entities/negotiation.dart';
 import '../../domain/usecases/get_negotiation_usecase.dart';
 
 class NegotiationScreen extends StatefulWidget {
-  const NegotiationScreen({super.key});
+  const NegotiationScreen({
+    super.key,
+  });
 
   @override
   State<NegotiationScreen> createState() => _NegotiationScreenState();
@@ -47,9 +52,9 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
     'Negotiation Code',
     // 'Negotiation Name',
     'Order Status',
-    // 'Start Date',
+    'Start Date',
     // 'End Date',
-    'Preffered Date',
+    // 'Preffered Date',
     // 'Enquiry Status',
     // 'Total Quantity',
     // 'Minimum Quantity',
@@ -62,9 +67,9 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
     'Negotiation Code': 200,
     // 'Negotiation Name': 200,
     'Order Status': 150,
-    // 'Start Date': 250,
+    'Start Date': 150,
     // 'End Date': 250,
-    'Preffered Date': 150,
+    // 'Preffered Date': 150,
     // 'Enquiry Status': 150,
     // 'Total Quantity': 200,
     // 'Minimum Quantity': 200,
@@ -146,6 +151,7 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
         ),
       ],
       child: AdaptiveScaffold(
+        drawer: const TradologieDrawer(),
         appBar: Constants.appBar(context,
             title: 'Negotiation',
             centerTitle: true,
@@ -161,7 +167,14 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
             //     SizedBox(width: 30),
             //   ],
             // ),
-            actions: []),
+            actions: [
+              IconButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, Routes.notificationScreen);
+                  },
+                  icon: Icon(Icons.notifications)),
+              SizedBox(width: 10),
+            ]),
         body: BlocBuilder<NegotiationCubit, NegotiationState>(
           buildWhen: (previous, current) {
             bool result = previous != current;
@@ -272,13 +285,25 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
                                               const SizedBox(width: 6),
                                               GestureDetector(
                                                 onTap: () {
-                                                  Navigator.pushNamed(context,
-                                                      Routes.webViewRoute,
-                                                      arguments: WebviewParams(
-                                                          url:
-                                                              "${EndPoints.supplierWebsiteurl}/${row.navigateViewUrl}",
-                                                          canPop: true,
-                                                          isAppBar: true));
+                                                  Constants.isAndroid14OrBelow &&
+                                                          Platform.isAndroid
+                                                      ? Navigator.pushNamed(
+                                                          context,
+                                                          Routes
+                                                              .inAppWebViewRoute,
+                                                          arguments: WebviewParams(
+                                                              url:
+                                                                  "${EndPoints.supplierWebsiteurl}/${row.navigateViewUrl}",
+                                                              canPop: true,
+                                                              isAppBar: true))
+                                                      : Navigator.pushNamed(
+                                                          context,
+                                                          Routes.webViewRoute,
+                                                          arguments: WebviewParams(
+                                                              url:
+                                                                  "${EndPoints.supplierWebsiteurl}/${row.navigateViewUrl}",
+                                                              canPop: true,
+                                                              isAppBar: true));
                                                 },
                                                 child: Text(
                                                   _getCellText(row, header),
@@ -311,13 +336,22 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
                                         onViewTap: () {
                                           if (header.toLowerCase() ==
                                               'negotiation code') {
-                                            Navigator.pushNamed(
-                                                context, Routes.webViewRoute,
-                                                arguments: WebviewParams(
-                                                    url:
-                                                        "${EndPoints.supplierWebsiteurl}/${row.navigateViewUrl}",
-                                                    canPop: true,
-                                                    isAppBar: true));
+                                            Constants.isAndroid14OrBelow &&
+                                                    Platform.isAndroid
+                                                ? Navigator.pushNamed(context,
+                                                    Routes.inAppWebViewRoute,
+                                                    arguments: WebviewParams(
+                                                        url:
+                                                            "${EndPoints.supplierWebsiteurl}/${row.navigateViewUrl}",
+                                                        canPop: true,
+                                                        isAppBar: true))
+                                                : Navigator.pushNamed(
+                                                    context, Routes.webViewRoute,
+                                                    arguments: WebviewParams(
+                                                        url:
+                                                            "${EndPoints.supplierWebsiteurl}/${row.navigateViewUrl}",
+                                                        canPop: true,
+                                                        isAppBar: true));
                                           }
                                         },
                                         onTap: () {
@@ -326,13 +360,22 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
                                               row.linkType == "directlink" &&
                                               row.orderStatus?.toLowerCase() ==
                                                   "update rate") {
-                                            Navigator.pushNamed(
-                                                context, Routes.webViewRoute,
-                                                arguments: WebviewParams(
-                                                    url:
-                                                        "${EndPoints.supplierWebsiteurl}/${row.navigateUrl}",
-                                                    canPop: true,
-                                                    isAppBar: true));
+                                            Constants.isAndroid14OrBelow &&
+                                                    Platform.isAndroid
+                                                ? Navigator.pushNamed(context,
+                                                    Routes.inAppWebViewRoute,
+                                                    arguments: WebviewParams(
+                                                        url:
+                                                            "${EndPoints.supplierWebsiteurl}/${row.navigateUrl}",
+                                                        canPop: true,
+                                                        isAppBar: true))
+                                                : Navigator.pushNamed(
+                                                    context, Routes.webViewRoute,
+                                                    arguments: WebviewParams(
+                                                        url:
+                                                            "${EndPoints.supplierWebsiteurl}/${row.navigateUrl}",
+                                                        canPop: true,
+                                                        isAppBar: true));
                                           }
                                         },
                                       );
@@ -352,13 +395,22 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
                                         children: [
                                           _detail("Negotiation Code ",
                                               row.auctionCode ?? '-', true, () {
-                                            Navigator.pushNamed(
-                                                context, Routes.webViewRoute,
-                                                arguments: WebviewParams(
-                                                    url:
-                                                        "${EndPoints.supplierWebsiteurl}/${row.navigateViewUrl}",
-                                                    canPop: true,
-                                                    isAppBar: true));
+                                            Constants.isAndroid14OrBelow &&
+                                                    Platform.isAndroid
+                                                ? Navigator.pushNamed(context,
+                                                    Routes.inAppWebViewRoute,
+                                                    arguments: WebviewParams(
+                                                        url:
+                                                            "${EndPoints.supplierWebsiteurl}/${row.navigateViewUrl}",
+                                                        canPop: true,
+                                                        isAppBar: true))
+                                                : Navigator.pushNamed(
+                                                    context, Routes.webViewRoute,
+                                                    arguments: WebviewParams(
+                                                        url:
+                                                            "${EndPoints.supplierWebsiteurl}/${row.navigateViewUrl}",
+                                                        canPop: true,
+                                                        isAppBar: true));
                                           }),
                                           _detail(
                                               "Negotiation Name ",
@@ -376,13 +428,25 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
                                                   row.orderStatus
                                                           ?.toLowerCase() ==
                                                       "update rate") {
-                                                Navigator.pushNamed(
-                                                    context, Routes.webViewRoute,
-                                                    arguments: WebviewParams(
-                                                        url:
-                                                            "${EndPoints.supplierWebsiteurl}/${row.navigateUrl}",
-                                                        canPop: true,
-                                                        isAppBar: true));
+                                                Constants.isAndroid14OrBelow &&
+                                                        Platform.isAndroid
+                                                    ? Navigator.pushNamed(
+                                                        context,
+                                                        Routes
+                                                            .inAppWebViewRoute,
+                                                        arguments: WebviewParams(
+                                                            url:
+                                                                "${EndPoints.supplierWebsiteurl}/${row.navigateUrl}",
+                                                            canPop: true,
+                                                            isAppBar: true))
+                                                    : Navigator.pushNamed(
+                                                        context,
+                                                        Routes.webViewRoute,
+                                                        arguments: WebviewParams(
+                                                            url:
+                                                                "${EndPoints.supplierWebsiteurl}/${row.navigateUrl}",
+                                                            canPop: true,
+                                                            isAppBar: true));
                                               }
                                             },
                                           ),
@@ -400,6 +464,15 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
                                               Constants.dateFormat(
                                                   DateTime.tryParse(
                                                           row.endDate ?? "") ??
+                                                      DateTime.now()),
+                                              false,
+                                              null),
+                                          _detail(
+                                              "Preffered Date",
+                                              Constants.dateFormat(
+                                                  DateTime.tryParse(
+                                                          row.preferredDate ??
+                                                              "") ??
                                                       DateTime.now()),
                                               false,
                                               null),

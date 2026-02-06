@@ -1,7 +1,9 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -30,6 +32,7 @@ class Constants {
     String title = "",
     double height = 70,
     double leadingWidth = 60,
+    PreferredSizeWidget? bottom,
     double titleSpacing = 0,
     double elevation = 0,
     bool centerTitle = false,
@@ -74,6 +77,7 @@ class Constants {
             leadingWidth: leadingWidth,
             titleSpacing: titleSpacing,
             toolbarHeight: height,
+            bottom: bottom,
             elevation: elevation,
             centerTitle: centerTitle,
             backgroundColor: backgroundColor ?? AppColors.white,
@@ -125,6 +129,18 @@ class Constants {
         ),
       ),
     );
+  }
+
+  static bool isAndroid14OrBelow = false;
+
+  Future<void> checkAndroidVersion() async {
+    if (!Platform.isAndroid) {
+      isAndroid14OrBelow = true;
+      return;
+    }
+
+    final androidInfo = await DeviceInfoPlugin().androidInfo;
+    isAndroid14OrBelow = androidInfo.version.sdkInt <= 34; // Android 14
   }
 
   static Widget defaultBackButton(BuildContext context,
@@ -261,14 +277,9 @@ class Constants {
                             color: AppColors.border,
                           ),
                         ),
-                        child: SvgPicture.asset(
-                          VectorAssets.exit,
-                          height: 24,
-                          width: 24,
-                          colorFilter: ColorFilter.mode(
-                            AppColors.black.withValues(alpha: 0.8),
-                            BlendMode.srcIn,
-                          ),
+                        child: Icon(
+                          Icons.cancel,
+                          size: 24,
                         ),
                       ),
                     ),
@@ -394,12 +405,9 @@ class Constants {
                         color: AppColors.white,
                       ),
                     ),
-                    child: SvgPicture.asset(
-                      VectorAssets.exit,
-                      colorFilter:
-                          ColorFilter.mode(AppColors.white, BlendMode.srcIn),
-                      height: 25,
-                      width: 25,
+                    child: Icon(
+                      Icons.close,
+                      size: 24,
                     ),
                   ),
                 ),
@@ -480,12 +488,9 @@ class Constants {
                         color: AppColors.white,
                       ),
                     ),
-                    child: SvgPicture.asset(
-                      VectorAssets.exit,
-                      colorFilter:
-                          ColorFilter.mode(AppColors.white, BlendMode.srcIn),
-                      height: 25,
-                      width: 25,
+                    child: Icon(
+                      Icons.close,
+                      size: 24,
                     ),
                   ),
                 ),
@@ -567,12 +572,9 @@ class Constants {
                         color: AppColors.white,
                       ),
                     ),
-                    child: SvgPicture.asset(
-                      VectorAssets.exit,
-                      colorFilter:
-                          ColorFilter.mode(AppColors.white, BlendMode.srcIn),
-                      height: 25,
-                      width: 25,
+                    child: Icon(
+                      Icons.close,
+                      size: 24,
                     ),
                   ),
                 ),
@@ -653,12 +655,9 @@ class Constants {
                         color: AppColors.white,
                       ),
                     ),
-                    child: SvgPicture.asset(
-                      VectorAssets.exit,
-                      colorFilter:
-                          ColorFilter.mode(AppColors.white, BlendMode.srcIn),
-                      height: 25,
-                      width: 25,
+                    child: Icon(
+                      Icons.close,
+                      size: 24,
                     ),
                   ),
                 ),

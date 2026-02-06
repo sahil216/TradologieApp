@@ -3,9 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:tradologie_app/core/utils/app_strings.dart';
 
 import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
+import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
@@ -48,12 +50,20 @@ class _SplashScreenState extends State<SplashScreen> {
     return info.version;
   }
 
+  Future<void> nameUpdate() async {
+    SecureStorageService secureStorage = SecureStorageService();
+    Constants.name = Constants.isBuyer == true
+        ? await secureStorage.read(AppStrings.customerName) ?? ""
+        : await secureStorage.read(AppStrings.vendorName) ?? "";
+  }
+
   Future<void> _goNext(BuildContext context) async {
+    nameUpdate();
     if (Constants.isLogin) {
       if (Constants.isBuyer == true) {
-        Navigator.pushReplacementNamed(context, Routes.buyerDashboardRoute);
+        Navigator.pushReplacementNamed(context, Routes.mainRoute);
       } else {
-        Navigator.pushReplacementNamed(context, Routes.dashboardRoute);
+        Navigator.pushReplacementNamed(context, Routes.mainRoute);
       }
     } else {
       Navigator.pushReplacementNamed(context, Routes.onboardingRoute);

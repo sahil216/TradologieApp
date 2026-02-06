@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,6 +12,7 @@ import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/common_single_child_scroll_view.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
+import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
 import 'package:tradologie_app/features/negotiation/domain/entities/buyer_negotitation_detail.dart';
 import 'package:tradologie_app/features/negotiation/presentation/cubit/negotiation_cubit.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
@@ -144,6 +147,7 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen> {
         ),
       ],
       child: AdaptiveScaffold(
+        drawer: const TradologieDrawer(),
         appBar: Constants.appBar(context,
             title: 'Negotiation',
             centerTitle: true,
@@ -159,7 +163,14 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen> {
             //     SizedBox(width: 30),
             //   ],
             // ),
-            actions: []),
+            actions: [
+              IconButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, Routes.notificationScreen);
+                  },
+                  icon: Icon(Icons.notifications)),
+              SizedBox(width: 10),
+            ]),
         body: BlocBuilder<NegotiationCubit, NegotiationState>(
             buildWhen: (previous, current) {
           bool result = previous != current;
@@ -288,13 +299,22 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen> {
                                               row.auctionStatus
                                                       ?.toLowerCase() ==
                                                   "view rate") {
-                                            Navigator.pushNamed(
-                                                context, Routes.webViewRoute,
-                                                arguments: WebviewParams(
-                                                    url:
-                                                        "${EndPoints.buyerUrlWeb}${row.auctionUrl}",
-                                                    canPop: true,
-                                                    isAppBar: true));
+                                            Constants.isAndroid14OrBelow &&
+                                                    Platform.isAndroid
+                                                ? Navigator.pushNamed(context,
+                                                    Routes.inAppWebViewRoute,
+                                                    arguments: WebviewParams(
+                                                        url:
+                                                            "${EndPoints.buyerUrlWeb}${row.auctionUrl}",
+                                                        canPop: true,
+                                                        isAppBar: true))
+                                                : Navigator.pushNamed(
+                                                    context, Routes.webViewRoute,
+                                                    arguments: WebviewParams(
+                                                        url:
+                                                            "${EndPoints.buyerUrlWeb}${row.auctionUrl}",
+                                                        canPop: true,
+                                                        isAppBar: true));
                                           } else if (header.toLowerCase() ==
                                               'negotiation code') {
                                             // Navigator.pushNamed(

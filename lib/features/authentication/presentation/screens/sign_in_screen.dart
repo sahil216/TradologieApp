@@ -141,7 +141,7 @@ class _SignInScreenState extends State<SignInScreen> {
             if (state is SigninSuccess) {
               Navigator.pushNamedAndRemoveUntil(
                 context,
-                Routes.dashboardRoute,
+                Routes.mainRoute,
                 (route) => false,
               );
 
@@ -175,7 +175,7 @@ class _SignInScreenState extends State<SignInScreen> {
             if (state is BuyerSigninSuccess) {
               Navigator.pushNamedAndRemoveUntil(
                 context,
-                Routes.buyerDashboardRoute,
+                Routes.mainRoute,
                 (route) => false,
               );
             }

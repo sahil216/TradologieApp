@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../utils/app_colors.dart';
-import '../utils/assets_manager.dart';
 
 import 'custom_icon_button.dart';
 import 'custom_text/text_style_constants.dart';
@@ -57,7 +56,10 @@ class CustomErrorWidget extends StatelessWidget {
             shape: BoxShape.circle,
             iconHeight: 50,
             iconColor: AppColors.red,
-            icon: VectorAssets.rotateRight,
+            widget: Icon(
+              Icons.rotate_right,
+              size: 24,
+            ),
           ),
         ],
       ),

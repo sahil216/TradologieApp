@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter_svg/svg.dart';
 import 'package:tradologie_app/core/utils/extensions.dart';
 
 import '../utils/app_colors.dart';
-import '../utils/assets_manager.dart';
 import 'custom_text/text_style_constants.dart';
 
 class CustomSelectWidget extends StatelessWidget {
@@ -86,13 +84,9 @@ class CustomSelectWidget extends StatelessWidget {
                     },
                   ),
                 ),
-                SvgPicture.asset(
-                  icon ?? VectorAssets.iosArrowDown,
-                  colorFilter: ColorFilter.mode(
-                    iconColor ?? AppColors.grayText,
-                    BlendMode.srcIn,
-                  ),
-                  height: heightIcon,
+                Icon(
+                  Icons.arrow_downward,
+                  size: 24,
                 ),
               ],
             ),

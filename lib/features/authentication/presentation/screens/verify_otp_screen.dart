@@ -168,10 +168,10 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
             if (state is VerifyOtpSuccess) {
               if (Constants.isBuyer == true) {
                 Navigator.pushNamedAndRemoveUntil(
-                    context, Routes.buyerDashboardRoute, (route) => false);
+                    context, Routes.mainRoute, (route) => false);
               } else {
                 Navigator.pushNamedAndRemoveUntil(
-                    context, Routes.dashboardRoute, (route) => false);
+                    context, Routes.mainRoute, (route) => false);
               }
 
               // Navigator.pushReplacementNamed(
