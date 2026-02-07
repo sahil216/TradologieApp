@@ -12,6 +12,7 @@ import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
+import 'package:tradologie_app/features/app/presentation/cubit/app_cubit.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/dashboard_result.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_dashboard_usecase.dart';
 import 'package:tradologie_app/features/dashboard/presentation/cubit/dashboard_cubit.dart';
@@ -32,6 +33,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   late PageController _pageController;
   int currentPage = 0;
 
+  late AppCubit _appCubit;
   double _currentPageValue = 0.0;
 
   DashboardCubit get dashboardCubit => BlocProvider.of<DashboardCubit>(context);
@@ -55,6 +57,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     getDashboardData();
+    _appCubit = BlocProvider.of<AppCubit>(context);
     _pageController = PageController();
     _pageController.addListener(() {
       setState(() {
@@ -213,7 +216,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 child: Padding(
                                   padding:
                                       const EdgeInsets.symmetric(horizontal: 8),
-                                  child: DashboardCard(item: item),
+                                  child: DashboardCard(
+                                    item: item,
+                                    onParticipateNowPressed: () {
+                                      _appCubit.changeTab(1);
+                                    },
+                                  ),
                                 ),
                               ),
                             )

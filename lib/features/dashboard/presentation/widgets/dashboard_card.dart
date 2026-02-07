@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:tradologie_app/config/routes/app_router.dart';
 import 'package:tradologie_app/core/api/end_points.dart';
 import 'package:tradologie_app/core/utils/app_colors.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
@@ -12,8 +11,10 @@ import '../../domain/entities/dashboard_result.dart';
 
 class DashboardCard extends StatelessWidget {
   final DashboardResult item;
+  final VoidCallback onParticipateNowPressed;
 
-  const DashboardCard({super.key, required this.item});
+  const DashboardCard(
+      {super.key, required this.item, required this.onParticipateNowPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -82,9 +83,7 @@ class DashboardCard extends StatelessWidget {
               // const Spacer(),
               SizedBox(height: 16),
               CommonButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, Routes.negotiationScreen);
-                },
+                onPressed: onParticipateNowPressed,
                 text: 'Participate Now',
                 width: double.infinity,
               ),
