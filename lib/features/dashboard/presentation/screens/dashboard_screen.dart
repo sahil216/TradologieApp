@@ -68,13 +68,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _autoScroll() {
     if (!mounted) return;
+    if (!_pageController.hasClients) return;
 
-    if (!_pageController.hasClients) {
-      Future.delayed(const Duration(milliseconds: 300), _autoScroll);
+    final pageCount = _totalPages(context);
+
+    if (pageCount <= 1) {
+      Future.delayed(const Duration(seconds: 4), _autoScroll);
       return;
     }
 
-    final pageCount = _totalPages(context);
     currentPage = (currentPage + 1) % pageCount;
 
     _pageController.animateToPage(
@@ -101,7 +103,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           listenWhen: (previous, current) => previous != current,
           listener: (context, state) {
             if (state is GetDashboardSuccess) {
-              dashboardData = state.data;
+              setState(() {
+                dashboardData = state.data;
+              });
             }
             if (state is GetDashboardError) {
               Constants.showFailureToast(state.failure);
@@ -154,13 +158,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
             return SafeArea(
               child: Column(
                 children: [
-                  Expanded(child: dashboardBody(totalPages)),
+                  dashboardBody(totalPages),
                 ],
               ),
             );
           },
         ),
-        bottomNavigationBar: _pageDots(totalPages),
+        bottomNavigationBar: totalPages > 1
+            ? _pageDots(totalPages)
+            : const SizedBox.shrink(), // _pageDots(totalPages),
       ),
     );
   }

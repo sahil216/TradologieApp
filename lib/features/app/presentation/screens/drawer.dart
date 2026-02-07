@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:tradologie_app/core/api/end_points.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
@@ -16,7 +15,6 @@ import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dar
 import 'package:tradologie_app/features/app/domain/usecases/check_force_update_usecase.dart';
 import 'package:tradologie_app/features/app/presentation/cubit/app_cubit.dart';
 import 'package:tradologie_app/features/app/presentation/widgets/input_dialog.dart';
-import 'package:tradologie_app/features/webview/presentation/screens/viewmodel/webview_params.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../config/routes/app_router.dart';
@@ -37,9 +35,12 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
 
   String name = "";
   bool showUpdate = false;
+
+  late AppCubit _appCubit;
   @override
   void initState() {
     super.initState();
+    _appCubit = BlocProvider.of<AppCubit>(context);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkVersion();
       getName();
@@ -48,12 +49,12 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
 
   Future<void> _checkVersion() async {
     final version = await getAppVersion();
-    context.read<AppCubit>().checkForceUpdate(
-          ForceUpdateParams(
-              token: "2018APR031848",
-              appVersion: version,
-              isAndroid: Platform.isAndroid ? true : false),
-        );
+    _appCubit.checkForceUpdate(
+      ForceUpdateParams(
+          token: "2018APR031848",
+          appVersion: version,
+          isAndroid: Platform.isAndroid ? true : false),
+    );
   }
 
   Future<String> getAppVersion() async {
@@ -72,8 +73,8 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
     return Drawer(
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
-          topRight: Radius.circular(28),
-          bottomRight: Radius.circular(28),
+          topRight: Radius.circular(0),
+          bottomRight: Radius.circular(0),
         ),
       ),
       child: AdaptiveScaffold(
@@ -176,120 +177,129 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
                           //                 isAppBar: true))
                           //     :
 
-                          setState(() {
-                            context.read<AppCubit>().changeTab(3);
-                          });
+                          _appCubit.changeTab(2);
                         }),
 
                     // Menu Items
 
-                    // _DrawerItem(
-                    //     onTap: Constants.isBuyer == true
-                    //         ? () async {
-                    //             Navigator.pop(context);
-                    //             SecureStorageService secureStorage =
-                    //                 SecureStorageService();
+                    _DrawerItem(
+                        onTap: () {
+                          // Constants.isBuyer == true
+                          //     ? () async {
+                          //         Navigator.pop(context);
+                          //         SecureStorageService secureStorage =
+                          //             SecureStorageService();
 
-                    //             final token = await secureStorage
-                    //                     .read(AppStrings.apiVerificationCode) ??
-                    //                 "";
+                          //         final token = await secureStorage
+                          //                 .read(AppStrings.apiVerificationCode) ??
+                          //             "";
 
-                    //             Constants.isAndroid14OrBelow &&
-                    //                     Platform.isAndroid
-                    //                 ? Navigator.pushNamed(
-                    //                     context, Routes.inAppWebViewRoute,
-                    //                     arguments: WebviewParams(
-                    //                         url:
-                    //                             "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
-                    //                         canPop: true,
-                    //                         isAppBar: true))
-                    //                 : Navigator.pushNamed(
-                    //                     context, Routes.webViewRoute,
-                    //                     arguments: WebviewParams(
-                    //                         url:
-                    //                             "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
-                    //                         canPop: true,
-                    //                         isAppBar: true));
-                    //           }
-                    //         : () async {
-                    //             Navigator.pop(context);
-                    //             Navigator.pushNamed(
-                    //               context,
-                    //               Routes.myAccountsScreen,
-                    //             );
-                    //             // SecureStorageService secureStorage = SecureStorageService();
+                          //         Constants.isAndroid14OrBelow &&
+                          //                 Platform.isAndroid
+                          //             ? Navigator.pushNamed(
+                          //                 context, Routes.inAppWebViewRoute,
+                          //                 arguments: WebviewParams(
+                          //                     url:
+                          //                         "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
+                          //                     canPop: true,
+                          //                     isAppBar: true))
+                          //             : Navigator.pushNamed(
+                          //                 context, Routes.webViewRoute,
+                          //                 arguments: WebviewParams(
+                          //                     url:
+                          //                         "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
+                          //                     canPop: true,
+                          //                     isAppBar: true));
+                          //       }
+                          //     : () async {
+                          // Navigator.pop(context);
+                          // Navigator.pushNamed(
+                          //   context,
+                          //   Routes.myAccountsScreen,
+                          // );
+                          // SecureStorageService secureStorage = SecureStorageService();
 
-                    //             // Navigator.pushReplacementNamed(context, Routes.webViewRoute,
-                    //             //     arguments: WebviewParams(
-                    //             //   url: Uri.parse(
-                    //             //     "${EndPoints.supplierImageurl}/Mobile_login.aspx",
-                    //             //   ).replace(
-                    //             //     queryParameters: {
-                    //             //       "VendorNAME": await secureStorage.read(
-                    //             //         AppStrings.vendorName,
-                    //             //       ),
-                    //             //       "VendorID": await secureStorage.read(
-                    //             //         AppStrings.vendorId,
-                    //             //       ),
-                    //             //       "ImageExist": await secureStorage.read(
-                    //             //         AppStrings.imageExist,
-                    //             //       ),
-                    //             //       "SellerTimeZone": await secureStorage.read(
-                    //             //         AppStrings.sellerTimeZone,
-                    //             //       ),
-                    //             //       "RegistrationStatus": await secureStorage.read(
-                    //             //         AppStrings.registrationStatus,
-                    //             //       ),
-                    //             //       "Project_Type": await secureStorage.read(
-                    //             //         AppStrings.projectType,
-                    //             //       ),
-                    //             //     },
-                    //             //   ).toString(),
-                    //             //   isAppBar: false,
-                    //             //   canPop: true,
-                    //             // ));
-                    //           },
-                    //     iconPath: Icon(Icons.account_circle_outlined, size: 24),
-                    //     title: 'My Account'),
+                          // Navigator.pushReplacementNamed(context, Routes.webViewRoute,
+                          //     arguments: WebviewParams(
+                          //   url: Uri.parse(
+                          //     "${EndPoints.supplierImageurl}/Mobile_login.aspx",
+                          //   ).replace(
+                          //     queryParameters: {
+                          //       "VendorNAME": await secureStorage.read(
+                          //         AppStrings.vendorName,
+                          //       ),
+                          //       "VendorID": await secureStorage.read(
+                          //         AppStrings.vendorId,
+                          //       ),
+                          //       "ImageExist": await secureStorage.read(
+                          //         AppStrings.imageExist,
+                          //       ),
+                          //       "SellerTimeZone": await secureStorage.read(
+                          //         AppStrings.sellerTimeZone,
+                          //       ),
+                          //       "RegistrationStatus": await secureStorage.read(
+                          //         AppStrings.registrationStatus,
+                          //       ),
+                          //       "Project_Type": await secureStorage.read(
+                          //         AppStrings.projectType,
+                          //       ),
+                          //     },
+                          //   ).toString(),
+                          //   isAppBar: false,
+                          //   canPop: true,
+                          // ));
 
-                    // _DrawerItem(
-                    //   iconPath: Icon(Icons.dashboard_outlined, size: 24),
-                    //   title: 'Dashboard',
-                    //   onTap: Constants.isBuyer == true
-                    //       ? () {
-                    //           Navigator.pop(context);
-                    //           Navigator.pushReplacementNamed(
-                    //             context,
-                    //             Routes.buyerDashboardRoute,
-                    //           );
-                    //         }
-                    //       : () {
-                    //           Navigator.pop(context);
-                    //           Navigator.pushReplacementNamed(
-                    //             context,
-                    //             Routes.dashboardRoute,
-                    //           );
-                    //         },
-                    // ),
-                    // _DrawerItem(
-                    //   onTap: Constants.isBuyer == true
-                    //       ? () {
-                    //           Navigator.pop(context);
-                    //           Navigator.pushNamed(
-                    //             context,
-                    //             Routes.buyerNegotiationScreen,
-                    //           );
-                    //         }
-                    //       : () {
-                    //           Navigator.pop(context);
-                    //           Navigator.pushNamed(
-                    //             context,
-                    //             Routes.negotiationScreen,
-                    //           );
-                    //         },
-                    //   iconPath: Icon(Icons.article_outlined, size: 24),
-                    //   title: 'Negotiation',
-                    // ),
+                          Navigator.pop(context);
+
+                          _appCubit.changeTab(2);
+                        },
+                        iconPath: Icon(Icons.account_circle_outlined, size: 24),
+                        title: 'My Account'),
+
+                    _DrawerItem(
+                      iconPath: Icon(Icons.dashboard_outlined, size: 24),
+                      title: 'Dashboard',
+                      onTap: () {
+                        Navigator.pop(context);
+                        _appCubit.changeTab(0);
+                        // Constants.isBuyer == true
+                        //     ? () {
+                        //         Navigator.pop(context);
+                        //         Navigator.pushReplacementNamed(
+                        //           context,
+                        //           Routes.buyerDashboardRoute,
+                        //         );
+                        //       }
+                        //     : () {
+                        //         Navigator.pop(context);
+                        //         Navigator.pushReplacementNamed(
+                        //           context,
+                        //           Routes.dashboardRoute,
+                        //         );
+                      },
+                    ),
+                    _DrawerItem(
+                      onTap: () {
+                        Navigator.pop(context);
+                        _appCubit.changeTab(1);
+                        // Constants.isBuyer == true
+                        //     ? () {
+                        //         Navigator.pop(context);
+                        //         Navigator.pushNamed(
+                        //           context,
+                        //           Routes.buyerNegotiationScreen,
+                        //         );
+                        //       }
+                        //     : () {
+                        //         Navigator.pop(context);
+                        //         Navigator.pushNamed(
+                        //           context,
+                        //           Routes.negotiationScreen,
+                        //         );
+                      },
+                      iconPath: Icon(Icons.article_outlined, size: 24),
+                      title: 'Negotiation',
+                    ),
                     // _DrawerItem(
                     //     onTap: () {
                     //       Navigator.pop(context);

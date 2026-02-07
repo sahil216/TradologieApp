@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -103,11 +102,20 @@ class _MainScreenState extends State<MainScreen>
   void initState() {
     _appCubit = BlocProvider.of<AppCubit>(context);
     _loadToken();
+    nameUpdate();
     _navAnimController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 250),
     )..forward();
+
     super.initState();
+  }
+
+  Future<void> nameUpdate() async {
+    SecureStorageService secureStorage = SecureStorageService();
+    Constants.name = Constants.isBuyer == true
+        ? await secureStorage.read(AppStrings.customerName) ?? ""
+        : await secureStorage.read(AppStrings.vendorName) ?? "";
   }
 
   @override
@@ -144,43 +152,46 @@ class _MainScreenState extends State<MainScreen>
             ),
             bottomNavigationBar: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 250),
-                child: SizedBox(
-                  height: 96,
-                  child: Center(
-                    child: SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0, 1),
-                        end: Offset.zero,
-                      ).animate(
-                        CurvedAnimation(
-                          parent: _navAnimController,
-                          curve: Curves.easeOut,
-                        ),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(40),
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(
-                            sigmaX: 12,
-                            sigmaY: 12,
+              child: SafeArea(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  child: SizedBox(
+                    height: 80,
+                    child: Center(
+                      child: SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(0, 1),
+                          end: Offset.zero,
+                        ).animate(
+                          CurvedAnimation(
+                            parent: _navAnimController,
+                            curve: Curves.easeOut,
                           ),
-                          child: Container(
-                            height: 76,
-                            padding: const EdgeInsets.symmetric(horizontal: 28),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.85),
-                              borderRadius: BorderRadius.circular(40),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.08),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 10),
-                                ),
-                              ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(40),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(
+                              sigmaX: 12,
+                              sigmaY: 12,
                             ),
-                            child: buildAnimatedTabs(), // icons + bubble
+                            child: Container(
+                              height: 76,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 28),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.85),
+                                borderRadius: BorderRadius.circular(40),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.08),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 10),
+                                  ),
+                                ],
+                              ),
+                              child: buildAnimatedTabs(), // icons + bubble
+                            ),
                           ),
                         ),
                       ),
@@ -248,10 +259,5 @@ class _MainScreenState extends State<MainScreen>
         }),
       ],
     );
-  }
-
-  double _bubbleAlignmentX(int index, int count) {
-    if (count <= 1) return 0;
-    return -1 + (2 / (count - 1)) * index;
   }
 }
