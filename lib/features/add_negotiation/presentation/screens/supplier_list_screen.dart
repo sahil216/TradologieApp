@@ -14,7 +14,6 @@ import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/custom_button.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
-import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/supplier_list.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/delete_supplier_shortlist_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/presentation/cubit/add_negotiation_cubit.dart';
@@ -297,65 +296,8 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
               );
             },
           ),
-          //   bottomNavigationBar: SafeArea(
-          //     child: Padding(
-          //       padding: const EdgeInsets.symmetric(
-          //         horizontal: 16.0,
-          //       ),
-          //       child: CommonButton(
-          //         onPressed: () async {
-          //           // SecureStorageService secureStorage = SecureStorageService();
-
-          //           // if (selectedCommodity != null &&
-          //           //     selectedSubCommodity != null &&
-          //           //     selectedAttribute1 != null &&
-          //           //     selectedAttribute2 != null &&
-          //           //     selectedUnit != null &&
-          //           //     qtyController.text.isNotEmpty &&
-          //           //     messageController.text.isNotEmpty) {
-          //           //   final params = AddCustomerRequirementParams(
-          //           //       token: await secureStorage
-          //           //               .read(AppStrings.apiVerificationCode) ??
-          //           //           "",
-          //           //       commodityID: selectedCommodity?.groupId ?? "",
-          //           //       subCommodityID: selectedSubCommodity?.categoryId ?? "",
-          //           //       attribute1: selectedAttribute1?.attributeValueId ?? "",
-          //           //       attribute2: selectedAttribute2?.attributeValueId ?? "",
-          //           //       quantity: qtyController.text,
-          //           //       quantityUnit: selectedUnit?.unitName ?? "",
-          //           //       otherSpecifications: messageController.text,
-          //           //       userId: await secureStorage.read(AppStrings.customerId) ??
-          //           //           "");
-
-          //           //   cubit.addCustomerRequirement(params);
-          //           // } else {
-          //           //   Constants.showErrorToast(
-          //           //       context: context, msg: CommonStrings.enterAllDetails);
-          //           // }
-          //         },
-          //         text: "Submit",
-          //         textStyle: TextStyleConstants.medium(
-          //           context,
-          //           fontSize: 16,
-          //           color: AppColors.white,
-          //         ),
-          //       ),
-          //     ),
-          //   ),
         ),
       ),
-    );
-  }
-
-  Widget _infoRow({required String title, required String val}) {
-    return Row(
-      children: [
-        Expanded(
-            child: CommonText("$title:",
-                style: TextStyleConstants.semiBold(context, fontSize: 14))),
-        const SizedBox(width: 12),
-        Expanded(child: CommonText(val)),
-      ],
     );
   }
 }
