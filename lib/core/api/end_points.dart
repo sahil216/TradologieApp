@@ -75,6 +75,14 @@ class EndPoints {
     return '$baseUrl/${userType.name}/auctionlist';
   }
 
+  // Add Negotiation
+  static String getCategoryList = '$baseUrlBuyer/category';
+  static String addSupplierShortList = '$baseUrlBuyer/AddSupplierShortlist';
+  static String deleteSupplierShortList =
+      '$baseUrlBuyer/RemoveSupplierShortlist';
+  static String supplierList = '$baseUrlBuyer/SupplierList';
+  static String supplierShortListed = '$baseUrlBuyer/SupplierShortlisted';
+
   // My Account apis
   // Information
   static String getInformation = '$baseUrlSupplier/getinformation';

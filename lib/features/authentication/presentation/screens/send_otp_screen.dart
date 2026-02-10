@@ -53,7 +53,6 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: AdaptiveScaffold(
-        isSafearea: false,
         resizeToAvoidBottomInset: false,
         body: BlocListener<AuthenticationCubit, AuthenticationState>(
           listenWhen: (previous, current) => previous != current,

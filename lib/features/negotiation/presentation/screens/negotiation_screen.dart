@@ -12,6 +12,7 @@ import 'package:tradologie_app/core/widgets/common_no_record_widget.dart';
 import 'package:tradologie_app/core/widgets/common_single_child_scroll_view.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
+import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
 import 'package:tradologie_app/features/negotiation/domain/entities/negotiation_result.dart';
 import 'package:tradologie_app/features/negotiation/presentation/cubit/negotiation_cubit.dart';
@@ -159,7 +160,7 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
             //   children: [
             //     Image.asset(ImgAssets.companyLogo, height: 40),
             //     Spacer(),
-            //     Text(
+            //    CommonText(
             //       'Negotiation',
             //       style: TextStyleConstants.bold(context,
             //           color: AppColors.defaultText),
@@ -305,7 +306,7 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
                                                               canPop: true,
                                                               isAppBar: true));
                                                 },
-                                                child: Text(
+                                                child: CommonText(
                                                   _getCellText(row, header),
                                                   style: TextStyleConstants
                                                       .regular(
@@ -538,10 +539,10 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
                           getNegotiationData(page: currentPage - 1);
                         }
                       : null,
-                  child: const Text('Previous'),
+                  child: const CommonText('Previous'),
                 ),
                 const SizedBox(width: 20),
-                Text(
+                CommonText(
                     'Page ${currentPage + 1} of ${negotiation?.totalPages ?? 0}'),
                 const SizedBox(width: 20),
                 ElevatedButton(
@@ -550,7 +551,7 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
                           getNegotiationData(page: currentPage + 1);
                         }
                       : null,
-                  child: const Text('Next'),
+                  child: const CommonText('Next'),
                 ),
               ],
             ),
@@ -568,11 +569,11 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title,
+          CommonText(title,
               style: TextStyleConstants.semiBold(context, fontSize: 14)),
           GestureDetector(
             onTap: onTap,
-            child: Text(
+            child: CommonText(
               value,
               style: TextStyleConstants.regular(context,
                   fontSize: 14,
@@ -582,7 +583,7 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
           isShowView == true
               ? GestureDetector(
                   onTap: onViewTap,
-                  child: Text("View Details",
+                  child: CommonText("View Details",
                       style: TextStyleConstants.medium(context,
                           fontSize: 14, decoration: TextDecoration.underline)),
                 )
@@ -613,7 +614,7 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
         children: [
           GestureDetector(
             onTap: onTap,
-            child: Text(
+            child: CommonText(
               text,
               overflow: TextOverflow.ellipsis,
               style: isHeader

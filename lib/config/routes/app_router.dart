@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
+import 'package:tradologie_app/features/add_negotiation/presentation/screens/supplier_list_screen.dart';
 import 'package:tradologie_app/features/app/presentation/screens/main_screen.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/send_otp_usecase.dart';
 import 'package:tradologie_app/features/contact_us/contact_us.dart';
@@ -53,6 +54,9 @@ class Routes {
   //! Negotiation
   static const String negotiationScreen = '/negotiationScreen';
   static const String buyerNegotiationScreen = '/buyerNegotiationScreen';
+
+  //! Add Negotiation
+  static const String supplierListScreen = '/supplierListScreen';
 
   //! MyAccounts
   static const String myAccountsScreen = '/myAccountsScreen';
@@ -136,6 +140,10 @@ class AppRoutes {
       case Routes.negotiationScreen:
         return CupertinoPageRoute(builder: (context) {
           return const NegotiationScreen();
+        });
+      case Routes.supplierListScreen:
+        return CupertinoPageRoute(builder: (context) {
+          return const SupplierListScreen();
         });
       case Routes.buyerNegotiationScreen:
         return CupertinoPageRoute(builder: (context) {

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:tradologie_app/core/utils/app_colors.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 
 class CommonDropdown<T> extends StatelessWidget {
@@ -55,14 +56,14 @@ class CommonDropdown<T> extends StatelessWidget {
               return Text(
                 hint,
                 style: TextStyleConstants.regular(context, fontSize: 14)
-                    .copyWith(color: Colors.black),
+                    .copyWith(color: AppColors.black),
               );
             }
 
             return Text(
               itemAsString(selectedItem),
               style: TextStyleConstants.regular(context, fontSize: 15)
-                  .copyWith(color: Colors.black), // change style here
+                  .copyWith(color: AppColors.black), // change style here
             );
           },
           popupProps: PopupProps.modalBottomSheet(
@@ -79,11 +80,11 @@ class CommonDropdown<T> extends StatelessWidget {
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: Colors.grey),
+                  borderSide: BorderSide(color: AppColors.grayText),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: Colors.blue),
+                  borderSide: BorderSide(color: AppColors.blue),
                 ),
               ),
             ),
@@ -96,8 +97,8 @@ class CommonDropdown<T> extends StatelessWidget {
               // 👇 DEFAULT BORDER
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(
-                  color: Colors.grey,
+                borderSide: BorderSide(
+                  color: AppColors.grayText,
                   width: 1.2,
                 ),
               ),
@@ -105,8 +106,8 @@ class CommonDropdown<T> extends StatelessWidget {
               // 👇 ENABLED (normal state)
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(
-                  color: Colors.grey,
+                borderSide: BorderSide(
+                  color: AppColors.grayText,
                   width: 1.2,
                 ),
               ),
@@ -114,8 +115,8 @@ class CommonDropdown<T> extends StatelessWidget {
               // 👇 WHEN USER TAPS FIELD
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(
-                  color: Colors.blue,
+                borderSide: BorderSide(
+                  color: AppColors.blue,
                   width: 1.6,
                 ),
               ),
@@ -123,8 +124,8 @@ class CommonDropdown<T> extends StatelessWidget {
               // 👇 VALIDATION ERROR
               errorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(
-                  color: Colors.red,
+                borderSide: BorderSide(
+                  color: AppColors.red,
                   width: 1.4,
                 ),
               ),
@@ -132,8 +133,8 @@ class CommonDropdown<T> extends StatelessWidget {
               // 👇 ERROR + FOCUSED
               focusedErrorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(
-                  color: Colors.red,
+                borderSide: BorderSide(
+                  color: AppColors.red,
                   width: 1.6,
                 ),
               ),

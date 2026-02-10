@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/api/end_points.dart';
 import 'package:tradologie_app/core/error/network_failure.dart';

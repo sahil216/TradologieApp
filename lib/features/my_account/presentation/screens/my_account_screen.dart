@@ -6,7 +6,6 @@ import 'package:tradologie_app/config/routes/app_router.dart';
 import 'package:tradologie_app/core/error/network_failure.dart';
 import 'package:tradologie_app/core/error/user_failure.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
-import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';

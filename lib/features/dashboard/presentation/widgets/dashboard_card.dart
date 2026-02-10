@@ -98,7 +98,7 @@ class DashboardCard extends StatelessWidget {
 
   // Widget _imageShimmer() {
   //   return Container(
-  //     color: AppColors.grayText.withOpacity(0.2),
+  //     color: AppColors.grayText.withValues(alpha:0.2),
   //     child: const Center(
   //       child: CircularProgressIndicator(strokeWidth: 2),
   //     ),

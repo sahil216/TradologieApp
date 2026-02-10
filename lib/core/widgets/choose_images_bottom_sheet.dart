@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:image_picker/image_picker.dart';
+import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 
 import '../../../../../../../core/utils/extensions.dart';
 import '../../../../../../../core/utils/app_colors.dart';
@@ -45,7 +46,7 @@ class ChooseImagesBottomSheet extends StatelessWidget {
                   children: [
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 4),
-                      child: Text(
+                      child: CommonText(
                         ("choose_photo"),
                         style: TextStyleConstants.medium(
                           context,
@@ -71,7 +72,7 @@ class ChooseImagesBottomSheet extends StatelessWidget {
                         child: Row(
                           children: [
                             Expanded(
-                              child: Text(
+                              child: CommonText(
                                 ("gallery"),
                                 style: TextStyleConstants.regular(
                                   context,
@@ -101,7 +102,7 @@ class ChooseImagesBottomSheet extends StatelessWidget {
                         child: Row(
                           children: [
                             Expanded(
-                              child: Text(
+                              child: CommonText(
                                 ("camera"),
                                 style: TextStyleConstants.regular(
                                   context,

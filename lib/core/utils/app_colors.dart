@@ -19,9 +19,12 @@ class AppColors {
   static Color defaultText = HexColor('#222222');
   static Color defaultBaseShimmer = HexColor('#E0E0E0');
   static Color defaultHighlightShimmer = HexColor('#F5F5F5');
+  static Color blue100 = Colors.blue.shade100;
+  static Color blue200 = Colors.blue.shade200;
 
   static Color orange = HexColor('#F16522');
   static Color transparent = Colors.transparent;
+  static Color black12 = Colors.black12;
 
   // static Color grayDark = HexColor('#707070');
   // static Color grayTextHint = HexColor('#ACACAC');

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
+import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 import 'package:tradologie_app/features/notification/presentation/cubit/notification_cubit.dart';
 
@@ -112,17 +113,17 @@ class _NotificationScreenState extends State<NotificationScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  CommonText(
                     notification.contentTitle ?? "",
                     style: TextStyleConstants.semiBold(context, fontSize: 16),
                   ),
                   const SizedBox(height: 4),
-                  Text(
+                  CommonText(
                     notification.contentText ?? "",
                     style: TextStyleConstants.medium(context, fontSize: 14),
                   ),
                   const SizedBox(height: 6),
-                  Text(
+                  CommonText(
                     Constants.dateFormat(DateTime.parse(
                         notification.updatedDate ??
                             "")), // DateTime.parse(notification.updatedDate)
@@ -153,7 +154,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         children: [
           Icon(Icons.notifications_none, size: 80, color: Colors.grey.shade400),
           const SizedBox(height: 12),
-          Text(
+          CommonText(
             "No notifications yet",
             style: TextStyle(
               fontSize: 16,

@@ -30,6 +30,8 @@ import 'features/dashboard/injection_container_dashboard.dart' as di_dashboard;
 
 import 'features/negotiation/injection_container_negotiation.dart'
     as di_negotiation;
+import 'features/add_negotiation/injection_container_add_negotiation.dart'
+    as di_add_negotiation;
 
 import 'features/my_account/injection_container_my_account.dart'
     as di_my_account;
@@ -102,6 +104,7 @@ Future<void> init(Future<void> Function(RemoteMessage) handler) async {
   await di_negotiation.init();
   await di_my_account.init();
   await di_notification.init();
+  await di_add_negotiation.init();
 
   //! init variable
   Constants.isLogin = bool.tryParse(

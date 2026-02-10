@@ -180,11 +180,11 @@ class _MainScreenState extends State<MainScreen>
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 28),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.85),
+                                color: Colors.white.withValues(alpha: 0.85),
                                 borderRadius: BorderRadius.circular(40),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.08),
+                                    color: Colors.black.withValues(alpha: 0.08),
                                     blurRadius: 20,
                                     offset: const Offset(0, 10),
                                   ),

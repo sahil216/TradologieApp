@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
+import 'package:tradologie_app/core/utils/app_colors.dart';
+import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 
 class CommonCupertinoDatePicker extends StatelessWidget {
   final String label;
@@ -28,14 +30,14 @@ class CommonCupertinoDatePicker extends StatelessWidget {
       BuildContext context, FormFieldState<DateTime> state) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       builder: (_) {
         DateTime tempDate = selectedDate ?? DateTime.now();
 
         return Container(
           height: 300,
-          decoration: const BoxDecoration(
-            color: Colors.white,
+          decoration: BoxDecoration(
+            color: AppColors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
           ),
           child: Column(
@@ -44,9 +46,9 @@ class CommonCupertinoDatePicker extends StatelessWidget {
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   border: Border(
-                    bottom: BorderSide(color: Colors.black12),
+                    bottom: BorderSide(color: AppColors.black12),
                   ),
                 ),
                 child: Row(
@@ -54,9 +56,9 @@ class CommonCupertinoDatePicker extends StatelessWidget {
                   children: [
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
-                      child: const Text(
+                      child: CommonText(
                         "Cancel",
-                        style: TextStyle(color: Colors.blue),
+                        style: TextStyle(color: AppColors.blue),
                       ),
                     ),
                     GestureDetector(
@@ -65,10 +67,10 @@ class CommonCupertinoDatePicker extends StatelessWidget {
                         state.didChange(tempDate);
                         Navigator.pop(context);
                       },
-                      child: const Text(
+                      child: CommonText(
                         "Done",
                         style: TextStyle(
-                          color: Colors.blue,
+                          color: AppColors.blue,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -129,21 +131,23 @@ class CommonCupertinoDatePicker extends StatelessWidget {
                   suffixIcon: const Icon(Icons.calendar_today),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.grey),
+                    borderSide: BorderSide(color: AppColors.grayText),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.blue),
+                    borderSide: BorderSide(color: AppColors.blue),
                   ),
                   errorBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.red),
+                    borderSide: BorderSide(color: AppColors.red),
                   ),
                 ),
                 child: Text(
                   selectedDate != null ? dateFormat.format(selectedDate!) : '',
                   style: TextStyle(
-                    color: selectedDate != null ? Colors.black : Colors.grey,
+                    color: selectedDate != null
+                        ? AppColors.black
+                        : AppColors.grayText,
                   ),
                 ),
               ),

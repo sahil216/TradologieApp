@@ -142,7 +142,6 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
                       ),
                     ),
 
-                    const Divider(),
                     ListTile(
                         leading: Icon(
                           Icons.account_circle_rounded,
@@ -182,7 +181,7 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
 
                     // Menu Items
 
-                    _DrawerItem(
+                    DrawerItem(
                         onTap: () {
                           // Constants.isBuyer == true
                           //     ? () async {
@@ -256,7 +255,7 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
                         iconPath: Icon(Icons.account_circle_outlined, size: 24),
                         title: 'My Account'),
 
-                    _DrawerItem(
+                    DrawerItem(
                       iconPath: Icon(Icons.dashboard_outlined, size: 24),
                       title: 'Dashboard',
                       onTap: () {
@@ -278,7 +277,7 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
                         //         );
                       },
                     ),
-                    _DrawerItem(
+                    DrawerItem(
                       onTap: () {
                         Navigator.pop(context);
                         _appCubit.changeTab(1);
@@ -300,44 +299,53 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
                       iconPath: Icon(Icons.article_outlined, size: 24),
                       title: 'Negotiation',
                     ),
-                    // _DrawerItem(
-                    //     onTap: () {
-                    //       Navigator.pop(context);
-                    //     },
-                    //     iconPath: ImgAssets.negotitationOrderHistory,
-                    //     title: 'Negotiation Order History'),
-                    // _DrawerItem(
+                    Constants.isBuyer == true
+                        ? DrawerItem(
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.pushNamed(
+                                context,
+                                Routes.supplierListScreen,
+                              );
+                            },
+                            iconPath: Icon(
+                              Icons.add,
+                              size: 24,
+                            ),
+                            title: 'Add Negotiation')
+                        : SizedBox.shrink(),
+                    // DrawerItem(
                     //     onTap: () {
                     //       Navigator.pop(context);
                     //     },
                     //     iconPath: ImgAssets.bulk,
                     //     title: "Bulk"),
-                    // _DrawerItem(
+                    // DrawerItem(
                     //     onTap: () {
                     //       Navigator.pop(context);
                     //     },
                     //     iconPath: ImgAssets.orders,
                     //     title: 'Orders'),
-                    // _DrawerItem(
+                    // DrawerItem(
                     //     onTap: () {
                     //       Navigator.pop(context);
                     //     },
                     //     iconPath: ImgAssets.accounts,
                     //     title: 'Accounts'),
-                    // _DrawerItem(
+                    // DrawerItem(
                     //     onTap: () {
                     //       Navigator.pop(context);
                     //     },
                     //     iconPath: ImgAssets.analysisReports,
                     //     title: 'Analysis/Reports'),
-                    _DrawerItem(
+                    DrawerItem(
                         onTap: () {
                           Navigator.pop(context);
                           Navigator.pushNamed(context, Routes.contactUsScreen);
                         },
                         iconPath: Icon(Icons.account_circle_outlined, size: 24),
                         title: 'Contact Us'),
-                    _DrawerItem(
+                    DrawerItem(
                         onTap: () {
                           SharePlus.instance.share(ShareParams(
                               text:
@@ -346,7 +354,7 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
                         iconPath: Icon(Icons.share, size: 24),
                         title: 'Share App'),
 
-                    _DrawerItem(
+                    DrawerItem(
                         onTap: () async {
                           String? result = await showInputDialog(context);
 
@@ -373,7 +381,7 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
                         },
                         iconPath: Icon(Icons.delete_outline, size: 24),
                         title: 'Delete Account'),
-                    _DrawerItem(
+                    DrawerItem(
                         onTap: () {
                           BlocProvider.of<AuthenticationCubit>(context)
                               .signOut(NoParams());
@@ -480,13 +488,14 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
   }
 }
 
-class _DrawerItem extends StatelessWidget {
+class DrawerItem extends StatelessWidget {
   final Widget iconPath;
 
   final String title;
   final VoidCallback onTap;
 
-  const _DrawerItem({
+  const DrawerItem({
+    super.key,
     required this.iconPath,
     required this.title,
     required this.onTap,

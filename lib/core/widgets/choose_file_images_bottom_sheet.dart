@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:image_picker/image_picker.dart';
+import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 
 import '../../../../../../../core/utils/extensions.dart';
 import '../../../../../../../core/utils/app_colors.dart';
@@ -45,8 +46,8 @@ class ChooseFileImagesBottomSheet extends StatelessWidget {
                   children: [
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 4),
-                      child: Text(
-                        ("choose_photo"),
+                      child: CommonText(
+                        "Choose Photo",
                         style: TextStyleConstants.medium(
                           context,
                           fontSize: 16,
@@ -71,7 +72,7 @@ class ChooseFileImagesBottomSheet extends StatelessWidget {
                         child: Row(
                           children: [
                             Expanded(
-                              child: Text(
+                              child: CommonText(
                                 ("gallery"),
                                 style: TextStyleConstants.regular(
                                   context,
@@ -101,7 +102,7 @@ class ChooseFileImagesBottomSheet extends StatelessWidget {
                         child: Row(
                           children: [
                             Expanded(
-                              child: Text(
+                              child: CommonText(
                                 ("camera"),
                                 style: TextStyleConstants.regular(
                                   context,
@@ -119,7 +120,7 @@ class ChooseFileImagesBottomSheet extends StatelessWidget {
                     ),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 4),
-                      child: Text(
+                      child: CommonText(
                         ("files"),
                         style: TextStyleConstants.medium(
                           context,
@@ -143,7 +144,7 @@ class ChooseFileImagesBottomSheet extends StatelessWidget {
                         child: Row(
                           children: [
                             Expanded(
-                              child: Text(
+                              child: CommonText(
                                 ("files"),
                                 style: TextStyleConstants.regular(
                                   context,

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../config/routes/navigation_service.dart';
@@ -82,7 +83,7 @@ class Constants {
             centerTitle: centerTitle,
             backgroundColor: backgroundColor ?? AppColors.white,
             systemOverlayStyle: SystemUiOverlayStyle(
-              statusBarColor: Colors.transparent,
+              statusBarColor: AppColors.transparent,
               systemNavigationBarColor:
                   systemNavigationBarColor ?? AppColors.white,
               statusBarIconBrightness: statusBarIconBrightness,
@@ -115,7 +116,7 @@ class Constants {
                   },
                 ),
             title: titleWidget ??
-                Text(
+                CommonText(
                   title,
                   style: TextStyleConstants.bold(
                     context,
@@ -226,7 +227,7 @@ class Constants {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                Text(
+                                CommonText(
                                   msg,
                                   textAlign: TextAlign.center,
                                   style: TextStyleConstants.semiBold(
@@ -322,7 +323,7 @@ class Constants {
             padding: EdgeInsets.only(
               bottom: 4,
             ),
-            child: Text(
+            child: CommonText(
               msg,
               textAlign: TextAlign.center,
               style: TextStyleConstants.medium(
@@ -379,8 +380,8 @@ class Constants {
                   color: AppColors.white,
                 ),
                 Expanded(
-                  child: Text(
-                    ("internet_connection"),
+                  child: CommonText(
+                    ("Internet connection not available"),
                     textAlign: TextAlign.start,
                     style: TextStyleConstants.medium(
                       context,
@@ -398,7 +399,7 @@ class Constants {
                   width: 25,
                   widget: Container(
                     decoration: BoxDecoration(
-                      color: Colors.transparent,
+                      color: AppColors.transparent,
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(
                         width: 1,
@@ -462,7 +463,7 @@ class Constants {
                   color: AppColors.white,
                 ),
                 Expanded(
-                  child: Text(
+                  child: CommonText(
                     ("no_internet_connection"),
                     textAlign: TextAlign.start,
                     style: TextStyleConstants.medium(
@@ -481,7 +482,7 @@ class Constants {
                   width: 25,
                   widget: Container(
                     decoration: BoxDecoration(
-                      color: Colors.transparent,
+                      color: AppColors.transparent,
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(
                         width: 1,
@@ -546,7 +547,7 @@ class Constants {
                   size: 21,
                 ),
                 Expanded(
-                  child: Text(
+                  child: CommonText(
                     msg ?? ("something_went_wrong"),
                     textAlign: TextAlign.start,
                     style: TextStyleConstants.medium(
@@ -565,7 +566,7 @@ class Constants {
                   width: 25,
                   widget: Container(
                     decoration: BoxDecoration(
-                      color: Colors.transparent,
+                      color: AppColors.transparent,
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(
                         width: 1,
@@ -629,7 +630,7 @@ class Constants {
                   size: 25,
                 ),
                 Expanded(
-                  child: Text(
+                  child: CommonText(
                     msg ?? "success",
                     textAlign: TextAlign.start,
                     style: TextStyleConstants.medium(
@@ -648,7 +649,7 @@ class Constants {
                   width: 25,
                   widget: Container(
                     decoration: BoxDecoration(
-                      color: Colors.transparent,
+                      color: AppColors.transparent,
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(
                         width: 1,

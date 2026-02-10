@@ -25,7 +25,7 @@ class CommonStrings {
   static const String mobileNumber = 'Mobile Number';
   static const String enterMobileNumber = 'Enter your Mobile Number';
   static const String enterFullName = 'Enter your Full Name';
-  static const String enterName = 'Enter you Name ';
+  static const String enterName = 'Enter your Name ';
   static const String forgotPassword = 'Forgot Password';
   static const String dontHaveAnAccount = 'Don\'t have an account? ';
   static const String orContinueWith = 'Or continue with';

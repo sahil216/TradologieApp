@@ -101,7 +101,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         Constants.isBuyer = true;
                         await secureStorage.write(AppStrings.isBuyer, "true");
                         Navigator.pushNamed(context, Routes.sendOtpScreen);
-                        ;
                       },
                       text: CommonStrings.buyerText,
                       width: double.infinity,
