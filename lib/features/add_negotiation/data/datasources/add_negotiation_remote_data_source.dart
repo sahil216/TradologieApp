@@ -3,6 +3,7 @@ import 'package:tradologie_app/core/api/end_points.dart';
 import 'package:tradologie_app/core/response_wrapper/response_wrapper.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_supplier_shortlist_usecase.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/usecases/create_auction_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/delete_supplier_shortlist_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/get_supplier_list_usecase.dart';
 
@@ -15,6 +16,7 @@ abstract class AddNegotiationRemoteDataSource {
   Future<ResponseWrapper<dynamic>?> getSupplierList(SupplierListParams params);
   Future<ResponseWrapper<dynamic>?> getSupplierShortlisted(
       SupplierListParams params);
+  Future<ResponseWrapper<dynamic>?> createAuction(CreateAuctionParams params);
 }
 
 class AddNegotiationRemoteDataSourceImpl
@@ -59,6 +61,15 @@ class AddNegotiationRemoteDataSourceImpl
       SupplierListParams params) async {
     return await apiConsumer.get(
       "${EndPoints.supplierShortListed}/${params.groupID}/${params.customerId}",
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> createAuction(
+      CreateAuctionParams params) async {
+    return await apiConsumer.post(
+      EndPoints.createAuction,
+      body: params.toJson(),
     );
   }
 }

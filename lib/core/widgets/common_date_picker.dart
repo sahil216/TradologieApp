@@ -13,9 +13,11 @@ class CommonCupertinoDatePicker extends StatelessWidget {
   final DateTime? minimumDate;
   final DateTime? maximumDate;
   final DateFormat dateFormat;
+  final CupertinoDatePickerMode mode;
 
   const CommonCupertinoDatePicker({
     super.key,
+    required this.mode,
     required this.label,
     required this.hint,
     required this.onDateSelected,
@@ -82,7 +84,7 @@ class CommonCupertinoDatePicker extends StatelessWidget {
               /// Cupertino picker
               Expanded(
                 child: CupertinoDatePicker(
-                  mode: CupertinoDatePickerMode.date,
+                  mode: mode,
                   initialDateTime: selectedDate ?? DateTime.now(),
                   minimumDate: minimumDate,
                   maximumDate: maximumDate,

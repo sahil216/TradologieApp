@@ -3,6 +3,7 @@ import 'package:tradologie_app/features/add_negotiation/data/datasources/add_neg
 import 'package:tradologie_app/features/add_negotiation/data/repositories/add_negotiation_repository_impl.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/repositories/add_negotiation_repository.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_supplier_shortlist_usecase.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/usecases/create_auction_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/delete_supplier_shortlist_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/get_category_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/get_supplier_list_usecase.dart';
@@ -19,6 +20,7 @@ Future<void> init() async {
         deleteSupplierShortlistUsecase: sl(),
         getSupplierListUsecase: sl(),
         getSupplierShortlistedUsecase: sl(),
+        createAuctionUsecase: sl(),
       ));
 
   //! Use cases
@@ -32,6 +34,8 @@ Future<void> init() async {
       () => GetSupplierListUsecase(addNegotiationRepository: sl()));
   sl.registerLazySingleton<GetSupplierShortlistedUsecase>(
       () => GetSupplierShortlistedUsecase(addNegotiationRepository: sl()));
+  sl.registerLazySingleton<CreateAuctionUsecase>(
+      () => CreateAuctionUsecase(addNegotiationRepository: sl()));
 
   //! Repository
   sl.registerLazySingleton<AddNegotiationRepository>(

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -196,6 +197,7 @@ class _CompanyDetailTabState extends State<CompanyDetailTab> {
                     ),
                     SizedBox(height: 16),
                     CommonCupertinoDatePicker(
+                      mode: CupertinoDatePickerMode.date,
                       label: CommonStrings.inCorporationDate,
                       hint: CommonStrings.selectinCorporationDate,
                       selectedDate: selectedDate,

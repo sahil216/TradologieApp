@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tradologie_app/core/api/end_points.dart';
 import 'package:tradologie_app/core/utils/app_colors.dart';
 import 'package:tradologie_app/core/widgets/custom_button.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';

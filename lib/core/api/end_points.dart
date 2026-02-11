@@ -82,6 +82,7 @@ class EndPoints {
       '$baseUrlBuyer/RemoveSupplierShortlist';
   static String supplierList = '$baseUrlBuyer/SupplierList';
   static String supplierShortListed = '$baseUrlBuyer/SupplierShortlisted';
+  static String createAuction = '$baseUrlBuyer/CreateAuction';
 
   // My Account apis
   // Information

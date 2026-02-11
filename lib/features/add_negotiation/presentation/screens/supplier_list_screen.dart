@@ -21,6 +21,7 @@ import 'package:tradologie_app/features/add_negotiation/presentation/widget/supp
 import 'package:tradologie_app/features/dashboard/domain/entities/commodity_list.dart';
 import 'package:tradologie_app/features/dashboard/presentation/cubit/dashboard_cubit.dart';
 
+import '../../../../config/routes/app_router.dart';
 import '../../../../core/widgets/custom_text/text_style_constants.dart';
 import '../../domian/usecases/get_supplier_list_usecase.dart';
 
@@ -196,7 +197,10 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
                             child: Padding(
                               padding: const EdgeInsets.only(top: 12),
                               child: CommonButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.pushNamed(context,
+                                      Routes.addNegotiationDetailScreen);
+                                },
                                 text: "Create Negotiation",
                                 width: double.infinity,
                                 textStyle: TextStyleConstants.medium(

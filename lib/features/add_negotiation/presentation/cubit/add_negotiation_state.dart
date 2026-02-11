@@ -108,3 +108,23 @@ class GetSupplierShortistedError extends AddNegotiationState {
   @override
   List<Object> get props => [failure];
 }
+
+class CreateAuctionIsLoading extends AddNegotiationState {}
+
+class CreateAuctionSuccess extends AddNegotiationState {
+  final CreateAuctionDetail data;
+
+  const CreateAuctionSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class CreateAuctionError extends AddNegotiationState {
+  final Failure failure;
+
+  const CreateAuctionError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}

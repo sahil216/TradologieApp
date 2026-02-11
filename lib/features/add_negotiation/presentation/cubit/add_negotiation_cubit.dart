@@ -3,8 +3,10 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/error/failures.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/enitities/create_auction_detail.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/supplier_list.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_supplier_shortlist_usecase.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/usecases/create_auction_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/delete_supplier_shortlist_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/get_category_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/get_supplier_list_usecase.dart';
@@ -19,6 +21,7 @@ class AddNegotiationCubit extends Cubit<AddNegotiationState> {
   final DeleteSupplierShortlistUsecase deleteSupplierShortlistUsecase;
   final GetSupplierListUsecase getSupplierListUsecase;
   final GetSupplierShortlistedUsecase getSupplierShortlistedUsecase;
+  final CreateAuctionUsecase createAuctionUsecase;
 
   AddNegotiationCubit({
     required this.getCategoryUsecase,
@@ -26,6 +29,7 @@ class AddNegotiationCubit extends Cubit<AddNegotiationState> {
     required this.deleteSupplierShortlistUsecase,
     required this.getSupplierListUsecase,
     required this.getSupplierShortlistedUsecase,
+    required this.createAuctionUsecase,
   }) : super(AddNegotiationInitial());
 
   Future<void> getCategoryList(NoParams params) async {
@@ -75,6 +79,16 @@ class AddNegotiationCubit extends Cubit<AddNegotiationState> {
     emit(response.fold(
       (failure) => GetSupplierShortistedError(failure: failure),
       (res) => GetSupplierShortistedSuccess(data: res),
+    ));
+  }
+
+  Future<void> createAuction(CreateAuctionParams params) async {
+    emit(CreateAuctionIsLoading());
+    Either<Failure, CreateAuctionDetail> response =
+        await createAuctionUsecase(params);
+    emit(response.fold(
+      (failure) => CreateAuctionError(failure: failure),
+      (res) => CreateAuctionSuccess(data: res),
     ));
   }
 
