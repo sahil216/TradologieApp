@@ -9,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pinput/pinput.dart';
+import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
@@ -17,6 +18,7 @@ import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_single_child_scroll_view.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
+import 'package:tradologie_app/features/app/presentation/screens/main_screen.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/verify_otp_usecase.dart';
 
 import '../../../../config/routes/app_router.dart';
@@ -24,6 +26,7 @@ import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_strings.dart';
 import '../../../../core/widgets/common_loader.dart';
 import '../../../../core/widgets/custom_button.dart';
+import '../../../../injection_container.dart';
 import '../../domain/usecases/send_otp_usecase.dart';
 import '../cubit/authentication_cubit.dart';
 

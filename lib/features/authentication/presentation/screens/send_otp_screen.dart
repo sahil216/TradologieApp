@@ -2,6 +2,7 @@ import 'package:country_picker/country_picker.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
@@ -20,6 +21,7 @@ import '../../../../core/widgets/common_single_child_scroll_view.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text/custom_text_rich.dart';
 import '../../../../core/widgets/custom_text_field.dart';
+import '../../../../injection_container.dart';
 import '../cubit/authentication_cubit.dart';
 
 class SendOtpScreen extends StatefulWidget {
@@ -458,11 +460,11 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
               ),
               if (Navigator.canPop(context)) ...[
                 Positioned(
-                  top: MediaQuery.of(context).padding.top + 12,
+                  top: Responsive(context).screenHeight * 0.01,
                   left: 16,
                   child: GestureDetector(
                     onTap: () {
-                      Navigator.pop(context);
+                      sl<NavigationService>().pop();
                     },
                     child: Container(
                       padding: const EdgeInsets.all(8),

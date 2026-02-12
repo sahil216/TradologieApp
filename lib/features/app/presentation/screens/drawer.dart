@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
@@ -22,6 +23,7 @@ import '../../../../core/utils/app_strings.dart';
 import '../../../../core/utils/constants.dart';
 import '../../../authentication/domain/usecases/delete_account_usecase.dart';
 import '../../../authentication/presentation/cubit/authentication_cubit.dart';
+import '../../injection_container_app.dart';
 
 class TradologieDrawer extends StatefulWidget {
   const TradologieDrawer({super.key});
@@ -95,9 +97,10 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
                     secureStorage.write(
                         AppStrings.appSession, false.toString());
 
-                    Navigator.of(context).pushNamedAndRemoveUntil(
+                    sl<NavigationService>().pushNamedAndRemoveUntil(
                       Routes.onboardingRoute,
-                      (route) => false, // removes all previous routes
+
+                      // removes all previous routes
                     );
                   }
                   if (state is SignOutError) {
@@ -183,71 +186,6 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
 
                     DrawerItem(
                         onTap: () {
-                          // Constants.isBuyer == true
-                          //     ? () async {
-                          //         Navigator.pop(context);
-                          //         SecureStorageService secureStorage =
-                          //             SecureStorageService();
-
-                          //         final token = await secureStorage
-                          //                 .read(AppStrings.apiVerificationCode) ??
-                          //             "";
-
-                          //         Constants.isAndroid14OrBelow &&
-                          //                 Platform.isAndroid
-                          //             ? Navigator.pushNamed(
-                          //                 context, Routes.inAppWebViewRoute,
-                          //                 arguments: WebviewParams(
-                          //                     url:
-                          //                         "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
-                          //                     canPop: true,
-                          //                     isAppBar: true))
-                          //             : Navigator.pushNamed(
-                          //                 context, Routes.webViewRoute,
-                          //                 arguments: WebviewParams(
-                          //                     url:
-                          //                         "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
-                          //                     canPop: true,
-                          //                     isAppBar: true));
-                          //       }
-                          //     : () async {
-                          // Navigator.pop(context);
-                          // Navigator.pushNamed(
-                          //   context,
-                          //   Routes.myAccountsScreen,
-                          // );
-                          // SecureStorageService secureStorage = SecureStorageService();
-
-                          // Navigator.pushReplacementNamed(context, Routes.webViewRoute,
-                          //     arguments: WebviewParams(
-                          //   url: Uri.parse(
-                          //     "${EndPoints.supplierImageurl}/Mobile_login.aspx",
-                          //   ).replace(
-                          //     queryParameters: {
-                          //       "VendorNAME": await secureStorage.read(
-                          //         AppStrings.vendorName,
-                          //       ),
-                          //       "VendorID": await secureStorage.read(
-                          //         AppStrings.vendorId,
-                          //       ),
-                          //       "ImageExist": await secureStorage.read(
-                          //         AppStrings.imageExist,
-                          //       ),
-                          //       "SellerTimeZone": await secureStorage.read(
-                          //         AppStrings.sellerTimeZone,
-                          //       ),
-                          //       "RegistrationStatus": await secureStorage.read(
-                          //         AppStrings.registrationStatus,
-                          //       ),
-                          //       "Project_Type": await secureStorage.read(
-                          //         AppStrings.projectType,
-                          //       ),
-                          //     },
-                          //   ).toString(),
-                          //   isAppBar: false,
-                          //   canPop: true,
-                          // ));
-
                           Navigator.pop(context);
 
                           _appCubit.changeTab(2);
@@ -281,39 +219,23 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
                       onTap: () {
                         Navigator.pop(context);
                         _appCubit.changeTab(1);
-                        // Constants.isBuyer == true
-                        //     ? () {
-                        //         Navigator.pop(context);
-                        //         Navigator.pushNamed(
-                        //           context,
-                        //           Routes.buyerNegotiationScreen,
-                        //         );
-                        //       }
-                        //     : () {
-                        //         Navigator.pop(context);
-                        //         Navigator.pushNamed(
-                        //           context,
-                        //           Routes.negotiationScreen,
-                        //         );
                       },
                       iconPath: Icon(Icons.article_outlined, size: 24),
                       title: 'Negotiation',
                     ),
-                    // Constants.isBuyer == true
-                    //     ? DrawerItem(
-                    //         onTap: () {
-                    //           Navigator.pop(context);
-                    //           Navigator.pushNamed(
-                    //             context,
-                    //             Routes.supplierListScreen,
-                    //           );
-                    //         },
-                    //         iconPath: Icon(
-                    //           Icons.add,
-                    //           size: 24,
-                    //         ),
-                    //         title: 'Add Negotiation')
-                    //     : SizedBox.shrink(),
+                    Constants.isBuyer == true
+                        ? DrawerItem(
+                            onTap: () {
+                              Navigator.pop(context);
+                              sl<NavigationService>()
+                                  .pushNamed(Routes.supplierListScreen);
+                            },
+                            iconPath: Icon(
+                              Icons.add,
+                              size: 24,
+                            ),
+                            title: 'Add Negotiation')
+                        : SizedBox.shrink(),
                     // DrawerItem(
                     //     onTap: () {
                     //       Navigator.pop(context);
@@ -341,7 +263,9 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
                     DrawerItem(
                         onTap: () {
                           Navigator.pop(context);
-                          Navigator.pushNamed(context, Routes.contactUsScreen);
+                          sl<NavigationService>().pushNamed(
+                            Routes.contactUsScreen,
+                          );
                         },
                         iconPath: Icon(Icons.account_circle_outlined, size: 24),
                         title: 'Contact Us'),

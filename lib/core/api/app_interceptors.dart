@@ -61,62 +61,6 @@ class AppIntercepters extends Interceptor {
       navigationService.pushNamedAndRemoveUntil(Routes.onboardingRoute);
       final ctx = navigationService.navigationKey.currentContext;
       Constants.showErrorToast(context: ctx!, msg: (AppStrings.sessionExpired));
-
-      // if (ctx != null) {
-      //   Constants.showWarningDialog(
-      //     context: ctx,
-      //     msg: AppStrings.sessionExpired,
-      //     onClickYes: () {
-      //       Navigator.pop(ctx);
-      //     },
-      //   );
-      //   Future.delayed(
-      //     const Duration(milliseconds: 200),
-      //     () {
-      //       FocusManager.instance.primaryFocus?.unfocus();
-      //     },
-      //   );
-      // }
     }
-
-    //   final lastVersionNum = int.tryParse(xAppVersion?.replaceAll(".", "") ?? "");
-    //   final currentVersionNum =
-    //       int.tryParse(packageInfo.version.replaceAll(".", ""));
-    //   final isContainsVersion = sharedPreferences.containsKey(xAppVersion ?? "");
-
-    //   if (lastVersionNum != null &&
-    //       currentVersionNum != null &&
-    //       currentVersionNum < lastVersionNum &&
-    //       (xUpdateRequired || !isContainsVersion)) {
-    //     if (!isContainsVersion) {
-    //       sharedPreferences.setString(xAppVersion!, "");
-    //     }
-    //     final ctx = navigationService.navigationKey.currentContext;
-    //     if (ctx != null) {
-    //       Constants.showWarningDialog(
-    //         context: ctx,
-    //         msg: Platform.isAndroid
-    //             ? ("update_message_google")
-    //             : ("update_message_app_store"),
-    //         canPop: xUpdateRequired,
-    //         barrierDismissible: false,
-    //         onClickYes: () {
-    //           if (Platform.isAndroid) {
-    //             AppStrings.linkAppOnGooglePlay.launchUrl;
-    //           } else {
-    //             AppStrings.linkAppOnAppStore.launchUrl;
-    //           }
-    //         },
-    //         onClickNo: () {
-    //           if (xUpdateRequired) {
-    //             SystemNavigator.pop();
-    //           } else {
-    //             Navigator.pop(ctx);
-    //           }
-    //         },
-    //         textYes: ("upgrade"),
-    //       );
-    //     }
-    //   }
   }
 }

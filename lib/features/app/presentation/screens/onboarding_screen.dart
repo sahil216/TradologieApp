@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:tradologie_app/config/routes/app_router.dart';
+import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/custom_button.dart';
+import 'package:tradologie_app/features/app/injection_container_app.dart';
 
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/assets_manager.dart';
@@ -80,7 +82,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             SecureStorageService();
                         Constants.isBuyer = false;
                         await secureStorage.write(AppStrings.isBuyer, "false");
-                        Navigator.pushNamed(context, Routes.sendOtpScreen);
+                        sl<NavigationService>().pushNamed(Routes.sendOtpScreen);
                       },
                       text: CommonStrings.sellerText,
                       width: double.infinity,
@@ -100,7 +102,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             SecureStorageService();
                         Constants.isBuyer = true;
                         await secureStorage.write(AppStrings.isBuyer, "true");
-                        Navigator.pushNamed(context, Routes.sendOtpScreen);
+                        sl<NavigationService>().pushNamed(Routes.sendOtpScreen);
                       },
                       text: CommonStrings.buyerText,
                       width: double.infinity,

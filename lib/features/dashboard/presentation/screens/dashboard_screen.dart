@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/config/routes/app_router.dart';
+import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/error/network_failure.dart';
 import 'package:tradologie_app/core/error/user_failure.dart';
 import 'package:tradologie_app/core/utils/app_Colors.dart';
@@ -13,10 +14,12 @@ import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
 import 'package:tradologie_app/features/app/presentation/cubit/app_cubit.dart';
+import 'package:tradologie_app/features/app/presentation/widgets/auto_refresh_mixin.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/dashboard_result.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_dashboard_usecase.dart';
 import 'package:tradologie_app/features/dashboard/presentation/cubit/dashboard_cubit.dart';
 
+import '../../../../injection_container.dart';
 import '../widgets/dashboard_card.dart';
 import '../../../app/presentation/screens/drawer.dart';
 
@@ -27,7 +30,8 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _DashboardScreenState extends State<DashboardScreen>
+    with TabAutoRefreshMixin {
   List<DashboardResult>? dashboardData;
 
   late PageController _pageController;
@@ -51,6 +55,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     GetDashboardParams params = GetDashboardParams(
         token: await secureStorage.read(AppStrings.apiVerificationCode) ?? "");
     await dashboardCubit.getDashboardData(params);
+  }
+
+  @override
+  int get tabIndex => 0;
+
+  @override
+  void onTabActive() {
+    getDashboardData(); // 🔥 auto refresh
   }
 
   @override
@@ -124,7 +136,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             actions: [
               IconButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, Routes.notificationScreen);
+                    sl<NavigationService>().pushNamed(
+                      Routes.notificationScreen,
+                    );
                   },
                   icon: Icon(Icons.notifications)),
               SizedBox(width: 10),
@@ -139,6 +153,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             return result;
           },
           builder: (context, state) {
+            if (state is GetDashboardIsLoading) {
+              return const CommonLoader();
+            }
             if (dashboardData == null) {
               if (state is GetDashboardError) {
                 if (state.failure is NetworkFailure) {

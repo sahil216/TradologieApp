@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/config/routes/app_router.dart';
+import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/error/network_failure.dart';
 import 'package:tradologie_app/core/error/user_failure.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
@@ -13,6 +14,7 @@ import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
 import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
+import 'package:tradologie_app/features/app/presentation/widgets/auto_refresh_mixin.dart';
 import 'package:tradologie_app/features/my_account/domain/entities/company_details.dart';
 import 'package:tradologie_app/features/my_account/presentation/cubit/my_account_cubit.dart';
 import 'package:tradologie_app/features/webview/presentation/screens/in_app_webview_screen.dart';
@@ -22,6 +24,7 @@ import 'package:tradologie_app/features/webview/presentation/screens/webview_scr
 import '../../../../core/api/end_points.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_strings.dart';
+import '../../../../injection_container.dart';
 
 class MyAccountScreen extends StatefulWidget {
   const MyAccountScreen({super.key});
@@ -31,7 +34,7 @@ class MyAccountScreen extends StatefulWidget {
 }
 
 class _MyAccountScreenState extends State<MyAccountScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, TabAutoRefreshMixin {
   final SecureStorageService _secureStorage = SecureStorageService();
   String? token;
   CompanyDetails? companyDetails;
@@ -42,6 +45,14 @@ class _MyAccountScreenState extends State<MyAccountScreen>
 
   Future<void> getCompanyDetails() async {
     await cubit.companyDetails(NoParams());
+  }
+
+  @override
+  int get tabIndex => 2;
+
+  @override
+  void onTabActive() {
+    getCompanyDetails(); // 🔥 auto refresh
   }
 
   @override
@@ -127,7 +138,9 @@ class _MyAccountScreenState extends State<MyAccountScreen>
               actions: [
                 IconButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, Routes.notificationScreen);
+                      sl<NavigationService>().pushNamed(
+                        Routes.notificationScreen,
+                      );
                     },
                     icon: Icon(Icons.notifications)),
                 SizedBox(width: 10),

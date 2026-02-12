@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/api/end_points.dart';
 import 'package:tradologie_app/core/error/network_failure.dart';
 import 'package:tradologie_app/core/error/user_failure.dart';
@@ -12,6 +13,7 @@ import 'package:tradologie_app/core/widgets/common_single_child_scroll_view.dart
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
 import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
+import 'package:tradologie_app/features/app/presentation/widgets/auto_refresh_mixin.dart';
 import 'package:tradologie_app/features/negotiation/domain/entities/buyer_negotitation_detail.dart';
 import 'package:tradologie_app/features/negotiation/presentation/cubit/negotiation_cubit.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
@@ -21,6 +23,7 @@ import '../../../../config/routes/app_router.dart';
 import '../../../../core/utils/app_strings.dart';
 import '../../../../core/utils/secure_storage_service.dart';
 import '../../../../core/widgets/custom_text/text_style_constants.dart';
+import '../../../../injection_container.dart';
 import '../../domain/entities/buyer_negotiation.dart';
 import '../../domain/usecases/get_negotiation_usecase.dart';
 
@@ -31,7 +34,8 @@ class BuyerNegotiationScreen extends StatefulWidget {
   State<BuyerNegotiationScreen> createState() => _BuyerNegotiationScreenState();
 }
 
-class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen> {
+class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen>
+    with TabAutoRefreshMixin {
   BuyerNegotiation? negotiation;
   List<BuyerNegotiationDetail>? negotiationData;
 
@@ -90,6 +94,14 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen> {
         _headerController.jumpTo(_bodyController.offset);
       }
     });
+  }
+
+  @override
+  int get tabIndex => 1;
+
+  @override
+  void onTabActive() {
+    getNegotiationData(); // 🔥 auto refresh
   }
 
   @override
@@ -165,7 +177,9 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen> {
             actions: [
               IconButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, Routes.notificationScreen);
+                    sl<NavigationService>().pushNamed(
+                      Routes.notificationScreen,
+                    );
                   },
                   icon: Icon(Icons.notifications)),
               SizedBox(width: 10),
@@ -179,6 +193,9 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen> {
                   current is BuyerNegotiationIsLoading);
           return result;
         }, builder: (context, state) {
+          if (state is BuyerNegotiationIsLoading) {
+            return const CommonLoader();
+          }
           if (state is BuyerNegotiationError) {
             if (state.failure is NetworkFailure) {
               return CustomErrorNetworkWidget(
@@ -194,8 +211,6 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen> {
                 errorText: state.failure.msg,
               );
             }
-          } else if (state is BuyerNegotiationIsLoading) {
-            return const CommonLoader();
           }
 
           return SafeArea(

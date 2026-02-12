@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:tradologie_app/config/routes/app_router.dart';
+import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
+import 'package:tradologie_app/features/app/presentation/widgets/auto_refresh_mixin.dart';
 
+import '../../../../injection_container.dart';
 import '../cubit/webview_cubit.dart';
 import '../../../../core/widgets/common_loader.dart';
 import 'viewmodel/webview_params.dart';
@@ -23,7 +26,16 @@ class InAppWebViewScreen extends StatefulWidget {
   State<InAppWebViewScreen> createState() => _InAppWebViewScreenState();
 }
 
-class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
+class _InAppWebViewScreenState extends State<InAppWebViewScreen>
+    with TabAutoRefreshMixin {
+  @override
+  int get tabIndex => 2;
+
+  @override
+  void onTabActive() {
+    initState(); // 🔥 auto refresh
+  }
+
   @override
   void initState() {
     super.initState();
@@ -44,8 +56,9 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
                   widget.params.isShowNotification == true
                       ? IconButton(
                           onPressed: () {
-                            Navigator.pushNamed(
-                                context, Routes.notificationScreen);
+                            sl<NavigationService>().pushNamed(
+                              Routes.notificationScreen,
+                            );
                           },
                           icon: Icon(Icons.notifications))
                       : SizedBox.shrink(),

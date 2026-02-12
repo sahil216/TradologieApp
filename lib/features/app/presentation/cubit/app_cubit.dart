@@ -22,14 +22,17 @@ class AppCubit extends Cubit<AppState> {
       required this.checkForceUpdateUsecase})
       : super(AppInitial());
 
-  PageController controller = PageController(initialPage: 0);
   int bottomNavIndex = 0;
 
+  /// 🍎 REAL iOS tab change
   Future<void> changeTab(int tab) async {
+    if (bottomNavIndex == tab) return;
+
     bottomNavIndex = tab;
-    controller.jumpToPage(bottomNavIndex);
     emit(ChangeTab(tab: tab));
   }
+
+  /// 🍎 Sync tab index from animation (VERY IMPORTANT)
 
   Future<void> checkForceUpdate(ForceUpdateParams params) async {
     emit(CheckForceUpdateIsLoading());

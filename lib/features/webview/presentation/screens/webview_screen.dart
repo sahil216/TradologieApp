@@ -4,17 +4,21 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/config/routes/app_router.dart';
+import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
+import 'package:tradologie_app/features/app/presentation/screens/onboarding_screen.dart';
+import 'package:tradologie_app/features/app/presentation/widgets/auto_refresh_mixin.dart';
 import 'package:tradologie_app/features/webview/presentation/screens/viewmodel/webview_params.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 
 import '../../../../core/utils/app_strings.dart';
+import '../../../../injection_container.dart';
 import '../cubit/webview_cubit.dart';
 
 class WebViewScreen extends StatefulWidget {
@@ -29,7 +33,8 @@ class WebViewScreen extends StatefulWidget {
   State<WebViewScreen> createState() => _WebViewScreenState();
 }
 
-class _WebViewScreenState extends State<WebViewScreen> {
+class _WebViewScreenState extends State<WebViewScreen>
+    with TabAutoRefreshMixin {
   late final WebViewController _controller;
   SecureStorageService secureStorage = SecureStorageService();
 
@@ -38,6 +43,14 @@ class _WebViewScreenState extends State<WebViewScreen> {
 
     final androidInfo = await DeviceInfoPlugin().androidInfo;
     return androidInfo.version.sdkInt <= 33; // Android 13 = API 33
+  }
+
+  @override
+  int get tabIndex => 2;
+
+  @override
+  void onTabActive() {
+    initState(); // 🔥 auto refresh
   }
 
   @override
@@ -115,8 +128,9 @@ class _WebViewScreenState extends State<WebViewScreen> {
                     widget.params.isShowNotification == true
                         ? IconButton(
                             onPressed: () {
-                              Navigator.pushNamed(
-                                  context, Routes.notificationScreen);
+                              sl<NavigationService>().pushNamed(
+                                Routes.notificationScreen,
+                              );
                             },
                             icon: Icon(Icons.notifications))
                         : SizedBox.shrink(),

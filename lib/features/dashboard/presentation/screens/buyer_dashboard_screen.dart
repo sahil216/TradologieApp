@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/config/routes/app_router.dart';
+import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/error/network_failure.dart';
 import 'package:tradologie_app/core/error/user_failure.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
@@ -19,6 +20,7 @@ import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text_field.dart';
 import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
+import 'package:tradologie_app/features/app/presentation/widgets/auto_refresh_mixin.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/all_list_detail.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/attribute_list.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/commodity_list.dart';
@@ -29,6 +31,7 @@ import 'package:tradologie_app/features/dashboard/domain/usecases/get_all_list_u
 import 'package:tradologie_app/features/dashboard/presentation/cubit/dashboard_cubit.dart';
 
 import '../../../../core/widgets/custom_text/text_style_constants.dart';
+import '../../../../injection_container.dart';
 
 class BuyerDashboardScreen extends StatefulWidget {
   const BuyerDashboardScreen({super.key});
@@ -37,7 +40,8 @@ class BuyerDashboardScreen extends StatefulWidget {
   State<BuyerDashboardScreen> createState() => _BuyerDashboardScreenState();
 }
 
-class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
+class _BuyerDashboardScreenState extends State<BuyerDashboardScreen>
+    with TabAutoRefreshMixin {
   AllListDetail? allListDetail;
   List<CommodityList>? commodityList;
 
@@ -139,6 +143,15 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
   }
 
   @override
+  int get tabIndex => 0;
+
+  @override
+  void onTabActive() {
+    clearForm();
+    getCommodityData(); // 🔥 auto refresh
+  }
+
+  @override
   void initState() {
     super.initState();
     getCommodityData();
@@ -200,7 +213,9 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
               actions: [
                 IconButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, Routes.notificationScreen);
+                      sl<NavigationService>().pushNamed(
+                        Routes.notificationScreen,
+                      );
                     },
                     icon: Icon(Icons.notifications)),
                 SizedBox(width: 10),
@@ -221,6 +236,9 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
               return result;
             },
             builder: (context, state) {
+              if (state is GetDashboardIsLoading) {
+                return const CommonLoader();
+              }
               // if (commodityList == null) {
               if (state is GetCommodityListError) {
                 if (state.failure is NetworkFailure) {
