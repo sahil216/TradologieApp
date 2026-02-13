@@ -33,12 +33,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen>
 
   @override
   void onTabActive() {
-    initState(); // 🔥 auto refresh
-  }
-
-  @override
-  void initState() {
-    super.initState();
+    // initState(); // 🔥 auto refresh
   }
 
   @override

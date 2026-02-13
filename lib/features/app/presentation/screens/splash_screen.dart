@@ -11,10 +11,7 @@ import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
-// import 'package:tradologie_app/features/app/domain/usecases/check_force_update_usecase.dart';
 import 'package:tradologie_app/features/app/presentation/cubit/app_cubit.dart';
-import 'package:tradologie_app/features/app/presentation/screens/main_screen.dart';
-import 'package:tradologie_app/features/app/presentation/screens/onboarding_screen.dart';
 
 import '../../../../config/routes/app_router.dart';
 import '../../../../config/routes/navigation_service.dart';

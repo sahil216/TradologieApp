@@ -62,7 +62,10 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   @override
   void onTabActive() {
-    getDashboardData(); // 🔥 auto refresh
+    getDashboardData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(seconds: 4), _autoScroll);
+    });
   }
 
   @override

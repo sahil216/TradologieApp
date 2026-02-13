@@ -34,6 +34,8 @@ class EndPoints {
     return '$baseUrl/${userType.name}/login';
   }
 
+  static String countryCodeList = '$baseUrlSupplier/GetOTPCountry';
+
   // Verify
   static String verifyOtp(UserType userType) {
     return '$baseUrl/${userType.name}/VerifyOTPForLogin';

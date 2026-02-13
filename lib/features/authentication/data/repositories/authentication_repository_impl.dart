@@ -1,10 +1,12 @@
 import 'package:dartz/dartz.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
+import 'package:tradologie_app/features/authentication/data/models/country_code_list_model.dart';
 import 'package:tradologie_app/features/authentication/data/models/login_success_model.dart';
 import 'package:tradologie_app/features/authentication/data/models/send_otp_result_model.dart';
 import 'package:tradologie_app/features/authentication/data/models/verify_otp_result_model.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/buyer_login_success.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/country_code_list.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/send_otp_result.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/delete_account_usecase.dart';
 
@@ -263,6 +265,23 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       final response = await authenticationRemoteDataSource.signOut(params);
       if (response != null && response.success) {
         return Right(response.success);
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<CountryCodeList>>> getCountryCodeList(
+      NoParams params) async {
+    try {
+      final response =
+          await authenticationRemoteDataSource.getCountryCodeList(params);
+      if (response != null && response.success) {
+        return Right((response.data as List)
+            .map((e) => CountryCodeListModel.fromJson(e))
+            .toList());
       }
       return Left(UserFailure(response?.message, response?.code));
     } on Failure catch (e) {

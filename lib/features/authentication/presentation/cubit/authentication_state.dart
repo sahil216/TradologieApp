@@ -138,3 +138,23 @@ class DeleteAccountError extends AuthenticationState {
   @override
   List<Object> get props => [failure];
 }
+
+class GetCountryCodeListIsLoading extends AuthenticationState {}
+
+class GetCountryCodeListSuccess extends AuthenticationState {
+  final List<CountryCodeList> data;
+
+  const GetCountryCodeListSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class GetCountryCodeListError extends AuthenticationState {
+  final Failure failure;
+
+  const GetCountryCodeListError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}

@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/buyer_login_success.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/country_code_list.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/login_success.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/send_otp_result.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/verify_otp_result.dart';
@@ -23,4 +24,6 @@ abstract class AuthenticationRepository {
   Future<Either<Failure, bool>> register(RegisterParams params);
   Future<Either<Failure, bool>> signOut(NoParams params);
   Future<Either<Failure, bool>> deleteAccount(DeleteAccountParams params);
+  Future<Either<Failure, List<CountryCodeList>>> getCountryCodeList(
+      NoParams params);
 }

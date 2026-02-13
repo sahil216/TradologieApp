@@ -1,8 +1,8 @@
-import 'package:country_picker/country_picker.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
+import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
@@ -11,6 +11,7 @@ import 'package:tradologie_app/core/widgets/common_social_icons.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 import 'package:tradologie_app/core/widgets/phone_number_widget.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/country_code_list.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/send_otp_usecase.dart';
 import '../../../../config/routes/app_router.dart';
 import '../../../../core/api/end_points.dart';
@@ -33,14 +34,20 @@ class SendOtpScreen extends StatefulWidget {
 class _SendOtpScreenState extends State<SendOtpScreen> {
   final textMobileController = TextEditingController();
   final textFullNameController = TextEditingController();
+  List<CountryCodeList>? countryCodeList;
   var params;
-  String countryCode = "91";
+  CountryCodeList? countryCode;
+
   bool isSubmitted = false;
   final termsAgree = ValueNotifier(false);
   final showPassword = ValueNotifier(false);
   final formKey = GlobalKey<FormState>();
+
+  AuthenticationCubit get authenticationCubit =>
+      BlocProvider.of<AuthenticationCubit>(context);
   @override
   void initState() {
+    authenticationCubit.getCountryCodeList(NoParams());
     super.initState();
   }
 
@@ -69,6 +76,15 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
               }
             }
             if (state is SendOtpError) {
+              Constants.showFailureToast(state.failure);
+            }
+            if (state is GetCountryCodeListSuccess) {
+              countryCodeList = state.data;
+              countryCode = countryCodeList
+                  ?.firstWhere((element) => element.countryCode == "91");
+              setState(() {});
+            }
+            if (state is GetCountryCodeListError) {
               Constants.showFailureToast(state.failure);
             }
           },
@@ -179,8 +195,18 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                                                           mobile: 16,
                                                           tablet: 24)),
                                                   CountryPhoneField(
-                                                    initialCountry:
-                                                        Country.parse('IN'),
+                                                    initialCountry: countryCodeList
+                                                            ?.firstWhere(
+                                                                (element) =>
+                                                                    element
+                                                                        .countryCode ==
+                                                                    "91") ??
+                                                        CountryCodeList(
+                                                            countryName:
+                                                                "India",
+                                                            countryCode: "91"),
+                                                    countryList:
+                                                        countryCodeList ?? [],
                                                     controller:
                                                         textMobileController,
                                                     hintText: CommonStrings
@@ -193,8 +219,7 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                                                     },
                                                     onCountryChanged: (value) {
                                                       setState(() {
-                                                        countryCode =
-                                                            value.phoneCode;
+                                                        countryCode = value;
                                                       });
                                                     },
                                                     autovalidateMode:
@@ -206,7 +231,9 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                                                         return "Phone cannot be empty";
                                                       }
                                                       if (value.length < 10 &&
-                                                          countryCode == "91") {
+                                                          countryCode
+                                                                  ?.countryCode ==
+                                                              "91") {
                                                         return "Phone must be at least 10 digits";
                                                       }
                                                       return null;
@@ -335,8 +362,6 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                                                                   if (textMobileController
                                                                           .text
                                                                           .isNotEmpty &&
-                                                                      countryCode
-                                                                          .isNotEmpty &&
                                                                       textFullNameController
                                                                           .text
                                                                           .isNotEmpty) {
@@ -345,7 +370,8 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                                                                             textMobileController
                                                                                 .text,
                                                                         countryCode:
-                                                                            countryCode,
+                                                                            countryCode ??
+                                                                                CountryCodeList(),
                                                                         name: textFullNameController
                                                                             .text);
                                                                     FocusManager

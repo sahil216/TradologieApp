@@ -3,12 +3,14 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/buyer_login_success.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/country_code_list.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/login_success.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/send_otp_result.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/buyer_send_otp_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/buyer_signin_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/buyer_verify_otp_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/delete_account_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/get_country_code_list_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/sign_out_usecase.dart';
 
 import '../../../../core/error/failures.dart';
@@ -30,6 +32,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   final BuyerSendOtpUsecase buyerSendOtpUsecase;
   final BuyerVerifyOtpUsecase buyerVerifyOtpUsecase;
   final DeleteAccountUsecase deleteAccountUsecase;
+  final GetCountryCodeListUsecase getCountryCodeListUsecase;
 
   AuthenticationCubit({
     required this.sendOtpUsecase,
@@ -41,6 +44,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     required this.buyerSendOtpUsecase,
     required this.buyerVerifyOtpUsecase,
     required this.deleteAccountUsecase,
+    required this.getCountryCodeListUsecase,
   }) : super(AuthenticationInitial());
 
   Future<void> sendOtp(SendOtpParams params, bool isResend) async {
@@ -118,6 +122,16 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       (res) => SignOutSuccess(
         success: res,
       ),
+    ));
+  }
+
+  Future<void> getCountryCodeList(NoParams params) async {
+    emit(GetCountryCodeListIsLoading());
+    Either<Failure, List<CountryCodeList>> response =
+        await getCountryCodeListUsecase(params);
+    emit(response.fold(
+      (failure) => GetCountryCodeListError(failure: failure),
+      (res) => GetCountryCodeListSuccess(data: res),
     ));
   }
 

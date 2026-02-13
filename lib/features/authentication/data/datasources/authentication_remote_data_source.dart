@@ -21,6 +21,7 @@ abstract class AuthenticationRemoteDataSource {
   Future<ResponseWrapper<dynamic>?> verifyOtpBuyer(VerifyOtpParams params);
   Future<ResponseWrapper<dynamic>?> signOut(NoParams params);
   Future<ResponseWrapper<dynamic>?> deleteAccount(DeleteAccountParams params);
+  Future<ResponseWrapper<dynamic>?> getCountryCodeList(NoParams params);
 }
 
 class AuthenticationRemoteDataSourceImpl
@@ -106,6 +107,14 @@ class AuthenticationRemoteDataSourceImpl
           ? EndPoints.deleteAccount(UserType.buyer)
           : EndPoints.deleteAccount(UserType.supplier),
       body: params.toJson(),
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> getCountryCodeList(NoParams params) async {
+    return await apiConsumer.post(
+      EndPoints.countryCodeList,
+      body: {"Token": "2018APR031848"},
     );
   }
 }

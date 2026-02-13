@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/buyer_signin_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/delete_account_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/get_country_code_list_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/sign_out_usecase.dart';
 import 'data/datasources/authentication_remote_data_source.dart';
 import 'data/repositories/authentication_repository_impl.dart';
@@ -28,6 +29,7 @@ Future<void> init() async {
         buyerSendOtpUsecase: sl(),
         buyerVerifyOtpUsecase: sl(),
         deleteAccountUsecase: sl(),
+        getCountryCodeListUsecase: sl(),
       ));
 
   //! Use cases
@@ -49,6 +51,8 @@ Future<void> init() async {
       () => BuyerVerifyOtpUsecase(authenticationRepository: sl()));
   sl.registerLazySingleton<DeleteAccountUsecase>(
       () => DeleteAccountUsecase(authenticationRepository: sl()));
+  sl.registerLazySingleton<GetCountryCodeListUsecase>(
+      () => GetCountryCodeListUsecase(authenticationRepository: sl()));
 
   //! Repository
   sl.registerLazySingleton<AuthenticationRepository>(

@@ -112,7 +112,7 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
               });
             }
             if (state is GetSupplierShortistedError) {
-              Constants.showFailureToast(state.failure);
+              // Constants.showFailureToast(state.failure);
             }
           },
         ),
@@ -218,42 +218,50 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
                             child: supplierList == null
                                 ? const SizedBox.shrink()
                                 : ListView.separated(
+                                    addAutomaticKeepAlives: false,
+                                    addRepaintBoundaries: true,
+                                    addSemanticIndexes: false,
+                                    cacheExtent: 300,
                                     padding: const EdgeInsets.only(bottom: 12),
                                     itemCount: supplierList?.length ?? 0,
                                     separatorBuilder: (_, __) =>
                                         const SizedBox(height: 12),
                                     itemBuilder: (context, index) {
                                       final item = supplierList![index];
-                                      return SupplierInfoCard(
-                                        supplier: item,
-                                        addRemoveShortListButton: cubit
-                                                .isSupplierShortlisted(
-                                                    supplier: item,
-                                                    shortlisted:
-                                                        shortlistedSupplierList)
-                                            ? () async {
-                                                late RemoveSupplierShortlistParams
-                                                    params;
+                                      return RepaintBoundary(
+                                        // 🔥 BIG performance gain
+                                        child: SupplierInfoCard(
+                                          supplier: item,
+                                          addRemoveShortListButton: cubit
+                                                  .isSupplierShortlisted(
+                                                      supplier: item,
+                                                      shortlisted:
+                                                          shortlistedSupplierList)
+                                              ? () async {
+                                                  late RemoveSupplierShortlistParams
+                                                      params;
 
-                                                params =
-                                                    RemoveSupplierShortlistParams(
-                                                  token: await secureStorage
-                                                          .read(AppStrings
-                                                              .apiVerificationCode) ??
-                                                      "",
-                                                  shortlistID: item.shortlistId
-                                                      .toString(),
-                                                );
+                                                  params =
+                                                      RemoveSupplierShortlistParams(
+                                                    token: await secureStorage
+                                                            .read(AppStrings
+                                                                .apiVerificationCode) ??
+                                                        "",
+                                                    shortlistID: item
+                                                        .shortlistId
+                                                        .toString(),
+                                                  );
 
-                                                cubit.deleteSupplierShortlist(
-                                                    params);
-                                              }
-                                            : () {},
-                                        isShortlisted:
-                                            cubit.isSupplierShortlisted(
-                                                supplier: item,
-                                                shortlisted:
-                                                    shortlistedSupplierList),
+                                                  cubit.deleteSupplierShortlist(
+                                                      params);
+                                                }
+                                              : () {},
+                                          isShortlisted:
+                                              cubit.isSupplierShortlisted(
+                                                  supplier: item,
+                                                  shortlisted:
+                                                      shortlistedSupplierList),
+                                        ),
                                       );
                                     },
                                   ),

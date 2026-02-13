@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/country_code_list.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/send_otp_result.dart';
 
 import '../../../../core/error/failures.dart';
@@ -18,7 +19,7 @@ class SendOtpUsecase implements UseCase<SendOtpResult, SendOtpParams> {
 
 class SendOtpParams extends Equatable {
   final String mobileNo;
-  final String countryCode;
+  final CountryCodeList countryCode;
   final String name;
 
   const SendOtpParams(
@@ -30,7 +31,7 @@ class SendOtpParams extends Equatable {
   Map<String, dynamic> toJson() => {
         "Token": "2018APR031848",
         "MobileNo": mobileNo,
-        "CountryCode": countryCode,
+        "CountryCode": countryCode.countryValue,
         if (Constants.isBuyer == false) "VendorName": name,
         if (Constants.isBuyer == true) "CustomerName": name
       };

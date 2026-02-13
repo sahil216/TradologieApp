@@ -1,7 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tradologie_app/config/routes/navigation_service.dart';
 
 import 'package:tradologie_app/core/utils/common_strings.dart';
 import 'package:tradologie_app/core/utils/extensions.dart';
@@ -22,7 +21,6 @@ import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text/custom_text_rich.dart';
 import '../../../../core/widgets/custom_text/text_style_constants.dart';
 import '../../../../core/widgets/custom_text_field.dart';
-import '../../../../injection_container.dart';
 import '../cubit/authentication_cubit.dart';
 
 class SignupScreen extends StatefulWidget {

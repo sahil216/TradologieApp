@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:country_picker/country_picker.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/country_code_list.dart';
 
 class CountryPhoneField extends StatefulWidget {
-  final Country initialCountry;
+  final CountryCodeList initialCountry;
   final String? hintText;
   final ValueChanged<String>? onChanged;
-  final ValueChanged<Country>? onCountryChanged;
+  final ValueChanged<CountryCodeList>? onCountryChanged;
+  final List<CountryCodeList> countryList;
 
   final TextEditingController? controller;
   final FocusNode? focusNode;
@@ -30,6 +31,7 @@ class CountryPhoneField extends StatefulWidget {
     this.readOnly = false,
     this.maxLength,
     this.validator,
+    required this.countryList,
   });
 
   @override
@@ -37,7 +39,7 @@ class CountryPhoneField extends StatefulWidget {
 }
 
 class _CountryPhoneFieldState extends State<CountryPhoneField> {
-  late Country _country;
+  late CountryCodeList _country;
   late TextEditingController _controller;
   String? _errorText;
 
@@ -91,33 +93,28 @@ class _CountryPhoneFieldState extends State<CountryPhoneField> {
               InkWell(
                 onTap: widget.enabled
                     ? () {
-                        showCountryPicker(
-                          context: context,
-                          showPhoneCode: true,
-                          countryListTheme: CountryListThemeData(
-                            bottomSheetHeight:
-                                MediaQuery.of(context).size.height * 0.8,
-                          ),
-                          onSelect: (country) {
-                            setState(() => _country = country);
-                            widget.onCountryChanged?.call(country);
-                          },
-                        );
+                        _openCountryPicker(context);
+                        // showCountryPicker(
+                        //   context: context,
+                        //   showPhoneCode: true,
+                        //   countryListTheme: CountryListThemeData(
+                        //     bottomSheetHeight:
+                        //         MediaQuery.of(context).size.height * 0.8,
+                        //   ),
+                        //   onSelect: (country) {
+                        //     setState(() => _country = country);
+                        //     widget.onCountryChanged?.call(country);
+                        //   },
+                        // );
                       }
                     : null,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Row(
                     children: [
-                      Text(
-                        _country.flagEmoji,
-                        style: TextStyle(
-                          fontSize: isTablet ? 26 : 22,
-                        ),
-                      ),
                       const SizedBox(width: 6),
                       Text(
-                        "+${_country.phoneCode}",
+                        "+${_country.countryCode}",
                         style: const TextStyle(
                           fontWeight: FontWeight.w500,
                         ),
@@ -175,6 +172,70 @@ class _CountryPhoneFieldState extends State<CountryPhoneField> {
           ),
         ],
       ],
+    );
+  }
+
+  void _openCountryPicker(BuildContext context) {
+    final height = MediaQuery.of(context).size.height * 0.7;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) {
+        return Container(
+          height: height, // ✅ 70% height
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(16),
+            ),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              children: [
+                /// drag handle (optional but nice UX)
+                const SizedBox(height: 10),
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                const SizedBox(height: 10),
+
+                /// ✅ List
+                Expanded(
+                  child: ListView.separated(
+                    itemCount: widget.countryList.length,
+                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    itemBuilder: (context, index) {
+                      final country = widget.countryList[index];
+
+                      return ListTile(
+                        title: Text(country.countryName ?? ""),
+                        trailing: Text("+${country.countryCode}"),
+                        onTap: () {
+                          Navigator.pop(context);
+
+                          setState(() {
+                            _country = country;
+                          });
+
+                          widget.onCountryChanged?.call(country);
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
