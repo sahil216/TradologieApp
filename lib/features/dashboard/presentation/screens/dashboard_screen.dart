@@ -74,11 +74,11 @@ class _DashboardScreenState extends State<DashboardScreen>
     getDashboardData();
     _appCubit = BlocProvider.of<AppCubit>(context);
     _pageController = PageController();
-    _pageController.addListener(() {
-      setState(() {
-        _currentPageValue = _pageController.page ?? 0.0;
-      });
-    });
+    // _pageController.addListener(() {
+    //   setState(() {
+    //     _currentPageValue = _pageController.page ?? 0.0;
+    //   });
+    // });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(const Duration(seconds: 4), _autoScroll);
     });
@@ -121,9 +121,8 @@ class _DashboardScreenState extends State<DashboardScreen>
           listenWhen: (previous, current) => previous != current,
           listener: (context, state) {
             if (state is GetDashboardSuccess) {
-              setState(() {
-                dashboardData = state.data;
-              });
+              dashboardData = state.data;
+              setState(() {});
             }
             if (state is GetDashboardError) {
               Constants.showFailureToast(state.failure);
@@ -178,11 +177,11 @@ class _DashboardScreenState extends State<DashboardScreen>
               }
               return const CommonLoader();
             }
-            return SafeArea(
-              child: Column(
-                children: [
-                  dashboardBody(totalPages),
-                ],
+            return SizedBox(
+              height: Responsive(context).screenHeight * 0.72,
+              child: UltraEliteDashboardCarousel(
+                data: dashboardData!,
+                onParticipate: (_) => _appCubit.changeTab(1),
               ),
             );
           },
@@ -202,55 +201,65 @@ class _DashboardScreenState extends State<DashboardScreen>
 
     return Column(
       children: [
-        AnimatedSize(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          child: SizedBox(
-            height: responsive.screenHeight * 0.7,
-            child: PageView.builder(
-                controller: _pageController,
-                itemCount: totalPages,
-                onPageChanged: (index) {
-                  setState(() => currentPage = index);
-                },
-                itemBuilder: (context, pageIndex) {
-                  final perPage = responsive.isTablet ? 2 : 1;
-                  final startIndex = pageIndex * perPage;
-                  final endIndex =
-                      (startIndex + perPage).clamp(0, dashboardData!.length);
+        SizedBox(
+          height: responsive.screenHeight * 0.7,
+          child: PageView.builder(
+              controller: _pageController,
+              itemCount: totalPages,
+              onPageChanged: (index) {
+                setState(() => currentPage = index);
+              },
+              itemBuilder: (context, pageIndex) {
+                final perPage = responsive.isTablet ? 2 : 1;
+                final startIndex = pageIndex * perPage;
+                final endIndex =
+                    (startIndex + perPage).clamp(0, dashboardData!.length);
 
-                  final items = dashboardData!.sublist(startIndex, endIndex);
+                final items = dashboardData!.sublist(startIndex, endIndex);
 
-                  final distance = (_currentPageValue - pageIndex).abs();
-                  final scale = (1 - distance * 0.08).clamp(0.92, 1.0);
-                  final opacity = (1 - distance * 0.4).clamp(0.6, 1.0);
+                return AnimatedBuilder(
+                  animation: _pageController,
+                  builder: (context, child) {
+                    double page = 0;
+                    if (_pageController.hasClients &&
+                        _pageController.page != null) {
+                      page = _pageController.page!;
+                    } else {
+                      page = currentPage.toDouble();
+                    }
 
-                  return Transform.scale(
-                    scale: scale,
-                    child: Opacity(
-                      opacity: opacity,
-                      child: Row(
-                        children: items
-                            .map(
-                              (item) => Expanded(
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 8),
-                                  child: DashboardCard(
-                                    item: item,
-                                    onParticipateNowPressed: () {
-                                      _appCubit.changeTab(1);
-                                    },
-                                  ),
-                                ),
-                              ),
-                            )
-                            .toList(),
+                    final distance = (page - pageIndex).abs();
+                    final scale = (1 - distance * 0.08).clamp(0.92, 1.0);
+                    final opacity = (1 - distance * 0.4).clamp(0.6, 1.0);
+
+                    return Transform.scale(
+                      scale: scale,
+                      child: Opacity(
+                        opacity: opacity,
+                        child: child,
                       ),
+                    );
+                  },
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: responsive.screenHeight * 0.7,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: items
+                          .map((item) => Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                                child: DashboardCard(
+                                  item: item,
+                                  onParticipateNowPressed: () =>
+                                      _appCubit.changeTab(1),
+                                ),
+                              ))
+                          .toList(),
                     ),
-                  );
-                }),
-          ),
+                  ),
+                );
+              }),
         ),
       ],
     );
@@ -295,6 +304,116 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
         );
       }),
+    );
+  }
+}
+
+class UltraEliteDashboardCarousel extends StatefulWidget {
+  final List<DashboardResult> data;
+  final Function(DashboardResult) onParticipate;
+
+  const UltraEliteDashboardCarousel({
+    super.key,
+    required this.data,
+    required this.onParticipate,
+  });
+
+  @override
+  State<UltraEliteDashboardCarousel> createState() =>
+      _UltraEliteDashboardCarouselState();
+}
+
+class _UltraEliteDashboardCarouselState
+    extends State<UltraEliteDashboardCarousel> {
+  late final PageController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+
+    /// 👇 Side preview like AppStore cards
+    _controller = PageController(viewportFraction: 0.88);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PageView.builder(
+      controller: _controller,
+      physics: const BouncingScrollPhysics(),
+      itemCount: widget.data.length,
+      itemBuilder: (context, index) {
+        return AnimatedBuilder(
+          animation: _controller,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: DashboardCard(
+              item: widget.data[index],
+              onParticipateNowPressed: () =>
+                  widget.onParticipate(widget.data[index]),
+            ),
+          ),
+          builder: (context, child) {
+            double page = 0;
+
+            if (_controller.hasClients && _controller.page != null) {
+              page = _controller.page!;
+            } else {
+              page = index.toDouble();
+            }
+
+            /// 🔥 Distance from center page
+            final distance = (page - index);
+
+            /// ✅ Scale
+            final scale =
+                (1 - (distance.abs() * 0.12)).clamp(0.86, 1.0).toDouble();
+
+            /// ✅ Opacity
+            final opacity =
+                (1 - (distance.abs() * 0.4)).clamp(0.6, 1.0).toDouble();
+
+            /// 🚀 3D Perspective Tilt
+            final tilt = (distance * 0.08);
+
+            /// 🌑 Dynamic shadow depth
+            final shadowBlur =
+                (20 * (1 - distance.abs())).clamp(4, 20).toDouble();
+
+            return Center(
+              child: Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.identity()
+                  ..setEntry(3, 2, 0.001) // perspective
+                  ..rotateY(tilt),
+                child: Transform.scale(
+                  scale: scale,
+                  child: Opacity(
+                    opacity: opacity,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: shadowBlur,
+                            color: Colors.black.withValues(alpha: .12),
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: child,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

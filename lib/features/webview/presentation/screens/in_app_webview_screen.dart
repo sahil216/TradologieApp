@@ -26,16 +26,7 @@ class InAppWebViewScreen extends StatefulWidget {
   State<InAppWebViewScreen> createState() => _InAppWebViewScreenState();
 }
 
-class _InAppWebViewScreenState extends State<InAppWebViewScreen>
-    with TabAutoRefreshMixin {
-  @override
-  int get tabIndex => 2;
-
-  @override
-  void onTabActive() {
-    // initState(); // 🔥 auto refresh
-  }
-
+class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
   @override
   Widget build(BuildContext context) {
     return PopScope(

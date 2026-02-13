@@ -223,19 +223,19 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
                       iconPath: Icon(Icons.article_outlined, size: 24),
                       title: 'Negotiation',
                     ),
-                    Constants.isBuyer == true
-                        ? DrawerItem(
-                            onTap: () {
-                              Navigator.pop(context);
-                              sl<NavigationService>()
-                                  .pushNamed(Routes.supplierListScreen);
-                            },
-                            iconPath: Icon(
-                              Icons.add,
-                              size: 24,
-                            ),
-                            title: 'Add Negotiation')
-                        : SizedBox.shrink(),
+                    // Constants.isBuyer == true
+                    //     ? DrawerItem(
+                    //         onTap: () {
+                    //           Navigator.pop(context);
+                    //           sl<NavigationService>()
+                    //               .pushNamed(Routes.supplierListScreen);
+                    //         },
+                    //         iconPath: Icon(
+                    //           Icons.add,
+                    //           size: 24,
+                    //         ),
+                    //         title: 'Add Negotiation')
+                    //     : SizedBox.shrink(),
                     // DrawerItem(
                     //     onTap: () {
                     //       Navigator.pop(context);

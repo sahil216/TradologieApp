@@ -32,8 +32,7 @@ class WebViewScreen extends StatefulWidget {
   State<WebViewScreen> createState() => _WebViewScreenState();
 }
 
-class _WebViewScreenState extends State<WebViewScreen>
-    with TabAutoRefreshMixin {
+class _WebViewScreenState extends State<WebViewScreen> {
   late final WebViewController _controller;
   SecureStorageService secureStorage = SecureStorageService();
 
@@ -42,14 +41,6 @@ class _WebViewScreenState extends State<WebViewScreen>
 
     final androidInfo = await DeviceInfoPlugin().androidInfo;
     return androidInfo.version.sdkInt <= 33; // Android 13 = API 33
-  }
-
-  @override
-  int get tabIndex => 2;
-
-  @override
-  void onTabActive() {
-    initState(); // 🔥 auto refresh
   }
 
   @override

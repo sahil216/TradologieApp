@@ -2,6 +2,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:tradologie_app/config/routes/app_router.dart';
 import 'package:tradologie_app/core/error/user_failure.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
@@ -407,7 +408,10 @@ class _AddNegotiationDetailsScreenState
                               child: Padding(
                                 padding: const EdgeInsets.only(top: 12),
                                 child: CommonButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                        context, Routes.addProductScreen);
+                                  },
                                   text: "Create Negotiation",
                                   width: double.infinity,
                                   textStyle: TextStyleConstants.medium(
