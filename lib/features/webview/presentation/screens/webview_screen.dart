@@ -11,7 +11,6 @@ import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
-import 'package:tradologie_app/features/app/presentation/widgets/auto_refresh_mixin.dart';
 import 'package:tradologie_app/features/webview/presentation/screens/viewmodel/webview_params.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';

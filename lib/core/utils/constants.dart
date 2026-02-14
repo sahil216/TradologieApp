@@ -8,12 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../config/routes/navigation_service.dart';
 import '../../core/utils/extensions.dart';
-import '../../injection_container.dart';
-import '../error/failures.dart';
-import '../error/network_failure.dart';
-import '../error/user_failure.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_icon_button.dart';
 import '../widgets/custom_text/text_style_constants.dart';

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tradologie_app/config/routes/app_router.dart';
 import 'package:tradologie_app/features/app/presentation/view_model/tab_view_model.dart';
 
 class CupertinoTabEngine extends StatefulWidget {
@@ -43,7 +44,7 @@ class CupertinoTabEngineState extends State<CupertinoTabEngine> {
             opacity: isActive ? 1 : 0,
             child: Navigator(
               key: _navigatorKeys[index],
-              onGenerateRoute: (_) => MaterialPageRoute(
+              onGenerateRoute: (_) => FadeCupertinoPageRoute(
                 builder: (_) => widget.tabs[index].page,
               ),
             ),

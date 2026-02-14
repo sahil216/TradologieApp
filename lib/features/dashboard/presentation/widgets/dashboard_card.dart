@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:tradologie_app/core/api/end_points.dart';
 import 'package:tradologie_app/core/utils/app_colors.dart';
-import 'package:tradologie_app/core/utils/responsive.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/common_single_child_scroll_view.dart';
 import 'package:tradologie_app/core/widgets/custom_button.dart';

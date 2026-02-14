@@ -7,7 +7,6 @@ import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
-import 'package:tradologie_app/features/app/presentation/widgets/auto_refresh_mixin.dart';
 
 import '../../../../injection_container.dart';
 import '../cubit/webview_cubit.dart';

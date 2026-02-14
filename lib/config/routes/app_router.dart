@@ -190,6 +190,16 @@ class AppRoutes {
     }
   }
 
+  static Widget? getPage(RouteSettings settings) {
+    switch (settings.name) {
+      case Routes.mainRoute:
+        return const MainScreen();
+
+      default:
+        return null;
+    }
+  }
+
   static Route<dynamic> undefinedRoute() {
     return FadeCupertinoPageRoute(
       builder: (context) => const AdaptiveScaffold(
@@ -215,9 +225,6 @@ class FadeCupertinoPageRoute<T> extends CupertinoPageRoute<T> {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    /// =========================================================
-    /// 🍎 iOS — Native swipe-back + iOS26 subtle fade
-    /// =========================================================
     if (Platform.isIOS) {
       final curved = CurvedAnimation(
         parent: animation,
@@ -234,10 +241,6 @@ class FadeCupertinoPageRoute<T> extends CupertinoPageRoute<T> {
       );
     }
 
-    /// =========================================================
-    /// 🤖 Android — Material 3 FadeThroughTransition
-    /// (Used by Gmail / Google Photos)
-    /// =========================================================
     return FadeThroughTransition(
       animation: animation,
       secondaryAnimation: secondaryAnimation,
