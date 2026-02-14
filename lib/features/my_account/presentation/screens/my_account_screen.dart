@@ -11,6 +11,7 @@ import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
+import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
 import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
@@ -122,7 +123,7 @@ class _MyAccountScreenState extends State<MyAccountScreen>
                   companyDetails = state.data;
                 }
                 if (state is CompanyDetailsError) {
-                  Constants.showFailureToast(state.failure);
+                  CommonToast.showFailureToast(state.failure);
                 }
               },
             ),

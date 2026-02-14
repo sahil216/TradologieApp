@@ -8,6 +8,7 @@ import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/common_social_icons.dart';
+import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 import 'package:tradologie_app/core/widgets/phone_number_widget.dart';
@@ -71,12 +72,11 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                 Navigator.pushNamed(context, Routes.verifyOtpScreen,
                     arguments: params);
               } else {
-                Constants.showSuccessToast(
-                    context: context, msg: CommonStrings.otpSentSuccessfully);
+                CommonToast.success(CommonStrings.otpSentSuccessfully);
               }
             }
             if (state is SendOtpError) {
-              Constants.showFailureToast(state.failure);
+              CommonToast.showFailureToast(state.failure);
             }
             if (state is GetCountryCodeListSuccess) {
               countryCodeList = state.data;
@@ -85,7 +85,7 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
               setState(() {});
             }
             if (state is GetCountryCodeListError) {
-              Constants.showFailureToast(state.failure);
+              CommonToast.showFailureToast(state.failure);
             }
           },
           child: Stack(
@@ -387,19 +387,14 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                                                                             params,
                                                                             false);
                                                                   } else {
-                                                                    Constants.showErrorToast(
-                                                                        context:
-                                                                            context,
-                                                                        msg:
+                                                                    CommonToast
+                                                                        .error(
                                                                             "Please Enter the Details to Continue");
                                                                   }
                                                                 }
                                                               : () {
-                                                                  Constants.showErrorToast(
-                                                                      context:
-                                                                          context,
-                                                                      msg:
-                                                                          "Please accept Terms and Conditions");
+                                                                  CommonToast.error(
+                                                                      "Please accept Terms and Conditions");
                                                                 },
                                                       text: CommonStrings
                                                           .sendOtpViaWhatsapp,

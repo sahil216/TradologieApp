@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
+import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/features/my_account/presentation/cubit/my_account_cubit.dart';
 
 import '../../../../../core/error/network_failure.dart';
@@ -45,7 +46,7 @@ class _MembershipTabState extends State<MembershipTab> {
               data = state.data;
             }
             if (state is MembershipError) {
-              Constants.showFailureToast(state.failure);
+              CommonToast.showFailureToast(state.failure);
             }
           },
         ),

@@ -15,6 +15,7 @@ import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_drop_down.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
+import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_button.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
@@ -173,17 +174,15 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen>
               commodityList = state.data;
             }
             if (state is GetCommodityListError) {
-              Constants.showFailureToast(state.failure);
+              CommonToast.showFailureToast(state.failure);
             }
             if (state is AddCustomerRequirementSuccess) {
-              Constants.showSuccessToast(
-                  context: context,
-                  msg:
-                      "Thank you for posting your requirement. Relevant sellers will be notified and you will receive quotes soon.");
+              CommonToast.success(
+                  "Thank you for posting your requirement. Relevant sellers will be notified and you will receive quotes soon.");
               clearForm();
             }
             if (state is AddCustomerRequirementError) {
-              Constants.showFailureToast(state.failure);
+              CommonToast.showFailureToast(state.failure);
             }
 
             if (state is GetAllListSuccess) {
@@ -198,7 +197,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen>
               unitKey = UniqueKey();
             }
             if (state is GetAllListError) {
-              Constants.showFailureToast(state.failure);
+              CommonToast.showFailureToast(state.failure);
             }
           },
         ),
@@ -547,8 +546,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen>
 
                   dashboardCubit.addCustomerRequirement(params);
                 } else {
-                  Constants.showErrorToast(
-                      context: context, msg: CommonStrings.enterAllDetails);
+                  CommonToast.error(CommonStrings.enterAllDetails);
                 }
               },
               text: "Submit",

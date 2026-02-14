@@ -11,6 +11,7 @@ import 'package:tradologie_app/core/utils/responsive.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
+import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
 import 'package:tradologie_app/features/app/presentation/cubit/app_cubit.dart';
@@ -34,11 +35,10 @@ class _DashboardScreenState extends State<DashboardScreen>
     with TabAutoRefreshMixin {
   List<DashboardResult>? dashboardData;
 
-  late PageController _pageController;
+  late final PageController _carouselController;
   int currentPage = 0;
 
   late AppCubit _appCubit;
-  double _currentPageValue = 0.0;
 
   DashboardCubit get dashboardCubit => BlocProvider.of<DashboardCubit>(context);
 
@@ -73,7 +73,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     super.initState();
     getDashboardData();
     _appCubit = BlocProvider.of<AppCubit>(context);
-    _pageController = PageController();
+    _carouselController = PageController(viewportFraction: 0.88);
     // _pageController.addListener(() {
     //   setState(() {
     //     _currentPageValue = _pageController.page ?? 0.0;
@@ -86,7 +86,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   void _autoScroll() {
     if (!mounted) return;
-    if (!_pageController.hasClients) return;
+    if (!_carouselController.hasClients) return;
 
     final pageCount = _totalPages(context);
 
@@ -97,7 +97,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
     currentPage = (currentPage + 1) % pageCount;
 
-    _pageController.animateToPage(
+    _carouselController.animateToPage(
       currentPage,
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeInOut,
@@ -108,13 +108,14 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   @override
   void dispose() {
-    _pageController.dispose();
+    // _carouselController.dispose();
+    _carouselController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final totalPages = _totalPages(context);
+    _totalPages(context);
     return MultiBlocListener(
       listeners: [
         BlocListener<DashboardCubit, DashboardState>(
@@ -125,7 +126,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               setState(() {});
             }
             if (state is GetDashboardError) {
-              Constants.showFailureToast(state.failure);
+              CommonToast.showFailureToast(state.failure);
             }
           },
         ),
@@ -179,179 +180,77 @@ class _DashboardScreenState extends State<DashboardScreen>
             }
             return SizedBox(
               height: Responsive(context).screenHeight * 0.72,
-              child: UltraEliteDashboardCarousel(
+              child: DashboardCarausel(
                 data: dashboardData!,
                 onParticipate: (_) => _appCubit.changeTab(1),
+                controller: _carouselController,
+                onPageChanged: (index) {
+                  setState(() {
+                    currentPage = index;
+                  });
+                },
               ),
             );
           },
         ),
-        bottomNavigationBar: totalPages > 1
-            ? _pageDots(totalPages)
+        bottomNavigationBar: dashboardData != null && dashboardData!.length > 1
+            ? PageDots(
+                controller: _carouselController,
+                itemCount: dashboardData!.length,
+              )
             : const SizedBox.shrink(), // _pageDots(totalPages),
       ),
     );
   }
-
-  Widget dashboardBody(int totalPages) {
-    Responsive responsive = Responsive(context);
-    if (dashboardData == null) {
-      return CommonLoader();
-    }
-
-    return Column(
-      children: [
-        SizedBox(
-          height: responsive.screenHeight * 0.7,
-          child: PageView.builder(
-              controller: _pageController,
-              itemCount: totalPages,
-              onPageChanged: (index) {
-                setState(() => currentPage = index);
-              },
-              itemBuilder: (context, pageIndex) {
-                final perPage = responsive.isTablet ? 2 : 1;
-                final startIndex = pageIndex * perPage;
-                final endIndex =
-                    (startIndex + perPage).clamp(0, dashboardData!.length);
-
-                final items = dashboardData!.sublist(startIndex, endIndex);
-
-                return AnimatedBuilder(
-                  animation: _pageController,
-                  builder: (context, child) {
-                    double page = 0;
-                    if (_pageController.hasClients &&
-                        _pageController.page != null) {
-                      page = _pageController.page!;
-                    } else {
-                      page = currentPage.toDouble();
-                    }
-
-                    final distance = (page - pageIndex).abs();
-                    final scale = (1 - distance * 0.08).clamp(0.92, 1.0);
-                    final opacity = (1 - distance * 0.4).clamp(0.6, 1.0);
-
-                    return Transform.scale(
-                      scale: scale,
-                      child: Opacity(
-                        opacity: opacity,
-                        child: child,
-                      ),
-                    );
-                  },
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: responsive.screenHeight * 0.7,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: items
-                          .map((item) => Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                child: DashboardCard(
-                                  item: item,
-                                  onParticipateNowPressed: () =>
-                                      _appCubit.changeTab(1),
-                                ),
-                              ))
-                          .toList(),
-                    ),
-                  ),
-                );
-              }),
-        ),
-      ],
-    );
-  }
-
-  Widget _pageDots(int totalPages) {
-    const int maxVisibleDots = 10;
-
-    // Calculate the start and end index of the visible dots
-    int start = 0;
-    int end = totalPages;
-
-    if (totalPages > maxVisibleDots) {
-      int middle = maxVisibleDots ~/ 2;
-
-      if (currentPage <= middle) {
-        start = 0;
-        end = maxVisibleDots;
-      } else if (currentPage >= totalPages - middle - 1) {
-        start = totalPages - maxVisibleDots;
-        end = totalPages;
-      } else {
-        start = currentPage - middle;
-        end = currentPage + middle + 1;
-      }
-    }
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(end - start, (i) {
-        int pageIndex = start + i;
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          width: currentPage == pageIndex ? 18 : 6,
-          height: 6,
-          decoration: BoxDecoration(
-            color: currentPage == pageIndex
-                ? AppColors.primary
-                : AppColors.grayText,
-            borderRadius: BorderRadius.circular(8),
-          ),
-        );
-      }),
-    );
-  }
 }
 
-class UltraEliteDashboardCarousel extends StatefulWidget {
+class DashboardCarausel extends StatefulWidget {
   final List<DashboardResult> data;
   final Function(DashboardResult) onParticipate;
+  final PageController controller;
+  final ValueChanged<int>? onPageChanged;
 
-  const UltraEliteDashboardCarousel({
+  const DashboardCarausel({
     super.key,
     required this.data,
     required this.onParticipate,
+    required this.controller,
+    this.onPageChanged,
   });
 
   @override
-  State<UltraEliteDashboardCarousel> createState() =>
-      _UltraEliteDashboardCarouselState();
+  State<DashboardCarausel> createState() => _DashboardCarauselState();
 }
 
-class _UltraEliteDashboardCarouselState
-    extends State<UltraEliteDashboardCarousel> {
-  late final PageController _controller;
-
+class _DashboardCarauselState extends State<DashboardCarausel> {
   @override
   void initState() {
     super.initState();
 
     /// 👇 Side preview like AppStore cards
-    _controller = PageController(viewportFraction: 0.88);
+    // widget.controller = PageController(viewportFraction: 0.88);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    // widget.controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return PageView.builder(
-      controller: _controller,
+      controller: widget.controller,
       physics: const BouncingScrollPhysics(),
       itemCount: widget.data.length,
+      onPageChanged: (index) {
+        widget.onPageChanged?.call(index);
+      },
       itemBuilder: (context, index) {
         return AnimatedBuilder(
-          animation: _controller,
+          animation: widget.controller,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 0),
             child: DashboardCard(
               item: widget.data[index],
               onParticipateNowPressed: () =>
@@ -361,8 +260,9 @@ class _UltraEliteDashboardCarouselState
           builder: (context, child) {
             double page = 0;
 
-            if (_controller.hasClients && _controller.page != null) {
-              page = _controller.page!;
+            if (widget.controller.hasClients &&
+                widget.controller.page != null) {
+              page = widget.controller.page!;
             } else {
               page = index.toDouble();
             }
@@ -412,6 +312,81 @@ class _UltraEliteDashboardCarouselState
               ),
             );
           },
+        );
+      },
+    );
+  }
+}
+
+class PageDots extends StatelessWidget {
+  final PageController controller;
+  final int itemCount;
+
+  const PageDots({
+    super.key,
+    required this.controller,
+    required this.itemCount,
+  });
+
+  static const int maxVisibleDots = 9;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, _) {
+        double page = 0;
+
+        if (controller.hasClients && controller.page != null) {
+          page = controller.page!;
+        } else {
+          page = controller.initialPage.toDouble();
+        }
+
+        int currentIndex = page.round();
+
+        /// ✅ calculate visible window
+        int start = 0;
+        int end = itemCount;
+
+        if (itemCount > maxVisibleDots) {
+          int half = maxVisibleDots ~/ 2;
+
+          if (currentIndex <= half) {
+            start = 0;
+            end = maxVisibleDots;
+          } else if (currentIndex >= itemCount - half - 1) {
+            start = itemCount - maxVisibleDots;
+            end = itemCount;
+          } else {
+            start = currentIndex - half;
+            end = currentIndex + half + 1;
+          }
+        }
+
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(end - start, (i) {
+            int index = start + i;
+
+            final distance = (page - index).abs();
+
+            /// 🔥 liquid width animation
+            final width = (26 * (1 - distance)).clamp(6, 26).toDouble();
+
+            final opacity = (1 - distance).clamp(0.35, 1.0).toDouble();
+
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 120),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              width: width,
+              height: 6,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: opacity),
+                borderRadius: BorderRadius.circular(20),
+              ),
+            );
+          }),
         );
       },
     );

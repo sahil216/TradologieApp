@@ -11,6 +11,7 @@ import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/common_social_icons.dart';
+import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 import 'package:tradologie_app/features/app/domain/usecases/check_force_update_usecase.dart';
@@ -87,9 +88,8 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
                 listenWhen: (previous, current) => previous != current,
                 listener: (context, state) {
                   if (state is SignOutSuccess) {
-                    Constants.showSuccessToast(
-                      context: context,
-                      msg: "Signed Out Successfully",
+                    CommonToast.success(
+                      "Signed Out Successfully",
                     );
                     Constants.isLogin = false;
                     SecureStorageService secureStorage = SecureStorageService();
@@ -104,14 +104,14 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
                     );
                   }
                   if (state is SignOutError) {
-                    Constants.showFailureToast(state.failure);
+                    CommonToast.showFailureToast(state.failure);
                   }
                   if (state is DeleteAccountSuccess) {
                     BlocProvider.of<AuthenticationCubit>(context)
                         .signOut(NoParams());
                   }
                   if (state is DeleteAccountError) {
-                    Constants.showFailureToast(state.failure);
+                    CommonToast.showFailureToast(state.failure);
                   }
                 },
               ),
@@ -223,19 +223,19 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
                       iconPath: Icon(Icons.article_outlined, size: 24),
                       title: 'Negotiation',
                     ),
-                    // Constants.isBuyer == true
-                    //     ? DrawerItem(
-                    //         onTap: () {
-                    //           Navigator.pop(context);
-                    //           sl<NavigationService>()
-                    //               .pushNamed(Routes.supplierListScreen);
-                    //         },
-                    //         iconPath: Icon(
-                    //           Icons.add,
-                    //           size: 24,
-                    //         ),
-                    //         title: 'Add Negotiation')
-                    //     : SizedBox.shrink(),
+                    Constants.isBuyer == true
+                        ? DrawerItem(
+                            onTap: () {
+                              Navigator.pop(context);
+                              sl<NavigationService>()
+                                  .pushNamed(Routes.supplierListScreen);
+                            },
+                            iconPath: Icon(
+                              Icons.add,
+                              size: 24,
+                            ),
+                            title: 'Add Negotiation')
+                        : SizedBox.shrink(),
                     // DrawerItem(
                     //     onTap: () {
                     //       Navigator.pop(context);

@@ -14,6 +14,7 @@ import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/extensions.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
+import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/sign_in_usecase.dart';
@@ -169,7 +170,7 @@ class _SignInScreenState extends State<SignInScreen> {
               // );
             }
             if (state is SigninError) {
-              Constants.showFailureToast(state.failure);
+              CommonToast.showFailureToast(state.failure);
             }
             if (state is BuyerSigninSuccess) {
               Navigator.pushNamedAndRemoveUntil(

@@ -11,6 +11,7 @@ import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_drop_down.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
+import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_button.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
@@ -96,7 +97,7 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
               categoryList = state.data;
             }
             if (state is GetCategoryError) {
-              Constants.showFailureToast(state.failure);
+              CommonToast.showFailureToast(state.failure);
             }
             if (state is GetSupplierListSuccess) {
               setState(() {
@@ -104,7 +105,7 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
               });
             }
             if (state is GetSupplierListError) {
-              Constants.showFailureToast(state.failure);
+              CommonToast.showFailureToast(state.failure);
             }
             if (state is GetSupplierShortistedSuccess) {
               setState(() {

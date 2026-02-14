@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
 import 'package:tradologie_app/core/utils/extensions.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
+import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/register_usecase.dart';
@@ -76,14 +77,12 @@ class _SignupScreenState extends State<SignupScreen> {
           listenWhen: (previous, current) => previous != current,
           listener: (context, state) {
             if (state is RegisterSuccess) {
-              Constants.showSuccessToast(
-                  context: context,
-                  msg: CommonStrings.accountCreatedSuccessfully);
+              CommonToast.success(CommonStrings.accountCreatedSuccessfully);
 
               Navigator.pop(context);
             }
             if (state is RegisterError) {
-              Constants.showFailureToast(state.failure);
+              CommonToast.showFailureToast(state.failure);
             }
           },
           child: Stack(

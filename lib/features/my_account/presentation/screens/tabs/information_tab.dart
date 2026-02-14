@@ -5,6 +5,7 @@ import 'package:tradologie_app/core/utils/common_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/responsive.dart';
 import 'package:tradologie_app/core/widgets/common_single_child_scroll_view.dart';
+import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 import 'package:tradologie_app/features/my_account/domain/entities/get_information_detail.dart';
 import 'package:tradologie_app/features/my_account/presentation/cubit/my_account_cubit.dart';
@@ -63,13 +64,13 @@ class _InformationTabState extends State<InformationTab> {
               data = state.data;
             }
             if (state is GetInformationError) {
-              Constants.showFailureToast(state.failure);
+              CommonToast.showFailureToast(state.failure);
             }
             if (state is SaveInformationSuccess) {
               // data = state.data;
             }
             if (state is SaveInformationError) {
-              Constants.showFailureToast(state.failure);
+              CommonToast.showFailureToast(state.failure);
             }
           },
         ),

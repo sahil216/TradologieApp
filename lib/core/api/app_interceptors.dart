@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
+import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 
 import '../../config/routes/app_router.dart';
 import '../../config/routes/navigation_service.dart';
@@ -59,8 +60,8 @@ class AppIntercepters extends Interceptor {
       secureStorage.delete(AppStrings.appSession);
       Constants.isLogin = false;
       navigationService.pushNamedAndRemoveUntil(Routes.onboardingRoute);
-      final ctx = navigationService.navigationKey.currentContext;
-      Constants.showErrorToast(context: ctx!, msg: (AppStrings.sessionExpired));
+
+      CommonToast.error(AppStrings.sessionExpired);
     }
   }
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tradologie_app/features/add_negotiation/presentation/cubit/add_negotiation_cubit.dart';
 import 'package:tradologie_app/features/notification/presentation/cubit/notification_cubit.dart';
 import 'package:tradologie_app/features/my_account/presentation/cubit/my_account_cubit.dart';
@@ -65,15 +64,11 @@ class MainApp extends StatelessWidget {
                 title: "Tradologie App",
                 navigatorKey: sl<NavigationService>().navigationKey,
                 builder: (context, child) {
-                  return FToastBuilder()(context, Builder(
-                    builder: (context) {
-                      return MediaQuery(
-                        data: MediaQuery.of(context)
-                            .copyWith(textScaler: const TextScaler.linear(1)),
-                        child: child!,
-                      );
-                    },
-                  ));
+                  return MediaQuery(
+                    data: MediaQuery.of(context)
+                        .copyWith(textScaler: const TextScaler.linear(1)),
+                    child: child!,
+                  );
                 },
                 debugShowCheckedModeBanner: false,
                 theme: appTheme(context),

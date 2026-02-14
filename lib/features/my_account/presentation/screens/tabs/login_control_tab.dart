@@ -5,6 +5,7 @@ import 'package:tradologie_app/core/utils/common_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/extensions.dart';
 import 'package:tradologie_app/core/widgets/common_single_child_scroll_view.dart';
+import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/features/my_account/presentation/cubit/my_account_cubit.dart';
 
 import '../../../../../core/error/network_failure.dart';
@@ -72,7 +73,7 @@ class _LoginControlTabState extends State<LoginControlTab> {
               data = state.data;
             }
             if (state is SaveLoginControlError) {
-              Constants.showFailureToast(state.failure);
+              CommonToast.showFailureToast(state.failure);
             }
           },
         ),

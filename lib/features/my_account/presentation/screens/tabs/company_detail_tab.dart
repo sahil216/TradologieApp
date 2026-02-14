@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
+import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/features/my_account/presentation/cubit/my_account_cubit.dart';
 
 import '../../../../../core/error/network_failure.dart';
@@ -54,7 +55,7 @@ class _CompanyDetailTabState extends State<CompanyDetailTab> {
               data = state.data;
             }
             if (state is CompanyDetailError) {
-              Constants.showFailureToast(state.failure);
+              CommonToast.showFailureToast(state.failure);
             }
           },
         ),

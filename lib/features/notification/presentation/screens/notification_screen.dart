@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
+import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 import 'package:tradologie_app/features/notification/presentation/cubit/notification_cubit.dart';
@@ -47,7 +48,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
               data = state.data;
             }
             if (state is NotificationError) {
-              Constants.showFailureToast(state.failure);
+              CommonToast.showFailureToast(state.failure);
             }
           },
         ),

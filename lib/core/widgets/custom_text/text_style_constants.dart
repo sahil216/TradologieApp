@@ -24,7 +24,7 @@ class TextStyleConstants {
         fontFamily: fontFamily ?? AppStrings.fontFamily,
         color: color ?? AppColors.defaultText,
         decorationColor: decorationColor,
-        decoration: decoration,
+        decoration: decoration ?? TextDecoration.none,
         shadows: shadows,
         fontWeight: fontWeight ?? FontWeight.w800,
       );
@@ -48,7 +48,7 @@ class TextStyleConstants {
         fontFamily: fontFamily ?? AppStrings.fontFamily,
         color: color ?? AppColors.defaultText,
         decorationColor: decorationColor,
-        decoration: decoration,
+        decoration: decoration ?? TextDecoration.none,
         shadows: shadows,
         fontWeight: fontWeight ?? FontWeight.w700,
       );
@@ -72,7 +72,7 @@ class TextStyleConstants {
         fontFamily: fontFamily ?? AppStrings.fontFamily,
         color: color ?? AppColors.defaultText,
         decorationColor: decorationColor,
-        decoration: decoration,
+        decoration: decoration ?? TextDecoration.none,
         shadows: shadows,
         fontWeight: fontWeight ?? FontWeight.w600,
       );
@@ -96,7 +96,7 @@ class TextStyleConstants {
         fontFamily: fontFamily ?? AppStrings.fontFamily,
         color: color ?? AppColors.defaultText,
         decorationColor: decorationColor,
-        decoration: decoration,
+        decoration: decoration ?? TextDecoration.none,
         shadows: shadows,
         fontWeight: fontWeight ?? FontWeight.w500,
       );
@@ -120,7 +120,7 @@ class TextStyleConstants {
         fontFamily: fontFamily ?? AppStrings.fontFamily,
         color: color ?? AppColors.defaultText,
         decorationColor: decorationColor,
-        decoration: decoration,
+        decoration: decoration ?? TextDecoration.none,
         shadows: shadows,
         fontWeight: fontWeight ?? FontWeight.w400,
       );
@@ -144,7 +144,7 @@ class TextStyleConstants {
         fontFamily: fontFamily ?? AppStrings.fontFamily,
         color: color ?? AppColors.defaultText,
         decorationColor: decorationColor,
-        decoration: decoration,
+        decoration: decoration ?? TextDecoration.none,
         shadows: shadows,
         fontWeight: fontWeight ?? FontWeight.w300,
       );
@@ -168,7 +168,7 @@ class TextStyleConstants {
         fontFamily: fontFamily ?? AppStrings.fontFamily,
         color: color ?? AppColors.defaultText,
         decorationColor: decorationColor,
-        decoration: decoration,
+        decoration: decoration ?? TextDecoration.none,
         shadows: shadows,
         fontWeight: fontWeight ?? FontWeight.w200,
       );

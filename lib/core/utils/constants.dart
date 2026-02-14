@@ -4,7 +4,6 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -301,393 +300,204 @@ class Constants {
     );
   }
 
-  static void showNormalToast({
-    required String msg,
-    Color? color,
-  }) {
-    var context = sl<NavigationService>().navigationKey.currentContext;
-    if (context != null) {
-      FToast fToast = FToast();
-      fToast.init(context);
-      fToast.showToast(
-        child: Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: 15,
-            vertical: 5,
-          ),
-          decoration: BoxDecoration(
-            color: color ?? AppColors.black.withValues(alpha: 0.8),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Padding(
-            padding: EdgeInsets.only(
-              bottom: 4,
-            ),
-            child: CommonText(
-              msg,
-              textAlign: TextAlign.center,
-              style: TextStyleConstants.medium(
-                context,
-                fontSize: 12,
-                color: AppColors.white,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-  }
+  // static void showNormalToast({
+  //   required String msg,
+  //   Color? color,
+  // }) {
+  //   final context = sl<NavigationService>().navigationKey.currentContext;
+  //   if (context == null) return;
 
-  static void showConnectInternetSnackbar({
-    required BuildContext context,
-  }) {
-    FToast fToast = FToast();
-    fToast.init(context);
-    fToast.showToast(
-      toastDuration: const Duration(seconds: 5),
-      child: SafeArea(
-        left: false,
-        right: false,
-        top: false,
-        child: GestureDetector(
-          onVerticalDragUpdate: (details) {
-            if (details.primaryDelta != null && details.primaryDelta! > 5) {
-              fToast.removeCustomToast();
-            }
-          },
-          child: Container(
-            width: context.width,
-            padding: EdgeInsets.symmetric(vertical: 14, horizontal: 14),
-            margin: EdgeInsets.only(
-                top: 10, bottom: context.bottom + 10, left: 10, right: 10),
-            decoration: BoxDecoration(
-              color: AppColors.black,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.black.withValues(alpha: 0.4),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Row(
-              spacing: 6,
-              children: [
-                Icon(
-                  Icons.wifi_rounded,
-                  size: 25,
-                  color: AppColors.white,
-                ),
-                Expanded(
-                  child: CommonText(
-                    ("Internet connection not available"),
-                    textAlign: TextAlign.start,
-                    style: TextStyleConstants.medium(
-                      context,
-                      color: AppColors.white,
-                    ),
-                  ),
-                ),
-                CustomIconButton(
-                  onPressed: () {
-                    fToast.removeCustomToast();
-                  },
-                  iconHeight: 25,
-                  iconWidth: 25,
-                  height: 25,
-                  width: 25,
-                  widget: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.transparent,
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(
-                        width: 1,
-                        color: AppColors.white,
-                      ),
-                    ),
-                    child: Icon(
-                      Icons.close,
-                      size: 24,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      gravity: ToastGravity.SNACKBAR,
-    );
-  }
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       content: Text(msg, textAlign: TextAlign.center),
+  //       backgroundColor: color ?? AppColors.black.withValues(alpha: 0.8),
+  //       behavior: SnackBarBehavior.floating,
+  //       duration: const Duration(seconds: 2),
+  //       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(6),
+  //       ),
+  //     ),
+  //   );
+  // }
 
-  static void showErrorInternetSnackbar({
-    required BuildContext context,
-  }) {
-    FToast fToast = FToast();
-    fToast.init(context);
-    fToast.showToast(
-      toastDuration: const Duration(seconds: 5),
-      child: SafeArea(
-        left: false,
-        right: false,
-        top: false,
-        child: GestureDetector(
-          onVerticalDragUpdate: (details) {
-            if (details.primaryDelta != null && details.primaryDelta! > 5) {
-              fToast.removeCustomToast();
-            }
-          },
-          child: Container(
-            width: context.width,
-            padding: EdgeInsets.symmetric(vertical: 14, horizontal: 14),
-            margin: EdgeInsets.only(
-                top: 10, bottom: context.bottom + 10, left: 10, right: 10),
-            decoration: BoxDecoration(
-              color: AppColors.black,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.black.withValues(alpha: 0.4),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Row(
-              spacing: 6,
-              children: [
-                Icon(
-                  Icons.wifi_off_outlined,
-                  size: 25,
-                  color: AppColors.white,
-                ),
-                Expanded(
-                  child: CommonText(
-                    ("no_internet_connection"),
-                    textAlign: TextAlign.start,
-                    style: TextStyleConstants.medium(
-                      context,
-                      color: AppColors.white,
-                    ),
-                  ),
-                ),
-                CustomIconButton(
-                  onPressed: () {
-                    fToast.removeCustomToast();
-                  },
-                  iconHeight: 25,
-                  iconWidth: 25,
-                  height: 25,
-                  width: 25,
-                  widget: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.transparent,
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(
-                        width: 1,
-                        color: AppColors.white,
-                      ),
-                    ),
-                    child: Icon(
-                      Icons.close,
-                      size: 24,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      gravity: ToastGravity.SNACKBAR,
-    );
-  }
+  // static void showConnectInternetSnackbar({
+  //   required BuildContext context,
+  // }) {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       duration: const Duration(seconds: 5),
+  //       behavior: SnackBarBehavior.floating,
+  //       backgroundColor: AppColors.black,
+  //       margin: EdgeInsets.only(
+  //         bottom: context.bottom + 10,
+  //         left: 10,
+  //         right: 10,
+  //       ),
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(6),
+  //       ),
+  //       content: Row(
+  //         children: [
+  //           Icon(Icons.wifi_rounded, color: AppColors.white, size: 25),
+  //           const SizedBox(width: 6),
+  //           Expanded(
+  //             child: CommonText(
+  //               "Internet connection not available",
+  //               style: TextStyleConstants.medium(
+  //                 context,
+  //                 color: AppColors.white,
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //       action: SnackBarAction(
+  //         label: "✕",
+  //         textColor: AppColors.white,
+  //         onPressed: () {
+  //           ScaffoldMessenger.of(context).hideCurrentSnackBar();
+  //         },
+  //       ),
+  //     ),
+  //   );
+  // }
 
-  static void showErrorToast({
-    required BuildContext context,
-    String? msg,
-  }) {
-    FToast fToast = FToast();
-    fToast.init(context);
-    fToast.showToast(
-      toastDuration: const Duration(seconds: 6),
-      child: SafeArea(
-        left: false,
-        right: false,
-        top: false,
-        child: GestureDetector(
-          onVerticalDragUpdate: (details) {
-            if (details.primaryDelta != null && details.primaryDelta! > 5) {
-              fToast.removeCustomToast();
-            }
-          },
-          child: Container(
-            width: context.width,
-            padding: EdgeInsets.symmetric(vertical: 14, horizontal: 14),
-            margin: EdgeInsets.only(
-                top: 10, bottom: context.bottom + 10, left: 10, right: 10),
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.black.withValues(alpha: 0.4),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Row(
-              spacing: 6,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  color: AppColors.white,
-                  size: 21,
-                ),
-                Expanded(
-                  child: CommonText(
-                    msg ?? ("something_went_wrong"),
-                    textAlign: TextAlign.start,
-                    style: TextStyleConstants.medium(
-                      context,
-                      color: AppColors.white,
-                    ),
-                  ),
-                ),
-                CustomIconButton(
-                  onPressed: () {
-                    fToast.removeCustomToast();
-                  },
-                  iconHeight: 25,
-                  iconWidth: 25,
-                  height: 25,
-                  width: 25,
-                  widget: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.transparent,
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(
-                        width: 1,
-                        color: AppColors.white,
-                      ),
-                    ),
-                    child: Icon(
-                      Icons.close,
-                      size: 24,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      gravity: ToastGravity.SNACKBAR,
-    );
-  }
+  // static void showErrorInternetSnackbar({
+  //   required BuildContext context,
+  // }) {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       duration: const Duration(seconds: 5),
+  //       behavior: SnackBarBehavior.floating,
+  //       backgroundColor: AppColors.black,
+  //       margin: EdgeInsets.only(
+  //         bottom: context.bottom + 10,
+  //         left: 10,
+  //         right: 10,
+  //       ),
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(6),
+  //       ),
+  //       content: Row(
+  //         children: [
+  //           Icon(Icons.wifi_off_outlined, color: AppColors.white, size: 25),
+  //           const SizedBox(width: 6),
+  //           Expanded(
+  //             child: CommonText(
+  //               "no_internet_connection",
+  //               style: TextStyleConstants.medium(
+  //                 context,
+  //                 color: AppColors.white,
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //       action: SnackBarAction(
+  //         label: "✕",
+  //         textColor: AppColors.white,
+  //         onPressed: () {
+  //           ScaffoldMessenger.of(context).hideCurrentSnackBar();
+  //         },
+  //       ),
+  //     ),
+  //   );
+  // }
 
-  static void showSuccessToast({
-    required BuildContext context,
-    String? msg,
-  }) {
-    FToast fToast = FToast();
-    fToast.init(context);
-    fToast.showToast(
-      toastDuration: const Duration(seconds: 3),
-      child: SafeArea(
-        left: false,
-        right: false,
-        top: false,
-        child: GestureDetector(
-          onVerticalDragUpdate: (details) {
-            if (details.primaryDelta != null && details.primaryDelta! > 5) {
-              fToast.removeCustomToast();
-            }
-          },
-          child: Container(
-            width: context.width,
-            padding: EdgeInsets.symmetric(vertical: 14, horizontal: 14),
-            margin: EdgeInsets.only(top: 2, bottom: 2, left: 10, right: 10),
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.black.withValues(alpha: 0.4),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Row(
-              spacing: 6,
-              children: [
-                Icon(
-                  Icons.check_circle_outline_rounded,
-                  color: AppColors.white,
-                  size: 25,
-                ),
-                Expanded(
-                  child: CommonText(
-                    msg ?? "success",
-                    textAlign: TextAlign.start,
-                    style: TextStyleConstants.medium(
-                      context,
-                      color: AppColors.white,
-                    ),
-                  ),
-                ),
-                CustomIconButton(
-                  onPressed: () {
-                    fToast.removeCustomToast();
-                  },
-                  iconHeight: 25,
-                  iconWidth: 25,
-                  height: 25,
-                  width: 25,
-                  widget: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.transparent,
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(
-                        width: 1,
-                        color: AppColors.white,
-                      ),
-                    ),
-                    child: Icon(
-                      Icons.close,
-                      size: 24,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      gravity: ToastGravity.SNACKBAR,
-    );
-  }
+  // static void showErrorToast({
+  //   required BuildContext context,
+  //   String? msg,
+  // }) {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       duration: const Duration(seconds: 4),
+  //       behavior: SnackBarBehavior.floating,
+  //       backgroundColor: AppColors.primary,
+  //       margin: EdgeInsets.only(
+  //         bottom: context.bottom + 10,
+  //         left: 10,
+  //         right: 10,
+  //       ),
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(6),
+  //       ),
+  //       content: Row(
+  //         children: [
+  //           Icon(Icons.error_outline, color: AppColors.white, size: 21),
+  //           const SizedBox(width: 6),
+  //           Expanded(
+  //             child: CommonText(
+  //               msg ?? "something_went_wrong",
+  //               style: TextStyleConstants.medium(
+  //                 context,
+  //                 color: AppColors.white,
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //       action: SnackBarAction(
+  //         label: "✕",
+  //         textColor: AppColors.white,
+  //         onPressed: () {
+  //           ScaffoldMessenger.of(context).hideCurrentSnackBar();
+  //         },
+  //       ),
+  //     ),
+  //   );
+  // }
 
-  static void showFailureToast(Failure failure) {
-    var context = sl<NavigationService>().navigationKey.currentContext;
-    if (context != null) {
-      if (failure is NetworkFailure) {
-        Constants.showErrorInternetSnackbar(
-          context: context,
-        );
-      } else if (failure is UserFailure) {
-        Constants.showErrorToast(
-          context: context,
-          msg: failure.msg,
-        );
-      } else {
-        Constants.showErrorToast(
-          context: context,
-        );
-      }
-    }
-  }
+  // static void showSuccessToast({
+  //   required BuildContext context,
+  //   String? msg,
+  // }) {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       duration: const Duration(seconds: 3),
+  //       behavior: SnackBarBehavior.floating,
+  //       backgroundColor: AppColors.primary,
+  //       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(6),
+  //       ),
+  //       content: Row(
+  //         children: [
+  //           Icon(Icons.check_circle_outline_rounded,
+  //               color: AppColors.white, size: 25),
+  //           const SizedBox(width: 6),
+  //           Expanded(
+  //             child: CommonText(
+  //               msg ?? "success",
+  //               style: TextStyleConstants.medium(
+  //                 context,
+  //                 color: AppColors.white,
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //       action: SnackBarAction(
+  //         label: "✕",
+  //         textColor: AppColors.white,
+  //         onPressed: () {
+  //           ScaffoldMessenger.of(context).hideCurrentSnackBar();
+  //         },
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  // static void showFailureToast(Failure failure) {
+  //   final context = sl<NavigationService>().navigationKey.currentContext;
+  //   if (context == null) return;
+
+  //   if (failure is NetworkFailure) {
+  //     showErrorInternetSnackbar(context: context);
+  //   } else if (failure is UserFailure) {
+  //     showErrorToast(context: context, msg: failure.msg);
+  //   } else {
+  //     showErrorToast(context: context);
+  //   }
+  // }
 }

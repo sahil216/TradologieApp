@@ -21,7 +21,7 @@ class DashboardCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
@@ -33,65 +33,62 @@ class DashboardCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Expanded(
-        child: CommonSingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              CachedNetworkImage(
-                imageUrl: Uri.encodeFull(EndPoints.getImage(
-                  item.groupName?.replaceAll(" ", "-") ?? "",
-                )),
-                height: 160,
-                placeholder: (context, url) => CommonLoader(),
-                errorWidget: (context, url, error) {
-                  debugPrint("Image load failed: $error");
-                  return const Icon(Icons.broken_image);
-                },
-                httpHeaders: const {
-                  "Connection": "keep-alive",
-                },
+      child: CommonSingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            CachedNetworkImage(
+              imageUrl: Uri.encodeFull(EndPoints.getImage(
+                item.groupName?.replaceAll(" ", "-") ?? "",
+              )),
+              height: 160,
+              placeholder: (context, url) => CommonLoader(),
+              errorWidget: (context, url, error) {
+                debugPrint("Image load failed: $error");
+                return const Icon(Icons.broken_image);
+              },
+              httpHeaders: const {
+                "Connection": "keep-alive",
+              },
+            ),
+            const SizedBox(height: 12),
+            Text(
+              item.groupName ?? "",
+              style: TextStyleConstants.medium(
+                context,
+                fontSize: 28,
+                color: AppColors.defaultText,
               ),
-              const SizedBox(height: 12),
-              Text(
-                item.groupName ?? "",
-                style: TextStyleConstants.medium(
+            ),
+            const SizedBox(height: 4),
+            Center(
+              child: Text(
+                item.auctionName ?? '',
+                style: TextStyleConstants.regular(
                   context,
-                  fontSize: 28,
+                  fontSize: 16,
                   color: AppColors.defaultText,
                 ),
               ),
-              const SizedBox(height: 4),
-              Center(
-                child: Text(
-                  item.auctionName ?? '',
-                  style: TextStyleConstants.regular(
-                    context,
-                    fontSize: 16,
-                    color: AppColors.defaultText,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              _infoRow(context, 'Code', item.auctionCode ?? ''),
-              _infoRow(context, 'Currency', item.currencyName ?? ''),
-              _infoRow(
-                  context, 'Port Of Discharge', item.portOfDischarge ?? ''),
-              _infoRow(context, 'Delivery', item.partialDelivery ?? ''),
-              _infoRow(context, 'Delivery State', item.deliveryState ?? ''),
-              _infoRow(context, 'Delivery Date', item.deliveryLastDate ?? ''),
-              _infoRow(context, 'Payment Term', item.paymentTerm ?? ''),
-              // const Spacer(),
-              SizedBox(height: 16),
-              CommonButton(
-                onPressed: onParticipateNowPressed,
-                text: 'Participate Now',
-                width: double.infinity,
-              ),
-              // const Spacer(),
-              SizedBox(height: 16),
-            ],
-          ),
+            ),
+            const SizedBox(height: 16),
+            _infoRow(context, 'Code', item.auctionCode ?? ''),
+            _infoRow(context, 'Currency', item.currencyName ?? ''),
+            _infoRow(context, 'Port Of Discharge', item.portOfDischarge ?? ''),
+            _infoRow(context, 'Delivery', item.partialDelivery ?? ''),
+            _infoRow(context, 'Delivery State', item.deliveryState ?? ''),
+            _infoRow(context, 'Delivery Date', item.deliveryLastDate ?? ''),
+            _infoRow(context, 'Payment Term', item.paymentTerm ?? ''),
+            // const Spacer(),
+            SizedBox(height: 16),
+            CommonButton(
+              onPressed: onParticipateNowPressed,
+              text: 'Participate Now',
+              width: double.infinity,
+            ),
+            // const Spacer(),
+            SizedBox(height: 16),
+          ],
         ),
       ),
     );

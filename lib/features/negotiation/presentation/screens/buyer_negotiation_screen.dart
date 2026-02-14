@@ -10,6 +10,7 @@ import 'package:tradologie_app/core/utils/app_colors.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/common_single_child_scroll_view.dart';
+import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
 import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
@@ -152,7 +153,7 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen>
               });
             }
             if (state is BuyerNegotiationError) {
-              Constants.showFailureToast(state.failure);
+              CommonToast.showFailureToast(state.failure);
             }
           },
         ),

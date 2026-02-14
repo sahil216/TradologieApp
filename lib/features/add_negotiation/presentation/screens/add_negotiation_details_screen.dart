@@ -10,6 +10,7 @@ import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_drop_down.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/common_single_child_scroll_view.dart';
+import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text_field.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/commodity_list.dart';
@@ -96,7 +97,7 @@ class _AddNegotiationDetailsScreenState
               categoryList = state.data;
             }
             if (state is GetCategoryError) {
-              Constants.showFailureToast(state.failure);
+              CommonToast.showFailureToast(state.failure);
             }
             if (state is GetSupplierListSuccess) {
               setState(() {
@@ -104,7 +105,7 @@ class _AddNegotiationDetailsScreenState
               });
             }
             if (state is GetSupplierListError) {
-              Constants.showFailureToast(state.failure);
+              CommonToast.showFailureToast(state.failure);
             }
             if (state is GetSupplierShortistedSuccess) {
               setState(() {
@@ -112,7 +113,7 @@ class _AddNegotiationDetailsScreenState
               });
             }
             if (state is GetSupplierShortistedError) {
-              Constants.showFailureToast(state.failure);
+              CommonToast.showFailureToast(state.failure);
             }
           },
         ),
