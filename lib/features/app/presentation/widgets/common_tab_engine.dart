@@ -17,11 +17,34 @@ class CupertinoTabEngine extends StatefulWidget {
 }
 
 class CupertinoTabEngineState extends State<CupertinoTabEngine> {
-  late final List<GlobalKey<NavigatorState>> _navigatorKeys =
-      List.generate(widget.tabs.length, (_) => GlobalKey<NavigatorState>());
+  late List<GlobalKey<NavigatorState>> _navigatorKeys;
+
+  @override
+  void initState() {
+    super.initState();
+    _navigatorKeys =
+        List.generate(widget.tabs.length, (_) => GlobalKey<NavigatorState>());
+  }
+
+  /// 🔥 VERY IMPORTANT — handle tab count change (4 → 5 items)
+  @override
+  void didUpdateWidget(covariant CupertinoTabEngine oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.tabs.length != widget.tabs.length) {
+      _navigatorKeys = List.generate(
+        widget.tabs.length,
+        (i) => i < _navigatorKeys.length
+            ? _navigatorKeys[i] // keep old navigator state
+            : GlobalKey<NavigatorState>(),
+      );
+    }
+  }
 
   /// 🔥 expose pop for MainScreen
   Future<bool> popCurrentTab(int index) async {
+    if (index >= _navigatorKeys.length) return false;
+
     final navigator = _navigatorKeys[index].currentState;
 
     if (navigator != null && navigator.canPop()) {

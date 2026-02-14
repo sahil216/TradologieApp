@@ -516,9 +516,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen>
             },
           ),
           bottomNavigationBar: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-            ),
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
             child: CommonButton(
               onPressed: () async {
                 SecureStorageService secureStorage = SecureStorageService();

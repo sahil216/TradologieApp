@@ -45,6 +45,12 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
 
   Key categoryKey = UniqueKey();
 
+  int _page = 1;
+  bool _isLastPage = false;
+  bool _isFetchingMore = false;
+
+  final ScrollController _listScrollController = ScrollController();
+
   final _formKey = GlobalKey<FormState>();
 
   List<CommodityList> fetchCommodity(String filter, LoadProps? loadProps) {
@@ -79,11 +85,42 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
   void initState() {
     super.initState();
     getCategory();
+
+    _listScrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_listScrollController.hasClients) return;
+
+    final threshold = 200; // px before bottom
+    final maxScroll = _listScrollController.position.maxScrollExtent;
+    final currentScroll = _listScrollController.position.pixels;
+
+    if (maxScroll - currentScroll <= threshold) {
+      _loadMore();
+    }
+  }
+
+  Future<void> _loadMore() async {
+    if (_isFetchingMore || _isLastPage || selectedCommodity == null) return;
+
+    _isFetchingMore = true;
+    _page++;
+
+    final params = SupplierListParams(
+      customerId: await secureStorage.read(AppStrings.customerId) ?? "",
+      groupID: selectedCommodity?.groupId ?? "",
+      indexNo: _page, // ⭐ IMPORTANT (add in params model)
+      token: await secureStorage.read(AppStrings.apiVerificationCode) ?? "",
+      vendorName: "",
+    );
+
+    cubit.getSupplierList(params);
   }
 
   @override
@@ -101,7 +138,19 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
             }
             if (state is GetSupplierListSuccess) {
               setState(() {
-                supplierList = state.data;
+                if (_page == 1) {
+                  supplierList = state.data;
+                } else {
+                  supplierList ??= [];
+                  supplierList!.addAll(state.data);
+                }
+
+                _isFetchingMore = false;
+
+                /// ⭐ Detect last page automatically
+                if (state.data.isEmpty) {
+                  _isLastPage = true;
+                }
               });
             }
             if (state is GetSupplierListError) {
@@ -172,21 +221,29 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
                             selectedItem: null,
                             itemAsString: (item) => item.groupName ?? "",
                             onChanged: (item) async {
-                              SecureStorageService secureStorage =
-                                  SecureStorageService();
-
                               final params = SupplierListParams(
                                 customerId: await secureStorage
                                         .read(AppStrings.customerId) ??
                                     "",
                                 groupID: item?.groupId ?? "",
+                                indexNo: 1,
+                                token: await secureStorage
+                                        .read(AppStrings.apiVerificationCode) ??
+                                    "",
+                                vendorName: "",
                               );
 
                               selectedCommodity = item;
 
-                              supplierList?.clear();
+                              _page = 1;
+                              _isLastPage = false;
+                              _isFetchingMore = false;
+
+                              supplierList = [];
+
                               cubit.getSupplierList(params);
                               cubit.getSupplierShortlisted(params);
+
                               setState(() {});
                             },
                             compareFn: (a, b) => a.groupName == b.groupName,
@@ -223,11 +280,24 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
                                     addRepaintBoundaries: true,
                                     addSemanticIndexes: false,
                                     cacheExtent: 300,
+                                    controller: _listScrollController,
                                     padding: const EdgeInsets.only(bottom: 12),
-                                    itemCount: supplierList?.length ?? 0,
+                                    itemCount: (supplierList?.length ?? 0) +
+                                        (_isLastPage ? 0 : 1),
                                     separatorBuilder: (_, __) =>
                                         const SizedBox(height: 12),
                                     itemBuilder: (context, index) {
+                                      if (index >=
+                                          (supplierList?.length ?? 0)) {
+                                        return const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 16),
+                                          child: Center(
+                                              child:
+                                                  CircularProgressIndicator()),
+                                        );
+                                      }
+
                                       final item = supplierList![index];
                                       return RepaintBoundary(
                                         // 🔥 BIG performance gain

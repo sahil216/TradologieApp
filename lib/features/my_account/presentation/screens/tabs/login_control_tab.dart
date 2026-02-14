@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/utils/app_colors.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
-import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/extensions.dart';
 import 'package:tradologie_app/core/widgets/common_single_child_scroll_view.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';

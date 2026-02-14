@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/widgets/common_single_child_scroll_view.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/features/my_account/presentation/cubit/my_account_cubit.dart';
@@ -139,9 +138,7 @@ class _LegalDocumentsTabState extends State<LegalDocumentsTab> {
           children: [
             _cardHeader(
               title: "Seller Agreement",
-              onDownload: () {
-                // TODO: download seller agreement
-              },
+              onDownload: () {},
             ),
             const SizedBox(height: 12),
             CheckboxListTile(
@@ -160,7 +157,6 @@ class _LegalDocumentsTabState extends State<LegalDocumentsTab> {
                     icon: const Icon(Icons.upload_file),
                     label: const Text("Upload Signed Agreement"),
                     onPressed: () {
-                      // TODO: integrate file_picker
                       setState(() {
                         sellerFileName = "seller_agreement.pdf";
                         sellerFileUrl =
@@ -213,9 +209,7 @@ class _LegalDocumentsTabState extends State<LegalDocumentsTab> {
           children: [
             _cardHeader(
               title: "Privacy Agreement",
-              onDownload: () {
-                // TODO: download privacy agreement
-              },
+              onDownload: () {},
             ),
             const SizedBox(height: 8),
             CheckboxListTile(
@@ -301,15 +295,14 @@ class _LegalDocumentsTabState extends State<LegalDocumentsTab> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  bool _canSubmit() {
-    return agreeSeller && agreePrivacy && sellerFileName != null;
-  }
+  // // ---------------------------------------------------------------------------
+  // bool _canSubmit() {
+  //   return agreeSeller && agreePrivacy && sellerFileName != null;
+  // }
 
-  void _submit() {
-    // TODO: API submit
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Legal documents submitted")),
-    );
-  }
+  // void _submit() {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     const SnackBar(content: Text("Legal documents submitted")),
+  //   );
+  // }
 }

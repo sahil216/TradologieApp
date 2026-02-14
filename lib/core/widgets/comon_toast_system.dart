@@ -227,7 +227,7 @@ class _ToastBannerState extends State<ToastBanner>
                       const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                   decoration: BoxDecoration(
                     color: isIOS
-                        ? widget.job.color.withOpacity(0.92)
+                        ? widget.job.color.withValues(alpha: 0.92)
                         : widget.job.color,
                     borderRadius: BorderRadius.circular(isIOS ? 16 : 6),
                     boxShadow: const [

@@ -38,7 +38,7 @@ extension MediaQueryValues on BuildContext {
         ((heightImage * (width / colsInRow)) / widthImage);
   }
 
-  showCustomDialog(
+  void showCustomDialog(
     Widget child, {
     double borderRadius = 18,
     bool barrierDismissible = true,

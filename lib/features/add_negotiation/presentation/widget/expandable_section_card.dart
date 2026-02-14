@@ -53,7 +53,7 @@ class ExpandableSectionCard extends StatelessWidget {
                 BoxShadow(
                   blurRadius: expanded ? 14 : 8,
                   offset: const Offset(0, 6),
-                  color: Colors.black.withOpacity(.06),
+                  color: Colors.black.withValues(alpha: .06),
                 )
               ],
             ),

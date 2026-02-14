@@ -8,8 +8,10 @@ import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
+import 'package:tradologie_app/features/add_negotiation/presentation/screens/supplier_list_screen.dart';
 import 'package:tradologie_app/features/app/presentation/widgets/common_tab_engine.dart';
 import 'package:tradologie_app/features/app/presentation/widgets/custom_bottom_navigation_bar.dart';
+import 'package:tradologie_app/features/contact_us/more_options_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_dashboard_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:tradologie_app/features/my_account/presentation/screens/my_account_screen.dart';
@@ -36,7 +38,7 @@ class _MainScreenState extends State<MainScreen>
 
   String? token;
 
-  List<TabViewModel> get _firstListTab {
+  List<TabViewModel> get supplierTabsList {
     if (token == null) {
       return []; // or loader
     }
@@ -44,7 +46,7 @@ class _MainScreenState extends State<MainScreen>
       TabViewModel(
         icon: Icon(Icons.dashboard_outlined),
         name: 'Dashboard',
-        height: 26,
+        height: 20,
         page: Constants.isBuyer == true
             ? const BuyerDashboardScreen()
             : const DashboardScreen(),
@@ -81,14 +83,64 @@ class _MainScreenState extends State<MainScreen>
                         isShowNotification: true)) // const OrdersScreen(),
             : MyAccountScreen(),
       ),
-      // TabViewModel(
-      //   icon: Icon(Icons.settings),
-      //   name: 'Settings',
-      //   height: 26,
-      //   page: Constants.isBuyer == true
-      //       ? const BuyerDashboardScreen()
-      //       : const DashboardScreen(),
-      // ),
+    ];
+  }
+
+  List<TabViewModel> get buyerTabsList {
+    if (token == null) {
+      return []; // or loader
+    }
+    return [
+      TabViewModel(
+        icon: Icon(Icons.dashboard_outlined),
+        name: 'Dashboard',
+        height: 20,
+        page: Constants.isBuyer == true
+            ? const BuyerDashboardScreen()
+            : const DashboardScreen(),
+      ),
+      TabViewModel(
+        icon: Icon(Icons.article_outlined),
+        name: 'Negotiations',
+        height: 20,
+        page: Constants.isBuyer == true
+            ? const BuyerNegotiationScreen()
+            : const NegotiationScreen(),
+      ),
+      TabViewModel(
+          icon: Icon(Icons.add_box_outlined),
+          name: 'Add Negotiation',
+          height: 20,
+          page: const SupplierListScreen()),
+      TabViewModel(
+        icon: Icon(Icons.person),
+        name: 'My Account',
+        height: 20,
+        page: Constants.isBuyer == true
+            ? Constants.isAndroid14OrBelow && Platform.isAndroid
+                ? InAppWebViewScreen(
+                    params: WebviewParams(
+                        url:
+                            "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
+                        canPop: true,
+                        isAppBar: true,
+                        isShowDrawer: true,
+                        isShowNotification: true))
+                : WebViewScreen(
+                    params: WebviewParams(
+                        url:
+                            "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
+                        canPop: true,
+                        isAppBar: true,
+                        isShowDrawer: true,
+                        isShowNotification: true)) // const OrdersScreen(),
+            : MyAccountScreen(),
+      ),
+      TabViewModel(
+          icon: Icon(Icons.menu_outlined),
+          name: 'More Options',
+          height: 20,
+          page: const MoreOptionsScreen()),
     ];
   }
 
@@ -164,23 +216,21 @@ class _MainScreenState extends State<MainScreen>
               children: [
                 CupertinoTabEngine(
                   key: _tabEngineKey,
-                  tabs: _firstListTab,
+                  tabs: Constants.isBuyer == true
+                      ? buyerTabsList
+                      : supplierTabsList,
                   currentIndex: _appCubit.bottomNavIndex,
                 ),
               ],
             ),
-            bottomNavigationBar: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 5, 20, 0),
-                child: CustomBottomNavigationBar(
-                  tabs: _firstListTab,
-                  currentIndex: _appCubit.bottomNavIndex,
-                  onTap: (i) {
-                    HapticFeedback.selectionClick();
-                    _appCubit.changeTab(i);
-                  },
-                ),
-              ),
+            bottomNavigationBar: CustomBottomNavigationBar(
+              tabs:
+                  Constants.isBuyer == true ? buyerTabsList : supplierTabsList,
+              currentIndex: _appCubit.bottomNavIndex,
+              onTap: (i) {
+                HapticFeedback.selectionClick();
+                _appCubit.changeTab(i);
+              },
             ),
           ),
         );

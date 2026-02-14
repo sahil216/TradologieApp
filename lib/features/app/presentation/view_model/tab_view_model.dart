@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
 class TabViewModel {
-  final double height;
   final Widget icon;
   final String name;
   final Widget page;
+  final double height;
+  final int? badgeCount; // ⭐ ADD THIS
 
-  TabViewModel({
-    required this.height,
+  const TabViewModel({
     required this.icon,
     required this.name,
     required this.page,
+    required this.height,
+    this.badgeCount,
   });
 }

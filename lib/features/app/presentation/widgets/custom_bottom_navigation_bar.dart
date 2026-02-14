@@ -1,7 +1,5 @@
-import 'dart:ui';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:tradologie_app/core/utils/app_colors.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 import 'package:tradologie_app/features/app/presentation/view_model/tab_view_model.dart';
@@ -20,125 +18,158 @@ class CustomBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(32),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(
-          sigmaX: 40,
-          sigmaY: 40,
-        ), // 🍎 stronger iOS blur
-        child: Container(
-          height: 70,
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(32),
-            color: Colors.white.withOpacity(.65),
-            border: Border.all(
-              color: Colors.white.withOpacity(.7),
-              width: .8,
-            ),
-            boxShadow: [
-              BoxShadow(
-                blurRadius: 40,
-                offset: const Offset(0, 16),
-                color: Colors.black.withOpacity(.12),
-              ),
-            ],
-          ),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final tabWidth = constraints.maxWidth / tabs.length;
+    final bottomInset = MediaQuery.of(context).padding.bottom;
 
-              return Stack(
-                children: [
-                  /// 🍎 iOS 17 SOFT ACTIVE GLOW CAPSULE
-                  AnimatedAlign(
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.easeOutCubic,
-                    alignment: Alignment(
-                      -1 + (2 / (tabs.length - 1)) * currentIndex,
-                      0,
-                    ),
-                    child: Container(
-                      width: tabWidth,
-                      margin: const EdgeInsets.symmetric(horizontal: 6),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(22),
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.white.withOpacity(.55),
-                            Colors.white.withOpacity(.25),
-                          ],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ),
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.only(bottom: bottomInset), // 👈 extend background
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(22),
+          topRight: Radius.circular(22),
+        ),
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 18,
+            offset: Offset(0, -2),
+            color: Colors.black12,
+          ),
+        ],
+      ),
+
+      /// 👇 actual bar content height
+      child: SizedBox(
+        height: 80,
+        child: Row(
+          children: tabs.asMap().entries.map((entry) {
+            final index = entry.key;
+            final item = entry.value;
+            final isActive = index == currentIndex;
+
+            final iconColor =
+                isActive ? Colors.black : Colors.black.withValues(alpha: .65);
+
+            final textColor =
+                isActive ? Colors.black : Colors.black.withValues(alpha: .55);
+
+            return Expanded(
+              child: _UltraHapticTabItem(
+                isActive: isActive,
+                icon: (item.icon as Icon).icon!,
+                label: item.name,
+                onTap: () => onTap(index),
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+}
+
+class _UltraHapticTabItem extends StatefulWidget {
+  final bool isActive;
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _UltraHapticTabItem({
+    required this.isActive,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  State<_UltraHapticTabItem> createState() => _UltraHapticTabItemState();
+}
+
+class _UltraHapticTabItemState extends State<_UltraHapticTabItem>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _pressController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 120),
+    lowerBound: 0.0,
+    upperBound: 1.0,
+  );
+
+  @override
+  void dispose() {
+    _pressController.dispose();
+    super.dispose();
+  }
+
+  void _handleTapDown(_) {
+    _pressController.forward();
+  }
+
+  void _handleTapUp(_) {
+    _pressController.reverse();
+  }
+
+  void _handleTapCancel() {
+    _pressController.reverse();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final iconColor =
+        widget.isActive ? Colors.black : Colors.black.withValues(alpha: .65);
+
+    final textColor =
+        widget.isActive ? Colors.black : Colors.black.withValues(alpha: .55);
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTapDown: _handleTapDown,
+      onTapUp: (d) {
+        _handleTapUp(d);
+
+        /// 🍎 Ultra haptic feedback
+        HapticFeedback.selectionClick();
+
+        widget.onTap();
+      },
+      onTapCancel: _handleTapCancel,
+      child: AnimatedBuilder(
+        animation: _pressController,
+        builder: (context, child) {
+          final pressValue = _pressController.value;
+
+          /// 🔥 press scale + lift effect
+          final scale = 1 - (pressValue * 0.06);
+          final lift = widget.isActive ? 1.08 : 1.0;
+
+          return Transform.translate(
+            offset: Offset(0, -pressValue * 2),
+            child: Transform.scale(
+              scale: scale * lift,
+              child: SizedBox(
+                width: double.infinity,
+                height: double.infinity,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(widget.icon, size: 26, color: iconColor),
+                    const SizedBox(height: 4),
+                    Text(
+                      widget.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.fade,
+                      textAlign: TextAlign.center,
+                      style: TextStyleConstants.medium(
+                        context,
+                        fontSize: 11,
+                        color: textColor,
                       ),
                     ),
-                  ),
-
-                  /// 🍎 ICONS (APPLE MOTION)
-                  Row(
-                    children: tabs.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final item = entry.value;
-                      final isActive = index == currentIndex;
-
-                      return Expanded(
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.translucent,
-                          onTap: () => onTap(index),
-                          child: TweenAnimationBuilder<double>(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeOutBack,
-                            tween: Tween(begin: 0, end: isActive ? 1 : 0),
-                            builder: (context, rawValue, child) {
-                              // 🔒 Clamp once (Apple-style safe guard)
-                              final value = rawValue.clamp(0.0, 1.0);
-
-                              final iconColor = Color.lerp(
-                                AppColors.grayText.withOpacity(.7),
-                                CupertinoColors.black,
-                                value,
-                              );
-
-                              return Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Transform.scale(
-                                    scale: 1 +
-                                        (value * .12), // still feels springy
-                                    child: Icon(
-                                      (item.icon as Icon).icon,
-                                      size: 24,
-                                      color: iconColor,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Opacity(
-                                    opacity:
-                                        0.6 + (value * 0.4), // ✅ guaranteed 0–1
-                                    child: Text(
-                                      item.name,
-                                      style: TextStyleConstants.medium(
-                                        context,
-                                        fontSize: 11,
-                                        color: iconColor!,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ],
-              );
-            },
-          ),
-        ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

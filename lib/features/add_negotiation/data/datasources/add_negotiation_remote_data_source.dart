@@ -51,8 +51,9 @@ class AddNegotiationRemoteDataSourceImpl
   @override
   Future<ResponseWrapper<dynamic>?> getSupplierList(
       SupplierListParams params) async {
-    return await apiConsumer.get(
-      "${EndPoints.supplierList}/${params.groupID}/${params.customerId}",
+    return await apiConsumer.post(
+      EndPoints.supplierList,
+      body: params.toJson(),
     );
   }
 

@@ -18,7 +18,25 @@ class GetSupplierListUsecase
 class SupplierListParams extends Equatable {
   final String customerId;
   final String groupID;
-  const SupplierListParams({required this.customerId, required this.groupID});
+  final int indexNo;
+  final String token;
+  final String vendorName;
+  const SupplierListParams(
+      {required this.customerId,
+      required this.groupID,
+      required this.indexNo,
+      required this.token,
+      required this.vendorName});
   @override
-  List<Object?> get props => [customerId, groupID];
+  List<Object?> get props => [customerId, groupID, indexNo, token, vendorName];
+
+  Map<String, dynamic> toJson() {
+    return {
+      "CustomerID": customerId,
+      "GroupID": groupID,
+      "IndexNo": indexNo.toString(),
+      "Token": token,
+      "VendorName": vendorName,
+    };
+  }
 }
