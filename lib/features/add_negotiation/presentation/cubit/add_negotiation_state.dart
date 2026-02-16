@@ -72,7 +72,7 @@ class DeleteSupplierShortlistError extends AddNegotiationState {
 class GetSupplierListIsLoading extends AddNegotiationState {}
 
 class GetSupplierListSuccess extends AddNegotiationState {
-  final List<SupplierList> data;
+  final GetSupplierData data;
 
   const GetSupplierListSuccess({required this.data});
 

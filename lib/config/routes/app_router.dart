@@ -80,35 +80,35 @@ class AppRoutes {
     switch (routeSettings.name) {
       //! app
       case Routes.initialRoute:
-        return FadeCupertinoPageRoute(builder: (context) {
+        return CupertinoPageRoute(builder: (context) {
           return const SplashScreen();
         });
       case Routes.mainRoute:
-        return FadeCupertinoPageRoute(builder: (context) {
+        return CupertinoPageRoute(builder: (context) {
           return MainScreen();
         });
       case Routes.onboardingRoute:
-        return FadeCupertinoPageRoute(builder: (context) {
+        return CupertinoPageRoute(builder: (context) {
           return const OnboardingScreen();
         });
       //! authentication
 
       case Routes.signinRoute:
-        return FadeCupertinoPageRoute(builder: (context) {
+        return CupertinoPageRoute(builder: (context) {
           return const SignInScreen();
         });
       case Routes.signupRoute:
-        return FadeCupertinoPageRoute(builder: (context) {
+        return CupertinoPageRoute(builder: (context) {
           return SignupScreen();
         });
 
       //! login with whatsapp route
       case Routes.sendOtpScreen:
-        return FadeCupertinoPageRoute(builder: (context) {
+        return CupertinoPageRoute(builder: (context) {
           return SendOtpScreen();
         });
       case Routes.verifyOtpScreen:
-        return FadeCupertinoPageRoute(builder: (context) {
+        return CupertinoPageRoute(builder: (context) {
           return VerifyOtpScreen(
             params: routeSettings.arguments as SendOtpParams,
           );
@@ -116,14 +116,14 @@ class AppRoutes {
 
       //! webView
       case Routes.webViewRoute:
-        return FadeCupertinoPageRoute(builder: (context) {
+        return CupertinoPageRoute(builder: (context) {
           final data = routeSettings.arguments as WebviewParams;
           return WebViewScreen(
             params: data,
           );
         });
       case Routes.inAppWebViewRoute:
-        return FadeCupertinoPageRoute(builder: (context) {
+        return CupertinoPageRoute(builder: (context) {
           final data = routeSettings.arguments as WebviewParams;
           return InAppWebViewScreen(
             params: data,
@@ -131,49 +131,49 @@ class AppRoutes {
         });
 
       case Routes.termsRoute:
-        return FadeCupertinoPageRoute(builder: (context) {
+        return CupertinoPageRoute(builder: (context) {
           return TermsScreen(
             initialUrl: routeSettings.arguments as String,
           );
         });
 
       case Routes.dashboardRoute:
-        return FadeCupertinoPageRoute(builder: (context) {
+        return CupertinoPageRoute(builder: (context) {
           return const DashboardScreen();
         });
       case Routes.buyerDashboardRoute:
-        return FadeCupertinoPageRoute(builder: (context) {
+        return CupertinoPageRoute(builder: (context) {
           return const BuyerDashboardScreen();
         });
 
       case Routes.negotiationScreen:
-        return FadeCupertinoPageRoute(builder: (context) {
+        return CupertinoPageRoute(builder: (context) {
           return const NegotiationScreen();
         });
       case Routes.supplierListScreen:
-        return FadeCupertinoPageRoute(builder: (context) {
+        return CupertinoPageRoute(builder: (context) {
           return const SupplierListScreen();
         });
       case Routes.addNegotiationDetailScreen:
-        return FadeCupertinoPageRoute(builder: (context) {
+        return CupertinoPageRoute(builder: (context) {
           return const AddNegotiationDetailsScreen();
         });
       case Routes.addProductScreen:
-        return FadeCupertinoPageRoute(builder: (context) {
+        return CupertinoPageRoute(builder: (context) {
           return const AddProductScreen();
         });
       case Routes.buyerNegotiationScreen:
-        return FadeCupertinoPageRoute(builder: (context) {
+        return CupertinoPageRoute(builder: (context) {
           return const BuyerNegotiationScreen();
         });
 
       case Routes.myAccountsScreen:
-        return FadeCupertinoPageRoute(builder: (context) {
+        return CupertinoPageRoute(builder: (context) {
           return const MyAccountScreen();
         });
 
       case Routes.contactUsScreen:
-        return FadeCupertinoPageRoute(
+        return CupertinoPageRoute(
           builder: (context) {
             return const ContactUsScreen();
           },
@@ -181,7 +181,7 @@ class AppRoutes {
         );
 
       case Routes.notificationScreen:
-        return FadeCupertinoPageRoute(builder: (context) {
+        return CupertinoPageRoute(builder: (context) {
           return const NotificationScreen();
         });
 
@@ -201,51 +201,12 @@ class AppRoutes {
   }
 
   static Route<dynamic> undefinedRoute() {
-    return FadeCupertinoPageRoute(
+    return CupertinoPageRoute(
       builder: (context) => const AdaptiveScaffold(
         body: Center(
           child: Text(AppStrings.noRouteFound),
         ),
       ),
-    );
-  }
-}
-
-class FadeCupertinoPageRoute<T> extends CupertinoPageRoute<T> {
-  FadeCupertinoPageRoute({
-    required super.builder,
-    super.settings,
-    super.fullscreenDialog,
-  });
-
-  @override
-  Widget buildTransitions(
-    BuildContext context,
-    Animation<double> animation,
-    Animation<double> secondaryAnimation,
-    Widget child,
-  ) {
-    if (Platform.isIOS) {
-      final curved = CurvedAnimation(
-        parent: animation,
-        curve: Curves.easeOutCubic,
-        reverseCurve: Curves.easeInCubic,
-      );
-
-      return FadeTransition(
-        opacity: curved,
-        child: ScaleTransition(
-          scale: Tween(begin: 0.985, end: 1.0).animate(curved),
-          child: child,
-        ),
-      );
-    }
-
-    return FadeThroughTransition(
-      animation: animation,
-      secondaryAnimation: secondaryAnimation,
-      fillColor: Theme.of(context).scaffoldBackgroundColor,
-      child: child,
     );
   }
 }

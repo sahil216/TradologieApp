@@ -41,8 +41,7 @@ class BuyerDashboardScreen extends StatefulWidget {
   State<BuyerDashboardScreen> createState() => _BuyerDashboardScreenState();
 }
 
-class _BuyerDashboardScreenState extends State<BuyerDashboardScreen>
-    with TabAutoRefreshMixin {
+class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
   AllListDetail? allListDetail;
   List<CommodityList>? commodityList;
 
@@ -143,14 +142,14 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen>
     });
   }
 
-  @override
-  int get tabIndex => 0;
+  // @override
+  // int get tabIndex => 0;
 
-  @override
-  void onTabActive() {
-    clearForm();
-    getCommodityData(); // 🔥 auto refresh
-  }
+  // @override
+  // void onTabActive() {
+  //   clearForm();
+  //   getCommodityData(); // 🔥 auto refresh
+  // }
 
   @override
   void initState() {

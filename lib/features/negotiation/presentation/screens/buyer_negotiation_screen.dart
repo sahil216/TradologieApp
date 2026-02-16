@@ -35,8 +35,7 @@ class BuyerNegotiationScreen extends StatefulWidget {
   State<BuyerNegotiationScreen> createState() => _BuyerNegotiationScreenState();
 }
 
-class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen>
-    with TabAutoRefreshMixin {
+class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen> {
   BuyerNegotiation? negotiation;
   List<BuyerNegotiationDetail>? negotiationData;
 
@@ -95,14 +94,6 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen>
         _headerController.jumpTo(_bodyController.offset);
       }
     });
-  }
-
-  @override
-  int get tabIndex => 1;
-
-  @override
-  void onTabActive() {
-    getNegotiationData(); // 🔥 auto refresh
   }
 
   @override

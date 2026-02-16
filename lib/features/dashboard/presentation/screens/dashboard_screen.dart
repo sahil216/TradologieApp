@@ -31,8 +31,7 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen>
-    with TabAutoRefreshMixin {
+class _DashboardScreenState extends State<DashboardScreen> {
   List<DashboardResult>? dashboardData;
 
   late final PageController _carouselController;
@@ -57,16 +56,16 @@ class _DashboardScreenState extends State<DashboardScreen>
     await dashboardCubit.getDashboardData(params);
   }
 
-  @override
-  int get tabIndex => 0;
+  // @override
+  // int get tabIndex => 0;
 
-  @override
-  void onTabActive() {
-    getDashboardData();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(seconds: 4), _autoScroll);
-    });
-  }
+  // @override
+  // void onTabActive() {
+  //   getDashboardData();
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     Future.delayed(const Duration(seconds: 4), _autoScroll);
+  //   });
+  // }
 
   @override
   void initState() {

@@ -2,16 +2,17 @@ import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:tradologie_app/core/error/failures.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/enitities/supplier_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/supplier_list.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/repositories/add_negotiation_repository.dart';
 
 class GetSupplierListUsecase
-    implements UseCase<List<SupplierList>, SupplierListParams> {
+    implements UseCase<GetSupplierData, SupplierListParams> {
   final AddNegotiationRepository addNegotiationRepository;
 
   GetSupplierListUsecase({required this.addNegotiationRepository});
   @override
-  Future<Either<Failure, List<SupplierList>>> call(SupplierListParams params) =>
+  Future<Either<Failure, GetSupplierData>> call(SupplierListParams params) =>
       addNegotiationRepository.getSupplierList(params);
 }
 

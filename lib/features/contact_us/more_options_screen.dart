@@ -29,8 +29,7 @@ class MoreOptionsScreen extends StatefulWidget {
   State<MoreOptionsScreen> createState() => _MoreOptionsScreenState();
 }
 
-class _MoreOptionsScreenState extends State<MoreOptionsScreen>
-    with TabAutoRefreshMixin {
+class _MoreOptionsScreenState extends State<MoreOptionsScreen> {
   SecureStorageService secureStorage = SecureStorageService();
 
   String name = "";
@@ -38,14 +37,14 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
 
   late AppCubit _appCubit;
 
-  @override
-  int get tabIndex => 4;
+  // @override
+  // int get tabIndex => 4;
 
-  @override
-  void onTabActive() {
-    // clearForm();
-    // getCommodityData(); // 🔥 auto refresh
-  }
+  // @override
+  // void onTabActive() {
+  //   // clearForm();
+  //   // getCommodityData(); // 🔥 auto refresh
+  // }
 
   @override
   void initState() {

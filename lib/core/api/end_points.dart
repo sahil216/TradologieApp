@@ -57,7 +57,7 @@ class EndPoints {
 
   // Send OTP
   static String sendOtp(UserType userType) {
-    return '$baseUrl/${userType.name}/SendOTPForLogin';
+    return '$baseUrl/${userType.name}/SendOTPForLoginV1';
   }
 
   static String sendOtpBuyer(UserType userType) {

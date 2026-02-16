@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:tradologie_app/core/error/failures.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/create_auction_detail.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/enitities/supplier_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/supplier_list.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_supplier_shortlist_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/create_auction_usecase.dart';
@@ -15,7 +16,7 @@ abstract class AddNegotiationRepository {
       AddShortListSupplierParams params);
   Future<Either<Failure, bool>> deleteSupplierShortList(
       RemoveSupplierShortlistParams params);
-  Future<Either<Failure, List<SupplierList>>> getSupplierList(
+  Future<Either<Failure, GetSupplierData>> getSupplierList(
       SupplierListParams params);
   Future<Either<Failure, List<SupplierList>>> getSupplierShortlisted(
       SupplierListParams params);

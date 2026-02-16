@@ -15,6 +15,7 @@ import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_button.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/enitities/supplier_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/supplier_list.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/delete_supplier_shortlist_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/presentation/cubit/add_negotiation_cubit.dart';
@@ -35,6 +36,8 @@ class SupplierListScreen extends StatefulWidget {
 
 class _SupplierListScreenState extends State<SupplierListScreen> {
   List<CommodityList>? categoryList;
+
+  GetSupplierData? supplierData;
 
   List<SupplierList>? supplierList;
   List<SupplierList>? shortlistedSupplierList;
@@ -139,16 +142,17 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
             if (state is GetSupplierListSuccess) {
               setState(() {
                 if (_page == 1) {
-                  supplierList = state.data;
+                  supplierData = state.data;
+                  supplierList = state.data.detail;
                 } else {
                   supplierList ??= [];
-                  supplierList!.addAll(state.data);
+                  supplierList!.addAll(state.data.detail ?? []);
                 }
 
                 _isFetchingMore = false;
 
                 /// ⭐ Detect last page automatically
-                if (state.data.isEmpty) {
+                if ((state.data.detail?.isEmpty ?? true)) {
                   _isLastPage = true;
                 }
               });
@@ -292,9 +296,7 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
                                         return const Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 16),
-                                          child: Center(
-                                              child:
-                                                  CircularProgressIndicator()),
+                                          child: CommonLoader(),
                                         );
                                       }
 

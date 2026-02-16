@@ -35,7 +35,7 @@ class MyAccountScreen extends StatefulWidget {
 }
 
 class _MyAccountScreenState extends State<MyAccountScreen>
-    with SingleTickerProviderStateMixin, TabAutoRefreshMixin {
+    with SingleTickerProviderStateMixin {
   final SecureStorageService _secureStorage = SecureStorageService();
   String? token;
   CompanyDetails? companyDetails;
@@ -46,14 +46,6 @@ class _MyAccountScreenState extends State<MyAccountScreen>
 
   Future<void> getCompanyDetails() async {
     await cubit.companyDetails(NoParams());
-  }
-
-  @override
-  int get tabIndex => 2;
-
-  @override
-  void onTabActive() {
-    getCompanyDetails(); // 🔥 auto refresh
   }
 
   @override
@@ -84,8 +76,7 @@ class _MyAccountScreenState extends State<MyAccountScreen>
   }
 
   bool _canOpenTab(int index) {
-    // Membership Type tab index = 5
-    if (index == 5 && companyDetails?.countryId == 0) {
+    if (index == 9 && companyDetails?.countryId == 0) {
       return false;
     }
     return true;

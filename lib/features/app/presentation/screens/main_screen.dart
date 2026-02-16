@@ -8,10 +8,7 @@ import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
-import 'package:tradologie_app/features/add_negotiation/presentation/screens/supplier_list_screen.dart';
-import 'package:tradologie_app/features/app/presentation/widgets/common_tab_engine.dart';
 import 'package:tradologie_app/features/app/presentation/widgets/custom_bottom_navigation_bar.dart';
-import 'package:tradologie_app/features/contact_us/more_options_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_dashboard_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:tradologie_app/features/my_account/presentation/screens/my_account_screen.dart';
@@ -107,11 +104,11 @@ class _MainScreenState extends State<MainScreen>
             ? const BuyerNegotiationScreen()
             : const NegotiationScreen(),
       ),
-      TabViewModel(
-          icon: Icon(Icons.add_box_outlined),
-          name: 'Add Negotiation',
-          height: 20,
-          page: const SupplierListScreen()),
+      // TabViewModel(
+      //     icon: Icon(Icons.add_box_outlined),
+      //     name: 'Add Negotiation',
+      //     height: 20,
+      //     page: const SupplierListScreen()),
       TabViewModel(
         icon: Icon(Icons.person),
         name: 'My Account',
@@ -136,11 +133,11 @@ class _MainScreenState extends State<MainScreen>
                         isShowNotification: true)) // const OrdersScreen(),
             : MyAccountScreen(),
       ),
-      TabViewModel(
-          icon: Icon(Icons.menu_outlined),
-          name: 'More Options',
-          height: 20,
-          page: const MoreOptionsScreen()),
+      // TabViewModel(
+      //     icon: Icon(Icons.menu_outlined),
+      //     name: 'More Options',
+      //     height: 20,
+      //     page: const MoreOptionsScreen()),
     ];
   }
 
@@ -155,7 +152,7 @@ class _MainScreenState extends State<MainScreen>
     });
   }
 
-  final GlobalKey<CupertinoTabEngineState> _tabEngineKey = GlobalKey();
+  // final GlobalKey<CupertinoTabEngineState> _tabEngineKey = GlobalKey();
 
   late final AnimationController _navAnimController;
 
@@ -194,18 +191,13 @@ class _MainScreenState extends State<MainScreen>
         return PopScope(
           canPop: false,
           onPopInvokedWithResult: (didPop, result) async {
-            final handled = await _tabEngineKey.currentState
-                    ?.popCurrentTab(_appCubit.bottomNavIndex) ??
-                false;
-
-            /// 🔥 if inner navigator handled pop → STOP
-            if (handled) return;
-
-            /// otherwise switch to first tab
             if (_appCubit.bottomNavIndex != 0) {
               _appCubit.changeTab(0);
               return;
             }
+
+            /// 🔥 Exit app
+            SystemNavigator.pop();
 
             /// else allow system back (exit app)
             SystemNavigator.pop();
@@ -214,12 +206,17 @@ class _MainScreenState extends State<MainScreen>
             appBar: Constants.appBar(context, height: 0, boxShadow: []),
             body: Stack(
               children: [
-                CupertinoTabEngine(
-                  key: _tabEngineKey,
-                  tabs: Constants.isBuyer == true
-                      ? buyerTabsList
-                      : supplierTabsList,
-                  currentIndex: _appCubit.bottomNavIndex,
+                Builder(
+                  builder: (_) {
+                    final tabs = Constants.isBuyer == true
+                        ? buyerTabsList
+                        : supplierTabsList;
+
+                    return KeyedSubtree(
+                      key: ValueKey(_appCubit.bottomNavIndex),
+                      child: tabs[_appCubit.bottomNavIndex].page,
+                    );
+                  },
                 ),
               ],
             ),

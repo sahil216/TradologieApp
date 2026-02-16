@@ -38,8 +38,7 @@ class NegotiationScreen extends StatefulWidget {
   State<NegotiationScreen> createState() => _NegotiationScreenState();
 }
 
-class _NegotiationScreenState extends State<NegotiationScreen>
-    with TabAutoRefreshMixin {
+class _NegotiationScreenState extends State<NegotiationScreen> {
   Negotiation? negotiation;
   List<NegotiationResult>? negotiationData;
 
@@ -101,14 +100,6 @@ class _NegotiationScreenState extends State<NegotiationScreen>
         _headerController.jumpTo(_bodyController.offset);
       }
     });
-  }
-
-  @override
-  int get tabIndex => 1;
-
-  @override
-  void onTabActive() {
-    getNegotiationData(); // 🔥 auto refresh
   }
 
   @override

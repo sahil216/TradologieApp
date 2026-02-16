@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
@@ -100,21 +101,25 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                         builder: (context, value, child) {
                           return Column(
                             children: [
-                              Container(
+                              SizedBox(
                                 width: double.infinity,
                                 height: r.value(
-                                    mobile: r.screenHeight * 0.35,
-                                    tablet: r.screenHeight * 0.4),
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: Constants.isBuyer == true
-                                        ? const AssetImage(
-                                            ImgAssets.buyerLoginImage)
-                                        : const AssetImage(
-                                            ImgAssets.sellerLoginImage),
-                                    fit: BoxFit.cover,
-                                  ),
+                                  mobile: r.screenHeight * 0.35,
+                                  tablet: r.screenHeight * 0.4,
                                 ),
+                                child: Constants.isBuyer == true
+                                    ? SvgPicture.asset(
+                                        ImgAssets.buyerLoginImage,
+                                        fit: BoxFit.cover,
+                                        width: double.infinity,
+                                        height: double.infinity,
+                                      )
+                                    : SvgPicture.asset(
+                                        ImgAssets.sellerLoginImage,
+                                        fit: BoxFit.cover,
+                                        width: double.infinity,
+                                        height: double.infinity,
+                                      ),
                               ),
                               Expanded(
                                 child: CommonSingleChildScrollView(

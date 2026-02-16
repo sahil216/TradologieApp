@@ -223,43 +223,20 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
                       iconPath: Icon(Icons.article_outlined, size: 24),
                       title: 'Negotiation',
                     ),
-                    Constants.isBuyer == true
-                        ? DrawerItem(
-                            onTap: () {
-                              Navigator.pop(context);
-                              sl<NavigationService>()
-                                  .pushNamed(Routes.supplierListScreen);
-                            },
-                            iconPath: Icon(
-                              Icons.add,
-                              size: 24,
-                            ),
-                            title: 'Add Negotiation')
-                        : SizedBox.shrink(),
-                    // DrawerItem(
-                    //     onTap: () {
-                    //       Navigator.pop(context);
-                    //     },
-                    //     iconPath: ImgAssets.bulk,
-                    //     title: "Bulk"),
-                    // DrawerItem(
-                    //     onTap: () {
-                    //       Navigator.pop(context);
-                    //     },
-                    //     iconPath: ImgAssets.orders,
-                    //     title: 'Orders'),
-                    // DrawerItem(
-                    //     onTap: () {
-                    //       Navigator.pop(context);
-                    //     },
-                    //     iconPath: ImgAssets.accounts,
-                    //     title: 'Accounts'),
-                    // DrawerItem(
-                    //     onTap: () {
-                    //       Navigator.pop(context);
-                    //     },
-                    //     iconPath: ImgAssets.analysisReports,
-                    //     title: 'Analysis/Reports'),
+                    // Constants.isBuyer == true
+                    //     ? DrawerItem(
+                    //         onTap: () {
+                    //           Navigator.pop(context);
+                    //           sl<NavigationService>()
+                    //               .pushNamed(Routes.supplierListScreen);
+                    //         },
+                    //         iconPath: Icon(
+                    //           Icons.add,
+                    //           size: 24,
+                    //         ),
+                    //         title: 'Add Negotiation')
+                    // : SizedBox.shrink(),
+
                     DrawerItem(
                         onTap: () {
                           Navigator.pop(context);
@@ -397,7 +374,8 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
 
               if (Platform.isIOS) {
                 launchUrl(
-                    Uri.parse("https://testflight.apple.com/join/sffC3HPU"),
+                    Uri.parse(
+                        "https://apps.apple.com/app/tradologie/id6758596323"),
                     mode: LaunchMode.externalApplication);
               }
             },
