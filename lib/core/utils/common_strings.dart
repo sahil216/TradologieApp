@@ -57,8 +57,7 @@ class CommonStrings {
   static const String facebookUrl = "https://www.facebook.com/tradologie/";
   static const String linkedinUrl =
       "https://www.linkedin.com/uas/login?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Fcompany%2F14383151%2Fadmin%2Fdashboard%2F";
-  static const String xUrl = "https://www.facebook.com/tradologie/";
-  static const String googleUrl = "https://www.facebook.com/tradologie/";
+  static const String xUrl = "https://x.com/tradologie_com/";
   static const String youtubeUrl = "https://www.youtube.com/@TradologieGlobal";
   static const String instagramUrl =
       "https://www.instagram.com/tradologieworld/";
