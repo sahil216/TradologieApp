@@ -405,6 +405,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                                                     osVersionRelease,
                                                 appVersion: appVersion,
                                               );
+                                              if (!context.mounted) return;
 
                                               FocusManager.instance.primaryFocus
                                                   ?.unfocus();

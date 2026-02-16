@@ -319,7 +319,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                                       osVersionRelease,
                                                   appVersion: appVersion,
                                                 );
-
+                                                if (!context.mounted) return;
                                                 FocusManager
                                                     .instance.primaryFocus
                                                     ?.unfocus();

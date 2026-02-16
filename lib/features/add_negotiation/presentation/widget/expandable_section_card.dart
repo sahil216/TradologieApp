@@ -23,6 +23,7 @@ class ExpandableSectionCard extends StatelessWidget {
     if (controller.isOpen(index)) {
       Future.delayed(const Duration(milliseconds: 260), () {
         final ctx = context;
+        if (!ctx.mounted) return;
         Scrollable.ensureVisible(
           ctx,
           duration: const Duration(milliseconds: 350),

@@ -260,6 +260,7 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
                           String? result = await showInputDialog(context);
 
                           if (result != null && result.isNotEmpty) {
+                            if (!context.mounted) return;
                             BlocProvider.of<AuthenticationCubit>(context)
                                 .deleteAccount(
                               DeleteAccountParams(

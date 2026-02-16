@@ -72,7 +72,10 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void startDelay(BuildContext context) {
-    Future.delayed(const Duration(milliseconds: 3000), () => _goNext(context));
+    Future.delayed(const Duration(milliseconds: 3000), () {
+      if (!context.mounted) return;
+      _goNext(context);
+    });
   }
 
   @override

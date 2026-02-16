@@ -61,7 +61,7 @@ class EndPoints {
   }
 
   static String sendOtpBuyer(UserType userType) {
-    return '$baseUrl/${userType.name}/SendOTPForCustomerLogin';
+    return '$baseUrl/${userType.name}/SendOTPForCustomerLoginV1';
   }
 
   // Dashboard Data

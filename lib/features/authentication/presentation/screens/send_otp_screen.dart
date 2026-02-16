@@ -37,7 +37,7 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
   final textMobileController = TextEditingController();
   final textFullNameController = TextEditingController();
   List<CountryCodeList>? countryCodeList;
-  var params;
+  late SendOtpParams params;
   CountryCodeList? countryCode;
 
   bool isSubmitted = false;
@@ -123,6 +123,7 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                               ),
                               Expanded(
                                 child: CommonSingleChildScrollView(
+                                  keyboardDismiss: true,
                                   child: Center(
                                     child: ConstrainedBox(
                                       constraints: BoxConstraints(

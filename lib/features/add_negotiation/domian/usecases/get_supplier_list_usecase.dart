@@ -3,7 +3,6 @@ import 'package:equatable/equatable.dart';
 import 'package:tradologie_app/core/error/failures.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/supplier_data.dart';
-import 'package:tradologie_app/features/add_negotiation/domian/enitities/supplier_list.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/repositories/add_negotiation_repository.dart';
 
 class GetSupplierListUsecase

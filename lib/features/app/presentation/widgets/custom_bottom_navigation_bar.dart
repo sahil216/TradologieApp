@@ -25,7 +25,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 6, 14, 0),
+        padding: const EdgeInsets.fromLTRB(14, 6, 14, 6),
         child: Container(
           padding: const EdgeInsets.all(2),
           decoration: BoxDecoration(

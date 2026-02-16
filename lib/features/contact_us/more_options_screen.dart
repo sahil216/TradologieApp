@@ -15,7 +15,6 @@ import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart'
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 import 'package:tradologie_app/features/app/presentation/cubit/app_cubit.dart';
 import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
-import 'package:tradologie_app/features/app/presentation/widgets/auto_refresh_mixin.dart';
 import 'package:tradologie_app/features/app/presentation/widgets/input_dialog.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/delete_account_usecase.dart';
 import 'package:tradologie_app/features/authentication/presentation/cubit/authentication_cubit.dart';
@@ -111,6 +110,7 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen> {
                     String? result = await showInputDialog(context);
 
                     if (result != null && result.isNotEmpty) {
+                      if (!context.mounted) return;
                       context.read<AuthenticationCubit>().deleteAccount(
                             DeleteAccountParams(
                               token: await secureStorage

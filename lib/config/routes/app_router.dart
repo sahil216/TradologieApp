@@ -1,8 +1,4 @@
-import 'dart:io';
-
-import 'package:animations/animations.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/features/add_negotiation/presentation/screens/add_negotiation_details_screen.dart';
 import 'package:tradologie_app/features/add_negotiation/presentation/screens/add_product_screen.dart';

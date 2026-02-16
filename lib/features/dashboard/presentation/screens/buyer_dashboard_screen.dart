@@ -21,7 +21,6 @@ import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text_field.dart';
 import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
-import 'package:tradologie_app/features/app/presentation/widgets/auto_refresh_mixin.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/all_list_detail.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/attribute_list.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/commodity_list.dart';

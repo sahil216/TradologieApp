@@ -14,8 +14,8 @@ import 'package:tradologie_app/core/widgets/common_single_child_scroll_view.dart
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
+import 'package:tradologie_app/features/app/presentation/cubit/app_cubit.dart';
 import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
-import 'package:tradologie_app/features/app/presentation/widgets/auto_refresh_mixin.dart';
 import 'package:tradologie_app/features/negotiation/domain/entities/negotiation_result.dart';
 import 'package:tradologie_app/features/negotiation/presentation/cubit/negotiation_cubit.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
@@ -82,11 +82,13 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
   };
 
   NegotiationCubit get cubit => BlocProvider.of<NegotiationCubit>(context);
+  late AppCubit _appCubit;
 
   @override
   void initState() {
     super.initState();
     getNegotiationData();
+    _appCubit = BlocProvider.of<AppCubit>(context);
 
     // Force landscape
     // SystemChrome.setPreferredOrientations([
@@ -153,6 +155,10 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
             }
           },
         ),
+        BlocListener<AppCubit, AppState>(
+          listenWhen: (previous, current) => previous != current,
+          listener: (context, state) {},
+        ),
       ],
       child: AdaptiveScaffold(
         drawer: const TradologieDrawer(),
@@ -205,8 +211,7 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
                 if (state.failure.msg?.toLowerCase() == "no record found!") {
                   return CommonNoRecordWidget(
                     onTap: () {
-                      sl<NavigationService>()
-                          .pushNamed(Routes.myAccountsScreen);
+                      _appCubit.changeTab(2);
                     },
                     text:
                         "No negotiations are assigned to your account, please get verified your account. If you need any assistance, contact us at info@tradologie.com or call us at +91-8595957412",
