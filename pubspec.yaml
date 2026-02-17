@@ -2,7 +2,7 @@ name: tradologie_app
 description: "A new tradologie flutter project."
 publish_to: 'none'
 
-version: 1.1.4+15
+version: 1.1.5+16
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
