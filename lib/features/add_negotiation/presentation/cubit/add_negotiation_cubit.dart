@@ -3,15 +3,26 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/error/failures.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/enitities/add_auction_supplier_list_data.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/enitities/auction_detail_for_edit_data.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/enitities/auction_item_list_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/create_auction_detail.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/supplier_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/supplier_list.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_auction_item_usecase.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_auction_supplier_list_usecase.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_auction_supplier_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_supplier_shortlist_usecase.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/usecases/auction_detail_for_edit_usecase.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/usecases/auction_item_list_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/create_auction_usecase.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/usecases/delete_auction_item_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/delete_supplier_shortlist_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/get_category_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/get_supplier_list_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/get_supplier_shortlisted_usecase.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/usecases/gradle_file_upload_usecase.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/usecases/packing_image_upload_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/commodity_list.dart';
 
 part 'add_negotiation_state.dart';
@@ -23,6 +34,14 @@ class AddNegotiationCubit extends Cubit<AddNegotiationState> {
   final GetSupplierListUsecase getSupplierListUsecase;
   final GetSupplierShortlistedUsecase getSupplierShortlistedUsecase;
   final CreateAuctionUsecase createAuctionUsecase;
+  final AuctionItemListUsecase auctionItemListUsecase;
+  final GradleFileUploadUsecase gradleFileUploadUsecase;
+  final PackingImageUploadUsecase packingImageUploadUsecase;
+  final AddAuctionItemUsecase addAuctionItemUsecase;
+  final AuctionDetailForEditUsecase auctionDetailForEditUsecase;
+  final AddAuctionSupplierUsecase addAuctionSupplierUsecase;
+  final AddAuctionSupplierListUsecase addAuctionSupplierListUsecase;
+  final DeleteAuctionItemUsecase deleteAuctionItemUsecase;
 
   AddNegotiationCubit({
     required this.getCategoryUsecase,
@@ -31,6 +50,14 @@ class AddNegotiationCubit extends Cubit<AddNegotiationState> {
     required this.getSupplierListUsecase,
     required this.getSupplierShortlistedUsecase,
     required this.createAuctionUsecase,
+    required this.auctionItemListUsecase,
+    required this.gradleFileUploadUsecase,
+    required this.packingImageUploadUsecase,
+    required this.addAuctionItemUsecase,
+    required this.auctionDetailForEditUsecase,
+    required this.addAuctionSupplierUsecase,
+    required this.addAuctionSupplierListUsecase,
+    required this.deleteAuctionItemUsecase,
   }) : super(AddNegotiationInitial());
 
   Future<void> getCategoryList(NoParams params) async {
@@ -102,5 +129,80 @@ class AddNegotiationCubit extends Cubit<AddNegotiationState> {
     return shortlisted.any(
       (item) => item.vendorId == supplier.vendorId,
     );
+  }
+
+  Future<void> auctionItemList(AuctionItemListParams params) async {
+    emit(AuctionItemListIsLoading());
+    Either<Failure, List<AuctionItemListData>> response =
+        await auctionItemListUsecase(params);
+    emit(response.fold(
+      (failure) => AuctionItemListError(failure: failure),
+      (res) => AuctionItemListSuccess(data: res),
+    ));
+  }
+
+  Future<void> gradleFileUpload(NoParams params) async {
+    emit(GradleFileUploadIsLoading());
+    Either<Failure, bool> response = await gradleFileUploadUsecase(params);
+    emit(response.fold(
+      (failure) => GradleFileUploadError(failure: failure),
+      (res) => GradleFileUploadSuccess(data: res),
+    ));
+  }
+
+  Future<void> packingImageUpload(NoParams params) async {
+    emit(PackingImageUploadIsLoading());
+    Either<Failure, bool> response = await packingImageUploadUsecase(params);
+    emit(response.fold(
+      (failure) => PackingImageUploadError(failure: failure),
+      (res) => PackingImageUploadSuccess(data: res),
+    ));
+  }
+
+  Future<void> addAuctionItem(AddAuctionItemParams params) async {
+    emit(AddAuctionItemIsLoading());
+    Either<Failure, bool> response = await addAuctionItemUsecase(params);
+    emit(response.fold(
+      (failure) => AddAuctionItemError(failure: failure),
+      (res) => AddAuctionItemSuccess(data: res),
+    ));
+  }
+
+  Future<void> auctionDetailForEdit(AuctionDetailForEditParams params) async {
+    emit(AuctionDetailForEditIsLoading());
+    Either<Failure, AuctionDetailForEditData> response =
+        await auctionDetailForEditUsecase(params);
+    emit(response.fold(
+      (failure) => AuctionDetailForEditError(failure: failure),
+      (res) => AuctionDetailForEditSuccess(data: res),
+    ));
+  }
+
+  Future<void> addAuctionSupplier(AddAuctionSupplierParams params) async {
+    emit(AddAuctionSupplierIsLoading());
+    Either<Failure, bool> response = await addAuctionSupplierUsecase(params);
+    emit(response.fold(
+      (failure) => AddAuctionSupplierError(failure: failure),
+      (res) => AddAuctionSupplierSuccess(data: res),
+    ));
+  }
+
+  Future<void> addAuctionSupplierList(NoParams params) async {
+    emit(AddAuctionSupplierListIsLoading());
+    Either<Failure, List<AddAuctionSupplierListData>> response =
+        await addAuctionSupplierListUsecase(params);
+    emit(response.fold(
+      (failure) => AddAuctionSupplierListError(failure: failure),
+      (res) => AddAuctionSupplierListSuccess(data: res),
+    ));
+  }
+
+  Future<void> deleteAuctionItem(DeleteAuctionItemParams params) async {
+    emit(DeleteAuctionItemIsLoading());
+    Either<Failure, bool> response = await deleteAuctionItemUsecase(params);
+    emit(response.fold(
+      (failure) => DeleteAuctionItemError(failure: failure),
+      (res) => DeleteAuctionItemSuccess(data: res),
+    ));
   }
 }
