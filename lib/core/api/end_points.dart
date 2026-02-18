@@ -101,6 +101,7 @@ class EndPoints {
   static String auctionItemList = '$baseUrlBuyer/AuctionItemList';
   static String deleteAuctionItem = '$baseUrlBuyer/DeleteAuctionItem';
   static String addAuctionSupplierList = '$baseUrlBuyer/AddAuctionSupplierList';
+  static String addUpdateAuction = '$baseUrlBuyer/AddUpdateAuction';
 
   // My Account apis
   // Information

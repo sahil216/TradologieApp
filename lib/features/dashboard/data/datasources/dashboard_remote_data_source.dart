@@ -4,7 +4,6 @@ import 'package:tradologie_app/features/dashboard/domain/usecases/add_customer_r
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_all_list_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_dashboard_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/post_vendor_stock_requirement.dart';
-import 'package:tradologie_app/features/dashboard/presentation/screens/post_stock_requirement_screen.dart';
 
 import '../../../../core/api/api_consumer.dart';
 import '../../../../core/api/end_points.dart';

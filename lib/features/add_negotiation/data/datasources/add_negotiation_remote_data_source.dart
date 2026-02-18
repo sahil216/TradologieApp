@@ -12,6 +12,8 @@ import 'package:tradologie_app/features/add_negotiation/domian/usecases/delete_a
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/delete_supplier_shortlist_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/get_supplier_list_usecase.dart';
 
+import '../../domian/usecases/add_update_auction_usecase.dart';
+
 abstract class AddNegotiationRemoteDataSource {
   Future<ResponseWrapper<dynamic>?> getCategoryList(NoParams params);
   Future<ResponseWrapper<dynamic>?> addSupplierShortList(
@@ -34,6 +36,8 @@ abstract class AddNegotiationRemoteDataSource {
   Future<ResponseWrapper<dynamic>?> addAuctionSupplierList(NoParams params);
   Future<ResponseWrapper<dynamic>?> deleteAuctionItem(
       DeleteAuctionItemParams params);
+  Future<ResponseWrapper<dynamic>?> addUpdateAuction(
+      AddUpdateAuctionParams params);
 }
 
 class AddNegotiationRemoteDataSourceImpl
@@ -157,6 +161,15 @@ class AddNegotiationRemoteDataSourceImpl
       NoParams params) async {
     return await apiConsumer.get(
       EndPoints.addAuctionSupplierList,
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> addUpdateAuction(
+      AddUpdateAuctionParams params) async {
+    return await apiConsumer.post(
+      EndPoints.addUpdateAuction,
+      body: params.toJson(),
     );
   }
 }

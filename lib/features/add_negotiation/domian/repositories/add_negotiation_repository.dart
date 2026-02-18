@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:tradologie_app/core/error/failures.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/add_auction_supplier_list_data.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/enitities/add_update_auction_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/auction_detail_for_edit_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/auction_item_list_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/create_auction_detail.dart';
@@ -10,6 +11,7 @@ import 'package:tradologie_app/features/add_negotiation/domian/enitities/supplie
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_auction_item_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_auction_supplier_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_supplier_shortlist_usecase.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_update_auction_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/auction_detail_for_edit_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/auction_item_list_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/create_auction_usecase.dart';
@@ -43,4 +45,6 @@ abstract class AddNegotiationRepository {
       addAuctionSupplierList(NoParams params);
   Future<Either<Failure, bool>> deleteAuctionItem(
       DeleteAuctionItemParams params);
+  Future<Either<Failure, AddUpdateAuctionData>> addUpdateAuction(
+      AddUpdateAuctionParams params);
 }

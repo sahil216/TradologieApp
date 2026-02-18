@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:tradologie_app/core/utils/app_colors.dart';
+import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 
 class CommonDropdown<T> extends StatelessWidget {
@@ -38,7 +39,7 @@ class CommonDropdown<T> extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        CommonText(
           label,
           style: TextStyleConstants.semiBold(context, fontSize: 16),
         ),
@@ -69,6 +70,12 @@ class CommonDropdown<T> extends StatelessWidget {
           popupProps: PopupProps.modalBottomSheet(
             showSearchBox: true, // search is visible
             fit: FlexFit.loose,
+            containerBuilder: (context, popupWidget) {
+              return SafeArea(
+                top: false,
+                child: popupWidget,
+              );
+            },
 
             searchFieldProps: TextFieldProps(
               decoration: InputDecoration(

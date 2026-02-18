@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/error/failures.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/add_auction_supplier_list_data.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/enitities/add_update_auction_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/auction_detail_for_edit_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/auction_item_list_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/create_auction_detail.dart';
@@ -13,6 +14,7 @@ import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_auct
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_auction_supplier_list_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_auction_supplier_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_supplier_shortlist_usecase.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_update_auction_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/auction_detail_for_edit_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/auction_item_list_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/create_auction_usecase.dart';
@@ -42,6 +44,7 @@ class AddNegotiationCubit extends Cubit<AddNegotiationState> {
   final AddAuctionSupplierUsecase addAuctionSupplierUsecase;
   final AddAuctionSupplierListUsecase addAuctionSupplierListUsecase;
   final DeleteAuctionItemUsecase deleteAuctionItemUsecase;
+  final AddUpdateAuctionUsecase addUpdateAuctionUsecase;
 
   AddNegotiationCubit({
     required this.getCategoryUsecase,
@@ -58,6 +61,7 @@ class AddNegotiationCubit extends Cubit<AddNegotiationState> {
     required this.addAuctionSupplierUsecase,
     required this.addAuctionSupplierListUsecase,
     required this.deleteAuctionItemUsecase,
+    required this.addUpdateAuctionUsecase,
   }) : super(AddNegotiationInitial());
 
   Future<void> getCategoryList(NoParams params) async {
@@ -203,6 +207,16 @@ class AddNegotiationCubit extends Cubit<AddNegotiationState> {
     emit(response.fold(
       (failure) => DeleteAuctionItemError(failure: failure),
       (res) => DeleteAuctionItemSuccess(data: res),
+    ));
+  }
+
+  Future<void> addUpdateAuction(AddUpdateAuctionParams params) async {
+    emit(AddUpdateAuctionIsLoading());
+    Either<Failure, AddUpdateAuctionData> response =
+        await addUpdateAuctionUsecase(params);
+    emit(response.fold(
+      (failure) => AddUpdateAuctionError(failure: failure),
+      (res) => AddUpdateAuctionSuccess(data: res),
     ));
   }
 }

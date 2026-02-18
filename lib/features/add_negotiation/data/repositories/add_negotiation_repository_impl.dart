@@ -4,12 +4,14 @@ import 'package:tradologie_app/core/error/user_failure.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/data/datasources/add_negotiation_remote_data_source.dart';
 import 'package:tradologie_app/features/add_negotiation/data/models/add_auction_supplier_list_data_model.dart';
+import 'package:tradologie_app/features/add_negotiation/data/models/add_update_auction_data_model.dart';
 import 'package:tradologie_app/features/add_negotiation/data/models/auction_detail_for_edit_data_model.dart';
 import 'package:tradologie_app/features/add_negotiation/data/models/auction_item_list_data_model.dart';
 import 'package:tradologie_app/features/add_negotiation/data/models/create_auction_detail_model.dart';
 import 'package:tradologie_app/features/add_negotiation/data/models/get_supplier_data_model.dart';
 import 'package:tradologie_app/features/add_negotiation/data/models/get_supplier_list_model.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/add_auction_supplier_list_data.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/enitities/add_update_auction_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/auction_detail_for_edit_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/auction_item_list_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/create_auction_detail.dart';
@@ -19,6 +21,7 @@ import 'package:tradologie_app/features/add_negotiation/domian/repositories/add_
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_auction_item_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_auction_supplier_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_supplier_shortlist_usecase.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_update_auction_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/auction_detail_for_edit_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/auction_item_list_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/create_auction_usecase.dart';
@@ -248,6 +251,21 @@ class AddNegotiationRepositoryImpl implements AddNegotiationRepository {
           await addNegotiationRemoteDataSource.deleteAuctionItem(params);
       if (response != null && response.success) {
         return Right(response.data);
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, AddUpdateAuctionData>> addUpdateAuction(
+      AddUpdateAuctionParams params) async {
+    try {
+      final response =
+          await addNegotiationRemoteDataSource.addUpdateAuction(params);
+      if (response != null && response.success) {
+        return Right(AddUpdateAuctionDataModel.fromJson(response.data));
       }
       return Left(UserFailure(response?.message, response?.code));
     } on Failure catch (e) {

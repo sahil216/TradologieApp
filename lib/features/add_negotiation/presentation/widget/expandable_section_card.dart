@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 
 class ExpandableSectionCard extends StatelessWidget {
   final int index;
@@ -68,10 +69,10 @@ class ExpandableSectionCard extends StatelessWidget {
                   child: Row(
                     children: [
                       Expanded(
-                        child: Text(
+                        child: CommonText(
                           title,
                           style: const TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -121,18 +122,18 @@ class ExpandableSectionCard extends StatelessWidget {
 }
 
 class ExpandableController extends ChangeNotifier {
-  int? _openedIndex;
+  final Set<int> _openedIndexes = {};
 
-  int? get openedIndex => _openedIndex;
+  Set<int> get openedIndexes => _openedIndexes;
 
   void toggle(int index) {
-    if (_openedIndex == index) {
-      _openedIndex = null;
+    if (_openedIndexes.contains(index)) {
+      _openedIndexes.remove(index);
     } else {
-      _openedIndex = index;
+      _openedIndexes.add(index);
     }
     notifyListeners();
   }
 
-  bool isOpen(int index) => _openedIndex == index;
+  bool isOpen(int index) => _openedIndexes.contains(index);
 }

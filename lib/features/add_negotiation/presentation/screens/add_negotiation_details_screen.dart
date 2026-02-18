@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:tradologie_app/config/routes/app_router.dart';
 import 'package:tradologie_app/core/error/user_failure.dart';
-import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
@@ -46,6 +45,9 @@ class _AddNegotiationDetailsScreenState
   List<InspectionAgencyList>? inspectionAgencyList;
   List<CurrencyList>? currencyList;
   List<CustomerAddressList>? customerAddressList;
+
+  List<String> paymentTermList = ["LC", "ESCROW"];
+  List<String> partialDeliveryList = ["Allowed", "Not Allowed"];
   CreateAuctionDetail? createAuctionDetail;
 
   CommodityList? selectedCommodity;
@@ -85,6 +87,22 @@ class _AddNegotiationDetailsScreenState
     return allItems
         .where((e) =>
             (e.addressValue ?? "").toLowerCase().contains(filter.toLowerCase()))
+        .toList();
+  }
+
+  List<String> fetchPaymentTerm(String filter, LoadProps? loadProps) {
+    final allItems = paymentTermList;
+    if (filter.isEmpty) return allItems;
+    return allItems
+        .where((e) => (e).toLowerCase().contains(filter.toLowerCase()))
+        .toList();
+  }
+
+  List<String> fetchPartialDelivery(String filter, LoadProps? loadProps) {
+    final allItems = partialDeliveryList;
+    if (filter.isEmpty) return allItems;
+    return allItems
+        .where((e) => (e).toLowerCase().contains(filter.toLowerCase()))
         .toList();
   }
 
@@ -315,20 +333,19 @@ class _AddNegotiationDetailsScreenState
                                 return null;
                               },
                             ),
-                            CommonDropdown<CurrencyList>(
+                            CommonDropdown<String>(
                               label: 'Payment Term',
                               hint: 'Select Payment Term',
                               dropdownKey: categoryKey,
                               asyncItems: (filter, loadProps) {
-                                return fetchCurrency(filter, loadProps);
+                                return fetchPaymentTerm(filter, loadProps);
                               },
                               validator: (value) =>
                                   value == null ? "Required" : null,
                               selectedItem: null,
-                              itemAsString: (item) => item.currencyName ?? "",
+                              itemAsString: (item) => item,
                               onChanged: (item) async {},
-                              compareFn: (a, b) =>
-                                  a.currencyName == b.currencyName,
+                              compareFn: (a, b) => a == b,
                             ),
                             CommonDropdown<CurrencyList>(
                               label: 'Currency',
@@ -345,33 +362,32 @@ class _AddNegotiationDetailsScreenState
                               compareFn: (a, b) =>
                                   a.currencyName == b.currencyName,
                             ),
-                            CommonDropdown<CurrencyList>(
+                            CommonDropdown<String>(
                               label: 'Partial Delivery',
                               hint: 'Select Partial Delivery',
                               dropdownKey: categoryKey,
                               asyncItems: (filter, loadProps) {
-                                return fetchCurrency(filter, loadProps);
+                                return fetchPartialDelivery(filter, loadProps);
                               },
                               validator: (value) =>
                                   value == null ? "Required" : null,
                               selectedItem: null,
-                              itemAsString: (item) => item.currencyName ?? "",
+                              itemAsString: (item) => item,
                               onChanged: (item) async {},
-                              compareFn: (a, b) =>
-                                  a.currencyName == b.currencyName,
+                              compareFn: (a, b) => a == b,
                             ),
-                            CommonCupertinoDatePicker(
+                            CommonDateTimePicker(
                               label:
                                   "Preferred Date and Time of Enquiry (yyyy/mm/dd HH:mm)",
                               hint: "Select Date and Time of Enquiry",
-                              selectedDate: enquiryDate,
-                              mode: CupertinoDatePickerMode.dateAndTime,
-                              dateFormat: DateFormat("yyyy/MM/dd HH:mm"),
-                              minimumDate: DateTime.now(),
-                              onDateSelected: (date) {
-                                setState(() {
-                                  enquiryDate = date;
-                                });
+                              onChanged: (value) {
+                                print(value);
+                              },
+                              type: PickerType.dateTime,
+                              validator: (value) {
+                                if (value == null)
+                                  return "Please select date & time";
+                                return null;
                               },
                             ),
                             CommonTextField(
@@ -417,17 +433,17 @@ class _AddNegotiationDetailsScreenState
                                 return null;
                               },
                             ),
-                            CommonCupertinoDatePicker(
+                            CommonDateTimePicker(
                               label: "Last Date of Dispatch (yyyy/mm/dd)",
                               hint: "Enter last date of dispatch",
-                              selectedDate: dispatchDate,
-                              mode: CupertinoDatePickerMode.date,
-                              dateFormat: DateFormat("yyyy/MM/dd"),
-                              minimumDate: DateTime.now(),
-                              onDateSelected: (date) {
-                                setState(() {
-                                  dispatchDate = date;
-                                });
+                              onChanged: (value) {
+                                print(value);
+                              },
+                              type: PickerType.date,
+                              validator: (value) {
+                                if (value == null)
+                                  return "Please select date & time";
+                                return null;
                               },
                             ),
                             CommonTextField(

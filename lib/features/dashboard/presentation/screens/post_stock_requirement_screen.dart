@@ -388,9 +388,6 @@ class _PostStockRequirementScreenState
                                 controller: addressController,
                                 backgroundColor: AppColors.transparent,
                                 textInputType: TextInputType.text,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly
-                                ],
                                 isEnable: true,
                                 height: 45,
                                 autovalidateMode:

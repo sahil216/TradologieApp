@@ -288,3 +288,23 @@ class DeleteAuctionItemError extends AddNegotiationState {
   @override
   List<Object> get props => [failure];
 }
+
+class AddUpdateAuctionIsLoading extends AddNegotiationState {}
+
+class AddUpdateAuctionSuccess extends AddNegotiationState {
+  final AddUpdateAuctionData data;
+
+  const AddUpdateAuctionSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class AddUpdateAuctionError extends AddNegotiationState {
+  final Failure failure;
+
+  const AddUpdateAuctionError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}

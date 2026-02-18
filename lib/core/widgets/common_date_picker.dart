@@ -1,155 +1,154 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
-import 'package:tradologie_app/core/utils/app_colors.dart';
-import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 
-class CommonCupertinoDatePicker extends StatelessWidget {
+enum PickerType { date, time, dateTime }
+
+class CommonDateTimePicker extends StatefulWidget {
   final String label;
   final String hint;
-  final DateTime? selectedDate;
-  final ValueChanged<DateTime> onDateSelected;
+  final PickerType type;
+  final DateTime? initialValue;
+  final DateTime? firstDate;
+  final DateTime? lastDate;
+  final Function(DateTime?) onChanged;
   final String? Function(DateTime?)? validator;
-  final DateTime? minimumDate;
-  final DateTime? maximumDate;
-  final DateFormat dateFormat;
-  final CupertinoDatePickerMode mode;
 
-  const CommonCupertinoDatePicker({
+  const CommonDateTimePicker({
     super.key,
-    required this.mode,
     required this.label,
     required this.hint,
-    required this.onDateSelected,
-    this.selectedDate,
+    required this.type,
+    required this.onChanged,
+    this.initialValue,
+    this.firstDate,
+    this.lastDate,
     this.validator,
-    this.minimumDate,
-    this.maximumDate,
-    required this.dateFormat,
   });
 
-  void _showCupertinoPicker(
-      BuildContext context, FormFieldState<DateTime> state) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: AppColors.transparent,
-      builder: (_) {
-        DateTime tempDate = selectedDate ?? DateTime.now();
+  @override
+  State<CommonDateTimePicker> createState() => _CommonDateTimePickerState();
+}
 
-        return Container(
-          height: 300,
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-          ),
-          child: Column(
-            children: [
-              /// Top action bar
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: AppColors.black12),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: CommonText(
-                        "Cancel",
-                        style: TextStyle(color: AppColors.blue),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        onDateSelected(tempDate);
-                        state.didChange(tempDate);
-                        Navigator.pop(context);
-                      },
-                      child: CommonText(
-                        "Done",
-                        style: TextStyle(
-                          color: AppColors.blue,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+class _CommonDateTimePickerState extends State<CommonDateTimePicker> {
+  DateTime? _selected;
 
-              /// Cupertino picker
-              Expanded(
-                child: CupertinoDatePicker(
-                  mode: mode,
-                  initialDateTime: selectedDate ?? DateTime.now(),
-                  minimumDate: minimumDate,
-                  maximumDate: maximumDate,
-                  onDateTimeChanged: (date) {
-                    tempDate = date;
-                  },
-                ),
-              ),
-            ],
-          ),
+  @override
+  void initState() {
+    super.initState();
+    _selected = widget.initialValue;
+  }
+
+  Future<void> _pick() async {
+    DateTime now = DateTime.now();
+
+    if (widget.type == PickerType.date) {
+      final date = await showDatePicker(
+        context: context,
+        initialDate: _selected ?? now,
+        firstDate: widget.firstDate ?? DateTime(1900),
+        lastDate: widget.lastDate ?? DateTime(2100),
+      );
+
+      if (date != null) {
+        setState(() => _selected = date);
+        widget.onChanged(date);
+      }
+    } else if (widget.type == PickerType.time) {
+      final time = await showTimePicker(
+        context: context,
+        initialTime: _selected != null
+            ? TimeOfDay.fromDateTime(_selected!)
+            : TimeOfDay.now(),
+      );
+
+      if (time != null) {
+        final dateTime = DateTime(
+          now.year,
+          now.month,
+          now.day,
+          time.hour,
+          time.minute,
         );
-      },
-    );
+
+        setState(() => _selected = dateTime);
+        widget.onChanged(dateTime);
+      }
+    } else {
+      final date = await showDatePicker(
+        context: context,
+        initialDate: _selected ?? now,
+        firstDate: widget.firstDate ?? DateTime(1900),
+        lastDate: widget.lastDate ?? DateTime(2100),
+      );
+
+      if (date == null) return;
+
+      final time = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(_selected ?? now),
+      );
+
+      if (time == null) return;
+
+      final dateTime = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        time.hour,
+        time.minute,
+      );
+
+      setState(() => _selected = dateTime);
+      widget.onChanged(dateTime);
+    }
+  }
+
+  String _format(DateTime? value) {
+    if (value == null) return widget.hint;
+
+    switch (widget.type) {
+      case PickerType.date:
+        return DateFormat('dd MMM yyyy').format(value);
+      case PickerType.time:
+        return DateFormat('hh:mm a').format(value);
+      case PickerType.dateTime:
+        return DateFormat('dd MMM yyyy • hh:mm a').format(value);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return FormField<DateTime>(
-      validator: validator,
-      initialValue: selectedDate,
-      builder: (state) {
+      validator: widget.validator,
+      builder: (field) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// Label
             Text(
-              label,
+              widget.label,
               style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 6),
-
-            /// Field
+            const SizedBox(height: 8),
             InkWell(
-              onTap: () => _showCupertinoPicker(context, state),
+              onTap: _pick,
+              borderRadius: BorderRadius.circular(12),
               child: InputDecorator(
                 decoration: InputDecoration(
-                  hintText: hint,
-                  errorText: state.errorText,
+                  errorText: field.errorText,
                   contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 14,
+                    horizontal: 16,
                     vertical: 14,
                   ),
-                  suffixIcon: const Icon(Icons.calendar_today),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: AppColors.grayText),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: AppColors.blue),
-                  ),
-                  errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: AppColors.red),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 child: Text(
-                  selectedDate != null ? dateFormat.format(selectedDate!) : '',
+                  _format(_selected),
                   style: TextStyle(
-                    color: selectedDate != null
-                        ? AppColors.black
-                        : AppColors.grayText,
+                    color: _selected == null ? Colors.grey : Colors.black,
                   ),
                 ),
               ),

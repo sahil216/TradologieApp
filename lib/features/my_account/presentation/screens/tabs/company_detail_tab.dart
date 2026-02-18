@@ -195,25 +195,25 @@ class _CompanyDetailTabState extends State<CompanyDetailTab> {
                       },
                     ),
                     SizedBox(height: 16),
-                    CommonCupertinoDatePicker(
-                      mode: CupertinoDatePickerMode.date,
-                      label: CommonStrings.inCorporationDate,
-                      hint: CommonStrings.selectinCorporationDate,
-                      selectedDate: selectedDate,
-                      minimumDate: DateTime(1900),
-                      maximumDate: DateTime.now(),
-                      onDateSelected: (date) {
-                        selectedDate = date;
-                        setState(() {});
-                      },
-                      validator: (date) {
-                        if (date == null) {
-                          return "Date of birth is required";
-                        }
-                        return null;
-                      },
-                      dateFormat: DateFormat('dd-MMM-yyyy'),
-                    ),
+                    // CommonCupertinoDatePicker(
+                    //   mode: CupertinoDatePickerMode.date,
+                    //   label: CommonStrings.inCorporationDate,
+                    //   hint: CommonStrings.selectinCorporationDate,
+                    //   selectedDate: selectedDate,
+                    //   minimumDate: DateTime(1900),
+                    //   maximumDate: DateTime.now(),
+                    //   onDateSelected: (date) {
+                    //     selectedDate = date;
+                    //     setState(() {});
+                    //   },
+                    //   validator: (date) {
+                    //     if (date == null) {
+                    //       return "Date of birth is required";
+                    //     }
+                    //     return null;
+                    //   },
+                    //   dateFormat: DateFormat('dd-MMM-yyyy'),
+                    // ),
                     SizedBox(height: 16),
                     // CommonBottomSheetSearchDropdown<String>(
                     //   label: CommonStrings.timeZone,

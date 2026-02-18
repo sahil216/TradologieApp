@@ -5,6 +5,8 @@ import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/error/failures.dart';
 import 'package:tradologie_app/core/error/network_failure.dart';
 import 'package:tradologie_app/core/error/user_failure.dart';
+import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
+import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 
 import '../../injection_container.dart';
 
@@ -244,9 +246,10 @@ class _ToastBannerState extends State<ToastBanner>
                         Icon(widget.job.icon, color: Colors.white),
                       if (widget.job.icon != null) const SizedBox(width: 8),
                       Expanded(
-                        child: Text(
+                        child: CommonText(
                           widget.job.message,
-                          style: TextStyle(
+                          style: TextStyleConstants.semiBold(
+                            context,
                             color: Colors.white,
                             fontSize: isIOS ? 15 : 14,
                             fontWeight: FontWeight.w500,
