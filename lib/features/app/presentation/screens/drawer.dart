@@ -231,7 +231,7 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
                                   .pushNamed(Routes.supplierListScreen);
                             },
                             iconPath: Icon(
-                              Icons.add,
+                              Icons.add_box_outlined,
                               size: 24,
                             ),
                             title: 'Add Negotiation')

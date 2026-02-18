@@ -93,6 +93,14 @@ class EndPoints {
   static String supplierList = '$baseUrlBuyer/SupplierList';
   static String supplierShortListed = '$baseUrlBuyer/SupplierShortlisted';
   static String createAuction = '$baseUrlBuyer/CreateAuction';
+  static String gradleFileUpload = '$baseUrlBuyer/GradeFileUpload';
+  static String addAuctionItem = '$baseUrlBuyer/AddAuctionItem';
+  static String packingImageUpload = '$baseUrlBuyer/PackingImageUpload';
+  static String auctionDetailForEdit = '$baseUrlBuyer/AuctionDetailForEdit';
+  static String addAuctionSupplier = '$baseUrlBuyer/AddAuctionSupplier';
+  static String auctionItemList = '$baseUrlBuyer/AuctionItemList';
+  static String deleteAuctionItem = '$baseUrlBuyer/DeleteAuctionItem';
+  static String addAuctionSupplierList = '$baseUrlBuyer/AddAuctionSupplierList';
 
   // My Account apis
   // Information

@@ -15,10 +15,8 @@ class AddProductScreen extends StatefulWidget {
 }
 
 class _AddProductScreenState extends State<AddProductScreen> {
-  /// ⭐ CENTRAL ACCORDION CONTROLLER
   final ExpandableController controller = ExpandableController();
 
-  /// ⭐ REQUIRED FOR AUTO SCROLL
   final ScrollController scrollController = ScrollController();
 
   @override

@@ -128,3 +128,163 @@ class CreateAuctionError extends AddNegotiationState {
   @override
   List<Object> get props => [failure];
 }
+
+class AuctionItemListIsLoading extends AddNegotiationState {}
+
+class AuctionItemListSuccess extends AddNegotiationState {
+  final List<AuctionItemListData> data;
+
+  const AuctionItemListSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class AuctionItemListError extends AddNegotiationState {
+  final Failure failure;
+
+  const AuctionItemListError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class GradleFileUploadIsLoading extends AddNegotiationState {}
+
+class GradleFileUploadSuccess extends AddNegotiationState {
+  final bool data;
+
+  const GradleFileUploadSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class GradleFileUploadError extends AddNegotiationState {
+  final Failure failure;
+
+  const GradleFileUploadError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class PackingImageUploadIsLoading extends AddNegotiationState {}
+
+class PackingImageUploadSuccess extends AddNegotiationState {
+  final bool data;
+
+  const PackingImageUploadSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class PackingImageUploadError extends AddNegotiationState {
+  final Failure failure;
+
+  const PackingImageUploadError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class AddAuctionItemIsLoading extends AddNegotiationState {}
+
+class AddAuctionItemSuccess extends AddNegotiationState {
+  final bool data;
+
+  const AddAuctionItemSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class AddAuctionItemError extends AddNegotiationState {
+  final Failure failure;
+
+  const AddAuctionItemError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class AuctionDetailForEditIsLoading extends AddNegotiationState {}
+
+class AuctionDetailForEditSuccess extends AddNegotiationState {
+  final AuctionDetailForEditData data;
+
+  const AuctionDetailForEditSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class AuctionDetailForEditError extends AddNegotiationState {
+  final Failure failure;
+
+  const AuctionDetailForEditError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class AddAuctionSupplierIsLoading extends AddNegotiationState {}
+
+class AddAuctionSupplierSuccess extends AddNegotiationState {
+  final bool data;
+
+  const AddAuctionSupplierSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class AddAuctionSupplierError extends AddNegotiationState {
+  final Failure failure;
+
+  const AddAuctionSupplierError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class AddAuctionSupplierListIsLoading extends AddNegotiationState {}
+
+class AddAuctionSupplierListSuccess extends AddNegotiationState {
+  final List<AddAuctionSupplierListData> data;
+
+  const AddAuctionSupplierListSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class AddAuctionSupplierListError extends AddNegotiationState {
+  final Failure failure;
+
+  const AddAuctionSupplierListError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class DeleteAuctionItemIsLoading extends AddNegotiationState {}
+
+class DeleteAuctionItemSuccess extends AddNegotiationState {
+  final bool data;
+
+  const DeleteAuctionItemSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class DeleteAuctionItemError extends AddNegotiationState {
+  final Failure failure;
+
+  const DeleteAuctionItemError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
