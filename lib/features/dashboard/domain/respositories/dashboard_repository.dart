@@ -5,6 +5,7 @@ import 'package:tradologie_app/features/dashboard/domain/entities/dashboard_resu
 import 'package:tradologie_app/features/dashboard/domain/usecases/add_customer_requirement_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_all_list_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_dashboard_usecase.dart';
+import 'package:tradologie_app/features/dashboard/domain/usecases/post_vendor_stock_requirement.dart';
 
 import '../../../../core/error/failures.dart';
 import '../entities/commodity_list.dart';
@@ -14,6 +15,8 @@ abstract class DashboardRepository {
       GetDashboardParams params);
   Future<Either<Failure, bool>> addCustomerRequirement(
       AddCustomerRequirementParams params);
+  Future<Either<Failure, bool>> postVendorStockRequirement(
+      PostVendorStockRequirementParams params);
   Future<Either<Failure, List<CommodityList>>> getCommodityList(
       NoParams params);
   Future<Either<Failure, AllListDetail>> getAllList(GetAllListParams params);

@@ -179,7 +179,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             return SizedBox(
               height: Responsive(context).screenHeight * 0.72,
               child: DashboardCarausel(
-                data: dashboardData!,
+                data: dashboardData ?? [],
                 onParticipate: (_) => _appCubit.changeTab(1),
                 controller: _carouselController,
                 onPageChanged: (index) {
@@ -253,6 +253,9 @@ class _DashboardCarauselState extends State<DashboardCarausel> {
               item: widget.data[index],
               onParticipateNowPressed: () =>
                   widget.onParticipate(widget.data[index]),
+              onPostReadyToSellStockPressed: () {
+                Navigator.pushNamed(context, Routes.postStockRequirementScreen);
+              },
             ),
           ),
           builder: (context, child) {

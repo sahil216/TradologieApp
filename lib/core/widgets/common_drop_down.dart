@@ -69,9 +69,10 @@ class CommonDropdown<T> extends StatelessWidget {
           popupProps: PopupProps.modalBottomSheet(
             showSearchBox: true, // search is visible
             fit: FlexFit.loose,
+
             searchFieldProps: TextFieldProps(
               decoration: InputDecoration(
-                hintText: 'Search...',
+                hintText: 'Search.',
                 prefixIcon: const Icon(Icons.search),
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 14),

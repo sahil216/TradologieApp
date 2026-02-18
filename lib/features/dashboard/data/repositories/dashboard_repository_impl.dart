@@ -11,6 +11,7 @@ import 'package:tradologie_app/features/dashboard/domain/entities/dashboard_resu
 import 'package:tradologie_app/features/dashboard/domain/usecases/add_customer_requirement_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_all_list_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_dashboard_usecase.dart';
+import 'package:tradologie_app/features/dashboard/domain/usecases/post_vendor_stock_requirement.dart';
 
 import '../../../../core/error/user_failure.dart';
 import '../../domain/respositories/dashboard_repository.dart';
@@ -44,6 +45,21 @@ class DashboardRepositoryImpl implements DashboardRepository {
     try {
       final response =
           await dashboardRemoteDataSource.addCustomerRequirement(params);
+      if (response != null && response.success) {
+        return Right(response.data);
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> postVendorStockRequirement(
+      PostVendorStockRequirementParams params) async {
+    try {
+      final response =
+          await dashboardRemoteDataSource.postVendorStockRequirement(params);
       if (response != null && response.success) {
         return Right(response.data);
       }

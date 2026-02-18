@@ -5,6 +5,7 @@ import 'package:tradologie_app/features/dashboard/domain/usecases/add_customer_r
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_all_list_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_commodity_list_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_dashboard_usecase.dart';
+import 'package:tradologie_app/features/dashboard/domain/usecases/post_vendor_stock_requirement.dart';
 import 'data/repositories/dashboard_repository_impl.dart';
 import 'presentation/cubit/dashboard_cubit.dart';
 
@@ -17,6 +18,7 @@ Future<void> init() async {
         dashboardUsecase: sl(),
         getCommodityListUsecase: sl(),
         getAllListUsecase: sl(),
+        postVendorStockRequirementUsecase: sl(),
       ));
 
   //! Use cases
@@ -24,6 +26,8 @@ Future<void> init() async {
       () => GetDashboardUsecase(dasboardRepository: sl()));
   sl.registerLazySingleton<AddCustomerRequirementUsecase>(
       () => AddCustomerRequirementUsecase(dasboardRepository: sl()));
+  sl.registerLazySingleton<PostVendorStockRequirementUsecase>(
+      () => PostVendorStockRequirementUsecase(dasboardRepository: sl()));
   sl.registerLazySingleton<GetCommodityListUsecase>(
       () => GetCommodityListUsecase(dasboardRepository: sl()));
   sl.registerLazySingleton<GetAllListUsecase>(

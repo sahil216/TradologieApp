@@ -107,7 +107,7 @@ class CommonStrings {
   static const String entercompanyGstNumber = "Enter Company GST Number";
   static const String companyPanNumber = "Company Pan Number";
   static const String entercompanyPanNumber = "Enter Company Pan Number";
-  static const String address = "Address";
+  static const String address = "Address *";
   static const String enteraddress = "Enter Address";
   static const String zipPostalCode = "Zip/Postal Code";
   static const String enterzipPostalCode = "Enter Zip/Postal Code";

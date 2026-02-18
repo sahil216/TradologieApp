@@ -4,17 +4,17 @@ import 'package:tradologie_app/core/error/failures.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/respositories/dashboard_repository.dart';
 
-class AddCustomerRequirementUsecase
-    implements UseCase<bool, AddCustomerRequirementParams> {
+class PostVendorStockRequirementUsecase
+    implements UseCase<bool, PostVendorStockRequirementParams> {
   final DashboardRepository dasboardRepository;
 
-  AddCustomerRequirementUsecase({required this.dasboardRepository});
+  PostVendorStockRequirementUsecase({required this.dasboardRepository});
   @override
-  Future<Either<Failure, bool>> call(AddCustomerRequirementParams params) =>
-      dasboardRepository.addCustomerRequirement(params);
+  Future<Either<Failure, bool>> call(PostVendorStockRequirementParams params) =>
+      dasboardRepository.postVendorStockRequirement(params);
 }
 
-class AddCustomerRequirementParams extends Equatable {
+class PostVendorStockRequirementParams extends Equatable {
   final String token;
   final String commodityID;
   final String subCommodityID;
@@ -24,8 +24,9 @@ class AddCustomerRequirementParams extends Equatable {
   final String quantityUnit;
   final String otherSpecifications;
   final String userId;
+  final String stockLocation;
 
-  const AddCustomerRequirementParams({
+  const PostVendorStockRequirementParams({
     required this.token,
     required this.commodityID,
     required this.subCommodityID,
@@ -35,6 +36,7 @@ class AddCustomerRequirementParams extends Equatable {
     required this.quantityUnit,
     required this.otherSpecifications,
     required this.userId,
+    required this.stockLocation,
   });
 
   @override
@@ -48,6 +50,7 @@ class AddCustomerRequirementParams extends Equatable {
         quantityUnit,
         otherSpecifications,
         userId,
+        stockLocation
       ];
 
   Map<String, dynamic> toJson() => {
@@ -60,5 +63,6 @@ class AddCustomerRequirementParams extends Equatable {
         "QuantityUnit": quantityUnit,
         "OtherSpecifications": otherSpecifications,
         "UserId": userId,
+        "StockLocation": stockLocation,
       };
 }

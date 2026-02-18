@@ -49,6 +49,26 @@ class AddCustomerRequirementError extends DashboardState {
   List<Object> get props => [failure];
 }
 
+class PostVendorStockRequirementIsLoading extends DashboardState {}
+
+class PostVendorStockRequirementSuccess extends DashboardState {
+  final bool data;
+
+  const PostVendorStockRequirementSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class PostVendorStockRequirementError extends DashboardState {
+  final Failure failure;
+
+  const PostVendorStockRequirementError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
 class GetCommodityListIsLoading extends DashboardState {}
 
 class GetCommodityListSuccess extends DashboardState {

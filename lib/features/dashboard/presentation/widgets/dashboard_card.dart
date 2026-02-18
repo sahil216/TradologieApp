@@ -12,9 +12,13 @@ import '../../domain/entities/dashboard_result.dart';
 class DashboardCard extends StatelessWidget {
   final DashboardResult item;
   final VoidCallback onParticipateNowPressed;
+  final VoidCallback onPostReadyToSellStockPressed;
 
   const DashboardCard(
-      {super.key, required this.item, required this.onParticipateNowPressed});
+      {super.key,
+      required this.item,
+      required this.onParticipateNowPressed,
+      required this.onPostReadyToSellStockPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +44,7 @@ class DashboardCard extends StatelessWidget {
               imageUrl: Uri.encodeFull(EndPoints.getImage(
                 item.groupName?.replaceAll(" ", "-") ?? "",
               )),
-              height: 160,
+              height: 120,
               placeholder: (context, url) => CommonLoader(),
               errorWidget: (context, url, error) {
                 debugPrint("Image load failed: $error");
@@ -55,7 +59,7 @@ class DashboardCard extends StatelessWidget {
               item.groupName ?? "",
               style: TextStyleConstants.medium(
                 context,
-                fontSize: 28,
+                fontSize: 24,
                 color: AppColors.defaultText,
               ),
             ),
@@ -63,6 +67,7 @@ class DashboardCard extends StatelessWidget {
             Center(
               child: Text(
                 item.auctionName ?? '',
+                overflow: TextOverflow.ellipsis,
                 style: TextStyleConstants.regular(
                   context,
                   fontSize: 16,
@@ -79,14 +84,22 @@ class DashboardCard extends StatelessWidget {
             _infoRow(context, 'Delivery Date', item.deliveryLastDate ?? ''),
             _infoRow(context, 'Payment Term', item.paymentTerm ?? ''),
             // const Spacer(),
-            SizedBox(height: 16),
+            SizedBox(height: 12),
             CommonButton(
               onPressed: onParticipateNowPressed,
               text: 'Participate Now',
               width: double.infinity,
             ),
             // const Spacer(),
-            SizedBox(height: 16),
+            SizedBox(height: 8),
+            CommonButton(
+              onPressed: onPostReadyToSellStockPressed,
+              text: 'Post Ready to sell Stock',
+              textStyle: TextStyleConstants.semiBold(context,
+                  fontSize: 16, color: AppColors.primary),
+              backgroundColor: AppColors.transparent,
+              width: double.infinity,
+            ),
           ],
         ),
       ),

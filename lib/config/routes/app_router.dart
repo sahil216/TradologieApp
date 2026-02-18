@@ -8,6 +8,7 @@ import 'package:tradologie_app/features/authentication/domain/usecases/send_otp_
 import 'package:tradologie_app/features/contact_us/contact_us.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_dashboard_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/dashboard_screen.dart';
+import 'package:tradologie_app/features/dashboard/presentation/screens/post_stock_requirement_screen.dart';
 import 'package:tradologie_app/features/my_account/presentation/screens/my_account_screen.dart';
 import 'package:tradologie_app/features/negotiation/presentation/screens/buyer_negotiation_screen.dart';
 import 'package:tradologie_app/features/negotiation/presentation/screens/negotiation_screen.dart';
@@ -52,6 +53,8 @@ class Routes {
   //! Dashboard
   static const String dashboardRoute = '/dashboard';
   static const String buyerDashboardRoute = '/buyerDashboard';
+  static const String postStockRequirementScreen =
+      '/postStockRequirementScreen';
 
   //! Negotiation
   static const String negotiationScreen = '/negotiationScreen';
@@ -141,6 +144,10 @@ class AppRoutes {
         return CupertinoPageRoute(builder: (context) {
           return const BuyerDashboardScreen();
         });
+      case Routes.postStockRequirementScreen:
+        return CupertinoPageRoute(builder: (context) {
+          return const PostStockRequirementScreen();
+        });
 
       case Routes.negotiationScreen:
         return CupertinoPageRoute(builder: (context) {
@@ -152,7 +159,8 @@ class AppRoutes {
         });
       case Routes.addNegotiationDetailScreen:
         return CupertinoPageRoute(builder: (context) {
-          return const AddNegotiationDetailsScreen();
+          final groupID = routeSettings.arguments as String;
+          return AddNegotiationDetailsScreen(groupID: groupID);
         });
       case Routes.addProductScreen:
         return CupertinoPageRoute(builder: (context) {

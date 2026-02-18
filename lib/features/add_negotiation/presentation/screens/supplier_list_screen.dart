@@ -52,6 +52,8 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
   bool _isLastPage = false;
   bool _isFetchingMore = false;
 
+  String groupId = "";
+
   final ScrollController _listScrollController = ScrollController();
 
   final _formKey = GlobalKey<FormState>();
@@ -244,6 +246,7 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
                               _isFetchingMore = false;
 
                               supplierList = [];
+                              groupId = item?.groupId ?? "";
 
                               cubit.getSupplierList(params);
                               cubit.getSupplierShortlisted(params);
@@ -261,7 +264,8 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
                               child: CommonButton(
                                 onPressed: () {
                                   Navigator.pushNamed(context,
-                                      Routes.addNegotiationDetailScreen);
+                                      Routes.addNegotiationDetailScreen,
+                                      arguments: groupId);
                                 },
                                 text: "Create Negotiation",
                                 width: double.infinity,
@@ -302,7 +306,6 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
 
                                       final item = supplierList![index];
                                       return RepaintBoundary(
-                                        // 🔥 BIG performance gain
                                         child: SupplierInfoCard(
                                           supplier: item,
                                           addRemoveShortListButton: cubit

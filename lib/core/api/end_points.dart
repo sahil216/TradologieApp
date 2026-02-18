@@ -68,9 +68,17 @@ class EndPoints {
   static String getLiveAuctionDashboard = '$baseUrlSupplier/GetLiveAuctionList';
 
   static String getCommodityList = '$baseUrlBuyer/CategoryForBuyer';
-  static String getAllList = '$baseUrlBuyer/AuctionItemddl';
+  // static String getAllList = '$baseUrlBuyer/AuctionItemddl';
+  static String getAllList(UserType userType) {
+    return userType == UserType.buyer
+        ? '$baseUrl/${userType.name}/AuctionItemddl'
+        : '$baseUrl/${userType.name}/AuctionItemddl';
+  }
 
   static String addCustomerRequirement = '$baseUrlBuyer/AddCustomerRequirement';
+
+  static String postVendorStockRequirement =
+      '$baseUrlSupplier/AddVendorStockListing';
 
   // Negotiation
   static String getNegotiation(UserType userType) {

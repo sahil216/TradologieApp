@@ -8,6 +8,7 @@ import 'package:tradologie_app/features/dashboard/domain/usecases/add_customer_r
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_all_list_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_commodity_list_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_dashboard_usecase.dart';
+import 'package:tradologie_app/features/dashboard/domain/usecases/post_vendor_stock_requirement.dart';
 
 import '../../domain/entities/commodity_list.dart';
 import '../../domain/entities/dashboard_result.dart';
@@ -18,12 +19,14 @@ class DashboardCubit extends Cubit<DashboardState> {
   final AddCustomerRequirementUsecase addCustomerRequirementUsecase;
   final GetCommodityListUsecase getCommodityListUsecase;
   final GetAllListUsecase getAllListUsecase;
+  final PostVendorStockRequirementUsecase postVendorStockRequirementUsecase;
 
   DashboardCubit({
     required this.dashboardUsecase,
     required this.addCustomerRequirementUsecase,
     required this.getCommodityListUsecase,
     required this.getAllListUsecase,
+    required this.postVendorStockRequirementUsecase,
   }) : super(DashboardInitial());
 
   Future<void> getDashboardData(GetDashboardParams params) async {
@@ -44,6 +47,17 @@ class DashboardCubit extends Cubit<DashboardState> {
     emit(response.fold(
       (failure) => AddCustomerRequirementError(failure: failure),
       (res) => AddCustomerRequirementSuccess(data: res),
+    ));
+  }
+
+  Future<void> postVendorStockRequirement(
+      PostVendorStockRequirementParams params) async {
+    emit(PostVendorStockRequirementIsLoading());
+    Either<Failure, bool> response =
+        await postVendorStockRequirementUsecase(params);
+    emit(response.fold(
+      (failure) => PostVendorStockRequirementError(failure: failure),
+      (res) => PostVendorStockRequirementSuccess(data: res),
     ));
   }
 
