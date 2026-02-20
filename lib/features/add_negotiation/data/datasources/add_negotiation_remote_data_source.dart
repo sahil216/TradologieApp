@@ -58,14 +58,16 @@ class AddNegotiationRemoteDataSourceImpl
       AddShortListSupplierParams params) async {
     return await apiConsumer.post(
       EndPoints.addSupplierShortList,
+      body: params.toJson(),
     );
   }
 
   @override
   Future<ResponseWrapper<dynamic>?> deleteSupplierShortList(
       RemoveSupplierShortlistParams params) async {
-    return await apiConsumer.get(
+    return await apiConsumer.post(
       EndPoints.deleteSupplierShortList,
+      body: params.toJson(),
     );
   }
 

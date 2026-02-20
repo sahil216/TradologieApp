@@ -313,9 +313,9 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                               const SizedBox(height: 20),
                               CommonDropdown<AttributeList>(
                                 label:
-                                    '${allListDetail?.attribute1Header ?? "Attribute-1"} *',
+                                    '${allListDetail?.attribute1Header ?? "Type-1"} *',
                                 hint:
-                                    '${allListDetail?.attribute1Header ?? "Attribute-1"} *',
+                                    '${allListDetail?.attribute1Header ?? "Type-1"} *',
                                 dropdownKey: attr1Key,
                                 asyncItems: (filter, loadProps) {
                                   return fetchAttribute1(filter, loadProps);
@@ -332,9 +332,9 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                               const SizedBox(height: 20),
                               CommonDropdown<AttributeList>(
                                 label:
-                                    '${allListDetail?.attribute2Header ?? "Attribute-2"} *',
+                                    '${allListDetail?.attribute2Header ?? "Type-2"} *',
                                 hint:
-                                    '${allListDetail?.attribute2Header ?? "Attribute-2"} *',
+                                    '${allListDetail?.attribute2Header ?? "Type-2"} *',
                                 dropdownKey: attr2Key,
                                 asyncItems: (filter, loadProps) {
                                   return fetchAttribute2(filter, loadProps);

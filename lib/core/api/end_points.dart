@@ -55,6 +55,8 @@ class EndPoints {
         : '$baseUrl/${userType.name}/DeleteVendorActive';
   }
 
+  static String getCustomerDetailsById = '$baseUrlBuyer/GetCustomerDetailsByID';
+
   // Send OTP
   static String sendOtp(UserType userType) {
     return '$baseUrl/${userType.name}/SendOTPForLoginV1';

@@ -122,7 +122,10 @@ class ExpandableSectionCard extends StatelessWidget {
 }
 
 class ExpandableController extends ChangeNotifier {
-  final Set<int> _openedIndexes = {};
+  final Set<int> _openedIndexes;
+
+  ExpandableController({Set<int>? defaultOpened})
+      : _openedIndexes = defaultOpened ?? {};
 
   Set<int> get openedIndexes => _openedIndexes;
 

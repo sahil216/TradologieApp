@@ -39,10 +39,16 @@ class CommonDropdown<T> extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CommonText(
-          label,
-          style: TextStyleConstants.semiBold(context, fontSize: 16),
-        ),
+        label.isNotEmpty
+            ? CommonText(
+                label,
+                style: TextStyleConstants.semiBold(context, fontSize: 16),
+              )
+            : const SizedBox.shrink(),
+        // CommonText(
+        //   label,
+        //   style: TextStyleConstants.semiBold(context, fontSize: 16),
+        // ),
         const SizedBox(height: 6),
         DropdownSearch<T>(
           selectedItem: selectedItem,

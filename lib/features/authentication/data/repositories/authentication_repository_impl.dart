@@ -135,7 +135,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
             AppStrings.userId, response.data["UserID"] ?? "");
 
         await secureStorage.write(
-            AppStrings.userTimeZone, response.data["UserTimeZone"] ?? "");
+            AppStrings.sellerTimeZone, response.data["UserTimeZone"] ?? "");
 
         await secureStorage.write(
             AppStrings.customerId, response.data["CustomerID"].toString());
@@ -225,6 +225,8 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
 
         await secureStorage.write(
             AppStrings.customerName, response.data["FullName"].toString());
+        await secureStorage.write(
+            AppStrings.sellerTimeZone, response.data["UserTimeZone"] ?? "");
 
         return Right(BuyerLoginSuccessModel.fromJson(response.data));
       }

@@ -9,14 +9,12 @@ import 'package:tradologie_app/features/add_negotiation/data/models/auction_deta
 import 'package:tradologie_app/features/add_negotiation/data/models/auction_item_list_data_model.dart';
 import 'package:tradologie_app/features/add_negotiation/data/models/create_auction_detail_model.dart';
 import 'package:tradologie_app/features/add_negotiation/data/models/get_supplier_data_model.dart';
-import 'package:tradologie_app/features/add_negotiation/data/models/get_supplier_list_model.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/add_auction_supplier_list_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/add_update_auction_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/auction_detail_for_edit_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/auction_item_list_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/create_auction_detail.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/supplier_data.dart';
-import 'package:tradologie_app/features/add_negotiation/domian/enitities/supplier_list.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/repositories/add_negotiation_repository.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_auction_item_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_auction_supplier_usecase.dart';
@@ -105,15 +103,17 @@ class AddNegotiationRepositoryImpl implements AddNegotiationRepository {
   }
 
   @override
-  Future<Either<Failure, List<SupplierList>>> getSupplierShortlisted(
+  Future<Either<Failure, GetSupplierData>> getSupplierShortlisted(
       SupplierListParams params) async {
     try {
       final response =
           await addNegotiationRemoteDataSource.getSupplierShortlisted(params);
       if (response != null && response.success) {
-        return Right((response.data as List)
-            .map((e) => SupplierListModel.fromJson(e))
-            .toList());
+        return Right(GetSupplierDataModel.fromJson(response.data));
+
+        // Right((response.data as List)
+        //     .map((e) => SupplierListModel.fromJson(e))
+        //     .toList());
       }
       return Left(UserFailure(response?.message, response?.code));
     } on Failure catch (e) {

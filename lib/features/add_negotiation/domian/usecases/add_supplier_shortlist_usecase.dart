@@ -15,11 +15,11 @@ class AddSupplierShortlistUsecase
 }
 
 class AddShortListSupplierParams extends Equatable {
-  final int token;
-  final int customerID;
-  final int userID;
-  final int supplierID;
-  final int groupID;
+  final String token;
+  final String customerID;
+  final String userID;
+  final String supplierID;
+  final String groupID;
 
   const AddShortListSupplierParams({
     required this.token,

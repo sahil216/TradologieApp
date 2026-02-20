@@ -94,31 +94,32 @@ class SupplierInfoCard extends StatelessWidget {
               Row(
                 children: [
                   supplier.webUrl == null || supplier.webUrl == ""
-                      ? SizedBox()
-                      : InkWell(
-                          onTap: () {
-                            if (supplier.webUrl != null) {
-                              launchUrl(Uri.parse(supplier.webUrl ?? ""));
-                            }
-                          },
-                          child: CommonText(
-                            "View Microsite",
-                            style: TextStyleConstants.medium(context,
-                                color: Color(0xff0b3c6d),
-                                fontSize: 14,
-                                decoration: TextDecoration.underline),
+                      ? Expanded(
+                          child: Container(),
+                        )
+                      : Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              if (supplier.webUrl != null) {
+                                launchUrl(Uri.parse(supplier.webUrl ?? ""));
+                              }
+                            },
+                            child: CommonText(
+                              "View Microsite",
+                              style: TextStyleConstants.medium(context,
+                                  color: Color(0xff0b3c6d),
+                                  fontSize: 14,
+                                  decoration: TextDecoration.underline),
+                            ),
                           ),
                         ),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: CommonButton(
-                      onPressed: addRemoveShortListButton,
-                      text: isShortlisted
-                          ? "Remove from shortlist"
-                          : "Add to shortlist",
-                      backgroundColor:
-                          isShortlisted ? AppColors.blue200 : AppColors.blue100,
-                    ),
+                  CommonButton(
+                    onPressed: addRemoveShortListButton,
+                    text: isShortlisted
+                        ? "Remove from shortlist"
+                        : "Add to shortlist",
+                    backgroundColor:
+                        isShortlisted ? AppColors.blue200 : AppColors.blue100,
                   ),
                 ],
               ),

@@ -92,7 +92,7 @@ class GetSupplierListError extends AddNegotiationState {
 class GetSupplierShortistedIsLoading extends AddNegotiationState {}
 
 class GetSupplierShortistedSuccess extends AddNegotiationState {
-  final List<SupplierList> data;
+  final GetSupplierData data;
 
   const GetSupplierShortistedSuccess({required this.data});
 

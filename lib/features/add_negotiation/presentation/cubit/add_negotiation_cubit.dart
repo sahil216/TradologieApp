@@ -106,7 +106,7 @@ class AddNegotiationCubit extends Cubit<AddNegotiationState> {
 
   Future<void> getSupplierShortlisted(SupplierListParams params) async {
     emit(GetSupplierShortistedIsLoading());
-    Either<Failure, List<SupplierList>> response =
+    Either<Failure, GetSupplierData> response =
         await getSupplierShortlistedUsecase(params);
     emit(response.fold(
       (failure) => GetSupplierShortistedError(failure: failure),

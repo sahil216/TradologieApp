@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:tradologie_app/features/app/domain/usecases/check_force_update_usecase.dart';
+import 'package:tradologie_app/features/app/domain/usecases/get_customer_details_by_id_usecase.dart';
 
 import 'data/datasources/app_local_data_source.dart';
 import 'data/repositories/app_repository_impl.dart';
@@ -15,6 +16,7 @@ Future<void> init() async {
         changeLangUseCase: sl(),
         checkForceUpdateUsecase: sl(),
         networkInfo: sl(),
+        getCustomerDetailsByIdUsecase: sl(),
       ));
 
   //! Use cases
@@ -24,6 +26,8 @@ Future<void> init() async {
 
   sl.registerLazySingleton<CheckForceUpdateUsecase>(
       () => CheckForceUpdateUsecase(appRepository: sl()));
+  sl.registerLazySingleton<GetCustomerDetailsByIdUsecase>(
+      () => GetCustomerDetailsByIdUsecase(appRepository: sl()));
 
   //! Repository
   sl.registerLazySingleton<AppRepository>(

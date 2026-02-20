@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class AddUpdateAuctionData extends Equatable {
-  final int? auctionId;
+  final String? auctionId;
 
   const AddUpdateAuctionData({
     this.auctionId,

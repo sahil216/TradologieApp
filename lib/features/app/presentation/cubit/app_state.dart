@@ -54,3 +54,23 @@ class CheckForceUpdateError extends AppState {
   @override
   List<Object> get props => [failure];
 }
+
+class CheckCustomerDetailsByIdIsLoading extends AppState {}
+
+class CheckCustomerDetailsByIdSuccess extends AppState {
+  final VerifyOtpResult data;
+
+  const CheckCustomerDetailsByIdSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class CheckCustomerDetailsByIdError extends AppState {
+  final Failure failure;
+
+  const CheckCustomerDetailsByIdError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}

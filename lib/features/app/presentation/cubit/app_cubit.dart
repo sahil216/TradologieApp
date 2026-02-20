@@ -6,7 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:tradologie_app/core/error/failures.dart';
+import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/features/app/domain/usecases/check_force_update_usecase.dart';
+import 'package:tradologie_app/features/app/domain/usecases/get_customer_details_by_id_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/verify_otp_result.dart';
 import '../../../../app_lifecycle_observer.dart';
 import '../../domain/usecases/change_lang.dart';
 part 'app_state.dart';
@@ -15,16 +18,17 @@ class AppCubit extends Cubit<AppState> {
   final ChangeLangUseCase changeLangUseCase;
   final InternetConnectionChecker networkInfo;
   final CheckForceUpdateUsecase checkForceUpdateUsecase;
+  final GetCustomerDetailsByIdUsecase getCustomerDetailsByIdUsecase;
 
   AppCubit(
       {required this.changeLangUseCase,
       required this.networkInfo,
-      required this.checkForceUpdateUsecase})
+      required this.checkForceUpdateUsecase,
+      required this.getCustomerDetailsByIdUsecase})
       : super(AppInitial());
 
   int bottomNavIndex = 0;
 
-  /// 🍎 REAL iOS tab change
   Future<void> changeTab(int tab) async {
     if (bottomNavIndex == tab) return;
 
@@ -32,14 +36,22 @@ class AppCubit extends Cubit<AppState> {
     emit(ChangeTab(tab: tab));
   }
 
-  /// 🍎 Sync tab index from animation (VERY IMPORTANT)
-
   Future<void> checkForceUpdate(ForceUpdateParams params) async {
     emit(CheckForceUpdateIsLoading());
     Either<Failure, bool> response = await checkForceUpdateUsecase(params);
     emit(response.fold(
       (failure) => CheckForceUpdateError(failure: failure),
       (res) => CheckForceUpdateSuccess(data: res),
+    ));
+  }
+
+  Future<void> getCustomerDetailsById(NoParams params) async {
+    emit(CheckCustomerDetailsByIdIsLoading());
+    Either<Failure, VerifyOtpResult> response =
+        await getCustomerDetailsByIdUsecase(params);
+    emit(response.fold(
+      (failure) => CheckCustomerDetailsByIdError(failure: failure),
+      (res) => CheckCustomerDetailsByIdSuccess(data: res),
     ));
   }
 

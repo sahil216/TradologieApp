@@ -17,11 +17,11 @@ import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/supplier_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/supplier_list.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_supplier_shortlist_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/delete_supplier_shortlist_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/presentation/cubit/add_negotiation_cubit.dart';
 import 'package:tradologie_app/features/add_negotiation/presentation/widget/supplier_card.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/commodity_list.dart';
-import 'package:tradologie_app/features/dashboard/presentation/cubit/dashboard_cubit.dart';
 
 import '../../../../config/routes/app_router.dart';
 import '../../../../core/widgets/custom_text/text_style_constants.dart';
@@ -38,6 +38,7 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
   List<CommodityList>? categoryList;
 
   GetSupplierData? supplierData;
+  GetSupplierData? supplierShortListData;
 
   List<SupplierList>? supplierList;
   List<SupplierList>? shortlistedSupplierList;
@@ -48,7 +49,7 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
 
   Key categoryKey = UniqueKey();
 
-  int _page = 1;
+  int _page = 0;
   bool _isLastPage = false;
   bool _isFetchingMore = false;
 
@@ -81,8 +82,6 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
 
     setState(() {
       selectedCommodity = null;
-
-      categoryKey = UniqueKey();
     });
   }
 
@@ -96,6 +95,7 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
 
   @override
   void dispose() {
+    _listScrollController.dispose();
     super.dispose();
   }
 
@@ -120,7 +120,7 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
     final params = SupplierListParams(
       customerId: await secureStorage.read(AppStrings.customerId) ?? "",
       groupID: selectedCommodity?.groupId ?? "",
-      indexNo: _page, // ⭐ IMPORTANT (add in params model)
+      indexNo: _page,
       token: await secureStorage.read(AppStrings.apiVerificationCode) ?? "",
       vendorName: "",
     );
@@ -134,7 +134,7 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
       listeners: [
         BlocListener<AddNegotiationCubit, AddNegotiationState>(
           listenWhen: (previous, current) => previous != current,
-          listener: (context, state) {
+          listener: (context, state) async {
             if (state is GetCategorySuccess) {
               categoryList = state.data;
             }
@@ -164,11 +164,26 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
             }
             if (state is GetSupplierShortistedSuccess) {
               setState(() {
-                shortlistedSupplierList = state.data;
+                supplierShortListData = state.data;
               });
             }
             if (state is GetSupplierShortistedError) {
               // Constants.showFailureToast(state.failure);
+            }
+            if (state is AddSupplierShortlistSuccess ||
+                state is DeleteSupplierShortlistSuccess) {
+              final params = SupplierListParams(
+                customerId:
+                    await secureStorage.read(AppStrings.customerId) ?? "",
+                groupID: selectedCommodity?.groupId ?? "",
+                indexNo: 0,
+                token:
+                    await secureStorage.read(AppStrings.apiVerificationCode) ??
+                        "",
+                vendorName: "",
+              );
+
+              cubit.getSupplierShortlisted(params);
             }
           },
         ),
@@ -179,14 +194,6 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
           appBar: Constants.appBar(context,
               title: 'Add Negotiation', centerTitle: true, actions: []),
           body: BlocBuilder<AddNegotiationCubit, AddNegotiationState>(
-            buildWhen: (previous, current) {
-              bool result = previous != current;
-              result = result &&
-                  (current is GetDashboardSuccess ||
-                      current is GetDashboardError ||
-                      current is GetDashboardIsLoading);
-              return result;
-            },
             builder: (context, state) {
               if (state is GetCategoryError) {
                 if (state.failure is NetworkFailure) {
@@ -232,16 +239,14 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
                                         .read(AppStrings.customerId) ??
                                     "",
                                 groupID: item?.groupId ?? "",
-                                indexNo: 1,
+                                indexNo: 0,
                                 token: await secureStorage
                                         .read(AppStrings.apiVerificationCode) ??
                                     "",
                                 vendorName: "",
                               );
 
-                              selectedCommodity = item;
-
-                              _page = 1;
+                              // _page = 1;
                               _isLastPage = false;
                               _isFetchingMore = false;
 
@@ -250,8 +255,6 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
 
                               cubit.getSupplierList(params);
                               cubit.getSupplierShortlisted(params);
-
-                              setState(() {});
                             },
                             compareFn: (a, b) => a.groupName == b.groupName,
                           ),
@@ -331,7 +334,31 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
                                                   cubit.deleteSupplierShortlist(
                                                       params);
                                                 }
-                                              : () {},
+                                              : () async {
+                                                  late AddShortListSupplierParams
+                                                      params;
+                                                  params =
+                                                      AddShortListSupplierParams(
+                                                    token: await secureStorage
+                                                            .read(AppStrings
+                                                                .apiVerificationCode) ??
+                                                        "",
+                                                    customerID: await secureStorage
+                                                            .read(AppStrings
+                                                                .customerId) ??
+                                                        "",
+                                                    userID: await secureStorage
+                                                            .read(AppStrings
+                                                                .customerId) ??
+                                                        "",
+                                                    supplierID: item.vendorId
+                                                        .toString(),
+                                                    groupID: groupId,
+                                                  );
+
+                                                  cubit.addSupplierShortlist(
+                                                      params);
+                                                },
                                           isShortlisted:
                                               cubit.isSupplierShortlisted(
                                                   supplier: item,

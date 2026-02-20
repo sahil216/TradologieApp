@@ -24,7 +24,7 @@ class AuctionDetailForEditData extends Equatable {
   final int? auctionGroupId;
   final String? totalQuantity;
   final String? minQuantity;
-  final DateTime? deliveryLastDate;
+  final String? deliveryLastDate;
   final String? agencyName;
   final String? agencyAddress;
   final String? agencyPhone;

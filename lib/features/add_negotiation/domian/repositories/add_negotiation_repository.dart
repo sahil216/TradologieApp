@@ -7,7 +7,6 @@ import 'package:tradologie_app/features/add_negotiation/domian/enitities/auction
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/auction_item_list_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/create_auction_detail.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/supplier_data.dart';
-import 'package:tradologie_app/features/add_negotiation/domian/enitities/supplier_list.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_auction_item_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_auction_supplier_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_supplier_shortlist_usecase.dart';
@@ -28,7 +27,7 @@ abstract class AddNegotiationRepository {
       RemoveSupplierShortlistParams params);
   Future<Either<Failure, GetSupplierData>> getSupplierList(
       SupplierListParams params);
-  Future<Either<Failure, List<SupplierList>>> getSupplierShortlisted(
+  Future<Either<Failure, GetSupplierData>> getSupplierShortlisted(
       SupplierListParams params);
   Future<Either<Failure, CreateAuctionDetail>> createAuction(
       CreateAuctionParams params);

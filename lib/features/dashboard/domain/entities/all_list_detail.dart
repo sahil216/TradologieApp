@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/attribute_list.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/item_unit_list.dart';
+import 'package:tradologie_app/features/dashboard/domain/entities/packing_size_list.dart';
+import 'package:tradologie_app/features/dashboard/domain/entities/packing_type_list.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/sub_commodity_list.dart';
 
 class AllListDetail extends Equatable {
@@ -10,6 +12,8 @@ class AllListDetail extends Equatable {
   final String? attribute2Header;
   final List<AttributeList>? attribute2List;
   final List<ItemUnitList>? itemUnitList;
+  final List<PackingTypeList>? packingTypeList;
+  final List<PackingSizeList>? packingSizeList;
 
   const AllListDetail({
     this.categoryList,
@@ -18,6 +22,8 @@ class AllListDetail extends Equatable {
     this.attribute2Header,
     this.attribute2List,
     this.itemUnitList,
+    this.packingTypeList,
+    this.packingSizeList,
   });
 
   @override
@@ -28,5 +34,7 @@ class AllListDetail extends Equatable {
         attribute2Header,
         attribute2List,
         itemUnitList,
+        packingTypeList,
+        packingSizeList,
       ];
 }

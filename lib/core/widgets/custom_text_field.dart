@@ -176,20 +176,18 @@ class _CommonTextFieldState extends State<CommonTextField> {
                   )
                 : const SizedBox.shrink(),
         Container(
-          height: widget.height,
+          constraints: BoxConstraints(
+            minHeight: widget.height,
+          ),
           decoration: BoxDecoration(
             boxShadow: widget.boxShadow,
             color: widget.backgroundColor ?? AppColors.white,
             borderRadius: BorderRadius.circular(widget.borderRadius),
-            border: Border.all(
-              color: widget.borderColor ?? AppColors.border,
-              width: 1,
-            ),
-          ),
+          ), //
           child: TextFormField(
             focusNode: widget.focusNode,
             keyboardType: widget.textInputType,
-            controller: widget.controller,
+            controller: _controller,
             enableSuggestions: false,
             autocorrect: false,
             autofocus: widget.autofocus,
@@ -202,7 +200,7 @@ class _CommonTextFieldState extends State<CommonTextField> {
             obscureText: widget.isObsecureText,
             obscuringCharacter: '\u25cf',
             onChanged: widget.onChanged,
-            // validator: widget.validator,
+            validator: widget.validator,
             autovalidateMode: widget.autovalidateMode,
             cursorColor: AppColors.defaultText,
             textAlign: widget.textAlign,
@@ -219,16 +217,16 @@ class _CommonTextFieldState extends State<CommonTextField> {
                     left: 10,
                     right: 22,
                   ),
-              constraints: BoxConstraints(
-                minHeight: (widget.maxLines != null && widget.maxLines! > 1)
-                    ? 0
-                    : widget.height,
-                maxHeight: (widget.maxLines != null && widget.maxLines! > 1)
-                    ? double.infinity
-                    : widget.height,
-                maxWidth: double.infinity,
-                minWidth: double.infinity,
-              ),
+              // constraints: BoxConstraints(
+              //   minHeight: (widget.maxLines != null && widget.maxLines! > 1)
+              //       ? 0
+              //       : widget.height,
+              //   maxHeight: (widget.maxLines != null && widget.maxLines! > 1)
+              //       ? double.infinity
+              //       : widget.height,
+              //   maxWidth: double.infinity,
+              //   minWidth: double.infinity,
+              // ),
               labelText: widget.labalText,
               labelStyle: widget.labalStyle ??
                   TextStyleConstants.medium(
@@ -238,45 +236,55 @@ class _CommonTextFieldState extends State<CommonTextField> {
                     color: widget.labalColor ?? AppColors.blackApp,
                   ),
               hintText: widget.hintText,
-              hintStyle: TextStyleConstants.medium(
-                context,
-                color: widget.hintColor ?? AppColors.grayText,
-              ),
+              hintStyle: TextStyleConstants.medium(context,
+                  color: widget.hintColor ?? AppColors.grayText, fontSize: 14),
               suffixIconConstraints: widget.suffixIconConstraints,
               suffixIcon: widget.suffixIcon,
               prefixIconConstraints: widget.prefixIconConstraints,
               prefixIcon: widget.prefixIcon,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(widget.borderRadius),
-                borderSide: BorderSide.none,
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(widget.borderRadius),
-                borderSide: BorderSide.none,
+                borderSide: BorderSide(
+                  color: widget.borderColor ?? AppColors.border,
+                  width: 1,
+                ),
               ),
-              disabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(widget.borderRadius),
-                borderSide: BorderSide.none,
-              ),
+
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(widget.borderRadius),
-                borderSide: BorderSide.none,
+                borderSide: BorderSide(
+                  color: widget.borderColor ?? AppColors.border,
+                  width: 1.2,
+                ),
+              ),
+
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(widget.borderRadius),
+                borderSide: const BorderSide(color: Colors.red, width: 1.5),
+              ),
+
+              focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(widget.borderRadius),
+                borderSide: const BorderSide(color: Colors.red, width: 1.5),
               ),
             ),
           ),
         ),
 
-        /// Error Text
-        if (_errorText != null) ...[
-          const SizedBox(height: 6),
-          Text(
-            _errorText!,
-            style: const TextStyle(
-              color: Colors.red,
-              fontSize: 12,
-            ),
-          ),
-        ],
+        // /// Error Text
+        // if (_errorText != null) ...[
+        //   const SizedBox(height: 6),
+        //   Text(
+        //     _errorText!,
+        //     style: const TextStyle(
+        //       color: Colors.red,
+        //       fontSize: 12,
+        //     ),
+        //   ),
+        // ],
       ],
     );
   }

@@ -3,6 +3,7 @@ import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/features/add_negotiation/presentation/screens/add_negotiation_details_screen.dart';
 import 'package:tradologie_app/features/add_negotiation/presentation/screens/add_product_screen.dart';
 import 'package:tradologie_app/features/add_negotiation/presentation/screens/supplier_list_screen.dart';
+import 'package:tradologie_app/features/add_negotiation/presentation/viewmodel/add_product_params.dart';
 import 'package:tradologie_app/features/app/presentation/screens/main_screen.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/send_otp_usecase.dart';
 import 'package:tradologie_app/features/contact_us/contact_us.dart';
@@ -164,7 +165,10 @@ class AppRoutes {
         });
       case Routes.addProductScreen:
         return CupertinoPageRoute(builder: (context) {
-          return const AddProductScreen();
+          final params = routeSettings.arguments as AddProductParams;
+          return AddProductScreen(
+            params: params,
+          );
         });
       case Routes.buyerNegotiationScreen:
         return CupertinoPageRoute(builder: (context) {

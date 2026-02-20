@@ -12,7 +12,6 @@ class AppStrings {
   static const String apiVerificationCode = 'api_verification_code';
   static const String imageExist = 'image_exist';
   static const String sellerTimeZone = 'seller_time_zone';
-  static const String userTimeZone = 'user_time_zone';
   static const String mobileNo = 'mobile_no';
   static const String registrationStatus = 'registration_status';
   static const String projectType = 'project_Type';

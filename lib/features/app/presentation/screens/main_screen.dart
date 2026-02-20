@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/api/end_points.dart';
+import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 
@@ -164,6 +165,8 @@ class _MainScreenState extends State<MainScreen>
     });
   }
 
+  SecureStorageService secureStorage = SecureStorageService();
+
   // final GlobalKey<CupertinoTabEngineState> _tabEngineKey = GlobalKey();
 
   late final AnimationController _navAnimController;
@@ -177,12 +180,21 @@ class _MainScreenState extends State<MainScreen>
       vsync: this,
       duration: const Duration(milliseconds: 250),
     )..forward();
+    getTimezone();
+    _appCubit.bottomNavIndex = 0;
 
     super.initState();
   }
 
+  void getTimezone() async {
+    String timeZone = await secureStorage.read(AppStrings.sellerTimeZone) ?? "";
+
+    if (timeZone == "" && Constants.isBuyer == true) {
+      _appCubit.getCustomerDetailsById(NoParams());
+    }
+  }
+
   Future<void> nameUpdate() async {
-    SecureStorageService secureStorage = SecureStorageService();
     Constants.name = Constants.isBuyer == true
         ? await secureStorage.read(AppStrings.customerName) ?? ""
         : await secureStorage.read(AppStrings.vendorName) ?? "";
@@ -208,11 +220,13 @@ class _MainScreenState extends State<MainScreen>
               return;
             }
 
-            /// 🔥 Exit app
             SystemNavigator.pop();
-
-            /// else allow system back (exit app)
             SystemNavigator.pop();
+            if (state is CheckCustomerDetailsByIdSuccess) {
+              await secureStorage.write(
+                  AppStrings.sellerTimeZone, state.data.sellerTimeZone ?? "");
+              Constants.timeZone = state.data.sellerTimeZone ?? "";
+            }
           },
           child: AdaptiveScaffold(
             appBar: Constants.appBar(context, height: 0, boxShadow: []),

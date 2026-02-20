@@ -59,9 +59,7 @@ class AuctionDetailForEditDataModel extends AuctionDetailForEditData {
         auctionGroupId: json["AuctionGroupID"],
         totalQuantity: json["TotalQuantity"],
         minQuantity: json["MinQuantity"],
-        deliveryLastDate: json["DeliveryLastDate"] == null
-            ? null
-            : DateTime.parse(json["DeliveryLastDate"]),
+        deliveryLastDate: json["DeliveryLastDate"].toString(),
         agencyName: json["AgencyName"],
         agencyAddress: json["AgencyAddress"],
         agencyPhone: json["AgencyPhone"],
