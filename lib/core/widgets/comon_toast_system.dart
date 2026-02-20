@@ -26,7 +26,7 @@ class CommonToast {
       message: msg,
       icon: Icons.check_circle_outline_rounded,
       color: Colors.green,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 4),
       priority: ToastPriority.normal,
     ));
   }

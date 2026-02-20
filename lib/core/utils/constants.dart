@@ -18,6 +18,7 @@ import 'assets_manager.dart';
 class Constants {
   static bool isLogin = false;
   static bool isBuyer = false;
+  static String timeZone = "";
 
   static String name = "";
 

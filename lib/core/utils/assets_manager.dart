@@ -49,4 +49,6 @@ class ImgAssets {
 
   // svg
   static const String onboardingImage = 'assets/svg/onboarding_image.svg';
+  static const String postStockListingIcon =
+      'assets/svg/post_stock_listing_icon.svg';
 }

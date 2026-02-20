@@ -135,6 +135,7 @@ class _PostStockRequirementScreenState
       attr1Key = UniqueKey();
       attr2Key = UniqueKey();
       unitKey = UniqueKey();
+      allListDetail = null;
     });
   }
 
@@ -164,8 +165,9 @@ class _PostStockRequirementScreenState
             }
             if (state is PostVendorStockRequirementSuccess) {
               CommonToast.success(
-                  "Thank you for posting your requirement. Relevant sellers will be notified and you will receive quotes soon.");
+                  "Thank you for posting your ready-to-sell stock. Your offer will go live for buyer enquiries after verification of your account and stock details.");
               clearForm();
+              Navigator.pop(context);
             }
             if (state is PostVendorStockRequirementError) {
               CommonToast.showFailureToast(state.failure);
@@ -292,9 +294,9 @@ class _PostStockRequirementScreenState
                               const SizedBox(height: 20),
                               CommonDropdown<AttributeList>(
                                 label:
-                                    '${allListDetail?.attribute1Header ?? "Attribute-1"} *',
+                                    '${allListDetail?.attribute1Header ?? "Type-1"} *',
                                 hint:
-                                    '${allListDetail?.attribute1Header ?? "Attribute-1"} *',
+                                    '${allListDetail?.attribute1Header ?? "Type-1"} *',
                                 dropdownKey: attr1Key,
                                 asyncItems: (filter, loadProps) {
                                   return fetchAttribute1(filter, loadProps);
@@ -311,9 +313,9 @@ class _PostStockRequirementScreenState
                               const SizedBox(height: 20),
                               CommonDropdown<AttributeList>(
                                 label:
-                                    '${allListDetail?.attribute2Header ?? "Attribute-2"} *',
+                                    '${allListDetail?.attribute2Header ?? "Type-2"} *',
                                 hint:
-                                    '${allListDetail?.attribute2Header ?? "Attribute-2"} *',
+                                    '${allListDetail?.attribute2Header ?? "Type-2"} *',
                                 dropdownKey: attr2Key,
                                 asyncItems: (filter, loadProps) {
                                   return fetchAttribute2(filter, loadProps);
@@ -380,11 +382,11 @@ class _PostStockRequirementScreenState
                               ),
                               const SizedBox(height: 20),
                               CommonTextField(
-                                titleText: CommonStrings.address,
+                                titleText: CommonStrings.stockLocation,
                                 titleStyle:
                                     TextStyleConstants.semiBold(context),
-                                hintText: CommonStrings.enteraddress,
-                                textRequired: CommonStrings.enteraddress,
+                                hintText: CommonStrings.enterStockLocation,
+                                textRequired: CommonStrings.enterStockLocation,
                                 controller: addressController,
                                 backgroundColor: AppColors.transparent,
                                 textInputType: TextInputType.text,

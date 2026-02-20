@@ -69,6 +69,8 @@ class CommonStrings {
 
   static const String quantity = "Quantity *";
   static const String enterQuantity = "Enter Quantity";
+  static const String stockLocation = "Stock Location/Port *";
+  static const String enterStockLocation = "Enter Stock Location/Port";
 
   static const String message = "Message *";
   static const String enterMessage =

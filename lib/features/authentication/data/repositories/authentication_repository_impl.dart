@@ -135,6 +135,9 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
             AppStrings.userId, response.data["UserID"] ?? "");
 
         await secureStorage.write(
+            AppStrings.userTimeZone, response.data["UserTimeZone"] ?? "");
+
+        await secureStorage.write(
             AppStrings.customerId, response.data["CustomerID"].toString());
         await secureStorage.write(
             AppStrings.customerName, response.data["CustomerName"] ?? "");

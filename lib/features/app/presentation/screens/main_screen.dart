@@ -41,7 +41,9 @@ class _MainScreenState extends State<MainScreen>
     }
     return [
       TabViewModel(
-        icon: Icon(Icons.dashboard_outlined),
+        icon: _appCubit.bottomNavIndex == 0
+            ? Icon(Icons.dashboard)
+            : Icon(Icons.dashboard_outlined),
         name: 'Dashboard',
         height: 20,
         page: Constants.isBuyer == true
@@ -49,7 +51,9 @@ class _MainScreenState extends State<MainScreen>
             : const DashboardScreen(),
       ),
       TabViewModel(
-        icon: Icon(Icons.article_outlined),
+        icon: _appCubit.bottomNavIndex == 1
+            ? Icon(Icons.article)
+            : Icon(Icons.article_outlined),
         name: 'Negotiations',
         height: 20,
         page: Constants.isBuyer == true
@@ -57,7 +61,9 @@ class _MainScreenState extends State<MainScreen>
             : const NegotiationScreen(),
       ),
       TabViewModel(
-        icon: Icon(Icons.person),
+        icon: _appCubit.bottomNavIndex == 2
+            ? Icon(Icons.person)
+            : Icon(Icons.person_outline),
         name: 'My Account',
         height: 20,
         page: Constants.isBuyer == true
@@ -89,7 +95,9 @@ class _MainScreenState extends State<MainScreen>
     }
     return [
       TabViewModel(
-        icon: Icon(Icons.dashboard_outlined),
+        icon: _appCubit.bottomNavIndex == 0
+            ? Icon(Icons.dashboard)
+            : Icon(Icons.dashboard_outlined),
         name: 'Dashboard',
         height: 20,
         page: Constants.isBuyer == true
@@ -97,7 +105,9 @@ class _MainScreenState extends State<MainScreen>
             : const DashboardScreen(),
       ),
       TabViewModel(
-        icon: Icon(Icons.article_outlined),
+        icon: _appCubit.bottomNavIndex == 1
+            ? Icon(Icons.article)
+            : Icon(Icons.article_outlined),
         name: 'Negotiations',
         height: 20,
         page: Constants.isBuyer == true
@@ -110,7 +120,9 @@ class _MainScreenState extends State<MainScreen>
       //     height: 20,
       //     page: const SupplierListScreen()),
       TabViewModel(
-        icon: Icon(Icons.person),
+        icon: _appCubit.bottomNavIndex == 2
+            ? Icon(Icons.person)
+            : Icon(Icons.person_outline),
         name: 'My Account',
         height: 20,
         page: Constants.isBuyer == true

@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:tradologie_app/core/api/end_points.dart';
 import 'package:tradologie_app/core/utils/app_colors.dart';
+import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/common_single_child_scroll_view.dart';
 import 'package:tradologie_app/core/widgets/custom_button.dart';
@@ -95,6 +97,9 @@ class DashboardCard extends StatelessWidget {
             CommonButton(
               onPressed: onPostReadyToSellStockPressed,
               text: 'Post Ready to sell Stock',
+              icon: SvgPicture.asset(ImgAssets.postStockListingIcon,
+                  colorFilter:
+                      ColorFilter.mode(AppColors.primary, BlendMode.srcIn)),
               textStyle: TextStyleConstants.semiBold(context,
                   fontSize: 16, color: AppColors.primary),
               backgroundColor: AppColors.transparent,

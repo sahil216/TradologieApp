@@ -5,7 +5,8 @@ class TabViewModel {
   final String name;
   final Widget page;
   final double height;
-  final int? badgeCount; // ⭐ ADD THIS
+  final int? badgeCount;
+  final bool? isActive;
 
   const TabViewModel({
     required this.icon,
@@ -13,5 +14,6 @@ class TabViewModel {
     required this.page,
     required this.height,
     this.badgeCount,
+    this.isActive,
   });
 }

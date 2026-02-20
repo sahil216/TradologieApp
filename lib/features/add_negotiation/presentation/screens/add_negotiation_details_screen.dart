@@ -1,7 +1,6 @@
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:tradologie_app/config/routes/app_router.dart';
 import 'package:tradologie_app/core/error/user_failure.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
@@ -17,7 +16,9 @@ import 'package:tradologie_app/features/add_negotiation/domian/enitities/create_
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/currency_list.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/customer_address_list.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/inspection_agency_list.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/usecases/auction_detail_for_edit_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/create_auction_usecase.dart';
+import 'package:tradologie_app/features/authentication/presentation/cubit/authentication_cubit.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/commodity_list.dart';
 
 import '../../../../core/error/network_failure.dart';
@@ -121,6 +122,13 @@ class _AddNegotiationDetailsScreenState
         customerId: customerId ?? ""));
   }
 
+  Future<void> auctionDetailForEdit() async {
+    final token = await secureStorage.read(AppStrings.apiVerificationCode);
+
+    await cubit.auctionDetailForEdit(AuctionDetailForEditParams(
+        token: token ?? "", auctionID: "1", userTimeZone: ""));
+  }
+
   void clearForm() {
     _formKey.currentState?.reset();
 
@@ -134,6 +142,7 @@ class _AddNegotiationDetailsScreenState
   @override
   void initState() {
     createAuction();
+    auctionDetailForEdit();
     super.initState();
   }
 
@@ -376,18 +385,16 @@ class _AddNegotiationDetailsScreenState
                               onChanged: (item) async {},
                               compareFn: (a, b) => a == b,
                             ),
-                            CommonDateTimePicker(
+                            CommonDatePicker(
                               label:
                                   "Preferred Date and Time of Enquiry (yyyy/mm/dd HH:mm)",
                               hint: "Select Date and Time of Enquiry",
+                              type: PickerType.dateTime,
+                              firstDate: DateTime.now(),
+                              minTime: const TimeOfDay(hour: 9, minute: 0),
+                              maxTime: const TimeOfDay(hour: 18, minute: 0),
                               onChanged: (value) {
                                 print(value);
-                              },
-                              type: PickerType.dateTime,
-                              validator: (value) {
-                                if (value == null)
-                                  return "Please select date & time";
-                                return null;
                               },
                             ),
                             CommonTextField(
@@ -433,17 +440,14 @@ class _AddNegotiationDetailsScreenState
                                 return null;
                               },
                             ),
-                            CommonDateTimePicker(
-                              label: "Last Date of Dispatch (yyyy/mm/dd)",
-                              hint: "Enter last date of dispatch",
+                            CommonDatePicker(
+                              label:
+                                  "Preferred Date and Time of Enquiry (yyyy/mm/dd HH:mm)",
+                              hint: "Select Date and Time of Enquiry",
+                              type: PickerType.dateTime,
+                              firstDate: DateTime.now(),
                               onChanged: (value) {
-                                print(value);
-                              },
-                              type: PickerType.date,
-                              validator: (value) {
-                                if (value == null)
-                                  return "Please select date & time";
-                                return null;
+                                enquiryDate = value;
                               },
                             ),
                             CommonTextField(

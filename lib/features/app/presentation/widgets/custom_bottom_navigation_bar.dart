@@ -98,11 +98,11 @@ class CustomBottomNavigationBar extends StatelessWidget {
                               children: [
                                 AnimatedScale(
                                   duration: const Duration(milliseconds: 200),
-                                  scale: selected ? 1.05 : 1,
+                                  scale: selected ? 1.09 : 1,
                                   curve: Curves.easeOut,
                                   child: IconTheme(
                                     data: IconThemeData(
-                                      size: 24,
+                                      size: 28,
                                       color: selected
                                           ? Colors.black
                                           : Colors.black45,
@@ -112,9 +112,9 @@ class CustomBottomNavigationBar extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 4),
                                 AnimatedDefaultTextStyle(
-                                  duration: const Duration(milliseconds: 180),
+                                  duration: const Duration(milliseconds: 200),
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: selected ? 12 : 11,
                                     fontWeight: selected
                                         ? FontWeight.w600
                                         : FontWeight.w400,
