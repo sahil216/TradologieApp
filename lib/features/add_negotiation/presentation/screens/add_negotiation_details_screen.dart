@@ -13,7 +13,6 @@ import 'package:tradologie_app/core/widgets/common_single_child_scroll_view.dart
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text_field.dart';
-import 'package:tradologie_app/features/add_negotiation/domian/enitities/add_update_auction_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/create_auction_detail.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/currency_list.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/customer_address_list.dart';
@@ -31,12 +30,11 @@ import '../../../../core/widgets/common_date_picker.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_error_widget.dart';
 import '../../../../core/widgets/custom_text/text_style_constants.dart';
-import '../../../dashboard/presentation/cubit/dashboard_cubit.dart';
 import '../cubit/add_negotiation_cubit.dart';
 
 class AddNegotiationDetailsScreen extends StatefulWidget {
-  final String groupID;
-  const AddNegotiationDetailsScreen({super.key, required this.groupID});
+  final AddProductParams params;
+  const AddNegotiationDetailsScreen({super.key, required this.params});
 
   @override
   State<AddNegotiationDetailsScreen> createState() =>
@@ -138,7 +136,7 @@ class _AddNegotiationDetailsScreenState
 
     await cubit.createAuction(CreateAuctionParams(
         token: token ?? "",
-        groupID: widget.groupID,
+        groupID: widget.params.groupID,
         customerId: customerId ?? ""));
   }
 
@@ -193,10 +191,12 @@ class _AddNegotiationDetailsScreenState
               CommonToast.showFailureToast(state.failure);
             }
             if (state is AddUpdateAuctionSuccess) {
+              cubit.auctionId = state.data.auctionId;
               Navigator.pushNamed(context, Routes.addProductScreen,
                   arguments: AddProductParams(
                       auctionID: state.data.auctionId ?? "",
-                      groupID: widget.groupID));
+                      groupID: widget.params.groupID,
+                      groupName: widget.params.groupName));
             }
             if (state is AddUpdateAuctionError) {
               CommonToast.showFailureToast(state.failure);
@@ -567,43 +567,49 @@ class _AddNegotiationDetailsScreenState
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: CommonButton(
                 onPressed: () async {
-                  // if (_formKey.currentState?.validate() ?? false) {
-                  //   params = AddUpdateAuctionParams(
-                  //     token: await secureStorage
-                  //             .read(AppStrings.apiVerificationCode) ??
-                  //         "",
-                  //     customerID:
-                  //         await secureStorage.read(AppStrings.customerId) ?? "",
-                  //     auctionID: "0",
-                  //     auctionCode: auctionCodeController.text,
-                  //     auctionName: negotiationNameController.text,
-                  //     deliveryAddress:
-                  //         selectedLocationDelivery?.addressValue ?? "",
-                  //     inspectionAgency: selectedInspectionAgency
-                  //             ?.inspectionAgencyId
-                  //             .toString() ??
-                  //         "",
-                  //     paymentTerm: selectedPaymentTerm,
-                  //     bankerName: bankerNameAndAddressController.text,
-                  //     currency: selectedCurrency?.currencyId.toString() ?? "",
-                  //     partialDelivery: selectedPartialDelivery,
-                  //     auctionStartDate: enquiryDate.toString(),
-                  //     userTimeZone: Constants.timeZone,
-                  //     totalQuantity: totalQuantityController.text,
-                  //     minQuantity: minOrderQuantityController.text,
-                  //     deliveryLastDate: dispatchDate.toString(),
-                  //     agencyName: '',
-                  //     agencyAddress: '',
-                  //     agencyPhone: '',
-                  //     agencyEmail: '',
-                  //     remarks: deliveryTermsController.text,
-                  //   );
+                  if (_formKey.currentState?.validate() ?? false) {
+                    if ((createAuctionDetail?.minAuctionQty ?? 0) <
+                        int.parse(minOrderQuantityController.text)) {
+                      params = AddUpdateAuctionParams(
+                        token: await secureStorage
+                                .read(AppStrings.apiVerificationCode) ??
+                            "",
+                        customerID:
+                            await secureStorage.read(AppStrings.customerId) ??
+                                "",
+                        auctionID: cubit.auctionId ?? "0",
+                        auctionCode: auctionCodeController.text,
+                        auctionName: negotiationNameController.text,
+                        deliveryAddress:
+                            selectedLocationDelivery?.addressValue ?? "",
+                        inspectionAgency: selectedInspectionAgency
+                                ?.inspectionAgencyId
+                                .toString() ??
+                            "",
+                        paymentTerm: selectedPaymentTerm,
+                        bankerName: bankerNameAndAddressController.text,
+                        currency: selectedCurrency?.currencyId.toString() ?? "",
+                        partialDelivery: selectedPartialDelivery,
+                        auctionStartDate: enquiryDate.toString(),
+                        userTimeZone: Constants.timeZone,
+                        totalQuantity: totalQuantityController.text,
+                        minQuantity: minOrderQuantityController.text,
+                        deliveryLastDate: dispatchDate.toString(),
+                        agencyName: '',
+                        agencyAddress: '',
+                        agencyPhone: '',
+                        agencyEmail: '',
+                        remarks: deliveryTermsController.text,
+                      );
 
-                  //   await cubit.addUpdateAuction(params);
-                  // }
-                  Navigator.pushNamed(context, Routes.addProductScreen,
-                      arguments: AddProductParams(
-                          auctionID: "113325", groupID: widget.groupID));
+                      await cubit.addUpdateAuction(params);
+                    } else {
+                      CommonToast.error(
+                          "Min Order quantity cannot be less than ${createAuctionDetail?.minAuctionQty}");
+                    }
+                  } else {
+                    CommonToast.error("Please Enter details to continue");
+                  }
                 },
                 text: "Create Negotiation",
                 width: double.infinity,

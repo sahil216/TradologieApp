@@ -160,8 +160,8 @@ class AppRoutes {
         });
       case Routes.addNegotiationDetailScreen:
         return CupertinoPageRoute(builder: (context) {
-          final groupID = routeSettings.arguments as String;
-          return AddNegotiationDetailsScreen(groupID: groupID);
+          final params = routeSettings.arguments as AddProductParams;
+          return AddNegotiationDetailsScreen(params: params);
         });
       case Routes.addProductScreen:
         return CupertinoPageRoute(builder: (context) {

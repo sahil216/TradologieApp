@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
 import 'package:tradologie_app/core/error/failures.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
@@ -34,16 +36,18 @@ abstract class AddNegotiationRepository {
   Future<Either<Failure, List<AuctionItemListData>>> auctionItemList(
       AuctionItemListParams params);
   Future<Either<Failure, bool>> gradleFileUpload(NoParams params);
-  Future<Either<Failure, bool>> packingImageUpload(NoParams params);
+  Future<Either<Failure, bool>> packingImageUpload(File? params);
   Future<Either<Failure, bool>> addAuctionItem(AddAuctionItemParams params);
   Future<Either<Failure, AuctionDetailForEditData>> auctionDetailForEdit(
       AuctionDetailForEditParams params);
   Future<Either<Failure, bool>> addAuctionSupplier(
       AddAuctionSupplierParams params);
   Future<Either<Failure, List<AddAuctionSupplierListData>>>
-      addAuctionSupplierList(NoParams params);
+      addAuctionSupplierList(String params);
   Future<Either<Failure, bool>> deleteAuctionItem(
       DeleteAuctionItemParams params);
   Future<Either<Failure, AddUpdateAuctionData>> addUpdateAuction(
       AddUpdateAuctionParams params);
+  Future<Either<Failure, List<AddAuctionSupplierListData>>> auctionSupplierList(
+      String params);
 }

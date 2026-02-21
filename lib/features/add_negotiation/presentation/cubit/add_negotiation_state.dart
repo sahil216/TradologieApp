@@ -308,3 +308,23 @@ class AddUpdateAuctionError extends AddNegotiationState {
   @override
   List<Object> get props => [failure];
 }
+
+class AuctionSupplierListIsLoading extends AddNegotiationState {}
+
+class AuctionSupplierListSuccess extends AddNegotiationState {
+  final List<AddAuctionSupplierListData> data;
+
+  const AuctionSupplierListSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class AuctionSupplierListError extends AddNegotiationState {
+  final Failure failure;
+
+  const AuctionSupplierListError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}

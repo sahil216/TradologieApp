@@ -7,6 +7,6 @@ class AddUpdateAuctionDataModel extends AddUpdateAuctionData {
 
   factory AddUpdateAuctionDataModel.fromJson(Map<String, dynamic> json) =>
       AddUpdateAuctionDataModel(
-        auctionId: json["AuctionID"],
+        auctionId: json["AuctionID"].toString(),
       );
 }

@@ -1,5 +1,9 @@
 class AddProductParams {
   String auctionID;
   String groupID;
-  AddProductParams({required this.auctionID, required this.groupID});
+  String groupName;
+  AddProductParams(
+      {required this.auctionID,
+      required this.groupID,
+      required this.groupName});
 }

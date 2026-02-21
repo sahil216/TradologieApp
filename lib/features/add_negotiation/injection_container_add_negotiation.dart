@@ -9,6 +9,7 @@ import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_supp
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_update_auction_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/auction_detail_for_edit_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/auction_item_list_usecase.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/usecases/auction_supplier_list.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/create_auction_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/delete_auction_item_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/delete_supplier_shortlist_usecase.dart';
@@ -39,6 +40,7 @@ Future<void> init() async {
         addAuctionSupplierListUsecase: sl(),
         deleteAuctionItemUsecase: sl(),
         addUpdateAuctionUsecase: sl(),
+        auctionSupplierListUsecase: sl(),
       ));
 
   //! Use cases
@@ -72,6 +74,8 @@ Future<void> init() async {
       () => DeleteAuctionItemUsecase(addNegotiationRepository: sl()));
   sl.registerLazySingleton<AddUpdateAuctionUsecase>(
       () => AddUpdateAuctionUsecase(addNegotiationRepository: sl()));
+  sl.registerLazySingleton<AuctionSupplierListUsecase>(
+      () => AuctionSupplierListUsecase(addNegotiationRepository: sl()));
 
   //! Repository
   sl.registerLazySingleton<AddNegotiationRepository>(

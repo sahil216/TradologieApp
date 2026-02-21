@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/error/failures.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
+import 'package:tradologie_app/features/add_negotiation/data/models/add_auction_supplier_list_data_model.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/add_auction_supplier_list_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/add_update_auction_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/auction_detail_for_edit_data.dart';
@@ -17,6 +20,7 @@ import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_supp
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_update_auction_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/auction_detail_for_edit_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/auction_item_list_usecase.dart';
+import 'package:tradologie_app/features/add_negotiation/domian/usecases/auction_supplier_list.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/create_auction_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/delete_auction_item_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/delete_supplier_shortlist_usecase.dart';
@@ -45,6 +49,7 @@ class AddNegotiationCubit extends Cubit<AddNegotiationState> {
   final AddAuctionSupplierListUsecase addAuctionSupplierListUsecase;
   final DeleteAuctionItemUsecase deleteAuctionItemUsecase;
   final AddUpdateAuctionUsecase addUpdateAuctionUsecase;
+  final AuctionSupplierListUsecase auctionSupplierListUsecase;
 
   AddNegotiationCubit({
     required this.getCategoryUsecase,
@@ -62,7 +67,10 @@ class AddNegotiationCubit extends Cubit<AddNegotiationState> {
     required this.addAuctionSupplierListUsecase,
     required this.deleteAuctionItemUsecase,
     required this.addUpdateAuctionUsecase,
+    required this.auctionSupplierListUsecase,
   }) : super(AddNegotiationInitial());
+
+  String? auctionId;
 
   Future<void> getCategoryList(NoParams params) async {
     emit(GetCategoryIsLoading());
@@ -154,7 +162,7 @@ class AddNegotiationCubit extends Cubit<AddNegotiationState> {
     ));
   }
 
-  Future<void> packingImageUpload(NoParams params) async {
+  Future<void> packingImageUpload(File? params) async {
     emit(PackingImageUploadIsLoading());
     Either<Failure, bool> response = await packingImageUploadUsecase(params);
     emit(response.fold(
@@ -191,7 +199,7 @@ class AddNegotiationCubit extends Cubit<AddNegotiationState> {
     ));
   }
 
-  Future<void> addAuctionSupplierList(NoParams params) async {
+  Future<void> addAuctionSupplierList(String params) async {
     emit(AddAuctionSupplierListIsLoading());
     Either<Failure, List<AddAuctionSupplierListData>> response =
         await addAuctionSupplierListUsecase(params);
@@ -218,5 +226,20 @@ class AddNegotiationCubit extends Cubit<AddNegotiationState> {
       (failure) => AddUpdateAuctionError(failure: failure),
       (res) => AddUpdateAuctionSuccess(data: res),
     ));
+  }
+
+  Future<void> auctionSupplierList(String params) async {
+    emit(AuctionSupplierListIsLoading());
+    Either<Failure, List<AddAuctionSupplierListData>> response =
+        await auctionSupplierListUsecase(params);
+    emit(response.fold(
+      (failure) => AuctionSupplierListError(failure: failure),
+      (res) => AuctionSupplierListSuccess(data: res),
+    ));
+  }
+
+  String buildSupplierOutput(
+      List<AddAuctionSupplierListData> list, String auctionId) {
+    return list.map((e) => "$auctionId::${e.vendorId}").join(",");
   }
 }

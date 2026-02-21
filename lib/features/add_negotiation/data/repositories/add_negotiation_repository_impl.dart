@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
 import 'package:tradologie_app/core/error/failures.dart';
 import 'package:tradologie_app/core/error/user_failure.dart';
@@ -168,7 +170,7 @@ class AddNegotiationRepositoryImpl implements AddNegotiationRepository {
   }
 
   @override
-  Future<Either<Failure, bool>> packingImageUpload(NoParams params) async {
+  Future<Either<Failure, bool>> packingImageUpload(File? params) async {
     try {
       final response =
           await addNegotiationRemoteDataSource.packingImageUpload(params);
@@ -228,7 +230,7 @@ class AddNegotiationRepositoryImpl implements AddNegotiationRepository {
 
   @override
   Future<Either<Failure, List<AddAuctionSupplierListData>>>
-      addAuctionSupplierList(NoParams params) async {
+      addAuctionSupplierList(String params) async {
     try {
       final response =
           await addNegotiationRemoteDataSource.addAuctionSupplierList(params);
@@ -266,6 +268,23 @@ class AddNegotiationRepositoryImpl implements AddNegotiationRepository {
           await addNegotiationRemoteDataSource.addUpdateAuction(params);
       if (response != null && response.success) {
         return Right(AddUpdateAuctionDataModel.fromJson(response.data));
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<AddAuctionSupplierListData>>> auctionSupplierList(
+      String params) async {
+    try {
+      final response =
+          await addNegotiationRemoteDataSource.auctionSupplierList(params);
+      if (response != null && response.success) {
+        return Right((response.data as List)
+            .map((e) => AddAuctionSupplierListDataModel.fromJson(e))
+            .toList());
       }
       return Left(UserFailure(response?.message, response?.code));
     } on Failure catch (e) {

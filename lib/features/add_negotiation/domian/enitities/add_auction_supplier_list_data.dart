@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class AddAuctionSupplierListData extends Equatable {
-  final int? vendorId;
+  final String? vendorId;
   final String? vendorShortName;
   final String? vendorName;
   final String? companyName;

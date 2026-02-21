@@ -10,7 +10,7 @@ class AddAuctionSupplierListDataModel extends AddAuctionSupplierListData {
 
   factory AddAuctionSupplierListDataModel.fromJson(Map<String, dynamic> json) =>
       AddAuctionSupplierListDataModel(
-        vendorId: json["VendorID"],
+        vendorId: json["VendorID"].toString(),
         vendorShortName: json["VendorShortName"],
         vendorName: json["VendorName"],
         companyName: json["CompanyName"],

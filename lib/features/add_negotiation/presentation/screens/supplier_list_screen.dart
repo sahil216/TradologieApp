@@ -20,6 +20,7 @@ import 'package:tradologie_app/features/add_negotiation/domian/enitities/supplie
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_supplier_shortlist_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/delete_supplier_shortlist_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/presentation/cubit/add_negotiation_cubit.dart';
+import 'package:tradologie_app/features/add_negotiation/presentation/viewmodel/add_product_params.dart';
 import 'package:tradologie_app/features/add_negotiation/presentation/widget/supplier_card.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/commodity_list.dart';
 
@@ -54,6 +55,7 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
   bool _isFetchingMore = false;
 
   String groupId = "";
+  String groupName = "";
 
   final ScrollController _listScrollController = ScrollController();
 
@@ -252,6 +254,7 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
 
                               supplierList = [];
                               groupId = item?.groupId ?? "";
+                              groupName = item?.groupName ?? "";
 
                               cubit.getSupplierList(params);
                               cubit.getSupplierShortlisted(params);
@@ -266,9 +269,17 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
                               padding: const EdgeInsets.only(top: 12),
                               child: CommonButton(
                                 onPressed: () {
-                                  Navigator.pushNamed(context,
-                                      Routes.addNegotiationDetailScreen,
-                                      arguments: groupId);
+                                  if (groupId.isNotEmpty) {
+                                    Navigator.pushNamed(context,
+                                        Routes.addNegotiationDetailScreen,
+                                        arguments: AddProductParams(
+                                            auctionID: "",
+                                            groupID: groupId,
+                                            groupName: groupName));
+                                  } else {
+                                    CommonToast.error(
+                                        "Please Select a Category to Proceed");
+                                  }
                                 },
                                 text: "Create Negotiation",
                                 width: double.infinity,

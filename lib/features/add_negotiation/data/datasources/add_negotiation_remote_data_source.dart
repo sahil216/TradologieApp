@@ -1,7 +1,12 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:tradologie_app/core/api/api_consumer.dart';
 import 'package:tradologie_app/core/api/end_points.dart';
 import 'package:tradologie_app/core/response_wrapper/response_wrapper.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
+import 'package:tradologie_app/core/utils/app_strings.dart';
+import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_auction_item_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_auction_supplier_usecase.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/usecases/add_supplier_shortlist_usecase.dart';
@@ -28,16 +33,17 @@ abstract class AddNegotiationRemoteDataSource {
       AuctionItemListParams params);
   Future<ResponseWrapper<dynamic>?> gradleFileUpload(NoParams params);
   Future<ResponseWrapper<dynamic>?> addAuctionItem(AddAuctionItemParams params);
-  Future<ResponseWrapper<dynamic>?> packingImageUpload(NoParams params);
+  Future<ResponseWrapper<dynamic>?> packingImageUpload(File? params);
   Future<ResponseWrapper<dynamic>?> auctionDetailForEdit(
       AuctionDetailForEditParams params);
   Future<ResponseWrapper<dynamic>?> addAuctionSupplier(
       AddAuctionSupplierParams params);
-  Future<ResponseWrapper<dynamic>?> addAuctionSupplierList(NoParams params);
+  Future<ResponseWrapper<dynamic>?> addAuctionSupplierList(String params);
   Future<ResponseWrapper<dynamic>?> deleteAuctionItem(
       DeleteAuctionItemParams params);
   Future<ResponseWrapper<dynamic>?> addUpdateAuction(
       AddUpdateAuctionParams params);
+  Future<ResponseWrapper<dynamic>?> auctionSupplierList(String params);
 }
 
 class AddNegotiationRemoteDataSourceImpl
@@ -115,10 +121,22 @@ class AddNegotiationRemoteDataSourceImpl
   }
 
   @override
-  Future<ResponseWrapper<dynamic>?> packingImageUpload(NoParams params) async {
+  Future<ResponseWrapper<dynamic>?> packingImageUpload(File? params) async {
+    SecureStorageService storageService = SecureStorageService();
+    final token =
+        await storageService.read(AppStrings.apiVerificationCode) ?? "";
+    final body = {
+      "Files": await MultipartFile.fromFile(
+        params?.path ?? "",
+        filename: "packingImage",
+      ),
+      "Token": token,
+    };
+
     return await apiConsumer.post(
       EndPoints.packingImageUpload,
-      body: {},
+      body: body,
+      formDataIsEnabled: true,
     );
   }
 
@@ -160,9 +178,9 @@ class AddNegotiationRemoteDataSourceImpl
 
   @override
   Future<ResponseWrapper<dynamic>?> addAuctionSupplierList(
-      NoParams params) async {
+      String params) async {
     return await apiConsumer.get(
-      EndPoints.addAuctionSupplierList,
+      "${EndPoints.addAuctionSupplierList}/$params",
     );
   }
 
@@ -172,6 +190,21 @@ class AddNegotiationRemoteDataSourceImpl
     return await apiConsumer.post(
       EndPoints.addUpdateAuction,
       body: params.toJson(),
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> auctionSupplierList(String params) async {
+    SecureStorageService storageService = SecureStorageService();
+    final token =
+        await storageService.read(AppStrings.apiVerificationCode) ?? "";
+    final body = {
+      "AuctionID": params,
+      "Token": token,
+    };
+    return await apiConsumer.post(
+      EndPoints.auctionSupplierList,
+      body: body,
     );
   }
 }
