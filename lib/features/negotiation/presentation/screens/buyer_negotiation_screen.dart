@@ -11,8 +11,10 @@ import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/common_single_child_scroll_view.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
+import 'package:tradologie_app/core/widgets/custom_button.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
+import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
 import 'package:tradologie_app/features/negotiation/domain/entities/buyer_negotitation_detail.dart';
 import 'package:tradologie_app/features/negotiation/presentation/cubit/negotiation_cubit.dart';
@@ -151,8 +153,8 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen> {
       child: AdaptiveScaffold(
         drawer: const TradologieDrawer(),
         appBar: Constants.appBar(context,
-            title: 'Negotiation',
-            centerTitle: true,
+            title: "Negotiation",
+            centerTitle: false,
             // titleWidget: Row(
             //   children: [
             //     Image.asset(ImgAssets.companyLogo, height: 40),
@@ -166,6 +168,46 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen> {
             //   ],
             // ),
             actions: [
+              ElevatedButton(
+                onPressed: () {
+                  sl<NavigationService>().pushNamed(
+                    Routes.supplierListScreen,
+                  );
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.add,
+                      color: AppColors.defaultText,
+                      size: 20,
+                    ),
+                    CommonText('Add',
+                        style: TextStyleConstants.semiBold(context,
+                            color: AppColors.primary)),
+                  ],
+                ),
+              ),
+              // CommonButton(
+              //   onPressed: () {
+              //     sl<NavigationService>().pushNamed(
+              //       Routes.supplierListScreen,
+              //     );
+              //   },
+              //   backgroundColor: AppColors.white,
+              //   icon: Icon(
+              //     Icons.add,
+              //     color: AppColors.defaultText,
+              //   ),
+              //   borderSide: BorderSide(color: AppColors.primary, width: 2),
+              //   text: 'Add',
+              //   height: 10,
+              //   padding: EdgeInsets.symmetric(horizontal: 15, vertical: 7),
+              //   borderRadius: BorderRadius.circular(30),
+              //   textStyle: TextStyleConstants.semiBold(context,
+              //       color: AppColors.defaultText),
+              // ),
+              SizedBox(width: 10),
               IconButton(
                   onPressed: () {
                     sl<NavigationService>().pushNamed(

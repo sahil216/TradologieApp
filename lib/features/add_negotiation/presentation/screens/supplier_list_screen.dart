@@ -314,7 +314,7 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
                                         return const Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 16),
-                                          child: CommonLoader(),
+                                          child: SizedBox(),
                                         );
                                       }
 

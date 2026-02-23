@@ -487,9 +487,8 @@ class _PostStockRequirementScreenState
                         quantityUnit: selectedUnit?.unitName ?? "",
                         otherSpecifications: messageController.text,
                         stockLocation: addressController.text,
-                        userId:
-                            await secureStorage.read(AppStrings.customerId) ??
-                                "");
+                        userId: await secureStorage.read(AppStrings.vendorId) ??
+                            "");
 
                     dashboardCubit.postVendorStockRequirement(params);
                   } else {

@@ -177,11 +177,24 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                                                       textRequired:
                                                           CommonStrings
                                                               .enterName,
+                                                      titleStyle: TextStyleConstants
+                                                          .semiBold(context,
+                                                              fontSize: 16,
+                                                              color: AppColors
+                                                                  .defaultText),
+                                                      labalStyle:
+                                                          TextStyleConstants.medium(
+                                                              context,
+                                                              fontSize: 16,
+                                                              color: AppColors
+                                                                  .defaultText),
                                                       controller:
                                                           textFullNameController,
                                                       textInputType:
                                                           TextInputType.name,
                                                       isEnable: true,
+                                                      backgroundColor:
+                                                          AppColors.transparent,
                                                       autovalidateMode:
                                                           AutovalidateMode
                                                               .onUserInteraction,

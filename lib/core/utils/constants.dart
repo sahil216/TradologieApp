@@ -115,7 +115,6 @@ class Constants {
                   title,
                   style: TextStyleConstants.bold(
                     context,
-                    height: 2,
                     fontSize: 22,
                     color: AppColors.black,
                   ),

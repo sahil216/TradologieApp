@@ -206,7 +206,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
           drawer: const TradologieDrawer(),
           appBar: Constants.appBar(context,
               title: 'Post your Requirements',
-              centerTitle: true,
+              centerTitle: false,
               actions: [
                 IconButton(
                     onPressed: () {
