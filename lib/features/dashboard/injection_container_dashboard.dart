@@ -2,9 +2,12 @@ import 'package:get_it/get_it.dart';
 import 'package:tradologie_app/features/dashboard/data/datasources/dashboard_remote_data_source.dart';
 import 'package:tradologie_app/features/dashboard/domain/respositories/dashboard_repository.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/add_customer_requirement_usecase.dart';
+import 'package:tradologie_app/features/dashboard/domain/usecases/add_vendor_stock_enquiry_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_all_list_usecase.dart';
+import 'package:tradologie_app/features/dashboard/domain/usecases/get_auction_unit_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_commodity_list_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_dashboard_usecase.dart';
+import 'package:tradologie_app/features/dashboard/domain/usecases/get_vendor_stock_listing_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/post_vendor_stock_requirement.dart';
 import 'data/repositories/dashboard_repository_impl.dart';
 import 'presentation/cubit/dashboard_cubit.dart';
@@ -19,6 +22,9 @@ Future<void> init() async {
         getCommodityListUsecase: sl(),
         getAllListUsecase: sl(),
         postVendorStockRequirementUsecase: sl(),
+        getVendorStockListingUsecase: sl(),
+        getAuctionUnitUsecase: sl(),
+        addVendorStockEnquiryUsecase: sl(),
       ));
 
   //! Use cases
@@ -32,6 +38,12 @@ Future<void> init() async {
       () => GetCommodityListUsecase(dasboardRepository: sl()));
   sl.registerLazySingleton<GetAllListUsecase>(
       () => GetAllListUsecase(dasboardRepository: sl()));
+  sl.registerLazySingleton<GetVendorStockListingUsecase>(
+      () => GetVendorStockListingUsecase(dasboardRepository: sl()));
+  sl.registerLazySingleton<GetAuctionUnitUsecase>(
+      () => GetAuctionUnitUsecase(dasboardRepository: sl()));
+  sl.registerLazySingleton<AddVendorStockEnquiryUsecase>(
+      () => AddVendorStockEnquiryUsecase(dasboardRepository: sl()));
 
   //! Repository
   sl.registerLazySingleton<DashboardRepository>(() => DashboardRepositoryImpl(

@@ -108,3 +108,63 @@ class GetAllListError extends DashboardState {
   @override
   List<Object> get props => [failure];
 }
+
+class GetVendorStockListingIsLoading extends DashboardState {}
+
+class GetVendorStockListingSuccess extends DashboardState {
+  final List<GetVendorStockList> data;
+
+  const GetVendorStockListingSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class GetVendorStockListingError extends DashboardState {
+  final Failure failure;
+
+  const GetVendorStockListingError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class GetAuctionUnitListIsLoading extends DashboardState {}
+
+class GetAuctionUnitListSuccess extends DashboardState {
+  final List<AuctionUnitList> data;
+
+  const GetAuctionUnitListSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class GetAuctionUnitListError extends DashboardState {
+  final Failure failure;
+
+  const GetAuctionUnitListError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class AddVendorStockEnquiryIsLoading extends DashboardState {}
+
+class AddVendorStockEnquirySuccess extends DashboardState {
+  final bool data;
+
+  const AddVendorStockEnquirySuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class AddVendorStockEnquiryError extends DashboardState {
+  final Failure failure;
+
+  const AddVendorStockEnquiryError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}

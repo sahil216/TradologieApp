@@ -8,6 +8,8 @@ import 'package:tradologie_app/features/app/presentation/screens/main_screen.dar
 import 'package:tradologie_app/features/authentication/domain/usecases/send_otp_usecase.dart';
 import 'package:tradologie_app/features/contact_us/contact_us.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_dashboard_screen.dart';
+import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_post_requirement_screen.dart';
+import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_sell_stock_listing.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/post_stock_requirement_screen.dart';
 import 'package:tradologie_app/features/my_account/presentation/screens/my_account_screen.dart';
@@ -54,8 +56,11 @@ class Routes {
   //! Dashboard
   static const String dashboardRoute = '/dashboard';
   static const String buyerDashboardRoute = '/buyerDashboard';
+  static const String buyerPostRequirementRoute = '/buyerPostRequirement';
   static const String postStockRequirementScreen =
       '/postStockRequirementScreen';
+
+  static const String buyerSellStockListing = '/buyerSellStockListing';
 
   //! Negotiation
   static const String negotiationScreen = '/negotiationScreen';
@@ -145,9 +150,18 @@ class AppRoutes {
         return CupertinoPageRoute(builder: (context) {
           return const BuyerDashboardScreen();
         });
+      case Routes.buyerPostRequirementRoute:
+        return CupertinoPageRoute(builder: (context) {
+          return const BuyerPostRequirementScreen();
+        });
       case Routes.postStockRequirementScreen:
         return CupertinoPageRoute(builder: (context) {
           return const PostStockRequirementScreen();
+        });
+
+      case Routes.buyerSellStockListing:
+        return CupertinoPageRoute(builder: (context) {
+          return const BuyerSellStockListing();
         });
 
       case Routes.negotiationScreen:

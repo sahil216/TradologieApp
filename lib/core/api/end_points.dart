@@ -81,6 +81,10 @@ class EndPoints {
 
   static String postVendorStockRequirement =
       '$baseUrlSupplier/AddVendorStockListing';
+  static String getVendorStockListing =
+      '$baseUrlBuyer/GetReadyStockDataByRequirementID';
+  static String getAuctionUnit = '$baseUrlBuyer/GetAuctionUnit';
+  static String addVendorStockEnquiry = '$baseUrlBuyer/AddVendorStockEnquiry';
 
   // Negotiation
   static String getNegotiation(UserType userType) {

@@ -4,10 +4,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/error/failures.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/all_list_detail.dart';
+import 'package:tradologie_app/features/dashboard/domain/entities/auction_unit_list.dart';
+import 'package:tradologie_app/features/dashboard/domain/entities/get_vendor_stock_list.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/add_customer_requirement_usecase.dart';
+import 'package:tradologie_app/features/dashboard/domain/usecases/add_vendor_stock_enquiry_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_all_list_usecase.dart';
+import 'package:tradologie_app/features/dashboard/domain/usecases/get_auction_unit_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_commodity_list_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_dashboard_usecase.dart';
+import 'package:tradologie_app/features/dashboard/domain/usecases/get_vendor_stock_listing_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/post_vendor_stock_requirement.dart';
 
 import '../../domain/entities/commodity_list.dart';
@@ -20,6 +25,9 @@ class DashboardCubit extends Cubit<DashboardState> {
   final GetCommodityListUsecase getCommodityListUsecase;
   final GetAllListUsecase getAllListUsecase;
   final PostVendorStockRequirementUsecase postVendorStockRequirementUsecase;
+  final GetVendorStockListingUsecase getVendorStockListingUsecase;
+  final GetAuctionUnitUsecase getAuctionUnitUsecase;
+  final AddVendorStockEnquiryUsecase addVendorStockEnquiryUsecase;
 
   DashboardCubit({
     required this.dashboardUsecase,
@@ -27,6 +35,9 @@ class DashboardCubit extends Cubit<DashboardState> {
     required this.getCommodityListUsecase,
     required this.getAllListUsecase,
     required this.postVendorStockRequirementUsecase,
+    required this.getVendorStockListingUsecase,
+    required this.getAuctionUnitUsecase,
+    required this.addVendorStockEnquiryUsecase,
   }) : super(DashboardInitial());
 
   Future<void> getDashboardData(GetDashboardParams params) async {
@@ -79,6 +90,41 @@ class DashboardCubit extends Cubit<DashboardState> {
     emit(response.fold(
       (failure) => GetAllListError(failure: failure),
       (res) => GetAllListSuccess(data: res),
+    ));
+  }
+
+  Future<void> getReadyStockListing(
+    GetVendorStockListingParams params,
+  ) async {
+    emit(GetVendorStockListingIsLoading());
+    Either<Failure, List<GetVendorStockList>> response =
+        await getVendorStockListingUsecase(params);
+    emit(response.fold(
+      (failure) => GetVendorStockListingError(failure: failure),
+      (res) => GetVendorStockListingSuccess(data: res),
+    ));
+  }
+
+  Future<void> getAuctionUnit(
+    String params,
+  ) async {
+    emit(GetAuctionUnitListIsLoading());
+    Either<Failure, List<AuctionUnitList>> response =
+        await getAuctionUnitUsecase(params);
+    emit(response.fold(
+      (failure) => GetAuctionUnitListError(failure: failure),
+      (res) => GetAuctionUnitListSuccess(data: res),
+    ));
+  }
+
+  Future<void> addVendorStockEnquiry(
+    AddVendorStockEnquiryParams params,
+  ) async {
+    emit(AddVendorStockEnquiryIsLoading());
+    Either<Failure, bool> response = await addVendorStockEnquiryUsecase(params);
+    emit(response.fold(
+      (failure) => AddVendorStockEnquiryError(failure: failure),
+      (res) => AddVendorStockEnquirySuccess(data: res),
     ));
   }
 }

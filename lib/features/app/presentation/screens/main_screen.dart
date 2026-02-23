@@ -11,6 +11,7 @@ import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/features/app/presentation/widgets/custom_bottom_navigation_bar.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_dashboard_screen.dart';
+import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_post_requirement_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:tradologie_app/features/my_account/presentation/screens/my_account_screen.dart';
 import 'package:tradologie_app/features/negotiation/presentation/screens/buyer_negotiation_screen.dart';
@@ -47,9 +48,7 @@ class _MainScreenState extends State<MainScreen>
             : Icon(Icons.dashboard_outlined),
         name: 'Dashboard',
         height: 20,
-        page: Constants.isBuyer == true
-            ? const BuyerDashboardScreen()
-            : const DashboardScreen(),
+        page: const DashboardScreen(),
       ),
       TabViewModel(
         icon: _appCubit.bottomNavIndex == 1
@@ -57,9 +56,7 @@ class _MainScreenState extends State<MainScreen>
             : Icon(Icons.article_outlined),
         name: 'Negotiations',
         height: 20,
-        page: Constants.isBuyer == true
-            ? const BuyerNegotiationScreen()
-            : const NegotiationScreen(),
+        page: const NegotiationScreen(),
       ),
       TabViewModel(
         icon: _appCubit.bottomNavIndex == 2
@@ -67,25 +64,7 @@ class _MainScreenState extends State<MainScreen>
             : Icon(Icons.person_outline),
         name: 'My Account',
         height: 20,
-        page: Constants.isBuyer == true
-            ? Constants.isAndroid14OrBelow && Platform.isAndroid
-                ? InAppWebViewScreen(
-                    params: WebviewParams(
-                        url:
-                            "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
-                        canPop: true,
-                        isAppBar: true,
-                        isShowDrawer: true,
-                        isShowNotification: true))
-                : WebViewScreen(
-                    params: WebviewParams(
-                        url:
-                            "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
-                        canPop: true,
-                        isAppBar: true,
-                        isShowDrawer: true,
-                        isShowNotification: true)) // const OrdersScreen(),
-            : MyAccountScreen(),
+        page: MyAccountScreen(),
       ),
     ];
   }
@@ -96,61 +75,44 @@ class _MainScreenState extends State<MainScreen>
     }
     return [
       TabViewModel(
-        icon: _appCubit.bottomNavIndex == 0
-            ? Icon(Icons.dashboard)
-            : Icon(Icons.dashboard_outlined),
-        name: 'Dashboard',
-        height: 20,
-        page: Constants.isBuyer == true
-            ? const BuyerDashboardScreen()
-            : const DashboardScreen(),
-      ),
+          icon: _appCubit.bottomNavIndex == 0
+              ? Icon(Icons.dashboard)
+              : Icon(Icons.dashboard_outlined),
+          name: 'Dashboard',
+          height: 20,
+          page: const BuyerDashboardScreen()),
       TabViewModel(
-        icon: _appCubit.bottomNavIndex == 1
-            ? Icon(Icons.article)
-            : Icon(Icons.article_outlined),
-        name: 'Negotiations',
-        height: 20,
-        page: Constants.isBuyer == true
-            ? const BuyerNegotiationScreen()
-            : const NegotiationScreen(),
-      ),
-      // TabViewModel(
-      //     icon: Icon(Icons.add_box_outlined),
-      //     name: 'Add Negotiation',
-      //     height: 20,
-      //     page: const SupplierListScreen()),
+          icon: _appCubit.bottomNavIndex == 1
+              ? Icon(Icons.article)
+              : Icon(Icons.article_outlined),
+          name: 'Negotiations',
+          height: 20,
+          page: const BuyerNegotiationScreen()),
       TabViewModel(
-        icon: _appCubit.bottomNavIndex == 2
-            ? Icon(Icons.person)
-            : Icon(Icons.person_outline),
-        name: 'My Account',
-        height: 20,
-        page: Constants.isBuyer == true
-            ? Constants.isAndroid14OrBelow && Platform.isAndroid
-                ? InAppWebViewScreen(
-                    params: WebviewParams(
-                        url:
-                            "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
-                        canPop: true,
-                        isAppBar: true,
-                        isShowDrawer: true,
-                        isShowNotification: true))
-                : WebViewScreen(
-                    params: WebviewParams(
-                        url:
-                            "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
-                        canPop: true,
-                        isAppBar: true,
-                        isShowDrawer: true,
-                        isShowNotification: true)) // const OrdersScreen(),
-            : MyAccountScreen(),
-      ),
-      // TabViewModel(
-      //     icon: Icon(Icons.menu_outlined),
-      //     name: 'More Options',
-      //     height: 20,
-      //     page: const MoreOptionsScreen()),
+          icon: _appCubit.bottomNavIndex == 2
+              ? Icon(Icons.person)
+              : Icon(Icons.person_outline),
+          name: 'My Account',
+          height: 20,
+          page: Constants.isAndroid14OrBelow && Platform.isAndroid
+              ? InAppWebViewScreen(
+                  params: WebviewParams(
+                      url:
+                          "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
+                      canPop: true,
+                      isAppBar: true,
+                      isShowDrawer: true,
+                      isShowNotification: true))
+              : WebViewScreen(
+                  params: WebviewParams(
+                      url:
+                          "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
+                      canPop: true,
+                      isAppBar: true,
+                      isShowDrawer: true,
+                      isShowNotification: true)) // const OrdersScreen(),
+
+          ),
     ];
   }
 

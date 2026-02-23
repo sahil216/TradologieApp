@@ -1,8 +1,10 @@
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/add_customer_requirement_usecase.dart';
+import 'package:tradologie_app/features/dashboard/domain/usecases/add_vendor_stock_enquiry_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_all_list_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_dashboard_usecase.dart';
+import 'package:tradologie_app/features/dashboard/domain/usecases/get_vendor_stock_listing_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/post_vendor_stock_requirement.dart';
 
 import '../../../../core/api/api_consumer.dart';
@@ -17,6 +19,11 @@ abstract class DashboardRemoteDataSource {
       PostVendorStockRequirementParams params);
   Future<ResponseWrapper<dynamic>?> getCommodityList(NoParams params);
   Future<ResponseWrapper<dynamic>?> getAllList(GetAllListParams params);
+  Future<ResponseWrapper<dynamic>?> getReadyStockListing(
+      GetVendorStockListingParams params);
+  Future<ResponseWrapper<dynamic>?> getAuctionUnit(String params);
+  Future<ResponseWrapper<dynamic>?> addVendorStockEnquiry(
+      AddVendorStockEnquiryParams params);
 }
 
 class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
@@ -65,6 +72,30 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
   Future<ResponseWrapper<dynamic>?> getCommodityList(NoParams params) async {
     return await apiConsumer.get(
       EndPoints.getCommodityList,
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> getReadyStockListing(
+      GetVendorStockListingParams params) async {
+    return await apiConsumer.post(
+      EndPoints.getVendorStockListing,
+      body: params.toJson(),
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> getAuctionUnit(String params) async {
+    return await apiConsumer.get(
+      "${EndPoints.getAuctionUnit}/Token=$params",
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> addVendorStockEnquiry(
+      AddVendorStockEnquiryParams params) async {
+    return await apiConsumer.post(
+      EndPoints.addVendorStockEnquiry,
     );
   }
 }
