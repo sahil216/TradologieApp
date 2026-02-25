@@ -52,7 +52,6 @@ class _TermsScreenState extends State<TermsScreen> {
     return AdaptiveScaffold(
       appBar: Constants.appBar(
         context,
-        elevation: 0,
         boxShadow: [],
         centerTitle: true,
         titleWidget: Image.asset(

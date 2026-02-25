@@ -155,7 +155,6 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
       child: AdaptiveScaffold(
         appBar: Constants.appBar(
           context,
-          elevation: 0,
           boxShadow: [],
           centerTitle: true,
           titleWidget: Image.asset(

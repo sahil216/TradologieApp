@@ -11,7 +11,6 @@ import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/features/app/presentation/widgets/custom_bottom_navigation_bar.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_dashboard_screen.dart';
-import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_post_requirement_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:tradologie_app/features/my_account/presentation/screens/my_account_screen.dart';
 import 'package:tradologie_app/features/negotiation/presentation/screens/buyer_negotiation_screen.dart';

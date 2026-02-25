@@ -65,7 +65,6 @@ class _SignupScreenState extends State<SignupScreen> {
       child: AdaptiveScaffold(
         appBar: Constants.appBar(
           context,
-          elevation: 0,
           boxShadow: [],
           centerTitle: true,
           titleWidget: Image.asset(

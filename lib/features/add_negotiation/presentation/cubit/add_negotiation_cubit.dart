@@ -5,7 +5,6 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/error/failures.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
-import 'package:tradologie_app/features/add_negotiation/data/models/add_auction_supplier_list_data_model.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/add_auction_supplier_list_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/add_update_auction_data.dart';
 import 'package:tradologie_app/features/add_negotiation/domian/enitities/auction_detail_for_edit_data.dart';

@@ -2,8 +2,6 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tradologie_app/config/routes/app_router.dart';
-import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/error/network_failure.dart';
 import 'package:tradologie_app/core/error/user_failure.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
@@ -20,7 +18,6 @@ import 'package:tradologie_app/core/widgets/custom_button.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text_field.dart';
-import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/all_list_detail.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/attribute_list.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/commodity_list.dart';
@@ -31,7 +28,6 @@ import 'package:tradologie_app/features/dashboard/domain/usecases/get_all_list_u
 import 'package:tradologie_app/features/dashboard/presentation/cubit/dashboard_cubit.dart';
 
 import '../../../../core/widgets/custom_text/text_style_constants.dart';
-import '../../../../injection_container.dart';
 
 class BuyerPostRequirementScreen extends StatefulWidget {
   const BuyerPostRequirementScreen({super.key});

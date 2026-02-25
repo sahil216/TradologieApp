@@ -34,7 +34,6 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
         drawer: widget.params.isShowDrawer == true ? TradologieDrawer() : null,
         appBar: widget.params.isAppBar == true
             ? Constants.appBar(context,
-                elevation: 0,
                 centerTitle: true,
                 boxShadow: [],
                 actions: [

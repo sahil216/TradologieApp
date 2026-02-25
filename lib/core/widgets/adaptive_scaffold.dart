@@ -11,6 +11,7 @@ class AdaptiveScaffold extends StatelessWidget {
   final bool useSafeArea;
   final bool resizeToAvoidBottomInset;
   final double? maxContentWidth;
+  final bool extendBodyBehindAppBar;
 
   /// Background
   final Gradient? backgroundGradient;
@@ -22,6 +23,7 @@ class AdaptiveScaffold extends StatelessWidget {
     this.appBar,
     this.drawer,
     this.bottomNavigationBar,
+    this.extendBodyBehindAppBar = false,
     this.useSafeArea = true,
     this.resizeToAvoidBottomInset = true,
     this.maxContentWidth,

@@ -179,7 +179,7 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen> {
                   children: [
                     Icon(
                       Icons.add,
-                      color: AppColors.defaultText,
+                      color: AppColors.primary,
                       size: 20,
                     ),
                     CommonText('Add',

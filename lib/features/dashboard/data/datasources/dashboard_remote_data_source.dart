@@ -87,7 +87,7 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
   @override
   Future<ResponseWrapper<dynamic>?> getAuctionUnit(String params) async {
     return await apiConsumer.get(
-      "${EndPoints.getAuctionUnit}/Token=$params",
+      "${EndPoints.getAuctionUnit}?Token=$params",
     );
   }
 

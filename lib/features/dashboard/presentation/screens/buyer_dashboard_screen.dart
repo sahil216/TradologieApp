@@ -7,18 +7,15 @@ import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/error/network_failure.dart';
 import 'package:tradologie_app/core/error/user_failure.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
-import 'package:tradologie_app/core/utils/app_Colors.dart';
-import 'package:tradologie_app/core/utils/assets_manager.dart';
+import 'package:tradologie_app/core/utils/app_colors.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
-import 'package:tradologie_app/core/utils/responsive.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
-import 'package:tradologie_app/core/widgets/common_single_child_scroll_view.dart';
-import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
 import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
 import 'package:tradologie_app/features/dashboard/presentation/cubit/dashboard_cubit.dart';
+import 'package:tradologie_app/features/dashboard/presentation/widgets/buyer_banner_engine.dart';
 import 'package:tradologie_app/features/dashboard/presentation/widgets/buyer_dashboard_cards.dart';
 import '../../../../injection_container.dart';
 
@@ -33,7 +30,6 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
   DashboardCubit get dashboardCubit => BlocProvider.of<DashboardCubit>(context);
 
   final ScrollController _scrollController = ScrollController();
-  String? _openedWidget;
 
   final ScrollController _scroll = ScrollController();
 
@@ -85,13 +81,37 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
 
           return Stack(
             children: [
-              Positioned.fill(child: _parallaxBg()),
+              // Positioned.fill(child: _parallaxBg()),
               SafeArea(
                 child: CustomScrollView(
                   controller: _scroll,
                   physics: const BouncingScrollPhysics(),
                   slivers: [
-                    const SliverToBoxAdapter(child: SizedBox(height: 14)),
+                    const SliverToBoxAdapter(
+                      child: BuyerDashboardBannerEngine(
+                        banners: [
+                          AppBanner(
+                            image:
+                                "https://www.tradologie.com/DOCS/mobileapp/buyerdashboard-1.webp",
+                            title: "Source Quality\nBuy Globally",
+                            subtitle: "B2B Marketplace",
+                          ),
+                          AppBanner(
+                            image:
+                                "https://www.tradologie.com/DOCS/mobileapp/buyerdashboard-2.webp",
+                            title: "Trade Smart\nTrade Fast",
+                            subtitle: "Global Suppliers",
+                          ),
+                          AppBanner(
+                            image:
+                                "https://www.tradologie.com/DOCS/mobileapp/buyerdashboard-3.webp",
+                            title: "Trade Smart\nTrade Fast",
+                            subtitle: "Global Suppliers",
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 16)),
                     SliverPadding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       sliver: SliverToBoxAdapter(
@@ -103,7 +123,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                               icon: Icons.description,
                               title: "Post Your\nRequirement",
                               subtitle:
-                                  "Request quotes from verified suppliers",
+                                  "Submit requirement and receive quotes from verified suppliers.",
                               onTap: () {
                                 sl<NavigationService>().pushNamed(
                                     Routes.buyerPostRequirementRoute);
@@ -116,7 +136,8 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                               color: Colors.deepOrange,
                               icon: Icons.inventory_2,
                               title: "Ready to Sell\nStock",
-                              subtitle: "List your inventory for buyer",
+                              subtitle:
+                                  "View seller ready stock and send enquiries directly to them",
                               onTap: () {
                                 sl<NavigationService>()
                                     .pushNamed(Routes.buyerSellStockListing);
@@ -126,7 +147,30 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                         ],
                       )),
                     ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 120)),
+                    const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      sliver: SliverToBoxAdapter(
+                          child: Row(
+                        children: [
+                          Expanded(
+                            child: BuyerDashboardCard(
+                              color: Colors.lightGreen,
+                              icon: Icons.add,
+                              title: "Create Negotiation",
+                              subtitle:
+                                  "Create a negotiation with a supplier and get quotes.",
+                              onTap: () {
+                                sl<NavigationService>()
+                                    .pushNamed(Routes.supplierListScreen);
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          Spacer(),
+                        ],
+                      )),
+                    ),
                   ],
                 ),
               ),

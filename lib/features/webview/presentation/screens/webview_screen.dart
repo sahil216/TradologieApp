@@ -110,7 +110,6 @@ class _WebViewScreenState extends State<WebViewScreen> {
               widget.params.isShowDrawer == true ? TradologieDrawer() : null,
           appBar: widget.params.isAppBar == true
               ? Constants.appBar(context,
-                  elevation: 0,
                   centerTitle: true,
                   boxShadow: [],
                   actions: [

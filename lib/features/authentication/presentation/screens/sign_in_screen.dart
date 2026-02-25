@@ -127,7 +127,6 @@ class _SignInScreenState extends State<SignInScreen> {
         resizeToAvoidBottomInset: false,
         appBar: Constants.appBar(
           context,
-          elevation: 0,
           boxShadow: [],
           centerTitle: true,
           titleWidget: Image.asset(
