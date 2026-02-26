@@ -62,6 +62,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
                     title: "Account",
                     showBackButton: widget.params.canPop ?? false,
                     showNotification: widget.params.isShowNotification,
+                    showLogo: true,
                     onNotificationTap: () {
                       sl<NavigationService>().pushNamed(
                         Routes.notificationScreen,

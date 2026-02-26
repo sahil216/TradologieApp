@@ -125,8 +125,6 @@ class _MyAccountScreenState extends State<MyAccountScreen>
     if (tabName == "Documents") {
       AnalyticsService.logEvent("documents_tab_clicked");
     }
-
-    debugPrint("Analytics Triggered: $tabName");
   }
 
   bool _canOpenTab(int index) {

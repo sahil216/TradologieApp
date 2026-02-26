@@ -136,9 +136,10 @@ class _WebViewScreenState extends State<WebViewScreen> {
                     /// 💎 COMMON SLIVER APPBAR
                     if (widget.params.isAppBar == true)
                       CommonAppbar(
-                        title: widget.params.title == null ? "" : "Account",
+                        title: widget.params.title ?? '',
                         showBackButton: widget.params.canPop ?? false,
                         showNotification: widget.params.isShowNotification,
+                        showLogo: true,
                         onNotificationTap: () {
                           sl<NavigationService>().pushNamed(
                             Routes.notificationScreen,

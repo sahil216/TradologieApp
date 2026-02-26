@@ -29,180 +29,183 @@ class _BuyerDashboardCardState extends State<BuyerDashboardCard> {
 
   @override
   Widget build(BuildContext context) {
-    ////////////////////////////////////////////////////////////////
-    /// 🌊 DEPTH + LIQUID MOTION
-    ////////////////////////////////////////////////////////////////
-    final double scale = _pressed ? .96 : (_hover ? 1.02 : 1);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        ////////////////////////////////////////////////////////////////
+        /// 🧠 ADAPTIVE SIZE ENGINE
+        /// Card becomes compact automatically when width is small
+        ////////////////////////////////////////////////////////////////
 
-    Widget card = AnimatedContainer(
-      duration: const Duration(milliseconds: 220),
-      curve: Curves.easeOut,
-      transform: Matrix4.identity()..scale(scale),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
+        final double w = constraints.maxWidth;
 
-        ////////////////////////////////////////////////////////////
-        /// 🔥 EDGE GLOW LIGHTING
-        ////////////////////////////////////////////////////////////
-        boxShadow: [
-          BoxShadow(
-            color: widget.color.withOpacity(_hover ? .25 : .12),
-            blurRadius: _hover ? 35 : 22,
-            spreadRadius: _hover ? 1 : 0,
-            offset: const Offset(0, 12),
-          )
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: Stack(
-          children: [
-            ////////////////////////////////////////////////////////
-            /// GLASS BACKGROUND
-            ////////////////////////////////////////////////////////
-            BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-              child: Container(
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(28),
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.white.withOpacity(.40),
-                      Colors.white.withOpacity(.15),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  border: Border.all(
-                    color: widget.color.withOpacity(.25),
-                    width: 1.2,
-                  ),
-                ),
+        // You can tweak these breakpoints anytime
+        final bool compact = w < 140; // 3 cards on mobile
+        final bool medium = w >= 140 && w < 190;
 
-                ////////////////////////////////////////////////////
-                /// ⭐ INTRINSIC SAFE LAYOUT (NO OVERFLOW EVER)
-                ////////////////////////////////////////////////////
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    //////////////////////////////////////////////////
-                    /// ICON WITH GLOW
-                    //////////////////////////////////////////////////
-                    Container(
-                      height: 54,
-                      width: 54,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: [
-                            widget.color,
-                            widget.color.withOpacity(.75),
-                          ],
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: widget.color.withOpacity(.45),
-                            blurRadius: 22,
-                          )
+        final double iconBoxSize = compact ? 30 : (medium ? 46 : 54);
+        final double iconSize = compact ? 16 : (medium ? 20 : 24);
+
+        final double titleSize = compact ? 13 : (medium ? 15 : 18);
+        final double subtitleSize = compact ? 10 : (medium ? 12 : 13);
+
+        final double gapLarge = compact ? 8 : 14;
+        final double gapSmall = compact ? 4 : 6;
+        final double bottomGap = compact ? 6 : 12;
+
+        ////////////////////////////////////////////////////////////////
+        /// 🌊 DEPTH + LIQUID MOTION
+        ////////////////////////////////////////////////////////////////
+        final double scale = _pressed ? .96 : (_hover ? 1.02 : 1);
+
+        Widget card = AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOut,
+          transform: Matrix4.identity()..scale(scale),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: [
+              BoxShadow(
+                color: widget.color.withOpacity(_hover ? .25 : .12),
+                blurRadius: _hover ? 35 : 22,
+                spreadRadius: _hover ? 1 : 0,
+                offset: const Offset(0, 12),
+              )
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(28),
+            child: Stack(
+              children: [
+                ////////////////////////////////////////////////////////
+                /// GLASS BACKGROUND
+                ////////////////////////////////////////////////////////
+                BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                  child: Container(
+                    padding: EdgeInsets.all(compact ? 12 : 18),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(28),
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.white.withOpacity(.40),
+                          Colors.white.withOpacity(.15),
                         ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                      child: Icon(widget.icon, color: Colors.white),
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    //////////////////////////////////////////////////
-                    /// TITLE
-                    //////////////////////////////////////////////////
-                    Text(
-                      widget.title,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                        color: widget.color,
+                      border: Border.all(
+                        color: widget.color.withOpacity(.25),
+                        width: 1.2,
                       ),
                     ),
 
-                    const SizedBox(height: 6),
-
-                    //////////////////////////////////////////////////
-                    /// SUBTITLE
-                    //////////////////////////////////////////////////
-                    Text(
-                      widget.subtitle,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: Colors.black54,
-                      ),
+                    ////////////////////////////////////////////////////
+                    /// ⭐ ADAPTIVE CONTENT
+                    ////////////////////////////////////////////////////
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          height: iconBoxSize,
+                          width: iconBoxSize,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                              colors: [
+                                widget.color,
+                                widget.color.withOpacity(.75),
+                              ],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: widget.color.withOpacity(.45),
+                                blurRadius: 22,
+                              )
+                            ],
+                          ),
+                          child: Icon(
+                            widget.icon,
+                            color: Colors.white,
+                            size: iconSize,
+                          ),
+                        ),
+                        SizedBox(height: gapLarge),
+                        Text(
+                          widget.title,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: titleSize,
+                            height: 1.2,
+                            color: widget.color,
+                          ),
+                        ),
+                        SizedBox(height: gapSmall),
+                        Text(
+                          widget.subtitle,
+                          maxLines: 4,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: subtitleSize,
+                            height: 1.2,
+                            color: Colors.black54,
+                          ),
+                        ),
+                        SizedBox(height: bottomGap),
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: Icon(Icons.arrow_forward_ios,
+                              size: compact ? 14 : 16, color: widget.color),
+                        ),
+                      ],
                     ),
-
-                    const SizedBox(height: 12),
-
-                    //////////////////////////////////////////////////
-                    /// ARROW
-                    //////////////////////////////////////////////////
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: Icon(Icons.arrow_forward_ios,
-                          size: 16, color: widget.color),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            ////////////////////////////////////////////////////////
-            /// ✨ LIQUID HOVER SHINE (ULTRA EFFECT)
-            ////////////////////////////////////////////////////////
-            AnimatedOpacity(
-              duration: const Duration(milliseconds: 300),
-              opacity: _hover ? .18 : 0,
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      widget.color.withOpacity(.5),
-                      Colors.transparent,
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
                   ),
                 ),
-              ),
+
+                ////////////////////////////////////////////////////////
+                /// ✨ LIQUID HOVER SHINE
+                ////////////////////////////////////////////////////////
+                AnimatedOpacity(
+                  duration: const Duration(milliseconds: 300),
+                  opacity: _hover ? .18 : 0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          widget.color.withOpacity(.5),
+                          Colors.transparent,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-    );
+          ),
+        );
 
-    ////////////////////////////////////////////////////////////////
-    /// HERO SUPPORT
-    ////////////////////////////////////////////////////////////////
-    if (widget.heroTag != null) {
-      card = Hero(tag: widget.heroTag!, child: card);
-    }
+        if (widget.heroTag != null) {
+          card = Hero(tag: widget.heroTag!, child: card);
+        }
 
-    ////////////////////////////////////////////////////////////////
-    /// MATERIAL RIPPLE + MAGNETIC PRESS
-    ////////////////////////////////////////////////////////////////
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hover = true),
-      onExit: (_) => setState(() => _hover = false),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(28),
-          onTap: widget.onTap,
-          onHighlightChanged: (v) => setState(() => _pressed = v),
-          child: card,
-        ),
-      ),
+        return MouseRegion(
+          onEnter: (_) => setState(() => _hover = true),
+          onExit: (_) => setState(() => _hover = false),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(28),
+              onTap: widget.onTap,
+              onHighlightChanged: (v) => setState(() => _pressed = v),
+              child: card,
+            ),
+          ),
+        );
+      },
     );
   }
 }

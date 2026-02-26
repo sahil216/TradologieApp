@@ -503,43 +503,117 @@ class _BuyerSellStockListingState extends State<BuyerSellStockListing> {
 
                               const SizedBox(height: 8),
 
-                              Text(
-                                "Location: ${item.locations}",
-                                style: TextStyle(color: Colors.grey.shade600),
+                              Text.rich(
+                                TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: "Location: ",
+                                      style: TextStyleConstants.medium(
+                                        context,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: "${item.locations}",
+                                      style: TextStyle(
+                                          color: Colors.grey.shade600),
+                                    ),
+                                  ],
+                                ),
                               ),
 
                               const SizedBox(height: 6),
-                              Text(
-                                "Sub Commodity: ${item.subCommodityName ?? ""}",
-                                style: TextStyleConstants.medium(context,
-                                    fontSize: 18),
+
+                              Text.rich(
+                                TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: "Sub Commodity: ",
+                                      style: TextStyleConstants.medium(
+                                        context,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: item.subCommodityName ?? "",
+                                      style: TextStyleConstants.medium(context,
+                                          fontSize: 18),
+                                    ),
+                                  ],
+                                ),
                               ),
+
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    "Unit: ${item.quantityUnit ?? ""}",
-                                    style: TextStyleConstants.medium(context,
-                                        fontSize: 18),
+                                  Text.rich(
+                                    TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: "Unit: ",
+                                          style: TextStyleConstants.medium(
+                                            context,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: item.quantityUnit ?? "",
+                                          style: TextStyleConstants.medium(
+                                              context,
+                                              fontSize: 18),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  Text(
-                                    "Quantity: ${item.quantity ?? ""}",
-                                    style: TextStyleConstants.medium(context,
-                                        fontSize: 18),
+                                  Text.rich(
+                                    TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: "Quantity: ",
+                                          style: TextStyleConstants.medium(
+                                            context,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: "${item.quantity ?? ""}",
+                                          style: TextStyleConstants.medium(
+                                              context,
+                                              fontSize: 18),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
 
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Expanded(
-                                    child: Text(
-                                      "Remarks: ${item.remarks ?? ""}",
-                                      textAlign: TextAlign.left,
-                                      style: TextStyleConstants.medium(context,
-                                          fontSize: 18),
+                                    child: Text.rich(
+                                      TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: "Remarks: ",
+                                            style: TextStyleConstants.medium(
+                                              context,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: item.remarks ?? "",
+                                            style: TextStyleConstants.medium(
+                                                context,
+                                                fontSize: 18),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tradologie_app/config/routes/app_router.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
+import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/features/app/injection_container_app.dart';
 
 class CommonAppbar extends StatelessWidget {
@@ -12,6 +13,7 @@ class CommonAppbar extends StatelessWidget {
   /// ⭐ NEW CONTROLS
   final bool showBackButton;
   final bool showNotification;
+  final bool? showLogo;
 
   final VoidCallback? onBackTap;
   final VoidCallback? onNotificationTap;
@@ -31,6 +33,7 @@ class CommonAppbar extends StatelessWidget {
     this.statusBarBrightness = Brightness.light,
     this.statusBarIconBrightness = Brightness.dark,
     this.addAction,
+    this.showLogo = false,
   });
 
   @override
@@ -125,13 +128,18 @@ class CommonAppbar extends StatelessWidget {
                       child: Transform.scale(
                         scale: scale,
                         alignment: Alignment.bottomLeft,
-                        child: Text(
-                          title,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
+                        child: showLogo == true
+                            ? Image.asset(
+                                ImgAssets.companyLogo,
+                                height: 40,
+                              )
+                            : Text(
+                                title,
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                       ),
                     ),
 
