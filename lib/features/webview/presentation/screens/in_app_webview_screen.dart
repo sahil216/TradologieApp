@@ -6,6 +6,7 @@ import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
+import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
 
 import '../../../../injection_container.dart';
@@ -31,48 +32,75 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
     return PopScope(
       canPop: widget.params.canPop ?? false,
       child: AdaptiveScaffold(
-        drawer: widget.params.isShowDrawer == true ? TradologieDrawer() : null,
-        appBar: widget.params.isAppBar == true
-            ? Constants.appBar(context,
-                centerTitle: true,
-                boxShadow: [],
-                actions: [
-                  widget.params.isShowNotification == true
-                      ? IconButton(
-                          onPressed: () {
-                            sl<NavigationService>().pushNamed(
-                              Routes.notificationScreen,
-                            );
-                          },
-                          icon: Icon(Icons.notifications))
-                      : SizedBox.shrink(),
-                  SizedBox(width: 10),
-                ],
-                titleWidget: Image.asset(ImgAssets.companyLogo, height: 40))
-            : null,
+        // drawer: widget.params.isShowDrawer == true ? TradologieDrawer() : null,
+        // appBar: widget.params.isAppBar == true
+        //     ? Constants.appBar(context,
+        //         centerTitle: true,
+        //         boxShadow: [],
+        //         actions: [
+        //           widget.params.isShowNotification == true
+        //               ? IconButton(
+        //                   onPressed: () {
+        //                     sl<NavigationService>().pushNamed(
+        //                       Routes.notificationScreen,
+        //                     );
+        //                   },
+        //                   icon: Icon(Icons.notifications))
+        //               : SizedBox.shrink(),
+        //           SizedBox(width: 10),
+        //         ],
+        //         titleWidget: Image.asset(ImgAssets.companyLogo, height: 40))
+        //     : null,
         body: Stack(
           children: [
-            InAppWebView(
-              initialUrlRequest: URLRequest(
-                url: WebUri(widget.params.url),
-              ),
-              initialSettings: InAppWebViewSettings(
-                javaScriptEnabled: true,
-                domStorageEnabled: true,
-                useHybridComposition: true,
-                mediaPlaybackRequiresUserGesture: false,
-              ),
-              onReceivedServerTrustAuthRequest: (controller, challenge) async {
-                return ServerTrustAuthResponse(
-                  action: ServerTrustAuthResponseAction.PROCEED,
-                );
-              },
-              onLoadStart: (controller, url) {
-                context.read<WebViewCubit>().onPageStarted(url.toString());
-              },
-              onLoadStop: (controller, url) {
-                context.read<WebViewCubit>().onPageFinished(url.toString());
-              },
+            CustomScrollView(
+              physics: const NeverScrollableScrollPhysics(),
+              slivers: [
+                /// 💎 COMMON SLIVER APPBAR
+                if (widget.params.isAppBar == true)
+                  CommonAppbar(
+                    title: "Account",
+                    showBackButton: widget.params.canPop ?? false,
+                    showNotification: widget.params.isShowNotification,
+                    onNotificationTap: () {
+                      sl<NavigationService>().pushNamed(
+                        Routes.notificationScreen,
+                      );
+                    },
+                  ),
+
+                /// 🌐 WEBVIEW BODY
+                SliverFillRemaining(
+                  hasScrollBody: true,
+                  child: InAppWebView(
+                    initialUrlRequest: URLRequest(
+                      url: WebUri(widget.params.url),
+                    ),
+                    initialSettings: InAppWebViewSettings(
+                      javaScriptEnabled: true,
+                      domStorageEnabled: true,
+                      useHybridComposition: true,
+                      mediaPlaybackRequiresUserGesture: false,
+                    ),
+                    onReceivedServerTrustAuthRequest:
+                        (controller, challenge) async {
+                      return ServerTrustAuthResponse(
+                        action: ServerTrustAuthResponseAction.PROCEED,
+                      );
+                    },
+                    onLoadStart: (controller, url) {
+                      context
+                          .read<WebViewCubit>()
+                          .onPageStarted(url.toString());
+                    },
+                    onLoadStop: (controller, url) {
+                      context
+                          .read<WebViewCubit>()
+                          .onPageFinished(url.toString());
+                    },
+                  ),
+                ),
+              ],
             ),
             BlocBuilder<WebViewCubit, WebViewState>(
               builder: (context, state) {

@@ -16,6 +16,7 @@ import 'package:tradologie_app/core/utils/common_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
+import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_drop_down.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_button.dart';
@@ -145,12 +146,12 @@ class _BuyerSellStockListingState extends State<BuyerSellStockListing> {
         ),
       ],
       child: AdaptiveScaffold(
-        appBar: Constants.appBar(
-          context,
-          title: 'Ready to Sell Stock',
-          centerTitle: true,
-          backgroundColor: AppColors.transparent,
-        ),
+        // appBar: Constants.appBar(
+        //   context,
+        //   title: 'Ready to Sell Stock',
+        //   centerTitle: true,
+        //   backgroundColor: AppColors.transparent,
+        // ),
         body: BlocBuilder<DashboardCubit, DashboardState>(
           builder: (context, state) {
             if (state is GetVendorStockListingError) {
@@ -171,6 +172,10 @@ class _BuyerSellStockListingState extends State<BuyerSellStockListing> {
                     controller: _scrollController,
                     physics: const BouncingScrollPhysics(),
                     slivers: [
+                      const CommonAppbar(
+                        title: "Ready to Sell Stock",
+                        showBackButton: true,
+                      ),
                       if (state is GetVendorStockListingIsLoading ||
                           state is GetAuctionUnitListIsLoading)
                         const RiceShimmerSliver()

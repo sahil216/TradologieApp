@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,6 +11,7 @@ import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/features/app/presentation/widgets/custom_bottom_navigation_bar.dart';
+import 'package:tradologie_app/features/contact_us/more_options_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_dashboard_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:tradologie_app/features/my_account/presentation/screens/my_account_screen.dart';
@@ -65,6 +67,13 @@ class _MainScreenState extends State<MainScreen>
         height: 20,
         page: MyAccountScreen(),
       ),
+      TabViewModel(
+        icon:
+            _appCubit.bottomNavIndex == 3 ? Icon(Icons.menu) : Icon(Icons.menu),
+        name: 'More',
+        height: 20,
+        page: MoreOptionsScreen(),
+      ),
     ];
   }
 
@@ -98,7 +107,7 @@ class _MainScreenState extends State<MainScreen>
                   params: WebviewParams(
                       url:
                           "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
-                      canPop: true,
+                      canPop: false,
                       isAppBar: true,
                       isShowDrawer: true,
                       isShowNotification: true))
@@ -106,12 +115,19 @@ class _MainScreenState extends State<MainScreen>
                   params: WebviewParams(
                       url:
                           "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
-                      canPop: true,
+                      canPop: false,
                       isAppBar: true,
                       isShowDrawer: true,
                       isShowNotification: true)) // const OrdersScreen(),
 
           ),
+      TabViewModel(
+        icon:
+            _appCubit.bottomNavIndex == 3 ? Icon(Icons.menu) : Icon(Icons.menu),
+        name: 'More',
+        height: 20,
+        page: MoreOptionsScreen(),
+      ),
     ];
   }
 
@@ -190,35 +206,134 @@ class _MainScreenState extends State<MainScreen>
             }
           },
           child: AdaptiveScaffold(
-            appBar: Constants.appBar(context, height: 0, boxShadow: []),
+            extendBodyBehindAppBar: true,
             body: Stack(
               children: [
-                Builder(
-                  builder: (_) {
-                    final tabs = Constants.isBuyer == true
-                        ? buyerTabsList
-                        : supplierTabsList;
+                /// 🔥 CURRENT PAGE
+                CustomScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  slivers: [
+                    SliverFillRemaining(
+                      hasScrollBody: true,
+                      child: Builder(
+                        builder: (_) {
+                          final tabs = Constants.isBuyer == true
+                              ? buyerTabsList
+                              : supplierTabsList;
 
-                    return KeyedSubtree(
-                      key: ValueKey(_appCubit.bottomNavIndex),
-                      child: tabs[_appCubit.bottomNavIndex].page,
-                    );
+                          return KeyedSubtree(
+                            key: ValueKey(_appCubit.bottomNavIndex),
+                            child: tabs[_appCubit.bottomNavIndex].page,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+
+                /// 💎 ULTRA FLOATING NAVBAR V5
+                CommonFloatingNavBar(
+                  index: _appCubit.bottomNavIndex,
+                  onTap: (i) {
+                    HapticFeedback.selectionClick();
+                    _appCubit.changeTab(i);
                   },
                 ),
               ],
             ),
-            bottomNavigationBar: CustomBottomNavigationBar(
-              tabs:
-                  Constants.isBuyer == true ? buyerTabsList : supplierTabsList,
-              currentIndex: _appCubit.bottomNavIndex,
-              onTap: (i) {
-                HapticFeedback.selectionClick();
-                _appCubit.changeTab(i);
-              },
-            ),
           ),
         );
       },
+    );
+  }
+}
+
+class CommonFloatingNavBar extends StatelessWidget {
+  final int index;
+  final Function(int) onTap;
+
+  const CommonFloatingNavBar({
+    super.key,
+    required this.index,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      left: 20,
+      right: 20,
+      bottom: 5,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(40),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 10,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(.75),
+              borderRadius: BorderRadius.circular(40),
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 20,
+                  color: Colors.black.withOpacity(.08),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _item(0, Icons.dashboard_outlined, "Dashboard"),
+                _item(1, Icons.description_outlined, "Negotiations"),
+                _item(2, Icons.person_outline, "Account"),
+                _item(3, Icons.menu, "More"),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _item(int i, IconData icon, String label) {
+    final bool active = i == index;
+
+    return GestureDetector(
+      onTap: () => onTap(i),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        padding: EdgeInsets.symmetric(
+          horizontal: active ? 16 : 12,
+          vertical: 8,
+        ),
+        decoration: BoxDecoration(
+          color: active ? Colors.black : Colors.transparent,
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 22,
+              color: active ? Colors.white : Colors.black54,
+            ),
+            if (active) ...[
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ]
+          ],
+        ),
+      ),
     );
   }
 }

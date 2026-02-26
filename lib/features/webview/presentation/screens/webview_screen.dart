@@ -9,6 +9,7 @@ import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
+import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
 import 'package:tradologie_app/features/webview/presentation/screens/viewmodel/webview_params.dart';
@@ -106,30 +107,52 @@ class _WebViewScreenState extends State<WebViewScreen> {
       child: PopScope(
         canPop: widget.params.canPop ?? false,
         child: AdaptiveScaffold(
-          drawer:
-              widget.params.isShowDrawer == true ? TradologieDrawer() : null,
-          appBar: widget.params.isAppBar == true
-              ? Constants.appBar(context,
-                  centerTitle: true,
-                  boxShadow: [],
-                  actions: [
-                    widget.params.isShowNotification == true
-                        ? IconButton(
-                            onPressed: () {
-                              sl<NavigationService>().pushNamed(
-                                Routes.notificationScreen,
-                              );
-                            },
-                            icon: Icon(Icons.notifications))
-                        : SizedBox.shrink(),
-                    SizedBox(width: 10),
-                  ],
-                  titleWidget: Image.asset(ImgAssets.companyLogo, height: 40))
-              : null,
+          // drawer:
+          //     widget.params.isShowDrawer == true ? TradologieDrawer() : null,
+          // appBar: widget.params.isAppBar == true
+          //     ? Constants.appBar(context,
+          //         centerTitle: true,
+          //         boxShadow: [],
+          //         actions: [
+          //           widget.params.isShowNotification == true
+          //               ? IconButton(
+          //                   onPressed: () {
+          //                     sl<NavigationService>().pushNamed(
+          //                       Routes.notificationScreen,
+          //                     );
+          //                   },
+          //                   icon: Icon(Icons.notifications))
+          //               : SizedBox.shrink(),
+          //           SizedBox(width: 10),
+          //         ],
+          //         titleWidget: Image.asset(ImgAssets.companyLogo, height: 40))
+          //     : null,
           body: SafeArea(
             child: Stack(
               children: [
-                WebViewWidget(controller: _controller),
+                CustomScrollView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  slivers: [
+                    /// 💎 COMMON SLIVER APPBAR
+                    if (widget.params.isAppBar == true)
+                      CommonAppbar(
+                        title: "Account",
+                        showBackButton: widget.params.canPop ?? false,
+                        showNotification: widget.params.isShowNotification,
+                        onNotificationTap: () {
+                          sl<NavigationService>().pushNamed(
+                            Routes.notificationScreen,
+                          );
+                        },
+                      ),
+
+                    /// 🌐 WEBVIEW BODY
+                    SliverFillRemaining(
+                      hasScrollBody: true,
+                      child: WebViewWidget(controller: _controller),
+                    ),
+                  ],
+                ),
                 BlocBuilder<WebViewCubit, WebViewState>(
                   builder: (context, state) {
                     if (state is WebPageLoading) {

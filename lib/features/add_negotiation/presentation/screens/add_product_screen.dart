@@ -12,6 +12,7 @@ import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/choose_images_bottom_sheet.dart';
+import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_drop_down.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
@@ -286,116 +287,155 @@ class _AddProductScreenState extends State<AddProductScreen> {
         child: Stack(
           children: [
             AdaptiveScaffold(
-              appBar: Constants.appBar(
-                context,
-                title: "Add Product for Negotiation",
-                centerTitle: true,
-              ),
+              // appBar: Constants.appBar(
+              //   context,
+              //   title: "Add Product for Negotiation",
+              //   centerTitle: true,
+              // ),
               body: BlocBuilder<AddNegotiationCubit, AddNegotiationState>(
-                  builder: (context, state) {
-                if (state is AuctionDetailForEditIsLoading) {}
-                return ListView(
-                  controller: scrollController,
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    ExpandableSectionCard(
-                      index: 0,
-                      title: "Negotiation Details",
-                      controller: controller,
-                      scrollController: scrollController,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          InfoTile(
-                              label: "Negotiation Reference Code",
-                              value: auctionDetailData?.auctionCode ?? ""),
-                          InfoTile(
-                              label: "Negotiation Name",
-                              value: auctionDetailData?.auctionName ?? ""),
-                          InfoTile(
-                              label: "Location of Delivery",
-                              value: auctionDetailData?.deliveryAddress ?? ""),
-                          InfoTile(
-                              label: "Port of Discharge",
-                              value: auctionDetailData?.portOfDischarge ?? ""),
-                          InfoTile(
-                              label: "State of Delivery",
-                              value: auctionDetailData?.deliveryState ?? ""),
-                          InfoTile(
-                              label: "Payment Term",
-                              value: auctionDetailData?.paymentTerm ?? ""),
-                          InfoTile(
-                              label: "Currency",
-                              value: auctionDetailData?.currencyName ?? ""),
-                          InfoTile(
-                              label: "Partial Delivery",
-                              value: auctionDetailData?.partialDelivery ?? ""),
-                          InfoTile(
-                              label: "Status",
-                              value: auctionDetailData?.status ?? ""),
-                          InfoTile(
-                              label: "Preffered Date and time of Enquiry",
-                              value: auctionDetailData?.preferredDate ?? ""),
-                          InfoTile(
-                              label: "Total Quantity",
-                              value: auctionDetailData?.totalQuantity ?? ""),
-                          InfoTile(
-                              label: "Min Order Quantity per Supplier",
-                              value: auctionDetailData?.minQuantity ?? ""),
-                          InfoTile(
-                              label: "Last Date Of Delivery",
-                              value: auctionDetailData?.deliveryLastDate
-                                      .toString() ??
-                                  ""),
-                          InfoTile(
-                              label: "Remarks",
-                              value: auctionDetailData?.remarks ?? ""),
-                          InfoTile(
-                              label: "Inspection Agency",
-                              value:
-                                  auctionDetailData?.agencyCompanyName ?? ""),
-                          SizedBox(height: 8),
-                          CommonButton(
-                            text: "Add Product for Negotiation",
-                            onPressed: () {
-                              setState(() {
-                                // showProductForm = !showProductForm;
-                                controller.toggle(2);
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 12),
-                          CommonButton(
-                            text: "Edit Negotiation",
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                          addProductWidget(),
-                        ],
+                builder: (context, state) {
+                  if (state is AuctionDetailForEditIsLoading) {}
+                  return CustomScrollView(
+                    controller: scrollController,
+                    slivers: [
+                      CommonAppbar(
+                        title: 'Add Negotiation',
+                        showBackButton: true,
+                        showNotification: false,
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    (auctionItemList == null || auctionItemList == [])
-                        ? SizedBox.shrink()
-                        : ListView.separated(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: auctionItemList?.length ?? 0,
-                            separatorBuilder: (_, __) => SizedBox(
-                              height: 12,
-                            ),
-                            itemBuilder: (context, index) {
-                              return productDraftCard(auctionItemList?[index]);
-                            },
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            children: [
+                              ExpandableSectionCard(
+                                index: 0,
+                                title: "Negotiation Details",
+                                controller: controller,
+                                scrollController: scrollController,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    InfoTile(
+                                        label: "Negotiation Reference Code",
+                                        value: auctionDetailData?.auctionCode ??
+                                            ""),
+                                    InfoTile(
+                                        label: "Negotiation Name",
+                                        value: auctionDetailData?.auctionName ??
+                                            ""),
+                                    InfoTile(
+                                        label: "Location of Delivery",
+                                        value: auctionDetailData
+                                                ?.deliveryAddress ??
+                                            ""),
+                                    InfoTile(
+                                        label: "Port of Discharge",
+                                        value: auctionDetailData
+                                                ?.portOfDischarge ??
+                                            ""),
+                                    InfoTile(
+                                        label: "State of Delivery",
+                                        value:
+                                            auctionDetailData?.deliveryState ??
+                                                ""),
+                                    InfoTile(
+                                        label: "Payment Term",
+                                        value: auctionDetailData?.paymentTerm ??
+                                            ""),
+                                    InfoTile(
+                                        label: "Currency",
+                                        value:
+                                            auctionDetailData?.currencyName ??
+                                                ""),
+                                    InfoTile(
+                                        label: "Partial Delivery",
+                                        value: auctionDetailData
+                                                ?.partialDelivery ??
+                                            ""),
+                                    InfoTile(
+                                        label: "Status",
+                                        value: auctionDetailData?.status ?? ""),
+                                    InfoTile(
+                                        label:
+                                            "Preffered Date and time of Enquiry",
+                                        value:
+                                            auctionDetailData?.preferredDate ??
+                                                ""),
+                                    InfoTile(
+                                        label: "Total Quantity",
+                                        value:
+                                            auctionDetailData?.totalQuantity ??
+                                                ""),
+                                    InfoTile(
+                                        label:
+                                            "Min Order Quantity per Supplier",
+                                        value: auctionDetailData?.minQuantity ??
+                                            ""),
+                                    InfoTile(
+                                        label: "Last Date Of Delivery",
+                                        value: auctionDetailData
+                                                ?.deliveryLastDate
+                                                .toString() ??
+                                            ""),
+                                    InfoTile(
+                                        label: "Remarks",
+                                        value:
+                                            auctionDetailData?.remarks ?? ""),
+                                    InfoTile(
+                                        label: "Inspection Agency",
+                                        value: auctionDetailData
+                                                ?.agencyCompanyName ??
+                                            ""),
+                                    SizedBox(height: 8),
+                                    CommonButton(
+                                      text: "Add Product for Negotiation",
+                                      onPressed: () {
+                                        setState(() {
+                                          // showProductForm = !showProductForm;
+                                          controller.toggle(2);
+                                        });
+                                      },
+                                    ),
+                                    const SizedBox(height: 12),
+                                    CommonButton(
+                                      text: "Edit Negotiation",
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                    addProductWidget(),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              (auctionItemList == null || auctionItemList == [])
+                                  ? SizedBox.shrink()
+                                  : ListView.separated(
+                                      shrinkWrap: true,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      itemCount: auctionItemList?.length ?? 0,
+                                      separatorBuilder: (_, __) => SizedBox(
+                                        height: 12,
+                                      ),
+                                      itemBuilder: (context, index) {
+                                        return productDraftCard(
+                                            auctionItemList?[index]);
+                                      },
+                                    ),
+                              const SizedBox(height: 16),
+                              (auctionItemList?.isEmpty ?? true)
+                                  ? SizedBox.shrink()
+                                  : addSupplier(),
+                            ],
                           ),
-                    const SizedBox(height: 16),
-                    (auctionItemList?.isEmpty ?? true)
-                        ? SizedBox.shrink()
-                        : addSupplier(),
-                  ],
-                );
-              }),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
             BlocBuilder<AddNegotiationCubit, AddNegotiationState>(
               buildWhen: (previous, current) {

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
@@ -46,81 +47,129 @@ class Constants {
   }) {
     return PreferredSize(
       preferredSize: Size(context.width, height),
-      child: Container(
-        decoration: BoxDecoration(
-          boxShadow: boxShadow ??
-              [
-                // BoxShadow(
-                //   blurRadius: 4,
-                //   spreadRadius: 0,
-                //   offset: const Offset(0, 1),
-                //   color: AppColors.black.withValues(alpha: 0.1),
-                // ),
-              ],
-          // borderRadius: borderRadius ??
-          // BorderRadius.vertical(
-          //   bottom: Radius.circular(10),
-          // ),
-          color: backgroundColor ?? AppColors.white,
-        ),
-        child: ClipRRect(
-          borderRadius: borderRadius ??
-              BorderRadius.vertical(
-                bottom: Radius.circular(10),
-              ),
-          child: AppBar(
-            key: key,
-            leadingWidth: leadingWidth,
-            titleSpacing: titleSpacing,
-            toolbarHeight: height,
-            bottom: bottom,
-            elevation: elevation,
-            centerTitle: centerTitle,
-            backgroundColor: backgroundColor ?? AppColors.white,
-            systemOverlayStyle: SystemUiOverlayStyle(
-              statusBarColor: AppColors.transparent,
-              systemNavigationBarColor:
-                  systemNavigationBarColor ?? AppColors.white,
-              statusBarIconBrightness: statusBarIconBrightness,
-              statusBarBrightness: statusBarBrightness,
+      child: ClipRRect(
+        borderRadius: borderRadius ??
+            const BorderRadius.vertical(
+              bottom: Radius.circular(14),
             ),
-            flexibleSpace: flexibleSpace,
-            leading: leading ??
-                Builder(
-                  builder: (context) {
-                    final scaffold = Scaffold.maybeOf(context);
-
-                    if (scaffold?.hasDrawer ?? false) {
-                      return GestureDetector(
-                          onTap: () => scaffold!.openDrawer(),
-                          child: SizedBox(
-                            width: 12,
-                            height: 12,
-                            child: Image.asset(
-                              ImgAssets.menu,
-                            ),
-                          ));
-                    }
-
-                    // Else if can pop → show back button
-                    if (Navigator.canPop(context)) {
-                      return defaultBackButton(context);
-                    }
-
-                    return const SizedBox.shrink();
-                  },
+        child: Stack(
+          children: [
+            /// 💎 ULTRA LIQUID GLASS BACKGROUND
+            Positioned.fill(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: 18,
+                  sigmaY: 18,
                 ),
-            title: titleWidget ??
-                CommonText(
-                  title,
-                  style: TextStyleConstants.bold(
-                    context,
-                    fontSize: 22,
-                    color: AppColors.black,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: const Alignment(-0.5, -1),
+                      end: const Alignment(1, 1),
+                      colors: [
+                        Colors.white.withOpacity(.96),
+                        Colors.white.withOpacity(.82),
+                      ],
+                    ),
+                    boxShadow: boxShadow ??
+                        [
+                          BoxShadow(
+                            blurRadius: 20,
+                            color: Colors.black.withOpacity(.04),
+                          ),
+                        ],
                   ),
                 ),
-            actions: actions,
-          ),
+              ),
+            ),
+
+            /// 🔥 REAL APPBAR LAYER
+            AppBar(
+              key: key,
+              leadingWidth: leadingWidth,
+              titleSpacing: titleSpacing,
+              toolbarHeight: height,
+              bottom: bottom,
+              elevation: 0,
+              centerTitle: centerTitle,
+              backgroundColor: Colors.transparent,
+              systemOverlayStyle: SystemUiOverlayStyle(
+                statusBarColor: Colors.transparent,
+                systemNavigationBarColor:
+                    systemNavigationBarColor ?? Colors.white,
+                statusBarIconBrightness: statusBarIconBrightness,
+                statusBarBrightness: statusBarBrightness,
+              ),
+              flexibleSpace: flexibleSpace,
+
+              /// 🍏 LEADING (UNCHANGED LOGIC)
+              leading: leading ??
+                  Builder(
+                    builder: (context) {
+                      final scaffold = Scaffold.maybeOf(context);
+
+                      if (scaffold?.hasDrawer ?? false) {
+                        return GestureDetector(
+                          onTap: () => scaffold!.openDrawer(),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(14),
+                              child: BackdropFilter(
+                                filter:
+                                    ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(.8),
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  child: Image.asset(ImgAssets.menu),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+
+                      if (Navigator.canPop(context)) {
+                        return defaultBackButton(context);
+                      }
+
+                      return const SizedBox.shrink();
+                    },
+                  ),
+
+              /// 💎 ULTRA TITLE STYLE (V101 MATCH)
+              title: titleWidget ??
+                  CommonText(
+                    title,
+                    style: TextStyleConstants.bold(
+                      context,
+                      fontSize: 24,
+                      color: Colors.black,
+                    ),
+                  ),
+
+              actions: actions?.map((e) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(.8),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: e,
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
         ),
       ),
     );

@@ -9,6 +9,7 @@ import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
+import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_drop_down.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
@@ -193,8 +194,8 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
       child: GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: AdaptiveScaffold(
-          appBar: Constants.appBar(context,
-              title: 'Add Negotiation', centerTitle: true, actions: []),
+          // appBar: Constants.appBar(context,
+          //     title: 'Add Negotiation', centerTitle: true, actions: []),
           body: BlocBuilder<AddNegotiationCubit, AddNegotiationState>(
             builder: (context, state) {
               if (state is GetCategoryError) {
@@ -216,173 +217,164 @@ class _SupplierListScreenState extends State<SupplierListScreen> {
 
               return Stack(
                 children: [
-                  Form(
-                    key: _formKey,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
-                      child: Column(
-                        children: [
-                          /// 🔒 FIXED TOP
-                          CommonDropdown<CommodityList>(
-                            label: 'Category *',
-                            hint: 'Select Category',
-                            dropdownKey: categoryKey,
-                            asyncItems: (filter, loadProps) {
-                              return fetchCommodity(filter, loadProps);
-                            },
-                            validator: (value) =>
-                                value == null ? "Required" : null,
-                            selectedItem: null,
-                            itemAsString: (item) => item.groupName ?? "",
-                            onChanged: (item) async {
-                              final params = SupplierListParams(
-                                customerId: await secureStorage
-                                        .read(AppStrings.customerId) ??
-                                    "",
-                                groupID: item?.groupId ?? "",
-                                indexNo: 0,
-                                token: await secureStorage
-                                        .read(AppStrings.apiVerificationCode) ??
-                                    "",
-                                vendorName: "",
-                              );
+                  CustomScrollView(
+                    slivers: [
+                      CommonAppbar(
+                        title: "Add Negotiation",
+                        showBackButton: true,
+                        showNotification: false,
+                      ),
+                      SliverToBoxAdapter(
+                        child: Form(
+                          key: _formKey,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
+                            child: Column(
+                              children: [
+                                /// 🔒 FIXED TOP
+                                CommonDropdown<CommodityList>(
+                                  label: 'Category *',
+                                  hint: 'Select Category',
+                                  dropdownKey: categoryKey,
+                                  asyncItems: (filter, loadProps) {
+                                    return fetchCommodity(filter, loadProps);
+                                  },
+                                  validator: (value) =>
+                                      value == null ? "Required" : null,
+                                  selectedItem: null,
+                                  itemAsString: (item) => item.groupName ?? "",
+                                  onChanged: (item) async {
+                                    final params = SupplierListParams(
+                                      customerId: await secureStorage
+                                              .read(AppStrings.customerId) ??
+                                          "",
+                                      groupID: item?.groupId ?? "",
+                                      indexNo: 0,
+                                      token: await secureStorage.read(
+                                              AppStrings.apiVerificationCode) ??
+                                          "",
+                                      vendorName: "",
+                                    );
 
-                              // _page = 1;
-                              _isLastPage = false;
-                              _isFetchingMore = false;
+                                    // _page = 1;
+                                    _isLastPage = false;
+                                    _isFetchingMore = false;
 
-                              supplierList = [];
-                              groupId = item?.groupId ?? "";
-                              groupName = item?.groupName ?? "";
+                                    supplierList = [];
+                                    groupId = item?.groupId ?? "";
+                                    groupName = item?.groupName ?? "";
 
-                              cubit.getSupplierList(params);
-                              cubit.getSupplierShortlisted(params);
-                            },
-                            compareFn: (a, b) => a.groupName == b.groupName,
-                          ),
-
-                          const SizedBox(height: 12),
-                          SafeArea(
-                            top: false,
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 12),
-                              child: CommonButton(
-                                onPressed: () {
-                                  if (groupId.isNotEmpty) {
-                                    Navigator.pushNamed(context,
-                                        Routes.addNegotiationDetailScreen,
-                                        arguments: AddProductParams(
-                                            auctionID: "",
-                                            groupID: groupId,
-                                            groupName: groupName));
-                                  } else {
-                                    CommonToast.error(
-                                        "Please Select a Category to Proceed");
-                                  }
-                                },
-                                text: "Create Negotiation",
-                                width: double.infinity,
-                                textStyle: TextStyleConstants.medium(
-                                  context,
-                                  fontSize: 16,
-                                  color: AppColors.white,
+                                    cubit.getSupplierList(params);
+                                    cubit.getSupplierShortlisted(params);
+                                  },
+                                  compareFn: (a, b) =>
+                                      a.groupName == b.groupName,
                                 ),
-                              ),
+
+                                const SizedBox(height: 12),
+                                SafeArea(
+                                  top: false,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 12),
+                                    child: CommonButton(
+                                      onPressed: () {
+                                        if (groupId.isNotEmpty) {
+                                          Navigator.pushNamed(context,
+                                              Routes.addNegotiationDetailScreen,
+                                              arguments: AddProductParams(
+                                                  auctionID: "",
+                                                  groupID: groupId,
+                                                  groupName: groupName));
+                                        } else {
+                                          CommonToast.error(
+                                              "Please Select a Category to Proceed");
+                                        }
+                                      },
+                                      text: "Create Negotiation",
+                                      width: double.infinity,
+                                      textStyle: TextStyleConstants.medium(
+                                        context,
+                                        fontSize: 16,
+                                        color: AppColors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+
+                                /// 🟦 SCROLLABLE LIST (ONLY THIS SCROLLS)
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 12),
-
-                          /// 🟦 SCROLLABLE LIST (ONLY THIS SCROLLS)
-                          Expanded(
-                            child: supplierList == null
-                                ? const SizedBox.shrink()
-                                : ListView.separated(
-                                    addAutomaticKeepAlives: false,
-                                    addRepaintBoundaries: true,
-                                    addSemanticIndexes: false,
-                                    cacheExtent: 300,
-                                    controller: _listScrollController,
-                                    padding: const EdgeInsets.only(bottom: 12),
-                                    itemCount: (supplierList?.length ?? 0) +
-                                        (_isLastPage ? 0 : 1),
-                                    separatorBuilder: (_, __) =>
-                                        const SizedBox(height: 12),
-                                    itemBuilder: (context, index) {
-                                      if (index >=
-                                          (supplierList?.length ?? 0)) {
-                                        return const Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 16),
-                                          child: SizedBox(),
-                                        );
-                                      }
-
-                                      final item = supplierList![index];
-                                      return RepaintBoundary(
-                                        child: SupplierInfoCard(
-                                          supplier: item,
-                                          addRemoveShortListButton: cubit
-                                                  .isSupplierShortlisted(
-                                                      supplier: item,
-                                                      shortlisted:
-                                                          shortlistedSupplierList)
-                                              ? () async {
-                                                  late RemoveSupplierShortlistParams
-                                                      params;
-
-                                                  params =
-                                                      RemoveSupplierShortlistParams(
-                                                    token: await secureStorage
-                                                            .read(AppStrings
-                                                                .apiVerificationCode) ??
-                                                        "",
-                                                    shortlistID: item
-                                                        .shortlistId
-                                                        .toString(),
-                                                  );
-
-                                                  cubit.deleteSupplierShortlist(
-                                                      params);
-                                                }
-                                              : () async {
-                                                  late AddShortListSupplierParams
-                                                      params;
-                                                  params =
-                                                      AddShortListSupplierParams(
-                                                    token: await secureStorage
-                                                            .read(AppStrings
-                                                                .apiVerificationCode) ??
-                                                        "",
-                                                    customerID: await secureStorage
-                                                            .read(AppStrings
-                                                                .customerId) ??
-                                                        "",
-                                                    userID: await secureStorage
-                                                            .read(AppStrings
-                                                                .customerId) ??
-                                                        "",
-                                                    supplierID: item.vendorId
-                                                        .toString(),
-                                                    groupID: groupId,
-                                                  );
-
-                                                  cubit.addSupplierShortlist(
-                                                      params);
-                                                },
-                                          isShortlisted:
-                                              cubit.isSupplierShortlisted(
-                                                  supplier: item,
-                                                  shortlisted:
-                                                      shortlistedSupplierList),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                      if (supplierList != null)
+                        SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              final item = supplierList![index];
+
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 6),
+                                child: SupplierInfoCard(
+                                  supplier: item,
+                                  addRemoveShortListButton: cubit
+                                          .isSupplierShortlisted(
+                                              supplier: item,
+                                              shortlisted:
+                                                  shortlistedSupplierList)
+                                      ? () async {
+                                          late RemoveSupplierShortlistParams
+                                              params;
+
+                                          params =
+                                              RemoveSupplierShortlistParams(
+                                            token: await secureStorage.read(
+                                                    AppStrings
+                                                        .apiVerificationCode) ??
+                                                "",
+                                            shortlistID:
+                                                item.shortlistId.toString(),
+                                          );
+
+                                          cubit.deleteSupplierShortlist(params);
+                                        }
+                                      : () async {
+                                          late AddShortListSupplierParams
+                                              params;
+
+                                          params = AddShortListSupplierParams(
+                                            token: await secureStorage.read(
+                                                    AppStrings
+                                                        .apiVerificationCode) ??
+                                                "",
+                                            customerID: await secureStorage
+                                                    .read(AppStrings
+                                                        .customerId) ??
+                                                "",
+                                            userID: await secureStorage.read(
+                                                    AppStrings.customerId) ??
+                                                "",
+                                            supplierID:
+                                                item.vendorId.toString(),
+                                            groupID: groupId,
+                                          );
+
+                                          cubit.addSupplierShortlist(params);
+                                        },
+                                  isShortlisted: cubit.isSupplierShortlisted(
+                                    supplier: item,
+                                    shortlisted: shortlistedSupplierList,
+                                  ),
+                                ),
+                              );
+                            },
+                            childCount: supplierList!.length,
+                          ),
+                        ),
+                    ],
                   ),
                   BlocBuilder<AddNegotiationCubit, AddNegotiationState>(
                     buildWhen: (previous, current) {

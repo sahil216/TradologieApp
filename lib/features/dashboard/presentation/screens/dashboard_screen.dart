@@ -10,6 +10,7 @@ import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/responsive.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
+import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
@@ -130,73 +131,91 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ],
       child: AdaptiveScaffold(
-        drawer: const TradologieDrawer(),
-        appBar: Constants.appBar(context,
-            title: 'Dashboard',
-            centerTitle: true,
-            actions: [
-              IconButton(
-                  onPressed: () {
-                    sl<NavigationService>().pushNamed(
-                      Routes.notificationScreen,
-                    );
-                  },
-                  icon: Icon(Icons.notifications)),
-              SizedBox(width: 10),
-            ]),
-        body: BlocBuilder<DashboardCubit, DashboardState>(
-          buildWhen: (previous, current) {
-            bool result = previous != current;
-            result = result &&
-                (current is GetDashboardSuccess ||
-                    current is GetDashboardError ||
-                    current is GetDashboardIsLoading);
-            return result;
-          },
-          builder: (context, state) {
-            if (state is GetDashboardIsLoading) {
-              return const CommonLoader();
-            }
-            if (dashboardData == null) {
-              if (state is GetDashboardError) {
-                if (state.failure is NetworkFailure) {
-                  return CustomErrorNetworkWidget(
-                    onPress: () {
-                      getDashboardData();
-                    },
+        // drawer: const TradologieDrawer(),
+        // appBar: Constants.appBar(context,
+        //     title: 'Dashboard',
+        //     centerTitle: true,
+        //     actions: [
+        //       IconButton(
+        //           onPressed: () {
+        //             sl<NavigationService>().pushNamed(
+        //               Routes.notificationScreen,
+        //             );
+        //           },
+        //           icon: Icon(Icons.notifications)),
+        //       SizedBox(width: 10),
+        //     ]),
+        body: CustomScrollView(
+          slivers: [
+            /// ⭐ ULTRA COMMON APPBAR
+            CommonAppbar(
+              title: "Dashboard",
+              showNotification: true,
+              onNotificationTap: () {
+                sl<NavigationService>().pushNamed(
+                  Routes.notificationScreen,
+                );
+              },
+            ),
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: BlocBuilder<DashboardCubit, DashboardState>(
+                buildWhen: (previous, current) {
+                  bool result = previous != current;
+                  result = result &&
+                      (current is GetDashboardSuccess ||
+                          current is GetDashboardError ||
+                          current is GetDashboardIsLoading);
+                  return result;
+                },
+                builder: (context, state) {
+                  if (state is GetDashboardIsLoading) {
+                    return const CommonLoader();
+                  }
+
+                  if (dashboardData == null) {
+                    if (state is GetDashboardError) {
+                      if (state.failure is NetworkFailure) {
+                        return CustomErrorNetworkWidget(
+                          onPress: () {
+                            getDashboardData();
+                          },
+                        );
+                      } else if (state.failure is UserFailure) {
+                        return CustomErrorWidget(
+                          onPress: () {
+                            getDashboardData();
+                          },
+                          errorText: state.failure.msg,
+                        );
+                      }
+                    }
+                    return const CommonLoader();
+                  }
+
+                  /// ⭐ KEEP YOUR CAROUSEL EXACTLY SAME
+                  return Column(
+                    children: [
+                      SizedBox(
+                        height: Responsive(context).screenHeight * 0.72,
+                        child: DashboardCarausel(
+                          data: dashboardData ?? [],
+                          onParticipate: (_) => _appCubit.changeTab(1),
+                          controller: _carouselController,
+                          onPageChanged: (index) {
+                            setState(() {
+                              currentPage = index;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
                   );
-                } else if (state.failure is UserFailure) {
-                  return CustomErrorWidget(
-                    onPress: () {
-                      getDashboardData();
-                    },
-                    errorText: state.failure.msg,
-                  );
-                }
-              }
-              return const CommonLoader();
-            }
-            return SizedBox(
-              height: Responsive(context).screenHeight * 0.72,
-              child: DashboardCarausel(
-                data: dashboardData ?? [],
-                onParticipate: (_) => _appCubit.changeTab(1),
-                controller: _carouselController,
-                onPageChanged: (index) {
-                  setState(() {
-                    currentPage = index;
-                  });
                 },
               ),
-            );
-          },
+            ),
+          ],
         ),
-        bottomNavigationBar: dashboardData != null && dashboardData!.length > 1
-            ? PageDots(
-                controller: _carouselController,
-                itemCount: dashboardData!.length,
-              )
-            : const SizedBox.shrink(), // _pageDots(totalPages),
       ),
     );
   }

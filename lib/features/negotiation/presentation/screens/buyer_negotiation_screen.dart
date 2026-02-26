@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,6 +9,7 @@ import 'package:tradologie_app/core/error/network_failure.dart';
 import 'package:tradologie_app/core/error/user_failure.dart';
 import 'package:tradologie_app/core/utils/app_colors.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
+import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/common_single_child_scroll_view.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
@@ -151,72 +153,72 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen> {
         ),
       ],
       child: AdaptiveScaffold(
-        drawer: const TradologieDrawer(),
-        appBar: Constants.appBar(context,
-            title: "Negotiation",
-            centerTitle: false,
-            // titleWidget: Row(
-            //   children: [
-            //     Image.asset(ImgAssets.companyLogo, height: 40),
-            //     Spacer(),
-            //     Text(
-            //       'Negotiation',
-            //       style: TextStyleConstants.bold(context,
-            //           color: AppColors.defaultText),
-            //     ),
-            //     SizedBox(width: 30),
-            //   ],
-            // ),
-            actions: [
-              ElevatedButton(
-                onPressed: () {
-                  sl<NavigationService>().pushNamed(
-                    Routes.supplierListScreen,
-                  );
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.add,
-                      color: AppColors.primary,
-                      size: 20,
-                    ),
-                    CommonText('Add',
-                        style: TextStyleConstants.semiBold(context,
-                            color: AppColors.primary)),
-                  ],
-                ),
-              ),
-              // CommonButton(
-              //   onPressed: () {
-              //     sl<NavigationService>().pushNamed(
-              //       Routes.supplierListScreen,
-              //     );
-              //   },
-              //   backgroundColor: AppColors.white,
-              //   icon: Icon(
-              //     Icons.add,
-              //     color: AppColors.defaultText,
-              //   ),
-              //   borderSide: BorderSide(color: AppColors.primary, width: 2),
-              //   text: 'Add',
-              //   height: 10,
-              //   padding: EdgeInsets.symmetric(horizontal: 15, vertical: 7),
-              //   borderRadius: BorderRadius.circular(30),
-              //   textStyle: TextStyleConstants.semiBold(context,
-              //       color: AppColors.defaultText),
-              // ),
-              SizedBox(width: 10),
-              IconButton(
-                  onPressed: () {
-                    sl<NavigationService>().pushNamed(
-                      Routes.notificationScreen,
-                    );
-                  },
-                  icon: Icon(Icons.notifications)),
-              SizedBox(width: 10),
-            ]),
+        // drawer: const TradologieDrawer(),
+        // appBar: Constants.appBar(context,
+        //     title: "Negotiation",
+        //     centerTitle: false,
+        //     // titleWidget: Row(
+        //     //   children: [
+        //     //     Image.asset(ImgAssets.companyLogo, height: 40),
+        //     //     Spacer(),
+        //     //     Text(
+        //     //       'Negotiation',
+        //     //       style: TextStyleConstants.bold(context,
+        //     //           color: AppColors.defaultText),
+        //     //     ),
+        //     //     SizedBox(width: 30),
+        //     //   ],
+        //     // ),
+        // actions: [
+        // ElevatedButton(
+        //   onPressed: () {
+        //     sl<NavigationService>().pushNamed(
+        //       Routes.supplierListScreen,
+        //     );
+        //   },
+        //   child: Row(
+        //     mainAxisSize: MainAxisSize.min,
+        //     children: [
+        //       Icon(
+        //         Icons.add,
+        //         color: AppColors.primary,
+        //         size: 20,
+        //       ),
+        //       CommonText('Add',
+        //           style: TextStyleConstants.semiBold(context,
+        //               color: AppColors.primary)),
+        //     ],
+        //   ),
+        // ),
+        // CommonButton(
+        //   onPressed: () {
+        //     sl<NavigationService>().pushNamed(
+        //       Routes.supplierListScreen,
+        //     );
+        //   },
+        //   backgroundColor: AppColors.white,
+        //   icon: Icon(
+        //     Icons.add,
+        //     color: AppColors.defaultText,
+        //   ),
+        //   borderSide: BorderSide(color: AppColors.primary, width: 2),
+        //   text: 'Add',
+        //   height: 10,
+        //   padding: EdgeInsets.symmetric(horizontal: 15, vertical: 7),
+        //   borderRadius: BorderRadius.circular(30),
+        //   textStyle: TextStyleConstants.semiBold(context,
+        //       color: AppColors.defaultText),
+        // ),
+        //   SizedBox(width: 10),
+        //   IconButton(
+        //       onPressed: () {
+        //         sl<NavigationService>().pushNamed(
+        //           Routes.notificationScreen,
+        //         );
+        //       },
+        //       icon: Icon(Icons.notifications)),
+        //   SizedBox(width: 10),
+        // ]),
         body: BlocBuilder<NegotiationCubit, NegotiationState>(
             buildWhen: (previous, current) {
           bool result = previous != current;
@@ -246,228 +248,332 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen> {
             }
           }
 
-          return SafeArea(
-            child: Column(
-              children: [
-                SizedBox(height: 20),
-                // 🔹 Header
-                CommonSingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  physics: const NeverScrollableScrollPhysics(),
-                  controller: _headerController,
+          return CustomScrollView(
+            slivers: [
+              CommonAppbar(
+                title: "Negotiation",
+                addAction: GestureDetector(
+                  onTap: () {
+                    sl<NavigationService>().pushNamed(
+                      Routes.supplierListScreen,
+                    );
+                  },
                   child: Row(
-                    children: headers.map((header) {
-                      return _cell(
-                        header,
-                        width: columnWidths[header] ?? defaultColumnWidth,
-                        isHeader: true,
-                      );
-                    }).toList(),
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.add, size: 18, color: AppColors.primary),
+                      const SizedBox(width: 6),
+                      CommonText(
+                        'Add',
+                        style: TextStyleConstants.semiBold(
+                          context,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-
-                // 🔹 Body
-                Expanded(
-                  child: CommonSingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    controller: _bodyController,
-                    child: SizedBox(
-                      width: getTableWidth(),
-                      child: ListView.builder(
-                        itemCount: negotiationData?.length ?? 0,
-                        itemBuilder: (context, rowIndex) {
-                          final row = negotiationData![rowIndex];
-                          bool expanded = expandedIndex == rowIndex;
-                          return AnimatedSize(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                            child: Column(
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      expandedIndex =
-                                          expanded ? null : rowIndex;
-                                    });
-                                  },
-                                  child: Row(
-                                    children: headers.map((header) {
-                                      if (header == 'Negotiation Code') {
-                                        return Container(
-                                          width: 200,
-                                          height: 50,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                                color: Colors.grey.shade400),
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              AnimatedRotation(
-                                                turns: expanded ? 0.5 : 0,
-                                                duration: const Duration(
-                                                    milliseconds: 300),
-                                                child: const Icon(
-                                                  Icons.keyboard_arrow_down,
-                                                  color: Colors.blue,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 6),
-                                              Text(
-                                                _getCellText(row, header),
-                                                style:
-                                                    TextStyleConstants.regular(
-                                                  context,
-                                                  fontSize: 16,
-                                                  color: row.auctionColorCode ==
-                                                          "red"
-                                                      ? AppColors.red
-                                                      : AppColors.defaultText,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      }
-                                      return _cell(
-                                        _getCellText(row, header),
-                                        width: columnWidths[header] ??
-                                            defaultColumnWidth,
-                                        isUnderline: header.toLowerCase() ==
-                                            'order status',
-                                        color: row.auctionColorCode == "red"
-                                            ? AppColors.red
-                                            : AppColors.black,
-                                        onTap: () {
-                                          if (header.toLowerCase() ==
-                                                  'order status' &&
-                                              row.auctionStatus
-                                                      ?.toLowerCase() ==
-                                                  "view rate") {
-                                            Constants.isAndroid14OrBelow &&
-                                                    Platform.isAndroid
-                                                ? Navigator.pushNamed(context,
-                                                    Routes.inAppWebViewRoute,
-                                                    arguments: WebviewParams(
-                                                        url:
-                                                            "${EndPoints.buyerUrlWeb}${row.auctionUrl}",
-                                                        canPop: true,
-                                                        isAppBar: true))
-                                                : Navigator.pushNamed(
-                                                    context, Routes.webViewRoute,
-                                                    arguments: WebviewParams(
-                                                        url:
-                                                            "${EndPoints.buyerUrlWeb}${row.auctionUrl}",
-                                                        canPop: true,
-                                                        isAppBar: true));
-                                          } else if (header.toLowerCase() ==
-                                              'negotiation code') {
-                                            // Navigator.pushNamed(
-                                            //     context, Routes.webViewRoute,
-                                            //     arguments: WebviewParams(
-                                            //         url:
-                                            //             "${EndPoints.buyerUrlWeb}${row.auctionCodeUrl}",
-                                            //         canPop: true,
-                                            //         isAppBar: true));
-                                          }
-                                        },
-                                      );
-                                    }).toList(),
-                                  ),
-                                ),
-                                ClipRect(
-                                  child: Align(
-                                    heightFactor: expanded ? 1 : 0,
-                                    child: Container(
-                                      width: getTableWidth(),
-                                      padding: const EdgeInsets.all(16),
-                                      color: Colors.grey.shade100,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          _detail(
-                                              "Negotiation Name ",
-                                              row.auctionName ?? '-',
-                                              false,
-                                              null),
-                                          _detail(
-                                              "Delivery Address",
-                                              row.deliveryAddress ?? '-',
-                                              false,
-                                              null),
-                                          _detail(
-                                              "Delivery State",
-                                              row.deliveryState ?? '-',
-                                              false,
-                                              null),
-                                          _detail(
-                                              "Payment Term",
-                                              row.paymentTerm ?? '-',
-                                              false,
-                                              null),
-                                          _detail(
-                                              "Partial Delivery",
-                                              row.partialDelivery ?? '-',
-                                              false,
-                                              null),
-                                          _detail(
-                                              "Enquiry Status",
-                                              row.isStarted == true
-                                                  ? "Started"
-                                                  : row.isclosed == true
-                                                      ? "Closed"
-                                                      : 'Not Started',
-                                              false,
-                                              null),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              ],
+                showNotification: true,
+              ),
+              SliverToBoxAdapter(
+                child: SafeArea(
+                  top: false,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(28),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(.55),
+                            borderRadius: BorderRadius.circular(28),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(.4),
                             ),
-                          );
-                        },
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(.06),
+                                blurRadius: 18,
+                                offset: const Offset(0, 6),
+                              )
+                            ],
+                          ),
+
+                          /// ⭐ CONTENT ROW
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _glassPageButton(
+                                text: "Previous",
+                                enabled: currentPage > 0,
+                                onTap: () {
+                                  getNegotiationData(page: currentPage - 1);
+                                },
+                              ),
+                              Text(
+                                'Page ${currentPage + 1} of ${negotiation?.totalPages ?? 0}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              _glassPageButton(
+                                text: "Next",
+                                enabled: ((currentPage + 1) <
+                                    (negotiation?.totalPages ?? 0)),
+                                onTap: () {
+                                  getNegotiationData(page: currentPage + 1);
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+              SliverFillRemaining(
+                hasScrollBody: true,
+                child: Column(
+                  children: [
+                    // 🔹 Header
+                    CommonSingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const NeverScrollableScrollPhysics(),
+                      controller: _headerController,
+                      child: Row(
+                        children: headers.map((header) {
+                          return _cell(
+                            header,
+                            width: columnWidths[header] ?? defaultColumnWidth,
+                            isHeader: true,
+                          );
+                        }).toList(),
+                      ),
+                    ),
+
+                    // 🔹 Body
+                    Expanded(
+                      child: CommonSingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        controller: _bodyController,
+                        child: SizedBox(
+                          width: getTableWidth(),
+                          child: ListView.builder(
+                            itemCount: negotiationData?.length ?? 0,
+                            itemBuilder: (context, rowIndex) {
+                              final row = negotiationData![rowIndex];
+                              bool expanded = expandedIndex == rowIndex;
+                              return AnimatedSize(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                                child: Column(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          expandedIndex =
+                                              expanded ? null : rowIndex;
+                                        });
+                                      },
+                                      child: Row(
+                                        children: headers.map((header) {
+                                          if (header == 'Negotiation Code') {
+                                            return Container(
+                                              width: 200,
+                                              height: 50,
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                    color:
+                                                        Colors.grey.shade400),
+                                              ),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  AnimatedRotation(
+                                                    turns: expanded ? 0.5 : 0,
+                                                    duration: const Duration(
+                                                        milliseconds: 300),
+                                                    child: const Icon(
+                                                      Icons.keyboard_arrow_down,
+                                                      color: Colors.blue,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 6),
+                                                  Text(
+                                                    _getCellText(row, header),
+                                                    style: TextStyleConstants
+                                                        .regular(
+                                                      context,
+                                                      fontSize: 16,
+                                                      color:
+                                                          row.auctionColorCode ==
+                                                                  "red"
+                                                              ? AppColors.red
+                                                              : AppColors
+                                                                  .defaultText,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          }
+                                          return _cell(
+                                            _getCellText(row, header),
+                                            width: columnWidths[header] ??
+                                                defaultColumnWidth,
+                                            isUnderline: header.toLowerCase() ==
+                                                'order status',
+                                            color: row.auctionColorCode == "red"
+                                                ? AppColors.red
+                                                : AppColors.black,
+                                            onTap: () {
+                                              if (header.toLowerCase() ==
+                                                      'order status' &&
+                                                  row.auctionStatus
+                                                          ?.toLowerCase() ==
+                                                      "view rate") {
+                                                Constants.isAndroid14OrBelow &&
+                                                        Platform.isAndroid
+                                                    ? Navigator.pushNamed(
+                                                        context,
+                                                        Routes
+                                                            .inAppWebViewRoute,
+                                                        arguments: WebviewParams(
+                                                            url:
+                                                                "${EndPoints.buyerUrlWeb}${row.auctionUrl}",
+                                                            canPop: true,
+                                                            isAppBar: true))
+                                                    : Navigator.pushNamed(
+                                                        context,
+                                                        Routes.webViewRoute,
+                                                        arguments: WebviewParams(
+                                                            url:
+                                                                "${EndPoints.buyerUrlWeb}${row.auctionUrl}",
+                                                            canPop: true,
+                                                            isAppBar: true));
+                                              } else if (header.toLowerCase() ==
+                                                  'negotiation code') {
+                                                // Navigator.pushNamed(
+                                                //     context, Routes.webViewRoute,
+                                                //     arguments: WebviewParams(
+                                                //         url:
+                                                //             "${EndPoints.buyerUrlWeb}${row.auctionCodeUrl}",
+                                                //         canPop: true,
+                                                //         isAppBar: true));
+                                              }
+                                            },
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                                    ClipRect(
+                                      child: Align(
+                                        heightFactor: expanded ? 1 : 0,
+                                        child: Container(
+                                          width: getTableWidth(),
+                                          padding: const EdgeInsets.all(16),
+                                          color: Colors.grey.shade100,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              _detail(
+                                                  "Negotiation Name ",
+                                                  row.auctionName ?? '-',
+                                                  false,
+                                                  null),
+                                              _detail(
+                                                  "Delivery Address",
+                                                  row.deliveryAddress ?? '-',
+                                                  false,
+                                                  null),
+                                              _detail(
+                                                  "Delivery State",
+                                                  row.deliveryState ?? '-',
+                                                  false,
+                                                  null),
+                                              _detail(
+                                                  "Payment Term",
+                                                  row.paymentTerm ?? '-',
+                                                  false,
+                                                  null),
+                                              _detail(
+                                                  "Partial Delivery",
+                                                  row.partialDelivery ?? '-',
+                                                  false,
+                                                  null),
+                                              _detail(
+                                                  "Enquiry Status",
+                                                  row.isStarted == true
+                                                      ? "Started"
+                                                      : row.isclosed == true
+                                                          ? "Closed"
+                                                          : 'Not Started',
+                                                  false,
+                                                  null),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
           );
         }),
-        bottomNavigationBar: SafeArea(
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: currentPage > 0
-                      ? () {
-                          getNegotiationData(page: currentPage - 1);
-                        }
-                      : null,
-                  child: const Text('Previous'),
-                ),
-                const SizedBox(width: 20),
-                Text(
-                    'Page ${currentPage + 1} of ${negotiation?.totalPages ?? 0}'),
-                const SizedBox(width: 20),
-                ElevatedButton(
-                  onPressed:
-                      ((currentPage + 1) < (negotiation?.totalPages ?? 0))
-                          ? () {
-                              getNegotiationData(page: currentPage + 1);
-                            }
-                          : null,
-                  child: const Text('Next'),
-                ),
-              ],
-            ),
+        bottomNavigationBar: SizedBox(
+          height: 70,
+        ),
+      ),
+    );
+  }
+
+  Widget _glassPageButton({
+    required String text,
+    required bool enabled,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: enabled ? onTap : null,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+        decoration: BoxDecoration(
+          color: enabled ? Colors.white.withOpacity(.9) : Colors.grey.shade300,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: enabled
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(.08),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  )
+                ]
+              : [],
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: enabled ? Colors.blue : Colors.grey,
           ),
         ),
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
+import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
@@ -45,7 +46,17 @@ class _NotificationScreenState extends State<NotificationScreen> {
           listenWhen: (previous, current) => previous != current,
           listener: (context, state) {
             if (state is NotificationSuccess) {
-              data = state.data;
+              data = [...state.data];
+
+              /// ⭐ SORT BY DATE DESCENDING (LATEST FIRST)
+              data!.sort((a, b) {
+                final DateTime dateA =
+                    DateTime.tryParse(a.updatedDate ?? "") ?? DateTime(1970);
+                final DateTime dateB =
+                    DateTime.tryParse(b.updatedDate ?? "") ?? DateTime(1970);
+
+                return dateB.compareTo(dateA); // 👈 DESCENDING
+              });
             }
             if (state is NotificationError) {
               CommonToast.showFailureToast(state.failure);
@@ -54,8 +65,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
         ),
       ],
       child: AdaptiveScaffold(
-        appBar:
-            Constants.appBar(context, title: 'Notification', centerTitle: true),
         body: BlocBuilder<NotificationCubit, NotificationState>(
           buildWhen: (previous, current) {
             bool result = previous != current;
@@ -66,6 +75,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             return result;
           },
           builder: (context, state) {
+            /// 🔄 FIRST LOAD / ERROR STATES
             if (data == null) {
               if (state is NotificationError) {
                 if (state.failure is NetworkFailure) {
@@ -85,17 +95,33 @@ class _NotificationScreenState extends State<NotificationScreen> {
               }
               return const CommonLoader();
             }
-            return SafeArea(
-              child: data!.isEmpty
-                  ? _emptyState()
-                  : ListView.separated(
-                      padding: EdgeInsets.all(16),
+
+            /// 💎 SLIVER STRUCTURE
+            return CustomScrollView(
+              slivers: [
+                const CommonAppbar(
+                  title: "Notification",
+                  showBackButton: true,
+                ),
+                if (data!.isEmpty)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: _emptyState(),
+                  )
+                else
+
+                  /// 🔔 LIST
+                  SliverPadding(
+                    padding: const EdgeInsets.all(16),
+                    sliver: SliverList.separated(
                       itemCount: data?.length ?? 0,
-                      separatorBuilder: (_, __) => Divider(),
+                      separatorBuilder: (_, __) => const Divider(),
                       itemBuilder: (context, index) {
                         return _notificationTile(data![index]);
                       },
                     ),
+                  ),
+              ],
             );
           },
         ),
@@ -104,45 +130,109 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   Widget _notificationTile(NotificationDetail notification) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CommonText(
-                    notification.contentTitle ?? "",
-                    style: TextStyleConstants.semiBold(context, fontSize: 16),
-                  ),
-                  const SizedBox(height: 4),
-                  CommonText(
-                    notification.contentText ?? "",
-                    style: TextStyleConstants.medium(context, fontSize: 14),
-                  ),
-                  const SizedBox(height: 6),
-                  CommonText(
-                    Constants.dateFormat(DateTime.parse(
-                        notification.updatedDate ??
-                            "")), // DateTime.parse(notification.updatedDate)
-                    style: TextStyleConstants.regular(context, fontSize: 13),
-                  ),
-                ],
+    // final bool isUnread = !(notification.isRead ?? true);
+
+    return RepaintBoundary(
+      child: TweenAnimationBuilder<double>(
+        duration: const Duration(milliseconds: 450),
+        tween: Tween(begin: 0.95, end: 1),
+        curve: Curves.easeOutCubic,
+        builder: (context, scale, child) {
+          return Transform.scale(scale: scale, child: child);
+        },
+        child: InkWell(
+          borderRadius: BorderRadius.circular(18),
+          onTap: () {},
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+
+              /// 💎 ULTRA GLASS BACKGROUND
+              color: Colors.white.withOpacity(.85),
+
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 18,
+                  offset: const Offset(0, 10),
+                  color: Colors.black.withOpacity(.05),
+                ),
+              ],
+
+              border: Border.all(
+                color: Colors.black.withOpacity(.04),
               ),
             ),
-            // if (!notification.isRead)
-            //   Container(
-            //     width: 8,
-            //     height: 8,
-            //     decoration: const BoxDecoration(
-            //       color: Colors.blue,
-            //       shape: BoxShape.circle,
-            //     ),
-            //   ),
-          ],
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// 🔵 UNREAD DOT (ANIMATED)
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  margin: const EdgeInsets.only(top: 6, right: 10),
+                  // width: isUnread ? 10 : 0,
+                  // height: isUnread ? 10 : 0,
+                  decoration: const BoxDecoration(
+                    color: Colors.blue,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+
+                /// 📄 CONTENT
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CommonText(
+                        notification.contentTitle ?? "",
+                        style: TextStyleConstants.semiBold(
+                          context,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      CommonText(
+                        notification.contentText ?? "",
+                        style: TextStyleConstants.medium(
+                          context,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.schedule,
+                            size: 14,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(width: 6),
+                          CommonText(
+                            Constants.dateFormat(
+                              DateTime.parse(
+                                notification.updatedDate ?? "",
+                              ),
+                            ),
+                            style: TextStyleConstants.regular(
+                              context,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                /// 👉 CHEVRON (ULTRA STYLE)
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 14,
+                  color: Colors.black38,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

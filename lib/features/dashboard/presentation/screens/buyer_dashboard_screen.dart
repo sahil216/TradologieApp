@@ -8,12 +8,15 @@ import 'package:tradologie_app/core/error/network_failure.dart';
 import 'package:tradologie_app/core/error/user_failure.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/app_colors.dart';
+import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
+import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
 import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
+import 'package:tradologie_app/features/app/presentation/screens/main_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/cubit/dashboard_cubit.dart';
 import 'package:tradologie_app/features/dashboard/presentation/widgets/buyer_banner_engine.dart';
 import 'package:tradologie_app/features/dashboard/presentation/widgets/buyer_dashboard_cards.dart';
@@ -37,6 +40,8 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
     await dashboardCubit.getCommodityList(NoParams());
   }
 
+  int index = 0;
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -46,22 +51,22 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return AdaptiveScaffold(
-      drawer: const TradologieDrawer(),
-      appBar: Constants.appBar(
-        context,
-        title: 'Dashboard',
-        centerTitle: false,
-        backgroundColor: AppColors.transparent,
-        actions: [
-          IconButton(
-            onPressed: () {
-              sl<NavigationService>().pushNamed(Routes.notificationScreen);
-            },
-            icon: const Icon(Icons.notifications),
-          ),
-          const SizedBox(width: 10),
-        ],
-      ),
+      // drawer: const TradologieDrawer(),
+      // appBar: Constants.appBar(
+      //   context,
+      //   title: 'Dashboard',
+      //   centerTitle: false,
+      //   backgroundColor: AppColors.transparent,
+      //   actions: [
+      //     IconButton(
+      //       onPressed: () {
+      //         sl<NavigationService>().pushNamed(Routes.notificationScreen);
+      //       },
+      //       icon: const Icon(Icons.notifications),
+      //     ),
+      //     const SizedBox(width: 10),
+      //   ],
+      // ),
       body: BlocBuilder<DashboardCubit, DashboardState>(
         builder: (context, state) {
           if (state is GetDashboardIsLoading) {
@@ -81,12 +86,16 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
 
           return Stack(
             children: [
-              // Positioned.fill(child: _parallaxBg()),
               SafeArea(
                 child: CustomScrollView(
                   controller: _scroll,
                   physics: const BouncingScrollPhysics(),
                   slivers: [
+                    CommonAppbar(
+                      title: "Dashboard",
+                      showBackButton: false,
+                      showNotification: true,
+                    ),
                     const SliverToBoxAdapter(
                       child: BuyerDashboardBannerEngine(
                         banners: [
@@ -159,7 +168,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                               icon: Icons.add,
                               title: "Create Negotiation",
                               subtitle:
-                                  "Create a negotiation with a supplier and get quotes.",
+                                  "Start a live negotiation with verified suppliers and finalize best price.",
                               onTap: () {
                                 sl<NavigationService>()
                                     .pushNamed(Routes.supplierListScreen);
@@ -171,6 +180,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                         ],
                       )),
                     ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 110)),
                   ],
                 ),
               ),
@@ -178,31 +188,6 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
           );
         },
       ),
-    );
-  }
-
-  Widget _parallaxBg() {
-    return AnimatedBuilder(
-      animation: _scroll,
-      builder: (_, __) {
-        double offset = _scroll.hasClients ? _scroll.offset * .15 : 0;
-        return Transform.translate(
-          offset: Offset(0, -offset),
-          child: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xffF7FBFF),
-                  Color(0xffEAF4FF),
-                  Color(0xffDCEEFF),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 }
