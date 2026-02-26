@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tradologie_app/core/utils/analytics_services.dart';
 
 class NavigationService {
   final GlobalKey<NavigatorState> _navigationKey = GlobalKey<NavigatorState>();
@@ -27,5 +28,9 @@ class NavigationService {
 
   dynamic popUntil(bool Function(Route<dynamic>) predicate) {
     return _navigationKey.currentState?.popUntil(predicate);
+  }
+
+  void _logScreen(String routeName) {
+    AnalyticsService.logScreen(routeName);
   }
 }

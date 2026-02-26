@@ -96,6 +96,7 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
       AddVendorStockEnquiryParams params) async {
     return await apiConsumer.post(
       EndPoints.addVendorStockEnquiry,
+      body: params.toJson(),
     );
   }
 }

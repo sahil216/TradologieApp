@@ -6,7 +6,6 @@ import 'package:tradologie_app/core/error/network_failure.dart';
 import 'package:tradologie_app/core/error/user_failure.dart';
 import 'package:tradologie_app/core/utils/app_Colors.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
-import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/responsive.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
@@ -22,7 +21,6 @@ import 'package:tradologie_app/features/dashboard/presentation/cubit/dashboard_c
 
 import '../../../../injection_container.dart';
 import '../widgets/dashboard_card.dart';
-import '../../../app/presentation/screens/drawer.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});

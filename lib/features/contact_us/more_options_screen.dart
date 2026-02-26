@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:tradologie_app/config/routes/app_router.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
+import 'package:tradologie_app/core/utils/analytics_services.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
@@ -15,11 +19,13 @@ import 'package:tradologie_app/core/widgets/common_social_icons.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
+import 'package:tradologie_app/features/app/domain/usecases/check_force_update_usecase.dart';
 import 'package:tradologie_app/features/app/presentation/cubit/app_cubit.dart';
 import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
 import 'package:tradologie_app/features/app/presentation/widgets/input_dialog.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/delete_account_usecase.dart';
 import 'package:tradologie_app/features/authentication/presentation/cubit/authentication_cubit.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../injection_container.dart';
 
@@ -38,19 +44,35 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen> {
 
   late AppCubit _appCubit;
 
-  // @override
-  // int get tabIndex => 4;
-
-  // @override
-  // void onTabActive() {
-  //   // clearForm();
-  //   // getCommodityData(); // 🔥 auto refresh
-  // }
-
   @override
   void initState() {
     super.initState();
-    // _appCubit = context.read<AppCubit>();
+    _appCubit = BlocProvider.of<AppCubit>(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkVersion();
+      getName();
+    });
+  }
+
+  Future<void> _checkVersion() async {
+    final version = await getAppVersion();
+    _appCubit.checkForceUpdate(
+      ForceUpdateParams(
+          token: "2018APR031848",
+          appVersion: version,
+          isAndroid: Platform.isAndroid ? true : false),
+    );
+  }
+
+  Future<String> getAppVersion() async {
+    final info = await PackageInfo.fromPlatform();
+    return info.version;
+  }
+
+  Future<String> getName() async {
+    return name = Constants.isBuyer == true
+        ? await secureStorage.read(AppStrings.customerName) ?? ""
+        : await secureStorage.read(AppStrings.vendorName) ?? "";
   }
 
   @override
@@ -78,7 +100,8 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen> {
                 CommonToast.showFailureToast(state.failure);
               }
               if (state is DeleteAccountSuccess) {
-                context.read<AuthenticationCubit>().signOut(NoParams());
+                BlocProvider.of<AuthenticationCubit>(context)
+                    .signOut(NoParams());
               }
               if (state is DeleteAccountError) {
                 CommonToast.showFailureToast(state.failure);
@@ -183,6 +206,7 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen> {
                           title: "Logout",
                           color: Colors.redAccent,
                           onTap: () {
+                            AnalyticsService.logEvent("logout_clicked");
                             context
                                 .read<AuthenticationCubit>()
                                 .signOut(NoParams());
@@ -219,7 +243,7 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen> {
                     alignment: Alignment.bottomCenter,
                     child: Padding(
                       padding: const EdgeInsets.only(
-                        bottom: 110, // 👈 space for floating bottom navbar
+                        bottom: 70,
                         left: 16,
                         right: 16,
                       ),
@@ -247,8 +271,52 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen> {
   }
 
   void _showUpdateDialog(BuildContext context, bool isForce) {
-    // SAME METHOD AS YOUR DRAWER
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => AlertDialog(
+        title: CommonText(
+          "Update Available",
+          style: TextStyleConstants.semiBold(context),
+        ),
+        content: CommonText(
+          "A newer version of the app is available.",
+          style: TextStyleConstants.medium(context),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: CommonText(
+              "Later",
+              style: TextStyleConstants.medium(context),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (Platform.isAndroid) {
+                launchUrl(
+                    Uri.parse(
+                        "https://play.google.com/store/apps/details?id=com.tradologie.app"),
+                    mode: LaunchMode.externalApplication);
+              }
+
+              if (Platform.isIOS) {
+                launchUrl(
+                    Uri.parse(
+                        "https://apps.apple.com/app/tradologie/id6758596323"),
+                    mode: LaunchMode.externalApplication);
+              }
+            },
+            child: CommonText(
+              "Update",
+              style: TextStyleConstants.semiBold(context),
+            ),
+          ),
+        ],
+      ),
+    );
   }
+
   Widget _profileHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),

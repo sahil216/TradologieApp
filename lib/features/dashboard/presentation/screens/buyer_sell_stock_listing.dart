@@ -13,11 +13,11 @@ import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/app_Colors.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
-import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_drop_down.dart';
+import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_button.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
@@ -118,7 +118,9 @@ class _BuyerSellStockListingState extends State<BuyerSellStockListing> {
             if (state is GetVendorStockListingError) {
               CommonToast.showFailureToast(state.failure);
             }
-            if (state is AddVendorStockEnquirySuccess) {}
+            if (state is AddVendorStockEnquirySuccess) {
+              Navigator.popUntil(context, (route) => route.isFirst);
+            }
             if (state is AddVendorStockEnquiryError) {
               CommonToast.showFailureToast(state.failure);
             }
@@ -424,7 +426,6 @@ class _BuyerSellStockListingState extends State<BuyerSellStockListing> {
     return AdaptiveScaffold(
       body: Stack(
         children: [
-          /// HERO EXPANSION
           GestureDetector(
             onVerticalDragUpdate: (details) {
               if (details.primaryDelta! > 14) {
@@ -781,8 +782,14 @@ class _BuyerSellStockListingState extends State<BuyerSellStockListing> {
               ),
             ),
           ),
-
-          /// CLOSE BUTTON
+          BlocBuilder<DashboardCubit, DashboardState>(
+            builder: (context, state) {
+              if (state is AddVendorStockEnquiryIsLoading) {
+                return const CommonLoader();
+              }
+              return const SizedBox.shrink();
+            },
+          ),
         ],
       ),
     );

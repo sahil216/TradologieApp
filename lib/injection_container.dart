@@ -26,6 +26,7 @@ import '../../../../features/app/injection_container_app.dart' as di_app;
 import '../../../../features/webview/injection_container_webview.dart'
     as di_webview;
 
+import 'core/utils/analytics_services.dart';
 import 'features/dashboard/injection_container_dashboard.dart' as di_dashboard;
 
 import 'features/negotiation/injection_container_negotiation.dart'
@@ -49,6 +50,8 @@ Future<void> init(Future<void> Function(RemoteMessage) handler) async {
   //! init
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await Future.delayed(const Duration(milliseconds: 100));
+  await AnalyticsService.init();
   if (kDebugMode) {
     Bloc.observer = AppBlocObserver();
   }

@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:tradologie_app/core/utils/analytics_services.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
@@ -138,6 +139,7 @@ class _SignInScreenState extends State<SignInScreen> {
           listenWhen: (previous, current) => previous != current,
           listener: (context, state) async {
             if (state is SigninSuccess) {
+              AnalyticsService.logEvent("seller_email_login_success");
               Navigator.pushNamedAndRemoveUntil(
                 context,
                 Routes.mainRoute,
@@ -172,6 +174,7 @@ class _SignInScreenState extends State<SignInScreen> {
               CommonToast.showFailureToast(state.failure);
             }
             if (state is BuyerSigninSuccess) {
+              AnalyticsService.logEvent("buyer_email_login_success");
               Navigator.pushNamedAndRemoveUntil(
                 context,
                 Routes.mainRoute,

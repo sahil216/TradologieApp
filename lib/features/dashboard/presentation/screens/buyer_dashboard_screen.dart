@@ -1,25 +1,26 @@
 import 'dart:async';
-import 'dart:ui';
+import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/config/routes/app_router.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
+import 'package:tradologie_app/core/api/end_points.dart';
 import 'package:tradologie_app/core/error/network_failure.dart';
 import 'package:tradologie_app/core/error/user_failure.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
-import 'package:tradologie_app/core/utils/app_colors.dart';
-import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
-import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
-import 'package:tradologie_app/features/app/presentation/screens/main_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/cubit/dashboard_cubit.dart';
 import 'package:tradologie_app/features/dashboard/presentation/widgets/buyer_banner_engine.dart';
 import 'package:tradologie_app/features/dashboard/presentation/widgets/buyer_dashboard_cards.dart';
+import 'package:tradologie_app/features/webview/presentation/screens/in_app_webview_screen.dart';
+import 'package:tradologie_app/features/webview/presentation/screens/viewmodel/webview_params.dart';
+import 'package:tradologie_app/features/webview/presentation/screens/webview_screen.dart';
 import '../../../../injection_container.dart';
 
 class BuyerDashboardScreen extends StatefulWidget {
@@ -121,6 +122,61 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                       ),
                     ),
                     const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                    // SliverPadding(
+                    //   padding: const EdgeInsets.symmetric(horizontal: 16),
+                    //   sliver: SliverToBoxAdapter(
+                    //     child: InkWell(
+                    //       onTap: () {
+                    //         Constants.isAndroid14OrBelow && Platform.isAndroid
+                    //             ? InAppWebViewScreen(
+                    //                 params: WebviewParams(
+                    //                     url: "https://www.tradologie.com/fmcg/",
+                    //                     canPop: false,
+                    //                     isAppBar: true,
+                    //                     isShowDrawer: true,
+                    //                     isShowNotification: true))
+                    //             : WebViewScreen(
+                    //                 params: WebviewParams(
+                    //                     url: "https://www.tradologie.com/fmcg/",
+                    //                     canPop: false,
+                    //                     isAppBar: true,
+                    //                     isShowDrawer: true,
+                    //                     isShowNotification: true));
+                    //       },
+                    //       child: CachedNetworkImage(
+                    //         imageUrl:
+                    //             "https://www.tradologie.com/DOCS/mobileapp/buyerdashboard-1.webp",
+                    //       ),
+                    //     ),
+                    // BuyerDashboardBannerEngine(
+                    //   banners: [
+                    //     AppBanner(
+                    //       image:
+                    //           "https://www.tradologie.com/DOCS/mobileapp/buyerdashboard-1.webp",
+                    //       title: "FMCG",
+                    //       subtitle: "Coming Soon",
+                    //     ),
+                    //   ],
+                    //   onTap: (banner, index) {
+                    //     Constants.isAndroid14OrBelow && Platform.isAndroid
+                    //         ? InAppWebViewScreen(
+                    //             params: WebviewParams(
+                    //                 url: "https://www.tradologie.com/fmcg/",
+                    //                 canPop: false,
+                    //                 isAppBar: true,
+                    //                 isShowDrawer: true,
+                    //                 isShowNotification: true))
+                    //         : WebViewScreen(
+                    //             params: WebviewParams(
+                    //                 url: "https://www.tradologie.com/fmcg/",
+                    //                 canPop: false,
+                    //                 isAppBar: true,
+                    //                 isShowDrawer: true,
+                    //                 isShowNotification: true));
+                    //   },
+                    // ),
+                    //   ),
+                    // ),
                     SliverPadding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       sliver: SliverToBoxAdapter(
@@ -176,7 +232,37 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen> {
                             ),
                           ),
                           const SizedBox(width: 14),
-                          Spacer(),
+                          Spacer()
+                          // Expanded(
+                          //   child: BuyerDashboardCard(
+                          //     color: Colors.brown,
+                          //     icon: Icons.add,
+                          //     title: "FMCG\n",
+                          //     subtitle: "Coming soon\n \n",
+                          //     onTap: () {
+                          //       Constants.isAndroid14OrBelow &&
+                          //               Platform.isAndroid
+                          //           ? Navigator.pushNamed(
+                          //               context, Routes.inAppWebViewRoute,
+                          //               arguments: WebviewParams(
+                          //                   url:
+                          //                       "https://www.tradologie.com/fmcg/",
+                          //                   canPop: true,
+                          //                   isAppBar: true,
+                          //                   isShowDrawer: false,
+                          //                   isShowNotification: false))
+                          //           : Navigator.pushNamed(
+                          //               context, Routes.webViewRoute,
+                          //               arguments: WebviewParams(
+                          //                   url:
+                          //                       "https://www.tradologie.com/fmcg/",
+                          //                   canPop: true,
+                          //                   isAppBar: true,
+                          //                   isShowDrawer: false,
+                          //                   isShowNotification: false));
+                          //     },
+                          //   ),
+                          // ),
                         ],
                       )),
                     ),

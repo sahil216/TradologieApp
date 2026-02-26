@@ -9,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pinput/pinput.dart';
+import 'package:tradologie_app/core/utils/analytics_services.dart';
 import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
@@ -167,9 +168,11 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
           listener: (context, state) async {
             if (state is VerifyOtpSuccess) {
               if (Constants.isBuyer == true) {
+                AnalyticsService.logEvent("buyer_otp_login_success");
                 Navigator.pushNamedAndRemoveUntil(
                     context, Routes.mainRoute, (route) => false);
               } else {
+                AnalyticsService.logEvent("seller_otp_login_success");
                 Navigator.pushNamedAndRemoveUntil(
                     context, Routes.mainRoute, (route) => false);
               }

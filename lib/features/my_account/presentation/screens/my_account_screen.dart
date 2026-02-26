@@ -8,6 +8,7 @@ import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/error/network_failure.dart';
 import 'package:tradologie_app/core/error/user_failure.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
+import 'package:tradologie_app/core/utils/analytics_services.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
@@ -100,6 +101,32 @@ class _MyAccountScreenState extends State<MyAccountScreen>
     } else {
       _previousIndex = newIndex;
     }
+    _trackTabAnalytics(newIndex);
+  }
+
+  void _trackTabAnalytics(int index) {
+    final tabName = [
+      "Login Control",
+      "Information",
+      "Company Details",
+      "Documents",
+      "Authorized Person",
+      "Legal Documents",
+      "Bank Details",
+      "Selling Location",
+      "Bulk & Retail",
+      "Membership Type",
+      "Commodity",
+    ][index];
+
+    if (tabName == "Membership Type") {
+      AnalyticsService.logEvent("membership_tab_clicked");
+    }
+    if (tabName == "Documents") {
+      AnalyticsService.logEvent("documents_tab_clicked");
+    }
+
+    debugPrint("Analytics Triggered: $tabName");
   }
 
   bool _canOpenTab(int index) {

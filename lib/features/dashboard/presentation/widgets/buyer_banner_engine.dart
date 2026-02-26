@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 
 class BuyerDashboardBannerEngine extends StatefulWidget {
   final List<AppBanner> banners;
+  final void Function(AppBanner banner, int index)? onTap;
 
   const BuyerDashboardBannerEngine({
     super.key,
     required this.banners,
+    this.onTap,
   });
 
   @override
@@ -85,6 +87,8 @@ class _BuyerDashboardBannerEngineState
                     child: BuyerDashboardBannerCard(
                       banner: widget.banners[index],
                       pageOffset: (page - index),
+                      onTap: () =>
+                          widget.onTap?.call(widget.banners[index], index),
                     ),
                   );
                 },
@@ -93,10 +97,12 @@ class _BuyerDashboardBannerEngineState
           ),
         ),
         const SizedBox(height: 12),
-        BuyerDashboardBannerIndicator(
-          controller: _controller,
-          count: widget.banners.length,
-        ),
+        widget.banners.length == 1
+            ? SizedBox()
+            : BuyerDashboardBannerIndicator(
+                controller: _controller,
+                count: widget.banners.length,
+              ),
       ],
     );
   }
@@ -117,11 +123,13 @@ class AppBanner {
 class BuyerDashboardBannerCard extends StatelessWidget {
   final AppBanner banner;
   final double pageOffset;
+  final VoidCallback? onTap;
 
   const BuyerDashboardBannerCard({
     super.key,
     required this.banner,
     required this.pageOffset,
+    this.onTap,
   });
 
   @override
@@ -131,61 +139,64 @@ class BuyerDashboardBannerCard extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Transform.translate(
-              offset: Offset(imageShift, 0),
-              child: Image.network(
-                banner.image,
-                fit: BoxFit.cover,
-              ),
-            ),
-
-            /// GLASS DARK OVERLAY
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.black.withOpacity(0.65),
-                    Colors.transparent,
-                  ],
-                  begin: Alignment.bottomLeft,
-                  end: Alignment.topRight,
+      child: GestureDetector(
+        onTap: onTap,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Transform.translate(
+                offset: Offset(imageShift, 0),
+                child: Image.network(
+                  banner.image,
+                  fit: BoxFit.cover,
                 ),
               ),
-            ),
 
-            Positioned(
-              left: 20,
-              bottom: 22,
-              right: 20,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    banner.subtitle,
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 13,
-                    ),
+              /// GLASS DARK OVERLAY
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.black.withOpacity(0.65),
+                      Colors.transparent,
+                    ],
+                    begin: Alignment.bottomLeft,
+                    end: Alignment.topRight,
                   ),
-                  const SizedBox(height: 6),
-                  Text(
-                    banner.title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      height: 1.2,
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ],
+
+              Positioned(
+                left: 20,
+                bottom: 22,
+                right: 20,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      banner.subtitle,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      banner.title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        height: 1.2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

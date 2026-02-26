@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 
 import 'package:tradologie_app/config/routes/app_router.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
+import 'package:tradologie_app/core/utils/analytics_services.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
@@ -90,6 +91,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         Constants.isBuyer = false;
                         await secureStorage.write(AppStrings.isBuyer, "false");
                         sl<NavigationService>().pushNamed(Routes.sendOtpScreen);
+                        AnalyticsService.logEvent("seller_button_clicked");
                       },
                       text: CommonStrings.sellerText,
                       width: double.infinity,
@@ -110,6 +112,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         Constants.isBuyer = true;
                         await secureStorage.write(AppStrings.isBuyer, "true");
                         sl<NavigationService>().pushNamed(Routes.sendOtpScreen);
+                        AnalyticsService.logEvent("buyer_button_clicked");
                       },
                       text: CommonStrings.buyerText,
                       width: double.infinity,
