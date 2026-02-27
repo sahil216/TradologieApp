@@ -25,26 +25,51 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   _checkVersion();
-    // });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Constants().checkAndroidVersion();
+    });
+
+    _screenController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+
+    _screenFade = CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    );
+
+    _screenScale = Tween<double>(
+      begin: 0.97,
+      end: 1,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _screenSlide = Tween<Offset>(
+      begin: const Offset(0, .04),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted) _screenController.forward();
+    });
     startDelay(context);
   }
 
-  // Future<void> _checkVersion() async {
-  //   final version = await getAppVersion();
-
-  //   context.read<AppCubit>().checkForceUpdate(
-  //         ForceUpdateParams(
-  //             token: "2018APR031848",
-  //             appVersion: version,
-  //             isAndroid: Platform.isAndroid ? true : false),
-  //       );
-  // }
+  late AnimationController _screenController;
+  late Animation<double> _screenFade;
+  late Animation<double> _screenScale;
+  late Animation<Offset> _screenSlide;
 
   Future<String> getAppVersion() async {
     final info = await PackageInfo.fromPlatform();
@@ -82,7 +107,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     // startDelay(context);
     return AdaptiveScaffold(
-      appBar: Constants.appBar(context, height: 0, boxShadow: []),
+      // appBar: Constants.appBar(context, height: 0, boxShadow: []),
       body: SafeArea(
         child: BlocListener<AppCubit, AppState>(
           listener: (context, state) {
@@ -107,11 +132,27 @@ class _SplashScreenState extends State<SplashScreen> {
                   return const SizedBox.shrink();
                 },
               ),
-              Center(
-                child: Image.asset(
-                  ImgAssets.companyLogo,
-                  height: 386,
-                  width: 391,
+              FadeTransition(
+                opacity: _screenFade,
+                child: SlideTransition(
+                  position: _screenSlide,
+                  child: ScaleTransition(
+                    scale: _screenScale,
+                    child: CustomScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      slivers: [
+                        SliverToBoxAdapter(
+                          child: Center(
+                            child: Image.asset(
+                              ImgAssets.companyLogo,
+                              height: 386,
+                              width: 391,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
               Positioned(

@@ -42,7 +42,7 @@ class _CircularImageRotatorState extends State<CircularImageRotator> {
 
   Widget _buildSlot(String imagePath) {
     return SizedBox(
-      width: 120,
+      width: 90,
       height: 130,
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 500),
