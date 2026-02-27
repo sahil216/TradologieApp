@@ -221,9 +221,10 @@ class _MainScreenState extends State<MainScreen>
                               : supplierTabsList;
 
                           return KeyedSubtree(
-                            key: ValueKey(_appCubit.bottomNavIndex),
-                            child: tabs[_appCubit.bottomNavIndex].page,
-                          );
+                              key: ValueKey(_appCubit.bottomNavIndex),
+                              child: tabs.isEmpty
+                                  ? Container()
+                                  : tabs[_appCubit.bottomNavIndex].page);
                         },
                       ),
                     ),
