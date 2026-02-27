@@ -37,10 +37,10 @@ class _BuyerDashboardCardState extends State<BuyerDashboardCard> {
         final bool compact = w < 140; // 3 cards on mobile
         final bool medium = w >= 140 && w < 190;
 
-        final double iconBoxSize = compact ? 30 : (medium ? 46 : 54);
-        final double iconSize = compact ? 16 : (medium ? 20 : 24);
+        final double iconBoxSize = compact ? 24 : (medium ? 30 : 30);
+        final double iconSize = compact ? 14 : (medium ? 18 : 20);
 
-        final double titleSize = compact ? 13 : (medium ? 15 : 18);
+        final double titleSize = compact ? 14 : (medium ? 14 : 14);
         final double subtitleSize = compact ? 10 : (medium ? 12 : 13);
 
         final double gapLarge = compact ? 8 : 14;
@@ -87,10 +87,6 @@ class _BuyerDashboardCardState extends State<BuyerDashboardCard> {
                         width: 1.2,
                       ),
                     ),
-
-                    ////////////////////////////////////////////////////
-                    /// ⭐ ADAPTIVE CONTENT
-                    ////////////////////////////////////////////////////
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,31 +118,14 @@ class _BuyerDashboardCardState extends State<BuyerDashboardCard> {
                         SizedBox(height: gapLarge),
                         Text(
                           widget.title,
-                          maxLines: 3,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             fontSize: titleSize,
-                            height: 1.2,
+                            height: 1,
                             color: widget.color,
                           ),
-                        ),
-                        SizedBox(height: gapSmall),
-                        Text(
-                          widget.subtitle,
-                          maxLines: 4,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: subtitleSize,
-                            height: 1.2,
-                            color: Colors.black54,
-                          ),
-                        ),
-                        SizedBox(height: bottomGap),
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: Icon(Icons.arrow_forward_ios,
-                              size: compact ? 14 : 16, color: widget.color),
                         ),
                       ],
                     ),

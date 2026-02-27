@@ -37,8 +37,8 @@ class BuyerPostRequirementScreen extends StatefulWidget {
       _BuyerPostRequirementScreenState();
 }
 
-class _BuyerPostRequirementScreenState
-    extends State<BuyerPostRequirementScreen> {
+class _BuyerPostRequirementScreenState extends State<BuyerPostRequirementScreen>
+    with SingleTickerProviderStateMixin {
   AllListDetail? allListDetail;
   List<CommodityList>? commodityList;
 
@@ -47,6 +47,10 @@ class _BuyerPostRequirementScreenState
   AttributeList? selectedAttribute1;
   AttributeList? selectedAttribute2;
   ItemUnitList? selectedUnit;
+  late AnimationController _screenController;
+  late Animation<double> _screenFade;
+  late Animation<double> _screenScale;
+  late Animation<Offset> _screenSlide;
 
   Key commodityKey = UniqueKey();
   Key subCommodityKey = UniqueKey();
@@ -152,10 +156,40 @@ class _BuyerPostRequirementScreenState
   void initState() {
     super.initState();
     getCommodityData();
+    _screenController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+
+    _screenFade = CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    );
+
+    _screenScale = Tween<double>(
+      begin: 0.97,
+      end: 1,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _screenSlide = Tween<Offset>(
+      begin: const Offset(0, .04),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) _screenController.forward();
+    });
   }
 
   @override
   void dispose() {
+    _screenController.dispose();
     super.dispose();
   }
 
@@ -243,251 +277,288 @@ class _BuyerPostRequirementScreenState
               // }
               return Stack(
                 children: [
-                  CustomScrollView(slivers: [
-                    const CommonAppbar(
-                      title: "Post Your Requirement",
-                      showBackButton: true,
-                    ),
-                    SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
-                      sliver: SliverList(
-                        delegate: SliverChildListDelegate(
-                          [
-                            Form(
-                              key: _formKey,
-                              child: Column(
-                                children: [
-                                  CommonDropdown<CommodityList>(
-                                    label: 'Commodity *',
-                                    hint: 'Select Commodity',
-                                    dropdownKey: commodityKey,
-                                    asyncItems: (filter, loadProps) {
-                                      return fetchCommodity(filter, loadProps);
-                                    },
-                                    validator: (value) =>
-                                        value == null ? "Required" : null,
-                                    selectedItem: null,
-                                    itemAsString: (item) {
-                                      return item.groupName ?? "";
-                                    },
-                                    onChanged: (item) async {
-                                      SecureStorageService secureStorage =
-                                          SecureStorageService();
+                  FadeTransition(
+                      opacity: _screenFade,
+                      child: SlideTransition(
+                          position: _screenSlide,
+                          child: ScaleTransition(
+                              scale: _screenScale,
+                              child: CustomScrollView(slivers: [
+                                const CommonAppbar(
+                                  title: "Post Your Requirement",
+                                  showBackButton: true,
+                                ),
+                                SliverPadding(
+                                  padding: const EdgeInsets.fromLTRB(
+                                      16, 12, 16, 120),
+                                  sliver: SliverList(
+                                    delegate: SliverChildListDelegate(
+                                      [
+                                        Form(
+                                          key: _formKey,
+                                          child: Column(
+                                            children: [
+                                              CommonDropdown<CommodityList>(
+                                                label: 'Commodity *',
+                                                hint: 'Select Commodity',
+                                                dropdownKey: commodityKey,
+                                                asyncItems:
+                                                    (filter, loadProps) {
+                                                  return fetchCommodity(
+                                                      filter, loadProps);
+                                                },
+                                                validator: (value) =>
+                                                    value == null
+                                                        ? "Required"
+                                                        : null,
+                                                selectedItem: null,
+                                                itemAsString: (item) {
+                                                  return item.groupName ?? "";
+                                                },
+                                                onChanged: (item) async {
+                                                  SecureStorageService
+                                                      secureStorage =
+                                                      SecureStorageService();
 
-                                      final params = GetAllListParams(
-                                          token: await secureStorage.read(
-                                                  AppStrings
-                                                      .apiVerificationCode) ??
-                                              "",
-                                          groupID: item?.groupId ?? "");
-                                      selectedCommodity = item;
+                                                  final params = GetAllListParams(
+                                                      token: await secureStorage
+                                                              .read(AppStrings
+                                                                  .apiVerificationCode) ??
+                                                          "",
+                                                      groupID:
+                                                          item?.groupId ?? "");
+                                                  selectedCommodity = item;
 
-                                      dashboardCubit.getAllList(params);
-                                    },
-                                    compareFn: (a, b) =>
-                                        a.groupName == b.groupName,
-                                  ),
-                                  const SizedBox(height: 20),
-                                  CommonDropdown<SubCommodityList>(
-                                    label: 'Sub Commodity *',
-                                    hint: 'Select Sub Commodity',
-                                    dropdownKey: subCommodityKey,
-                                    asyncItems: (filter, loadProps) {
-                                      return fetchSubCommodity(
-                                          filter, loadProps);
-                                    },
-                                    selectedItem: null,
-                                    itemAsString: (item) =>
-                                        item.categoryName ?? "",
-                                    onChanged: (item) {
-                                      selectedSubCommodity = item;
-                                    },
-                                    compareFn: (a, b) =>
-                                        a.categoryId == b.categoryId,
-                                  ),
-                                  const SizedBox(height: 20),
-                                  CommonDropdown<AttributeList>(
-                                    label:
-                                        '${allListDetail?.attribute1Header ?? "Type-1"} *',
-                                    hint:
-                                        '${allListDetail?.attribute1Header ?? "Type-1"} *',
-                                    dropdownKey: attr1Key,
-                                    asyncItems: (filter, loadProps) {
-                                      return fetchAttribute1(filter, loadProps);
-                                    },
-                                    selectedItem: null,
-                                    itemAsString: (item) =>
-                                        item.attributeValue ?? "",
-                                    onChanged: (item) {
-                                      selectedAttribute1 = item;
-                                    },
-                                    compareFn: (a, b) =>
-                                        a.attributeValueId ==
-                                        b.attributeValueId,
-                                  ),
-                                  const SizedBox(height: 20),
-                                  CommonDropdown<AttributeList>(
-                                    label:
-                                        '${allListDetail?.attribute2Header ?? "Type-2"} *',
-                                    hint:
-                                        '${allListDetail?.attribute2Header ?? "Type-2"} *',
-                                    dropdownKey: attr2Key,
-                                    asyncItems: (filter, loadProps) {
-                                      return fetchAttribute2(filter, loadProps);
-                                    },
-                                    selectedItem: null,
-                                    itemAsString: (item) =>
-                                        item.attributeValue ?? "",
-                                    onChanged: (item) {
-                                      selectedAttribute2 = item;
-                                    },
-                                    compareFn: (a, b) =>
-                                        a.attributeValueId ==
-                                        b.attributeValueId,
-                                  ),
-                                  const SizedBox(height: 20),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: CommonDropdown<ItemUnitList>(
-                                          label: 'Unit *',
-                                          hint: 'Select Unit',
-                                          dropdownKey: unitKey,
-                                          asyncItems: (filter, loadProps) {
-                                            return fetchItemUnit(
-                                                filter, loadProps);
-                                          },
-                                          selectedItem: null,
-                                          itemAsString: (item) =>
-                                              item.unitName ?? "",
-                                          onChanged: (item) {
-                                            selectedUnit = item;
-                                          },
-                                          compareFn: (a, b) =>
-                                              a.unitName == b.unitName,
+                                                  dashboardCubit
+                                                      .getAllList(params);
+                                                },
+                                                compareFn: (a, b) =>
+                                                    a.groupName == b.groupName,
+                                              ),
+                                              const SizedBox(height: 20),
+                                              CommonDropdown<SubCommodityList>(
+                                                label: 'Sub Commodity *',
+                                                hint: 'Select Sub Commodity',
+                                                dropdownKey: subCommodityKey,
+                                                asyncItems:
+                                                    (filter, loadProps) {
+                                                  return fetchSubCommodity(
+                                                      filter, loadProps);
+                                                },
+                                                selectedItem: null,
+                                                itemAsString: (item) =>
+                                                    item.categoryName ?? "",
+                                                onChanged: (item) {
+                                                  selectedSubCommodity = item;
+                                                },
+                                                compareFn: (a, b) =>
+                                                    a.categoryId ==
+                                                    b.categoryId,
+                                              ),
+                                              const SizedBox(height: 20),
+                                              CommonDropdown<AttributeList>(
+                                                label:
+                                                    '${allListDetail?.attribute1Header ?? "Type-1"} *',
+                                                hint:
+                                                    '${allListDetail?.attribute1Header ?? "Type-1"} *',
+                                                dropdownKey: attr1Key,
+                                                asyncItems:
+                                                    (filter, loadProps) {
+                                                  return fetchAttribute1(
+                                                      filter, loadProps);
+                                                },
+                                                selectedItem: null,
+                                                itemAsString: (item) =>
+                                                    item.attributeValue ?? "",
+                                                onChanged: (item) {
+                                                  selectedAttribute1 = item;
+                                                },
+                                                compareFn: (a, b) =>
+                                                    a.attributeValueId ==
+                                                    b.attributeValueId,
+                                              ),
+                                              const SizedBox(height: 20),
+                                              CommonDropdown<AttributeList>(
+                                                label:
+                                                    '${allListDetail?.attribute2Header ?? "Type-2"} *',
+                                                hint:
+                                                    '${allListDetail?.attribute2Header ?? "Type-2"} *',
+                                                dropdownKey: attr2Key,
+                                                asyncItems:
+                                                    (filter, loadProps) {
+                                                  return fetchAttribute2(
+                                                      filter, loadProps);
+                                                },
+                                                selectedItem: null,
+                                                itemAsString: (item) =>
+                                                    item.attributeValue ?? "",
+                                                onChanged: (item) {
+                                                  selectedAttribute2 = item;
+                                                },
+                                                compareFn: (a, b) =>
+                                                    a.attributeValueId ==
+                                                    b.attributeValueId,
+                                              ),
+                                              const SizedBox(height: 20),
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: CommonDropdown<
+                                                        ItemUnitList>(
+                                                      label: 'Unit *',
+                                                      hint: 'Select Unit',
+                                                      dropdownKey: unitKey,
+                                                      asyncItems:
+                                                          (filter, loadProps) {
+                                                        return fetchItemUnit(
+                                                            filter, loadProps);
+                                                      },
+                                                      selectedItem: null,
+                                                      itemAsString: (item) =>
+                                                          item.unitName ?? "",
+                                                      onChanged: (item) {
+                                                        selectedUnit = item;
+                                                      },
+                                                      compareFn: (a, b) =>
+                                                          a.unitName ==
+                                                          b.unitName,
+                                                    ),
+                                                  ),
+                                                  SizedBox(width: 20),
+                                                  Expanded(
+                                                    child: CommonTextField(
+                                                      titleText: CommonStrings
+                                                          .quantity,
+                                                      titleStyle:
+                                                          TextStyleConstants
+                                                              .semiBold(
+                                                                  context),
+                                                      hintText: CommonStrings
+                                                          .enterQuantity,
+                                                      textRequired:
+                                                          CommonStrings
+                                                              .enterQuantity,
+                                                      controller: qtyController,
+                                                      backgroundColor:
+                                                          AppColors.transparent,
+                                                      textInputType:
+                                                          TextInputType.number,
+                                                      inputFormatters: [
+                                                        FilteringTextInputFormatter
+                                                            .digitsOnly
+                                                      ],
+                                                      isEnable: true,
+                                                      height: 45,
+                                                      autovalidateMode:
+                                                          AutovalidateMode
+                                                              .onUserInteraction,
+                                                      validator:
+                                                          (String? value) {
+                                                        // if (value == null ||
+                                                        //     value.trim().isEmpty) {
+                                                        //   return "Required";
+                                                        // }
+
+                                                        return null;
+                                                      },
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+
+                                              const SizedBox(height: 20),
+                                              CommonTextField(
+                                                titleText:
+                                                    CommonStrings.message,
+                                                hintText:
+                                                    CommonStrings.enterMessage,
+                                                titleStyle:
+                                                    TextStyleConstants.semiBold(
+                                                        context),
+                                                textRequired:
+                                                    CommonStrings.enterMessage,
+                                                controller: messageController,
+                                                textInputType:
+                                                    TextInputType.text,
+                                                isEnable: true,
+                                                backgroundColor:
+                                                    AppColors.transparent,
+                                                height: 100,
+                                                autovalidateMode:
+                                                    AutovalidateMode.disabled,
+                                                validator: (String? value) {
+                                                  if (value == null ||
+                                                      value.trim().isEmpty) {
+                                                    return "Required";
+                                                  }
+
+                                                  return null;
+                                                },
+                                              ),
+                                              const SizedBox(height: 20),
+
+                                              // CommonButton(
+                                              //   onPressed: () async {
+                                              //     SecureStorageService secureStorage =
+                                              //         SecureStorageService();
+
+                                              //     if (selectedCommodity != null &&
+                                              //         selectedSubCommodity != null &&
+                                              //         selectedAttribute1 != null &&
+                                              //         selectedAttribute2 != null &&
+                                              //         selectedUnit != null &&
+                                              //         qtyController.text.isNotEmpty &&
+                                              //         messageController.text.isNotEmpty) {
+                                              //       final params = AddCustomerRequirementParams(
+                                              //           token: await secureStorage.read(
+                                              //                   AppStrings
+                                              //                       .apiVerificationCode) ??
+                                              //               "",
+                                              //           commodityID:
+                                              //               selectedCommodity?.groupId ?? "",
+                                              //           subCommodityID:
+                                              //               selectedSubCommodity?.categoryId ??
+                                              //                   "",
+                                              //           attribute1: selectedAttribute1
+                                              //                   ?.attributeValueId ??
+                                              //               "",
+                                              //           attribute2: selectedAttribute2
+                                              //                   ?.attributeValueId ??
+                                              //               "",
+                                              //           quantity: qtyController.text,
+                                              //           quantityUnit:
+                                              //               selectedUnit?.unitName ?? "",
+                                              //           otherSpecifications:
+                                              //               messageController.text,
+                                              //           userId: await secureStorage
+                                              //                   .read(AppStrings.customerId) ??
+                                              //               "");
+
+                                              //       dashboardCubit
+                                              //           .addCustomerRequirement(params);
+                                              //     } else {
+                                              //       Constants.showErrorToast(
+                                              //           context: context,
+                                              //           msg: CommonStrings.enterAllDetails);
+                                              //     }
+                                              //   },
+                                              //   text: "Submit",
+                                              //   textStyle: TextStyleConstants.medium(
+                                              //     context,
+                                              //     fontSize: 16,
+                                              //     color: AppColors.white,
+                                              //   ),
+                                              // ),
+
+                                              /// Submit Button
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(width: 20),
-                                      Expanded(
-                                        child: CommonTextField(
-                                          titleText: CommonStrings.quantity,
-                                          titleStyle:
-                                              TextStyleConstants.semiBold(
-                                                  context),
-                                          hintText: CommonStrings.enterQuantity,
-                                          textRequired:
-                                              CommonStrings.enterQuantity,
-                                          controller: qtyController,
-                                          backgroundColor:
-                                              AppColors.transparent,
-                                          textInputType: TextInputType.number,
-                                          inputFormatters: [
-                                            FilteringTextInputFormatter
-                                                .digitsOnly
-                                          ],
-                                          isEnable: true,
-                                          height: 45,
-                                          autovalidateMode: AutovalidateMode
-                                              .onUserInteraction,
-                                          validator: (String? value) {
-                                            // if (value == null ||
-                                            //     value.trim().isEmpty) {
-                                            //   return "Required";
-                                            // }
-
-                                            return null;
-                                          },
-                                        ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-
-                                  const SizedBox(height: 20),
-                                  CommonTextField(
-                                    titleText: CommonStrings.message,
-                                    hintText: CommonStrings.enterMessage,
-                                    titleStyle:
-                                        TextStyleConstants.semiBold(context),
-                                    textRequired: CommonStrings.enterMessage,
-                                    controller: messageController,
-                                    textInputType: TextInputType.text,
-                                    isEnable: true,
-                                    backgroundColor: AppColors.transparent,
-                                    height: 100,
-                                    autovalidateMode: AutovalidateMode.disabled,
-                                    validator: (String? value) {
-                                      if (value == null ||
-                                          value.trim().isEmpty) {
-                                        return "Required";
-                                      }
-
-                                      return null;
-                                    },
-                                  ),
-                                  const SizedBox(height: 20),
-
-                                  // CommonButton(
-                                  //   onPressed: () async {
-                                  //     SecureStorageService secureStorage =
-                                  //         SecureStorageService();
-
-                                  //     if (selectedCommodity != null &&
-                                  //         selectedSubCommodity != null &&
-                                  //         selectedAttribute1 != null &&
-                                  //         selectedAttribute2 != null &&
-                                  //         selectedUnit != null &&
-                                  //         qtyController.text.isNotEmpty &&
-                                  //         messageController.text.isNotEmpty) {
-                                  //       final params = AddCustomerRequirementParams(
-                                  //           token: await secureStorage.read(
-                                  //                   AppStrings
-                                  //                       .apiVerificationCode) ??
-                                  //               "",
-                                  //           commodityID:
-                                  //               selectedCommodity?.groupId ?? "",
-                                  //           subCommodityID:
-                                  //               selectedSubCommodity?.categoryId ??
-                                  //                   "",
-                                  //           attribute1: selectedAttribute1
-                                  //                   ?.attributeValueId ??
-                                  //               "",
-                                  //           attribute2: selectedAttribute2
-                                  //                   ?.attributeValueId ??
-                                  //               "",
-                                  //           quantity: qtyController.text,
-                                  //           quantityUnit:
-                                  //               selectedUnit?.unitName ?? "",
-                                  //           otherSpecifications:
-                                  //               messageController.text,
-                                  //           userId: await secureStorage
-                                  //                   .read(AppStrings.customerId) ??
-                                  //               "");
-
-                                  //       dashboardCubit
-                                  //           .addCustomerRequirement(params);
-                                  //     } else {
-                                  //       Constants.showErrorToast(
-                                  //           context: context,
-                                  //           msg: CommonStrings.enterAllDetails);
-                                  //     }
-                                  //   },
-                                  //   text: "Submit",
-                                  //   textStyle: TextStyleConstants.medium(
-                                  //     context,
-                                  //     fontSize: 16,
-                                  //     color: AppColors.white,
-                                  //   ),
-                                  // ),
-
-                                  /// Submit Button
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ]),
+                                ),
+                              ])))),
                   BlocBuilder<DashboardCubit, DashboardState>(
                     buildWhen: (previous, current) {
                       bool result = current != previous;

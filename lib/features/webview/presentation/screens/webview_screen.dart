@@ -30,7 +30,8 @@ class WebViewScreen extends StatefulWidget {
   State<WebViewScreen> createState() => _WebViewScreenState();
 }
 
-class _WebViewScreenState extends State<WebViewScreen> {
+class _WebViewScreenState extends State<WebViewScreen>
+    with SingleTickerProviderStateMixin {
   late final WebViewController _controller;
   SecureStorageService secureStorage = SecureStorageService();
 
@@ -84,6 +85,46 @@ class _WebViewScreenState extends State<WebViewScreen> {
         },
       );
     }
+    _screenController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+
+    _screenFade = CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    );
+
+    _screenScale = Tween<double>(
+      begin: 0.97,
+      end: 1,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _screenSlide = Tween<Offset>(
+      begin: const Offset(0, .04),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) _screenController.forward();
+    });
+  }
+
+  late AnimationController _screenController;
+  late Animation<double> _screenFade;
+  late Animation<double> _screenScale;
+  late Animation<Offset> _screenSlide;
+
+  @override
+  void dispose() {
+    _screenController.dispose();
+    super.dispose();
   }
 
   @override
@@ -128,30 +169,38 @@ class _WebViewScreenState extends State<WebViewScreen> {
           body: SafeArea(
             child: Stack(
               children: [
-                CustomScrollView(
-                  physics: const NeverScrollableScrollPhysics(),
-                  slivers: [
-                    /// 💎 COMMON SLIVER APPBAR
-                    if (widget.params.isAppBar == true)
-                      CommonAppbar(
-                        title: widget.params.title ?? '',
-                        showBackButton: widget.params.canPop ?? false,
-                        showNotification: widget.params.isShowNotification,
-                        showLogo: true,
-                        onNotificationTap: () {
-                          sl<NavigationService>().pushNamed(
-                            Routes.notificationScreen,
-                          );
-                        },
-                      ),
+                FadeTransition(
+                    opacity: _screenFade,
+                    child: SlideTransition(
+                        position: _screenSlide,
+                        child: ScaleTransition(
+                            scale: _screenScale,
+                            child: CustomScrollView(
+                              physics: const NeverScrollableScrollPhysics(),
+                              slivers: [
+                                /// 💎 COMMON SLIVER APPBAR
+                                if (widget.params.isAppBar == true)
+                                  CommonAppbar(
+                                    title: widget.params.title ?? '',
+                                    showBackButton:
+                                        widget.params.canPop ?? false,
+                                    showNotification:
+                                        widget.params.isShowNotification,
+                                    showLogo: true,
+                                    onNotificationTap: () {
+                                      sl<NavigationService>().pushNamed(
+                                        Routes.notificationScreen,
+                                      );
+                                    },
+                                  ),
 
-                    /// 🌐 WEBVIEW BODY
-                    SliverFillRemaining(
-                      hasScrollBody: true,
-                      child: WebViewWidget(controller: _controller),
-                    ),
-                  ],
-                ),
+                                /// 🌐 WEBVIEW BODY
+                                SliverFillRemaining(
+                                  hasScrollBody: true,
+                                  child: WebViewWidget(controller: _controller),
+                                ),
+                              ],
+                            )))),
                 BlocBuilder<WebViewCubit, WebViewState>(
                   builder: (context, state) {
                     if (state is WebPageLoading) {

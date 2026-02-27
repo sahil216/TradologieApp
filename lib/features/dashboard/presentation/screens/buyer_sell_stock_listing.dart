@@ -39,7 +39,8 @@ class BuyerSellStockListing extends StatefulWidget {
   State<BuyerSellStockListing> createState() => _BuyerSellStockListingState();
 }
 
-class _BuyerSellStockListingState extends State<BuyerSellStockListing> {
+class _BuyerSellStockListingState extends State<BuyerSellStockListing>
+    with SingleTickerProviderStateMixin {
   DashboardCubit get dashboardCubit => BlocProvider.of<DashboardCubit>(context);
 
   final ScrollController _scrollController = ScrollController();
@@ -89,17 +90,52 @@ class _BuyerSellStockListingState extends State<BuyerSellStockListing> {
         .toList();
   }
 
+  late AnimationController _screenController;
+  late Animation<double> _screenFade;
+  late Animation<double> _screenScale;
+  late Animation<Offset> _screenSlide;
+
   @override
   void initState() {
     getStockListing();
     getAuctionUnitList();
     authenticationCubit.getCountryCodeList(NoParams());
+    _screenController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+
+    _screenFade = CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    );
+
+    _screenScale = Tween<double>(
+      begin: 0.97,
+      end: 1,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _screenSlide = Tween<Offset>(
+      begin: const Offset(0, .04),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) _screenController.forward();
+    });
     super.initState();
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _screenController.dispose();
     super.dispose();
   }
 
@@ -170,42 +206,48 @@ class _BuyerSellStockListingState extends State<BuyerSellStockListing> {
             return Stack(
               children: [
                 SafeArea(
-                  child: CustomScrollView(
-                    controller: _scrollController,
-                    physics: const BouncingScrollPhysics(),
-                    slivers: [
-                      const CommonAppbar(
-                        title: "Ready to Sell Stock",
-                        showBackButton: true,
-                      ),
-                      if (state is GetVendorStockListingIsLoading ||
-                          state is GetAuctionUnitListIsLoading)
-                        const RiceShimmerSliver()
-                      else
-                        SliverPadding(
-                          padding: const EdgeInsets.all(16),
-                          sliver: SliverGrid(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                                final item = stockList?[index];
-                                return categoryUltraCard(
-                                  item: item,
-                                  heroTag: "category_$index",
-                                );
-                              },
-                              childCount: stockList?.length,
-                            ),
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              mainAxisSpacing: 18,
-                              crossAxisSpacing: 14,
-                              childAspectRatio: .80,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
+                  child: FadeTransition(
+                      opacity: _screenFade,
+                      child: SlideTransition(
+                          position: _screenSlide,
+                          child: ScaleTransition(
+                              scale: _screenScale,
+                              child: CustomScrollView(
+                                controller: _scrollController,
+                                physics: const BouncingScrollPhysics(),
+                                slivers: [
+                                  const CommonAppbar(
+                                    title: "Ready to Sell Stock",
+                                    showBackButton: true,
+                                  ),
+                                  if (state is GetVendorStockListingIsLoading ||
+                                      state is GetAuctionUnitListIsLoading)
+                                    const RiceShimmerSliver()
+                                  else
+                                    SliverPadding(
+                                      padding: const EdgeInsets.all(16),
+                                      sliver: SliverGrid(
+                                        delegate: SliverChildBuilderDelegate(
+                                          (context, index) {
+                                            final item = stockList?[index];
+                                            return categoryUltraCard(
+                                              item: item,
+                                              heroTag: "category_$index",
+                                            );
+                                          },
+                                          childCount: stockList?.length,
+                                        ),
+                                        gridDelegate:
+                                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 2,
+                                          mainAxisSpacing: 18,
+                                          crossAxisSpacing: 14,
+                                          childAspectRatio: .80,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              )))),
                 ),
               ],
             );
@@ -346,6 +388,7 @@ class _BuyerSellStockListingState extends State<BuyerSellStockListing> {
                       borderRadius: BorderRadius.circular(18),
                     ),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const SizedBox(height: 6),
                         ClipRRect(
@@ -356,7 +399,7 @@ class _BuyerSellStockListingState extends State<BuyerSellStockListing> {
                             duration: const Duration(milliseconds: 350),
                             curve: Curves.easeOutCubic,
                             child: SizedBox(
-                              height: 130,
+                              height: 100,
                               child: CachedNetworkImage(
                                 imageUrl: Uri.encodeFull(
                                   EndPoints.getImage(
@@ -379,7 +422,7 @@ class _BuyerSellStockListingState extends State<BuyerSellStockListing> {
                           item?.commodityName ?? "",
                           style: const TextStyle(
                             fontWeight: FontWeight.w700,
-                            fontSize: 18,
+                            fontSize: 16,
                             letterSpacing: .2,
                             color: Color(0xff0C3C8C),
                           ),
@@ -388,7 +431,7 @@ class _BuyerSellStockListingState extends State<BuyerSellStockListing> {
                         Text(
                           "Location: ${item?.locations ?? ""}",
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 12,
                             color: Colors.grey.shade600,
                             fontWeight: FontWeight.w500,
                           ),
@@ -400,7 +443,7 @@ class _BuyerSellStockListingState extends State<BuyerSellStockListing> {
                             Text(
                               "Enquire Now",
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 14,
                                 color: Colors.grey.shade600,
                                 fontWeight: FontWeight.bold,
                               ),

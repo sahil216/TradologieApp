@@ -34,18 +34,52 @@ class MoreOptionsScreen extends StatefulWidget {
   State<MoreOptionsScreen> createState() => _MoreOptionsScreenState();
 }
 
-class _MoreOptionsScreenState extends State<MoreOptionsScreen> {
+class _MoreOptionsScreenState extends State<MoreOptionsScreen>
+    with SingleTickerProviderStateMixin {
   SecureStorageService secureStorage = SecureStorageService();
 
   String name = "";
   bool showUpdate = false;
 
   late AppCubit _appCubit;
+  late AnimationController _screenController;
+  late Animation<double> _screenFade;
+  late Animation<double> _screenScale;
+  late Animation<Offset> _screenSlide;
 
   @override
   void initState() {
     super.initState();
     _appCubit = BlocProvider.of<AppCubit>(context);
+    _screenController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+
+    _screenFade = CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    );
+
+    _screenScale = Tween<double>(
+      begin: 0.97,
+      end: 1,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _screenSlide = Tween<Offset>(
+      begin: const Offset(0, .04),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) _screenController.forward();
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkVersion();
       getName();
@@ -71,6 +105,12 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen> {
     return name = Constants.isBuyer == true
         ? await secureStorage.read(AppStrings.customerName) ?? ""
         : await secureStorage.read(AppStrings.vendorName) ?? "";
+  }
+
+  @override
+  void dispose() {
+    _screenController.dispose();
+    super.dispose();
   }
 
   @override
@@ -122,135 +162,155 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen> {
         /// 💎 SLIVER STRUCTURE START
         child: Stack(
           children: [
-            CustomScrollView(
-              slivers: [
-                /// ⭐ COMMON APPBAR
-                const CommonAppbar(
-                  title: "More",
-                  showNotification: true,
-                ),
+            FadeTransition(
+                opacity: _screenFade,
+                child: SlideTransition(
+                    position: _screenSlide,
+                    child: ScaleTransition(
+                        scale: _screenScale,
+                        child: CustomScrollView(
+                          slivers: [
+                            /// ⭐ COMMON APPBAR
+                            const CommonAppbar(
+                              title: "More",
+                              showNotification: true,
+                            ),
 
-                /// ⭐ BODY
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                    child: Column(
-                      children: [
-                        /// PROFILE HEADER
-                        _profileHeader(context),
+                            /// ⭐ BODY
+                            SliverToBoxAdapter(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                                child: Column(
+                                  children: [
+                                    /// PROFILE HEADER
+                                    _profileHeader(context),
 
-                        const SizedBox(height: 28),
+                                    const SizedBox(height: 28),
 
-                        /// GENERAL SECTION
-                        _sectionTitle(context, "GENERAL"),
+                                    /// GENERAL SECTION
+                                    _sectionTitle(context, "GENERAL"),
 
-                        _ultraTile(
-                          icon: Icons.contact_support_outlined,
-                          title: "Contact Us",
-                          onTap: () {
-                            sl<NavigationService>()
-                                .pushNamed(Routes.contactUsScreen);
-                          },
-                        ),
-
-                        _ultraTile(
-                          icon: Icons.share_outlined,
-                          title: "Share App",
-                          onTap: () {
-                            SharePlus.instance.share(
-                              ShareParams(
-                                text:
-                                    '${Constants.name} invited you to try the Tradologie app! https://tradologie.com/app/',
-                              ),
-                            );
-                          },
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        /// ACCOUNT SECTION
-                        _sectionTitle(context, "ACCOUNT"),
-
-                        _ultraTile(
-                          icon: Icons.delete_outline,
-                          title: "Delete Account",
-                          color: Colors.redAccent,
-                          onTap: () async {
-                            String? result = await showInputDialog(context);
-
-                            if (result != null && result.isNotEmpty) {
-                              if (!context.mounted) return;
-                              context.read<AuthenticationCubit>().deleteAccount(
-                                    DeleteAccountParams(
-                                      token: await secureStorage.read(
-                                              AppStrings.apiVerificationCode) ??
-                                          "",
-                                      message: result,
-                                      customerID: Constants.isBuyer
-                                          ? await secureStorage.read(
-                                                  AppStrings.customerId) ??
-                                              ""
-                                          : await secureStorage
-                                                  .read(AppStrings.vendorId) ??
-                                              "",
+                                    _ultraTile(
+                                      icon: Icons.contact_support_outlined,
+                                      title: "Contact Us",
+                                      onTap: () {
+                                        sl<NavigationService>()
+                                            .pushNamed(Routes.contactUsScreen);
+                                      },
                                     ),
-                                  );
-                            }
-                          },
-                        ),
 
-                        _ultraTile(
-                          icon: Icons.logout_rounded,
-                          title: "Logout",
-                          color: Colors.redAccent,
-                          onTap: () {
-                            AnalyticsService.logEvent("logout_clicked");
-                            context
-                                .read<AuthenticationCubit>()
-                                .signOut(NoParams());
-                          },
-                        ),
+                                    _ultraTile(
+                                      icon: Icons.share_outlined,
+                                      title: "Share App",
+                                      onTap: () {
+                                        SharePlus.instance.share(
+                                          ShareParams(
+                                            text:
+                                                '${Constants.name} invited you to try the Tradologie app! https://tradologie.com/app/',
+                                          ),
+                                        );
+                                      },
+                                    ),
 
-                        const SizedBox(height: 28),
+                                    const SizedBox(height: 24),
 
-                        /// UPDATE CTA
-                        if (showUpdate)
-                          Center(
-                            child: GestureDetector(
-                              onTap: () => _showUpdateDialog(context, false),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  CommonText(
-                                    'Newer App Version Available',
-                                    style: TextStyleConstants.semiBold(context),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  const Icon(Icons.arrow_forward_ios, size: 14),
-                                ],
+                                    /// ACCOUNT SECTION
+                                    _sectionTitle(context, "ACCOUNT"),
+
+                                    _ultraTile(
+                                      icon: Icons.delete_outline,
+                                      title: "Delete Account",
+                                      color: Colors.redAccent,
+                                      onTap: () async {
+                                        String? result =
+                                            await showInputDialog(context);
+
+                                        if (result != null &&
+                                            result.isNotEmpty) {
+                                          if (!context.mounted) return;
+                                          context
+                                              .read<AuthenticationCubit>()
+                                              .deleteAccount(
+                                                DeleteAccountParams(
+                                                  token: await secureStorage
+                                                          .read(AppStrings
+                                                              .apiVerificationCode) ??
+                                                      "",
+                                                  message: result,
+                                                  customerID: Constants.isBuyer
+                                                      ? await secureStorage
+                                                              .read(AppStrings
+                                                                  .customerId) ??
+                                                          ""
+                                                      : await secureStorage
+                                                              .read(AppStrings
+                                                                  .vendorId) ??
+                                                          "",
+                                                ),
+                                              );
+                                        }
+                                      },
+                                    ),
+
+                                    _ultraTile(
+                                      icon: Icons.logout_rounded,
+                                      title: "Logout",
+                                      color: Colors.redAccent,
+                                      onTap: () {
+                                        AnalyticsService.logEvent(
+                                            "logout_clicked");
+                                        context
+                                            .read<AuthenticationCubit>()
+                                            .signOut(NoParams());
+                                      },
+                                    ),
+
+                                    const SizedBox(height: 28),
+
+                                    /// UPDATE CTA
+                                    if (showUpdate)
+                                      Center(
+                                        child: GestureDetector(
+                                          onTap: () =>
+                                              _showUpdateDialog(context, false),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              CommonText(
+                                                'Newer App Version Available',
+                                                style:
+                                                    TextStyleConstants.semiBold(
+                                                        context),
+                                              ),
+                                              const SizedBox(width: 6),
+                                              const Icon(
+                                                  Icons.arrow_forward_ios,
+                                                  size: 14),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        bottom: 70,
-                        left: 16,
-                        right: 16,
-                      ),
-                      child: CommonSocialIcons(),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+                            SliverFillRemaining(
+                              hasScrollBody: false,
+                              child: Align(
+                                alignment: Alignment.bottomCenter,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                    bottom: 70,
+                                    left: 16,
+                                    right: 16,
+                                  ),
+                                  child: CommonSocialIcons(),
+                                ),
+                              ),
+                            ),
+                          ],
+                        )))),
 
             /// 🔄 LOADER
             BlocBuilder<AuthenticationCubit, AuthenticationState>(

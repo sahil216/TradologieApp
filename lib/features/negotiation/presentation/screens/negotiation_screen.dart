@@ -39,7 +39,8 @@ class NegotiationScreen extends StatefulWidget {
   State<NegotiationScreen> createState() => _NegotiationScreenState();
 }
 
-class _NegotiationScreenState extends State<NegotiationScreen> {
+class _NegotiationScreenState extends State<NegotiationScreen>
+    with SingleTickerProviderStateMixin {
   Negotiation? negotiation;
   List<NegotiationResult>? negotiationData;
 
@@ -103,6 +104,35 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
         _headerController.jumpTo(_bodyController.offset);
       }
     });
+    _screenController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+
+    _screenFade = CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    );
+
+    _screenScale = Tween<double>(
+      begin: 0.97,
+      end: 1,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _screenSlide = Tween<Offset>(
+      begin: const Offset(0, .04),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) _screenController.forward();
+    });
   }
 
   @override
@@ -114,6 +144,7 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
     // ]);
     _headerController.dispose();
     _bodyController.dispose();
+    _screenController.dispose();
     super.dispose();
   }
 
@@ -136,6 +167,11 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
     return headers.fold<double>(
         0, (sum, header) => sum + (columnWidths[header] ?? defaultColumnWidth));
   }
+
+  late AnimationController _screenController;
+  late Animation<double> _screenFade;
+  late Animation<double> _screenScale;
+  late Animation<Offset> _screenSlide;
 
   @override
   Widget build(BuildContext context) {
@@ -228,439 +264,477 @@ class _NegotiationScreenState extends State<NegotiationScreen> {
                 }
               }
 
-              return CustomScrollView(slivers: [
-                CommonAppbar(
-                  title: "Negotiation",
-                  showNotification: true,
-                  onNotificationTap: () {
-                    sl<NavigationService>().pushNamed(
-                      Routes.notificationScreen,
-                    );
-                  },
-                ),
-                SliverToBoxAdapter(
-                  child: SafeArea(
-                    top: false,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(28),
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: .55),
-                              borderRadius: BorderRadius.circular(28),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: .4),
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: .06),
-                                  blurRadius: 18,
-                                  offset: const Offset(0, 6),
-                                )
-                              ],
-                            ),
-
-                            /// ⭐ CONTENT ROW
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                _glassPageButton(
-                                  text: "Previous",
-                                  enabled: currentPage > 0,
-                                  onTap: () {
-                                    getNegotiationData(page: currentPage - 1);
-                                  },
-                                ),
-                                Text(
-                                  'Page ${currentPage + 1} of ${negotiation?.totalPages ?? 0}',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                _glassPageButton(
-                                  text: "Next",
-                                  enabled: ((currentPage + 1) <
-                                      (negotiation?.totalPages ?? 0)),
-                                  onTap: () {
-                                    getNegotiationData(page: currentPage + 1);
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SliverFillRemaining(
-                  hasScrollBody: true,
-                  child: Column(
-                    children: [
-                      CommonSingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        physics: const NeverScrollableScrollPhysics(),
-                        controller: _headerController,
-                        child: Row(
-                          children: headers.map((header) {
-                            return _cell(
-                              header,
-                              width: columnWidths[header] ?? defaultColumnWidth,
-                              isHeader: true,
-                            );
-                          }).toList(),
-                        ),
-                      ),
-
-                      // 🔹 Body
-                      Expanded(
-                        child: CommonSingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          controller: _bodyController,
-                          child: SizedBox(
-                            width: getTableWidth(),
-                            child: ListView.builder(
-                              itemCount: negotiationData?.length ?? 0,
-                              itemBuilder: (context, rowIndex) {
-                                final row = negotiationData![rowIndex];
-                                bool expanded = expandedIndex == rowIndex;
-                                return AnimatedSize(
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut,
-                                  child: Column(
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            expandedIndex =
-                                                expanded ? null : rowIndex;
-                                          });
-                                        },
-                                        child: Row(
-                                          children: headers.map((header) {
-                                            if (header == 'Negotiation Code') {
-                                              return Container(
-                                                width: 200,
-                                                height: 50,
-                                                alignment: Alignment.center,
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                      color:
-                                                          Colors.grey.shade400),
-                                                ),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    AnimatedRotation(
-                                                      turns: expanded ? 0.5 : 0,
-                                                      duration: const Duration(
-                                                          milliseconds: 300),
-                                                      child: const Icon(
-                                                        Icons
-                                                            .keyboard_arrow_down,
-                                                        color: Colors.blue,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(width: 6),
-                                                    GestureDetector(
-                                                      onTap: () {
-                                                        Constants.isAndroid14OrBelow &&
-                                                                Platform
-                                                                    .isAndroid
-                                                            ? sl<NavigationService>().pushNamed(
-                                                                Routes
-                                                                    .inAppWebViewRoute,
-                                                                arguments: WebviewParams(
-                                                                    url:
-                                                                        "${EndPoints.supplierWebsiteurl}/${row.navigateViewUrl}",
-                                                                    canPop:
-                                                                        true,
-                                                                    isAppBar:
-                                                                        true))
-                                                            : sl<NavigationService>().pushNamed(
-                                                                Routes
-                                                                    .webViewRoute,
-                                                                arguments: WebviewParams(
-                                                                    url:
-                                                                        "${EndPoints.supplierWebsiteurl}/${row.navigateViewUrl}",
-                                                                    canPop:
-                                                                        true,
-                                                                    isAppBar:
-                                                                        true));
-                                                      },
-                                                      child: CommonText(
-                                                        _getCellText(
-                                                            row, header),
-                                                        style:
-                                                            TextStyleConstants
-                                                                .regular(
-                                                          context,
-                                                          fontSize: 16,
-                                                          color: AppColors
-                                                              .defaultText,
-                                                          decoration:
-                                                              TextDecoration
-                                                                  .underline,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            }
-                                            return _cell(
-                                              _getCellText(row, header),
-                                              isShowView: false,
-                                              width: columnWidths[header] ??
-                                                  defaultColumnWidth,
-                                              isUnderline:
-                                                  header.toLowerCase() ==
-                                                      'order status',
-                                              color: header.toLowerCase() ==
-                                                      'order status'
-                                                  ? AppColors.blue
-                                                  : null,
-                                              onViewTap: () {
-                                                if (header.toLowerCase() ==
-                                                    'negotiation code') {
-                                                  Constants.isAndroid14OrBelow &&
-                                                          Platform.isAndroid
-                                                      ? sl<NavigationService>()
-                                                          .pushNamed(
-                                                              Routes
-                                                                  .inAppWebViewRoute,
-                                                              arguments:
-                                                                  WebviewParams(
-                                                                      url:
-                                                                          "${EndPoints.supplierWebsiteurl}/${row.navigateViewUrl}",
-                                                                      canPop:
-                                                                          true,
-                                                                      isAppBar:
-                                                                          true))
-                                                      : sl<NavigationService>()
-                                                          .pushNamed(
-                                                              Routes
-                                                                  .webViewRoute,
-                                                              arguments:
-                                                                  WebviewParams(
-                                                                      url:
-                                                                          "${EndPoints.supplierWebsiteurl}/${row.navigateViewUrl}",
-                                                                      canPop:
-                                                                          true,
-                                                                      isAppBar:
-                                                                          true));
-                                                }
-                                              },
-                                              onTap: () {
-                                                if (header.toLowerCase() ==
-                                                        'order status' &&
-                                                    row.linkType ==
-                                                        "directlink" &&
-                                                    row.orderStatus
-                                                            ?.toLowerCase() ==
-                                                        "update rate") {
-                                                  Constants.isAndroid14OrBelow &&
-                                                          Platform.isAndroid
-                                                      ? sl<NavigationService>()
-                                                          .pushNamed(
-                                                              Routes
-                                                                  .inAppWebViewRoute,
-                                                              arguments:
-                                                                  WebviewParams(
-                                                                      url:
-                                                                          "${EndPoints.supplierWebsiteurl}/${row.navigateUrl}",
-                                                                      canPop:
-                                                                          true,
-                                                                      isAppBar:
-                                                                          true))
-                                                      : sl<NavigationService>()
-                                                          .pushNamed(
-                                                              Routes
-                                                                  .webViewRoute,
-                                                              arguments:
-                                                                  WebviewParams(
-                                                                      url:
-                                                                          "${EndPoints.supplierWebsiteurl}/${row.navigateUrl}",
-                                                                      canPop:
-                                                                          true,
-                                                                      isAppBar:
-                                                                          true));
-                                                }
-                                              },
-                                            );
-                                          }).toList(),
-                                        ),
-                                      ),
-                                      ClipRect(
-                                        child: Align(
-                                          heightFactor: expanded ? 1 : 0,
-                                          child: Container(
-                                            width: getTableWidth(),
-                                            padding: const EdgeInsets.all(16),
-                                            color: Colors.grey.shade100,
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                _detail(
-                                                    "Negotiation Code ",
-                                                    row.auctionCode ?? '-',
-                                                    true, () {
-                                                  Constants.isAndroid14OrBelow &&
-                                                          Platform.isAndroid
-                                                      ? sl<NavigationService>()
-                                                          .pushNamed(
-                                                              Routes
-                                                                  .inAppWebViewRoute,
-                                                              arguments:
-                                                                  WebviewParams(
-                                                                      url:
-                                                                          "${EndPoints.supplierWebsiteurl}/${row.navigateViewUrl}",
-                                                                      canPop:
-                                                                          true,
-                                                                      isAppBar:
-                                                                          true))
-                                                      : sl<NavigationService>()
-                                                          .pushNamed(
-                                                              Routes
-                                                                  .webViewRoute,
-                                                              arguments:
-                                                                  WebviewParams(
-                                                                      url:
-                                                                          "${EndPoints.supplierWebsiteurl}/${row.navigateViewUrl}",
-                                                                      canPop:
-                                                                          true,
-                                                                      isAppBar:
-                                                                          true));
-                                                }),
-                                                _detail(
-                                                    "Negotiation Name ",
-                                                    row.auctionName ?? '-',
-                                                    false,
-                                                    null),
-                                                _detail(
-                                                  "Order Status ",
-                                                  row.orderStatus ?? '-',
-                                                  false,
-                                                  null,
-                                                  onTap: () {
-                                                    if (row.linkType ==
-                                                            "directlink" &&
-                                                        row.orderStatus
-                                                                ?.toLowerCase() ==
-                                                            "update rate") {
-                                                      Constants.isAndroid14OrBelow &&
-                                                              Platform.isAndroid
-                                                          ? sl<NavigationService>().pushNamed(
-                                                              Routes
-                                                                  .inAppWebViewRoute,
-                                                              arguments:
-                                                                  WebviewParams(
-                                                                      url:
-                                                                          "${EndPoints.supplierWebsiteurl}/${row.navigateUrl}",
-                                                                      canPop:
-                                                                          true,
-                                                                      isAppBar:
-                                                                          true))
-                                                          : sl<NavigationService>().pushNamed(
-                                                              Routes
-                                                                  .webViewRoute,
-                                                              arguments:
-                                                                  WebviewParams(
-                                                                      url:
-                                                                          "${EndPoints.supplierWebsiteurl}/${row.navigateUrl}",
-                                                                      canPop:
-                                                                          true,
-                                                                      isAppBar:
-                                                                          true));
-                                                    }
-                                                  },
-                                                ),
-                                                _detail(
-                                                    "Start Date ",
-                                                    Constants.dateFormat(
-                                                        DateTime.tryParse(
-                                                                row.startDate ??
-                                                                    "") ??
-                                                            DateTime.now()),
-                                                    false,
-                                                    null),
-                                                _detail(
-                                                    "End Date ",
-                                                    Constants.dateFormat(
-                                                        DateTime.tryParse(
-                                                                row.endDate ??
-                                                                    "") ??
-                                                            DateTime.now()),
-                                                    false,
-                                                    null),
-                                                _detail(
-                                                    "Preffered Date",
-                                                    Constants.dateFormat(
-                                                        DateTime.tryParse(
-                                                                row.preferredDate ??
-                                                                    "") ??
-                                                            DateTime.now()),
-                                                    false,
-                                                    null),
-                                                _detail(
-                                                    "Enquiry Status ",
-                                                    row.isStarted == true
-                                                        ? "Started"
-                                                        : row.isclosed == true
-                                                            ? "Closed"
-                                                            : '-',
-                                                    false,
-                                                    null),
-                                                _detail(
-                                                    "Total Quantity ",
-                                                    row.totalQuantity ?? '-',
-                                                    false,
-                                                    null),
-                                                _detail(
-                                                    "Minimum Quantity ",
-                                                    row.minQuantity ?? '-',
-                                                    false,
-                                                    null),
-                                                _detail(
-                                                    "Participate Quantity ",
-                                                    row.participateQuantity ??
-                                                        '-',
-                                                    false,
-                                                    null),
-                                                _detail(
-                                                    "Last Date of Delivery ",
-                                                    Constants.dateFormat(
-                                                        DateTime.tryParse(
-                                                                row.deliveryLastDate ??
-                                                                    "") ??
-                                                            DateTime.now()),
-                                                    false,
-                                                    null),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
+              return FadeTransition(
+                  opacity: _screenFade,
+                  child: SlideTransition(
+                      position: _screenSlide,
+                      child: ScaleTransition(
+                          scale: _screenScale,
+                          child: CustomScrollView(slivers: [
+                            CommonAppbar(
+                              title: "Negotiation",
+                              showNotification: true,
+                              onNotificationTap: () {
+                                sl<NavigationService>().pushNamed(
+                                  Routes.notificationScreen,
                                 );
                               },
                             ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ]);
+                            SliverToBoxAdapter(
+                              child: SafeArea(
+                                top: false,
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(28),
+                                    child: BackdropFilter(
+                                      filter: ImageFilter.blur(
+                                          sigmaX: 18, sigmaY: 18),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white
+                                              .withValues(alpha: .55),
+                                          borderRadius:
+                                              BorderRadius.circular(28),
+                                          border: Border.all(
+                                            color: Colors.white
+                                                .withValues(alpha: .4),
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black
+                                                  .withValues(alpha: .06),
+                                              blurRadius: 18,
+                                              offset: const Offset(0, 6),
+                                            )
+                                          ],
+                                        ),
+
+                                        /// ⭐ CONTENT ROW
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            _glassPageButton(
+                                              text: "Previous",
+                                              enabled: currentPage > 0,
+                                              onTap: () {
+                                                getNegotiationData(
+                                                    page: currentPage - 1);
+                                              },
+                                            ),
+                                            Text(
+                                              'Page ${currentPage + 1} of ${negotiation?.totalPages ?? 0}',
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            _glassPageButton(
+                                              text: "Next",
+                                              enabled: ((currentPage + 1) <
+                                                  (negotiation?.totalPages ??
+                                                      0)),
+                                              onTap: () {
+                                                getNegotiationData(
+                                                    page: currentPage + 1);
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SliverFillRemaining(
+                              hasScrollBody: true,
+                              child: Column(
+                                children: [
+                                  CommonSingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    controller: _headerController,
+                                    child: Row(
+                                      children: headers.map((header) {
+                                        return _cell(
+                                          header,
+                                          width: columnWidths[header] ??
+                                              defaultColumnWidth,
+                                          isHeader: true,
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+
+                                  // 🔹 Body
+                                  Expanded(
+                                    child: CommonSingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      controller: _bodyController,
+                                      child: SizedBox(
+                                        width: getTableWidth(),
+                                        child: ListView.builder(
+                                          itemCount:
+                                              negotiationData?.length ?? 0,
+                                          itemBuilder: (context, rowIndex) {
+                                            final row =
+                                                negotiationData![rowIndex];
+                                            bool expanded =
+                                                expandedIndex == rowIndex;
+                                            return AnimatedSize(
+                                              duration: const Duration(
+                                                  milliseconds: 300),
+                                              curve: Curves.easeInOut,
+                                              child: Column(
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        expandedIndex = expanded
+                                                            ? null
+                                                            : rowIndex;
+                                                      });
+                                                    },
+                                                    child: Row(
+                                                      children:
+                                                          headers.map((header) {
+                                                        if (header ==
+                                                            'Negotiation Code') {
+                                                          return Container(
+                                                            width: 200,
+                                                            height: 50,
+                                                            alignment: Alignment
+                                                                .center,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              border: Border.all(
+                                                                  color: Colors
+                                                                      .grey
+                                                                      .shade400),
+                                                            ),
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                AnimatedRotation(
+                                                                  turns:
+                                                                      expanded
+                                                                          ? 0.5
+                                                                          : 0,
+                                                                  duration: const Duration(
+                                                                      milliseconds:
+                                                                          300),
+                                                                  child:
+                                                                      const Icon(
+                                                                    Icons
+                                                                        .keyboard_arrow_down,
+                                                                    color: Colors
+                                                                        .blue,
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(
+                                                                    width: 6),
+                                                                GestureDetector(
+                                                                  onTap: () {
+                                                                    Constants.isAndroid14OrBelow &&
+                                                                            Platform
+                                                                                .isAndroid
+                                                                        ? sl<NavigationService>().pushNamed(
+                                                                            Routes
+                                                                                .inAppWebViewRoute,
+                                                                            arguments: WebviewParams(
+                                                                                url:
+                                                                                    "${EndPoints.supplierWebsiteurl}/${row.navigateViewUrl}",
+                                                                                canPop:
+                                                                                    true,
+                                                                                isAppBar:
+                                                                                    true))
+                                                                        : sl<NavigationService>().pushNamed(
+                                                                            Routes
+                                                                                .webViewRoute,
+                                                                            arguments: WebviewParams(
+                                                                                url: "${EndPoints.supplierWebsiteurl}/${row.navigateViewUrl}",
+                                                                                canPop: true,
+                                                                                isAppBar: true));
+                                                                  },
+                                                                  child:
+                                                                      CommonText(
+                                                                    _getCellText(
+                                                                        row,
+                                                                        header),
+                                                                    style: TextStyleConstants
+                                                                        .regular(
+                                                                      context,
+                                                                      fontSize:
+                                                                          16,
+                                                                      color: AppColors
+                                                                          .defaultText,
+                                                                      decoration:
+                                                                          TextDecoration
+                                                                              .underline,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          );
+                                                        }
+                                                        return _cell(
+                                                          _getCellText(
+                                                              row, header),
+                                                          isShowView: false,
+                                                          width: columnWidths[
+                                                                  header] ??
+                                                              defaultColumnWidth,
+                                                          isUnderline: header
+                                                                  .toLowerCase() ==
+                                                              'order status',
+                                                          color: header
+                                                                      .toLowerCase() ==
+                                                                  'order status'
+                                                              ? AppColors.blue
+                                                              : null,
+                                                          onViewTap: () {
+                                                            if (header
+                                                                    .toLowerCase() ==
+                                                                'negotiation code') {
+                                                              Constants.isAndroid14OrBelow &&
+                                                                      Platform
+                                                                          .isAndroid
+                                                                  ? sl<NavigationService>().pushNamed(
+                                                                      Routes
+                                                                          .inAppWebViewRoute,
+                                                                      arguments: WebviewParams(
+                                                                          url:
+                                                                              "${EndPoints.supplierWebsiteurl}/${row.navigateViewUrl}",
+                                                                          canPop:
+                                                                              true,
+                                                                          isAppBar:
+                                                                              true))
+                                                                  : sl<NavigationService>().pushNamed(
+                                                                      Routes
+                                                                          .webViewRoute,
+                                                                      arguments: WebviewParams(
+                                                                          url:
+                                                                              "${EndPoints.supplierWebsiteurl}/${row.navigateViewUrl}",
+                                                                          canPop:
+                                                                              true,
+                                                                          isAppBar:
+                                                                              true));
+                                                            }
+                                                          },
+                                                          onTap: () {
+                                                            if (header.toLowerCase() ==
+                                                                    'order status' &&
+                                                                row.linkType ==
+                                                                    "directlink" &&
+                                                                row.orderStatus
+                                                                        ?.toLowerCase() ==
+                                                                    "update rate") {
+                                                              Constants.isAndroid14OrBelow &&
+                                                                      Platform
+                                                                          .isAndroid
+                                                                  ? sl<NavigationService>().pushNamed(
+                                                                      Routes
+                                                                          .inAppWebViewRoute,
+                                                                      arguments: WebviewParams(
+                                                                          url:
+                                                                              "${EndPoints.supplierWebsiteurl}/${row.navigateUrl}",
+                                                                          canPop:
+                                                                              true,
+                                                                          isAppBar:
+                                                                              true))
+                                                                  : sl<NavigationService>().pushNamed(
+                                                                      Routes
+                                                                          .webViewRoute,
+                                                                      arguments: WebviewParams(
+                                                                          url:
+                                                                              "${EndPoints.supplierWebsiteurl}/${row.navigateUrl}",
+                                                                          canPop:
+                                                                              true,
+                                                                          isAppBar:
+                                                                              true));
+                                                            }
+                                                          },
+                                                        );
+                                                      }).toList(),
+                                                    ),
+                                                  ),
+                                                  ClipRect(
+                                                    child: Align(
+                                                      heightFactor:
+                                                          expanded ? 1 : 0,
+                                                      child: Container(
+                                                        width: getTableWidth(),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(16),
+                                                        color: Colors
+                                                            .grey.shade100,
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            _detail(
+                                                                "Negotiation Code ",
+                                                                row.auctionCode ??
+                                                                    '-',
+                                                                true, () {
+                                                              Constants.isAndroid14OrBelow &&
+                                                                      Platform
+                                                                          .isAndroid
+                                                                  ? sl<NavigationService>().pushNamed(
+                                                                      Routes
+                                                                          .inAppWebViewRoute,
+                                                                      arguments: WebviewParams(
+                                                                          url:
+                                                                              "${EndPoints.supplierWebsiteurl}/${row.navigateViewUrl}",
+                                                                          canPop:
+                                                                              true,
+                                                                          isAppBar:
+                                                                              true))
+                                                                  : sl<NavigationService>().pushNamed(
+                                                                      Routes
+                                                                          .webViewRoute,
+                                                                      arguments: WebviewParams(
+                                                                          url:
+                                                                              "${EndPoints.supplierWebsiteurl}/${row.navigateViewUrl}",
+                                                                          canPop:
+                                                                              true,
+                                                                          isAppBar:
+                                                                              true));
+                                                            }),
+                                                            _detail(
+                                                                "Negotiation Name ",
+                                                                row.auctionName ??
+                                                                    '-',
+                                                                false,
+                                                                null),
+                                                            _detail(
+                                                              "Order Status ",
+                                                              row.orderStatus ??
+                                                                  '-',
+                                                              false,
+                                                              null,
+                                                              onTap: () {
+                                                                if (row.linkType ==
+                                                                        "directlink" &&
+                                                                    row.orderStatus
+                                                                            ?.toLowerCase() ==
+                                                                        "update rate") {
+                                                                  Constants.isAndroid14OrBelow &&
+                                                                          Platform
+                                                                              .isAndroid
+                                                                      ? sl<NavigationService>().pushNamed(
+                                                                          Routes
+                                                                              .inAppWebViewRoute,
+                                                                          arguments: WebviewParams(
+                                                                              url:
+                                                                                  "${EndPoints.supplierWebsiteurl}/${row.navigateUrl}",
+                                                                              canPop:
+                                                                                  true,
+                                                                              isAppBar:
+                                                                                  true))
+                                                                      : sl<NavigationService>().pushNamed(
+                                                                          Routes
+                                                                              .webViewRoute,
+                                                                          arguments: WebviewParams(
+                                                                              url: "${EndPoints.supplierWebsiteurl}/${row.navigateUrl}",
+                                                                              canPop: true,
+                                                                              isAppBar: true));
+                                                                }
+                                                              },
+                                                            ),
+                                                            _detail(
+                                                                "Start Date ",
+                                                                Constants.dateFormat(DateTime.tryParse(
+                                                                        row.startDate ??
+                                                                            "") ??
+                                                                    DateTime
+                                                                        .now()),
+                                                                false,
+                                                                null),
+                                                            _detail(
+                                                                "End Date ",
+                                                                Constants.dateFormat(DateTime.tryParse(
+                                                                        row.endDate ??
+                                                                            "") ??
+                                                                    DateTime
+                                                                        .now()),
+                                                                false,
+                                                                null),
+                                                            _detail(
+                                                                "Preffered Date",
+                                                                Constants.dateFormat(DateTime.tryParse(
+                                                                        row.preferredDate ??
+                                                                            "") ??
+                                                                    DateTime
+                                                                        .now()),
+                                                                false,
+                                                                null),
+                                                            _detail(
+                                                                "Enquiry Status ",
+                                                                row.isStarted ==
+                                                                        true
+                                                                    ? "Started"
+                                                                    : row.isclosed ==
+                                                                            true
+                                                                        ? "Closed"
+                                                                        : '-',
+                                                                false,
+                                                                null),
+                                                            _detail(
+                                                                "Total Quantity ",
+                                                                row.totalQuantity ??
+                                                                    '-',
+                                                                false,
+                                                                null),
+                                                            _detail(
+                                                                "Minimum Quantity ",
+                                                                row.minQuantity ??
+                                                                    '-',
+                                                                false,
+                                                                null),
+                                                            _detail(
+                                                                "Participate Quantity ",
+                                                                row.participateQuantity ??
+                                                                    '-',
+                                                                false,
+                                                                null),
+                                                            _detail(
+                                                                "Last Date of Delivery ",
+                                                                Constants.dateFormat(DateTime.tryParse(
+                                                                        row.deliveryLastDate ??
+                                                                            "") ??
+                                                                    DateTime
+                                                                        .now()),
+                                                                false,
+                                                                null),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ]))));
             },
           ),
           bottomNavigationBar: SizedBox(

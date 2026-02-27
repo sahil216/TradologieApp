@@ -29,9 +29,13 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _DashboardScreenState extends State<DashboardScreen>
+    with SingleTickerProviderStateMixin {
   List<DashboardResult>? dashboardData;
-
+  late AnimationController _screenController;
+  late Animation<double> _screenFade;
+  late Animation<double> _screenScale;
+  late Animation<Offset> _screenSlide;
   late final PageController _carouselController;
   int currentPage = 0;
 
@@ -76,6 +80,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
     //     _currentPageValue = _pageController.page ?? 0.0;
     //   });
     // });
+    _screenController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+
+    _screenFade = CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    );
+
+    _screenScale = Tween<double>(
+      begin: 0.97,
+      end: 1,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _screenSlide = Tween<Offset>(
+      begin: const Offset(0, .04),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) _screenController.forward();
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(const Duration(seconds: 4), _autoScroll);
     });
@@ -107,6 +140,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void dispose() {
     // _carouselController.dispose();
     _carouselController.dispose();
+    _screenController.dispose();
     super.dispose();
   }
 
@@ -143,77 +177,85 @@ class _DashboardScreenState extends State<DashboardScreen> {
         //           icon: Icon(Icons.notifications)),
         //       SizedBox(width: 10),
         //     ]),
-        body: CustomScrollView(
-          slivers: [
-            /// ⭐ ULTRA COMMON APPBAR
-            CommonAppbar(
-              title: "Dashboard",
-              showNotification: true,
-              onNotificationTap: () {
-                sl<NavigationService>().pushNamed(
-                  Routes.notificationScreen,
-                );
-              },
-            ),
-            SliverFillRemaining(
-              hasScrollBody: false,
-              child: BlocBuilder<DashboardCubit, DashboardState>(
-                buildWhen: (previous, current) {
-                  bool result = previous != current;
-                  result = result &&
-                      (current is GetDashboardSuccess ||
-                          current is GetDashboardError ||
-                          current is GetDashboardIsLoading);
-                  return result;
-                },
-                builder: (context, state) {
-                  if (state is GetDashboardIsLoading) {
-                    return const CommonLoader();
-                  }
-
-                  if (dashboardData == null) {
-                    if (state is GetDashboardError) {
-                      if (state.failure is NetworkFailure) {
-                        return CustomErrorNetworkWidget(
-                          onPress: () {
-                            getDashboardData();
-                          },
-                        );
-                      } else if (state.failure is UserFailure) {
-                        return CustomErrorWidget(
-                          onPress: () {
-                            getDashboardData();
-                          },
-                          errorText: state.failure.msg,
-                        );
-                      }
-                    }
-                    return const CommonLoader();
-                  }
-
-                  /// ⭐ KEEP YOUR CAROUSEL EXACTLY SAME
-                  return Column(
-                    children: [
-                      SizedBox(
-                        height: Responsive(context).screenHeight * 0.72,
-                        child: DashboardCarausel(
-                          data: dashboardData ?? [],
-                          onParticipate: (_) => _appCubit.changeTab(1),
-                          controller: _carouselController,
-                          onPageChanged: (index) {
-                            setState(() {
-                              currentPage = index;
-                            });
+        body: FadeTransition(
+            opacity: _screenFade,
+            child: SlideTransition(
+                position: _screenSlide,
+                child: ScaleTransition(
+                    scale: _screenScale,
+                    child: CustomScrollView(
+                      slivers: [
+                        /// ⭐ ULTRA COMMON APPBAR
+                        CommonAppbar(
+                          title: "Dashboard",
+                          showNotification: true,
+                          onNotificationTap: () {
+                            sl<NavigationService>().pushNamed(
+                              Routes.notificationScreen,
+                            );
                           },
                         ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+                        SliverFillRemaining(
+                          hasScrollBody: false,
+                          child: BlocBuilder<DashboardCubit, DashboardState>(
+                            buildWhen: (previous, current) {
+                              bool result = previous != current;
+                              result = result &&
+                                  (current is GetDashboardSuccess ||
+                                      current is GetDashboardError ||
+                                      current is GetDashboardIsLoading);
+                              return result;
+                            },
+                            builder: (context, state) {
+                              if (state is GetDashboardIsLoading) {
+                                return const CommonLoader();
+                              }
+
+                              if (dashboardData == null) {
+                                if (state is GetDashboardError) {
+                                  if (state.failure is NetworkFailure) {
+                                    return CustomErrorNetworkWidget(
+                                      onPress: () {
+                                        getDashboardData();
+                                      },
+                                    );
+                                  } else if (state.failure is UserFailure) {
+                                    return CustomErrorWidget(
+                                      onPress: () {
+                                        getDashboardData();
+                                      },
+                                      errorText: state.failure.msg,
+                                    );
+                                  }
+                                }
+                                return const CommonLoader();
+                              }
+
+                              /// ⭐ KEEP YOUR CAROUSEL EXACTLY SAME
+                              return Column(
+                                children: [
+                                  SizedBox(
+                                    height:
+                                        Responsive(context).screenHeight * 0.72,
+                                    child: DashboardCarausel(
+                                      data: dashboardData ?? [],
+                                      onParticipate: (_) =>
+                                          _appCubit.changeTab(1),
+                                      controller: _carouselController,
+                                      onPageChanged: (index) {
+                                        setState(() {
+                                          currentPage = index;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    )))),
       ),
     );
   }

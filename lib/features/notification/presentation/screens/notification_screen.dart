@@ -23,7 +23,8 @@ class NotificationScreen extends StatefulWidget {
   State<NotificationScreen> createState() => _NotificationScreenState();
 }
 
-class _NotificationScreenState extends State<NotificationScreen> {
+class _NotificationScreenState extends State<NotificationScreen>
+    with SingleTickerProviderStateMixin {
   List<NotificationDetail>? data;
 
   NotificationCubit get cubit => BlocProvider.of<NotificationCubit>(context);
@@ -32,10 +33,49 @@ class _NotificationScreenState extends State<NotificationScreen> {
     await cubit.getNotification(NoParams());
   }
 
+  late AnimationController _screenController;
+  late Animation<double> _screenFade;
+  late Animation<double> _screenScale;
+  late Animation<Offset> _screenSlide;
   @override
   void initState() {
     super.initState();
     getInformation();
+    _screenController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+
+    _screenFade = CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    );
+
+    _screenScale = Tween<double>(
+      begin: 0.97,
+      end: 1,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _screenSlide = Tween<Offset>(
+      begin: const Offset(0, .04),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) _screenController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _screenController.dispose();
+    super.dispose();
   }
 
   @override
@@ -97,32 +137,38 @@ class _NotificationScreenState extends State<NotificationScreen> {
             }
 
             /// 💎 SLIVER STRUCTURE
-            return CustomScrollView(
-              slivers: [
-                const CommonAppbar(
-                  title: "Notification",
-                  showBackButton: true,
-                ),
-                if (data!.isEmpty)
-                  SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: _emptyState(),
-                  )
-                else
+            return FadeTransition(
+                opacity: _screenFade,
+                child: SlideTransition(
+                    position: _screenSlide,
+                    child: ScaleTransition(
+                        scale: _screenScale,
+                        child: CustomScrollView(
+                          slivers: [
+                            const CommonAppbar(
+                              title: "Notification",
+                              showBackButton: true,
+                            ),
+                            if (data!.isEmpty)
+                              SliverFillRemaining(
+                                hasScrollBody: false,
+                                child: _emptyState(),
+                              )
+                            else
 
-                  /// 🔔 LIST
-                  SliverPadding(
-                    padding: const EdgeInsets.all(16),
-                    sliver: SliverList.separated(
-                      itemCount: data?.length ?? 0,
-                      separatorBuilder: (_, __) => const Divider(),
-                      itemBuilder: (context, index) {
-                        return _notificationTile(data![index]);
-                      },
-                    ),
-                  ),
-              ],
-            );
+                              /// 🔔 LIST
+                              SliverPadding(
+                                padding: const EdgeInsets.all(16),
+                                sliver: SliverList.separated(
+                                  itemCount: data?.length ?? 0,
+                                  separatorBuilder: (_, __) => const Divider(),
+                                  itemBuilder: (context, index) {
+                                    return _notificationTile(data![index]);
+                                  },
+                                ),
+                              ),
+                          ],
+                        ))));
           },
         ),
       ),

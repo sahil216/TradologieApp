@@ -13,6 +13,7 @@ import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/features/contact_us/more_options_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_dashboard_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/dashboard_screen.dart';
+import 'package:tradologie_app/features/my_account/presentation/screens/buyer_my_account_screen.dart';
 import 'package:tradologie_app/features/my_account/presentation/screens/my_account_screen.dart';
 import 'package:tradologie_app/features/negotiation/presentation/screens/buyer_negotiation_screen.dart';
 import 'package:tradologie_app/features/negotiation/presentation/screens/negotiation_screen.dart';
@@ -54,7 +55,7 @@ class _MainScreenState extends State<MainScreen>
         icon: _appCubit.bottomNavIndex == 1
             ? Icon(Icons.article)
             : Icon(Icons.article_outlined),
-        name: 'Negotiations',
+        name: 'Negotiation',
         height: 20,
         page: const NegotiationScreen(),
       ),
@@ -92,34 +93,42 @@ class _MainScreenState extends State<MainScreen>
           icon: _appCubit.bottomNavIndex == 1
               ? Icon(Icons.article)
               : Icon(Icons.article_outlined),
-          name: 'Negotiations',
+          name: 'Negotiation',
           height: 20,
           page: const BuyerNegotiationScreen()),
       TabViewModel(
-          icon: _appCubit.bottomNavIndex == 2
-              ? Icon(Icons.person)
-              : Icon(Icons.person_outline),
-          name: 'My Account',
-          height: 20,
-          page: Constants.isAndroid14OrBelow && Platform.isAndroid
-              ? InAppWebViewScreen(
-                  params: WebviewParams(
-                      url:
-                          "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
-                      canPop: false,
-                      isAppBar: true,
-                      isShowDrawer: true,
-                      isShowNotification: true))
-              : WebViewScreen(
-                  params: WebviewParams(
-                      url:
-                          "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
-                      canPop: false,
-                      isAppBar: true,
-                      isShowDrawer: true,
-                      isShowNotification: true)) // const OrdersScreen(),
-
-          ),
+        icon: _appCubit.bottomNavIndex == 2
+            ? Icon(Icons.person)
+            : Icon(Icons.person_outline),
+        name: 'My Account',
+        height: 20,
+        page: Constants.isAndroid14OrBelow && Platform.isAndroid
+            ? InAppWebViewScreen(
+                params: WebviewParams(
+                    url:
+                        "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
+                    canPop: false,
+                    isAppBar: true,
+                    isShowDrawer: true,
+                    isShowNotification: true))
+            : WebViewScreen(
+                params: WebviewParams(
+                    url:
+                        "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
+                    canPop: false,
+                    isAppBar: true,
+                    isShowDrawer: true,
+                    isShowNotification: true),
+              ), // const OrdersScreen(),
+      ),
+      // TabViewModel(
+      //   icon: _appCubit.bottomNavIndex == 2
+      //       ? Icon(Icons.person)
+      //       : Icon(Icons.person_outline),
+      //   name: 'My Account',
+      //   height: 20,
+      //   page: BuyerMyAccountScreen(),
+      // ),
       TabViewModel(
         icon:
             _appCubit.bottomNavIndex == 3 ? Icon(Icons.menu) : Icon(Icons.menu),
@@ -287,7 +296,7 @@ class CommonFloatingNavBar extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _item(0, Icons.dashboard_outlined, "Dashboard"),
-                _item(1, Icons.description_outlined, "Negotiations"),
+                _item(1, Icons.description_outlined, "Negotiation"),
                 _item(2, Icons.person_outline, "Account"),
                 _item(3, Icons.menu, "More"),
               ],

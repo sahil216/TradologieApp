@@ -36,7 +36,8 @@ class BuyerNegotiationScreen extends StatefulWidget {
   State<BuyerNegotiationScreen> createState() => _BuyerNegotiationScreenState();
 }
 
-class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen> {
+class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen>
+    with SingleTickerProviderStateMixin {
   BuyerNegotiation? negotiation;
   List<BuyerNegotiationDetail>? negotiationData;
 
@@ -95,7 +96,41 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen> {
         _headerController.jumpTo(_bodyController.offset);
       }
     });
+    _screenController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+
+    _screenFade = CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    );
+
+    _screenScale = Tween<double>(
+      begin: 0.97,
+      end: 1,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _screenSlide = Tween<Offset>(
+      begin: const Offset(0, .04),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) _screenController.forward();
+    });
   }
+
+  late AnimationController _screenController;
+  late Animation<double> _screenFade;
+  late Animation<double> _screenScale;
+  late Animation<Offset> _screenSlide;
 
   @override
   void dispose() {
@@ -106,6 +141,7 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen> {
     // ]);
     _headerController.dispose();
     _bodyController.dispose();
+    _screenController.dispose();
     super.dispose();
   }
 
@@ -246,294 +282,356 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen> {
             }
           }
 
-          return CustomScrollView(
-            slivers: [
-              CommonAppbar(
-                title: "Negotiation",
-                addAction: GestureDetector(
-                  onTap: () {
-                    sl<NavigationService>().pushNamed(
-                      Routes.supplierListScreen,
-                    );
-                  },
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.add, size: 18, color: AppColors.primary),
-                      const SizedBox(width: 6),
-                      CommonText(
-                        'Add',
-                        style: TextStyleConstants.semiBold(
-                          context,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                showNotification: true,
-              ),
-              SliverToBoxAdapter(
-                child: SafeArea(
-                  top: false,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(28),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: .55),
-                            borderRadius: BorderRadius.circular(28),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: .4),
+          return FadeTransition(
+              opacity: _screenFade,
+              child: SlideTransition(
+                  position: _screenSlide,
+                  child: ScaleTransition(
+                      scale: _screenScale,
+                      child: CustomScrollView(
+                        slivers: [
+                          CommonAppbar(
+                            title: "Negotiation",
+                            addAction: GestureDetector(
+                              onTap: () {
+                                sl<NavigationService>().pushNamed(
+                                  Routes.supplierListScreen,
+                                );
+                              },
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.add,
+                                      size: 18, color: AppColors.primary),
+                                  const SizedBox(width: 6),
+                                  CommonText(
+                                    'Add',
+                                    style: TextStyleConstants.semiBold(
+                                      context,
+                                      color: AppColors.primary,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: .06),
-                                blurRadius: 18,
-                                offset: const Offset(0, 6),
-                              )
-                            ],
+                            showNotification: true,
                           ),
+                          SliverToBoxAdapter(
+                            child: SafeArea(
+                              top: false,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(28),
+                                  child: BackdropFilter(
+                                    filter: ImageFilter.blur(
+                                        sigmaX: 18, sigmaY: 18),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color:
+                                            Colors.white.withValues(alpha: .55),
+                                        borderRadius: BorderRadius.circular(28),
+                                        border: Border.all(
+                                          color: Colors.white
+                                              .withValues(alpha: .4),
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black
+                                                .withValues(alpha: .06),
+                                            blurRadius: 18,
+                                            offset: const Offset(0, 6),
+                                          )
+                                        ],
+                                      ),
 
-                          /// ⭐ CONTENT ROW
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              _glassPageButton(
-                                text: "Previous",
-                                enabled: currentPage > 0,
-                                onTap: () {
-                                  getNegotiationData(page: currentPage - 1);
-                                },
-                              ),
-                              Text(
-                                'Page ${currentPage + 1} of ${negotiation?.totalPages ?? 0}',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              _glassPageButton(
-                                text: "Next",
-                                enabled: ((currentPage + 1) <
-                                    (negotiation?.totalPages ?? 0)),
-                                onTap: () {
-                                  getNegotiationData(page: currentPage + 1);
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              SliverFillRemaining(
-                hasScrollBody: true,
-                child: Column(
-                  children: [
-                    // 🔹 Header
-                    CommonSingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      physics: const NeverScrollableScrollPhysics(),
-                      controller: _headerController,
-                      child: Row(
-                        children: headers.map((header) {
-                          return _cell(
-                            header,
-                            width: columnWidths[header] ?? defaultColumnWidth,
-                            isHeader: true,
-                          );
-                        }).toList(),
-                      ),
-                    ),
-
-                    // 🔹 Body
-                    Expanded(
-                      child: CommonSingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        controller: _bodyController,
-                        child: SizedBox(
-                          width: getTableWidth(),
-                          child: ListView.builder(
-                            itemCount: negotiationData?.length ?? 0,
-                            itemBuilder: (context, rowIndex) {
-                              final row = negotiationData![rowIndex];
-                              bool expanded = expandedIndex == rowIndex;
-                              return AnimatedSize(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeInOut,
-                                child: Column(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          expandedIndex =
-                                              expanded ? null : rowIndex;
-                                        });
-                                      },
+                                      /// ⭐ CONTENT ROW
                                       child: Row(
-                                        children: headers.map((header) {
-                                          if (header == 'Negotiation Code') {
-                                            return Container(
-                                              width: 200,
-                                              height: 50,
-                                              alignment: Alignment.center,
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                    color:
-                                                        Colors.grey.shade400),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  AnimatedRotation(
-                                                    turns: expanded ? 0.5 : 0,
-                                                    duration: const Duration(
-                                                        milliseconds: 300),
-                                                    child: const Icon(
-                                                      Icons.keyboard_arrow_down,
-                                                      color: Colors.blue,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 6),
-                                                  Text(
-                                                    _getCellText(row, header),
-                                                    style: TextStyleConstants
-                                                        .regular(
-                                                      context,
-                                                      fontSize: 16,
-                                                      color:
-                                                          row.auctionColorCode ==
-                                                                  "red"
-                                                              ? AppColors.red
-                                                              : AppColors
-                                                                  .defaultText,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          }
-                                          return _cell(
-                                            _getCellText(row, header),
-                                            width: columnWidths[header] ??
-                                                defaultColumnWidth,
-                                            isUnderline: header.toLowerCase() ==
-                                                'order status',
-                                            color: row.auctionColorCode == "red"
-                                                ? AppColors.red
-                                                : AppColors.black,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          _glassPageButton(
+                                            text: "Previous",
+                                            enabled: currentPage > 0,
                                             onTap: () {
-                                              if (header.toLowerCase() ==
-                                                      'order status' &&
-                                                  row.auctionStatus
-                                                          ?.toLowerCase() ==
-                                                      "view rate") {
-                                                Constants.isAndroid14OrBelow &&
-                                                        Platform.isAndroid
-                                                    ? Navigator.pushNamed(
-                                                        context,
-                                                        Routes
-                                                            .inAppWebViewRoute,
-                                                        arguments: WebviewParams(
-                                                            url:
-                                                                "${EndPoints.buyerUrlWeb}${row.auctionUrl}",
-                                                            canPop: true,
-                                                            isAppBar: true))
-                                                    : Navigator.pushNamed(
-                                                        context,
-                                                        Routes.webViewRoute,
-                                                        arguments: WebviewParams(
-                                                            url:
-                                                                "${EndPoints.buyerUrlWeb}${row.auctionUrl}",
-                                                            canPop: true,
-                                                            isAppBar: true));
-                                              } else if (header.toLowerCase() ==
-                                                  'negotiation code') {
-                                                // Navigator.pushNamed(
-                                                //     context, Routes.webViewRoute,
-                                                //     arguments: WebviewParams(
-                                                //         url:
-                                                //             "${EndPoints.buyerUrlWeb}${row.auctionCodeUrl}",
-                                                //         canPop: true,
-                                                //         isAppBar: true));
-                                              }
+                                              getNegotiationData(
+                                                  page: currentPage - 1);
                                             },
-                                          );
-                                        }).toList(),
+                                          ),
+                                          Text(
+                                            'Page ${currentPage + 1} of ${negotiation?.totalPages ?? 0}',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          _glassPageButton(
+                                            text: "Next",
+                                            enabled: ((currentPage + 1) <
+                                                (negotiation?.totalPages ?? 0)),
+                                            onTap: () {
+                                              getNegotiationData(
+                                                  page: currentPage + 1);
+                                            },
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    ClipRect(
-                                      child: Align(
-                                        heightFactor: expanded ? 1 : 0,
-                                        child: Container(
-                                          width: getTableWidth(),
-                                          padding: const EdgeInsets.all(16),
-                                          color: Colors.grey.shade100,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              _detail(
-                                                  "Negotiation Name ",
-                                                  row.auctionName ?? '-',
-                                                  false,
-                                                  null),
-                                              _detail(
-                                                  "Delivery Address",
-                                                  row.deliveryAddress ?? '-',
-                                                  false,
-                                                  null),
-                                              _detail(
-                                                  "Delivery State",
-                                                  row.deliveryState ?? '-',
-                                                  false,
-                                                  null),
-                                              _detail(
-                                                  "Payment Term",
-                                                  row.paymentTerm ?? '-',
-                                                  false,
-                                                  null),
-                                              _detail(
-                                                  "Partial Delivery",
-                                                  row.partialDelivery ?? '-',
-                                                  false,
-                                                  null),
-                                              _detail(
-                                                  "Enquiry Status",
-                                                  row.isStarted == true
-                                                      ? "Started"
-                                                      : row.isclosed == true
-                                                          ? "Closed"
-                                                          : 'Not Started',
-                                                  false,
-                                                  null),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
+                                  ),
                                 ),
-                              );
-                            },
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            ],
-          );
+                          SliverFillRemaining(
+                            hasScrollBody: true,
+                            child: Column(
+                              children: [
+                                // 🔹 Header
+                                CommonSingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  controller: _headerController,
+                                  child: Row(
+                                    children: headers.map((header) {
+                                      return _cell(
+                                        header,
+                                        width: columnWidths[header] ??
+                                            defaultColumnWidth,
+                                        isHeader: true,
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+
+                                // 🔹 Body
+                                Expanded(
+                                  child: CommonSingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    controller: _bodyController,
+                                    child: SizedBox(
+                                      width: getTableWidth(),
+                                      child: ListView.builder(
+                                        itemCount: negotiationData?.length ?? 0,
+                                        itemBuilder: (context, rowIndex) {
+                                          final row =
+                                              negotiationData![rowIndex];
+                                          bool expanded =
+                                              expandedIndex == rowIndex;
+                                          return AnimatedSize(
+                                            duration: const Duration(
+                                                milliseconds: 300),
+                                            curve: Curves.easeInOut,
+                                            child: Column(
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      expandedIndex = expanded
+                                                          ? null
+                                                          : rowIndex;
+                                                    });
+                                                  },
+                                                  child: Row(
+                                                    children:
+                                                        headers.map((header) {
+                                                      if (header ==
+                                                          'Negotiation Code') {
+                                                        return Container(
+                                                          width: 200,
+                                                          height: 50,
+                                                          alignment:
+                                                              Alignment.center,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            border: Border.all(
+                                                                color: Colors
+                                                                    .grey
+                                                                    .shade400),
+                                                          ),
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              AnimatedRotation(
+                                                                turns: expanded
+                                                                    ? 0.5
+                                                                    : 0,
+                                                                duration:
+                                                                    const Duration(
+                                                                        milliseconds:
+                                                                            300),
+                                                                child:
+                                                                    const Icon(
+                                                                  Icons
+                                                                      .keyboard_arrow_down,
+                                                                  color: Colors
+                                                                      .blue,
+                                                                ),
+                                                              ),
+                                                              const SizedBox(
+                                                                  width: 6),
+                                                              Text(
+                                                                _getCellText(
+                                                                    row,
+                                                                    header),
+                                                                style:
+                                                                    TextStyleConstants
+                                                                        .regular(
+                                                                  context,
+                                                                  fontSize: 16,
+                                                                  color: row.auctionColorCode ==
+                                                                          "red"
+                                                                      ? AppColors
+                                                                          .red
+                                                                      : AppColors
+                                                                          .defaultText,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        );
+                                                      }
+                                                      return _cell(
+                                                        _getCellText(
+                                                            row, header),
+                                                        width: columnWidths[
+                                                                header] ??
+                                                            defaultColumnWidth,
+                                                        isUnderline: header
+                                                                .toLowerCase() ==
+                                                            'order status',
+                                                        color:
+                                                            row.auctionColorCode ==
+                                                                    "red"
+                                                                ? AppColors.red
+                                                                : AppColors
+                                                                    .black,
+                                                        onTap: () {
+                                                          if (header.toLowerCase() ==
+                                                                  'order status' &&
+                                                              row.auctionStatus
+                                                                      ?.toLowerCase() ==
+                                                                  "view rate") {
+                                                            Constants.isAndroid14OrBelow &&
+                                                                    Platform
+                                                                        .isAndroid
+                                                                ? Navigator.pushNamed(
+                                                                    context,
+                                                                    Routes
+                                                                        .inAppWebViewRoute,
+                                                                    arguments: WebviewParams(
+                                                                        url:
+                                                                            "${EndPoints.buyerUrlWeb}${row.auctionUrl}",
+                                                                        canPop:
+                                                                            true,
+                                                                        isAppBar:
+                                                                            true))
+                                                                : Navigator.pushNamed(
+                                                                    context,
+                                                                    Routes
+                                                                        .webViewRoute,
+                                                                    arguments: WebviewParams(
+                                                                        url:
+                                                                            "${EndPoints.buyerUrlWeb}${row.auctionUrl}",
+                                                                        canPop:
+                                                                            true,
+                                                                        isAppBar:
+                                                                            true));
+                                                          } else if (header
+                                                                  .toLowerCase() ==
+                                                              'negotiation code') {
+                                                            // Navigator.pushNamed(
+                                                            //     context, Routes.webViewRoute,
+                                                            //     arguments: WebviewParams(
+                                                            //         url:
+                                                            //             "${EndPoints.buyerUrlWeb}${row.auctionCodeUrl}",
+                                                            //         canPop: true,
+                                                            //         isAppBar: true));
+                                                          }
+                                                        },
+                                                      );
+                                                    }).toList(),
+                                                  ),
+                                                ),
+                                                ClipRect(
+                                                  child: Align(
+                                                    heightFactor:
+                                                        expanded ? 1 : 0,
+                                                    child: Container(
+                                                      width: getTableWidth(),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              16),
+                                                      color:
+                                                          Colors.grey.shade100,
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          _detail(
+                                                              "Negotiation Name ",
+                                                              row.auctionName ??
+                                                                  '-',
+                                                              false,
+                                                              null),
+                                                          _detail(
+                                                              "Delivery Address",
+                                                              row.deliveryAddress ??
+                                                                  '-',
+                                                              false,
+                                                              null),
+                                                          _detail(
+                                                              "Delivery State",
+                                                              row.deliveryState ??
+                                                                  '-',
+                                                              false,
+                                                              null),
+                                                          _detail(
+                                                              "Payment Term",
+                                                              row.paymentTerm ??
+                                                                  '-',
+                                                              false,
+                                                              null),
+                                                          _detail(
+                                                              "Partial Delivery",
+                                                              row.partialDelivery ??
+                                                                  '-',
+                                                              false,
+                                                              null),
+                                                          _detail(
+                                                              "Enquiry Status",
+                                                              row.isStarted ==
+                                                                      true
+                                                                  ? "Started"
+                                                                  : row.isclosed ==
+                                                                          true
+                                                                      ? "Closed"
+                                                                      : 'Not Started',
+                                                              false,
+                                                              null),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
+                      ))));
         }),
         bottomNavigationBar: SizedBox(
           height: 70,
