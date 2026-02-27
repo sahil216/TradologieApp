@@ -13,11 +13,9 @@ import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/common_single_child_scroll_view.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
-import 'package:tradologie_app/core/widgets/custom_button.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
-import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
 import 'package:tradologie_app/features/negotiation/domain/entities/buyer_negotitation_detail.dart';
 import 'package:tradologie_app/features/negotiation/presentation/cubit/negotiation_cubit.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
@@ -288,14 +286,14 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(.55),
+                            color: Colors.white.withValues(alpha: .55),
                             borderRadius: BorderRadius.circular(28),
                             border: Border.all(
-                              color: Colors.white.withOpacity(.4),
+                              color: Colors.white.withValues(alpha: .4),
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(.06),
+                                color: Colors.black.withValues(alpha: .06),
                                 blurRadius: 18,
                                 offset: const Offset(0, 6),
                               )
@@ -556,12 +554,14 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen> {
         curve: Curves.easeOutCubic,
         padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
         decoration: BoxDecoration(
-          color: enabled ? Colors.white.withOpacity(.9) : Colors.grey.shade300,
+          color: enabled
+              ? Colors.white.withValues(alpha: .9)
+              : Colors.grey.shade300,
           borderRadius: BorderRadius.circular(24),
           boxShadow: enabled
               ? [
                   BoxShadow(
-                    color: Colors.black.withOpacity(.08),
+                    color: Colors.black.withValues(alpha: .08),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   )

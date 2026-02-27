@@ -88,8 +88,8 @@ class CommonAppbar extends StatelessWidget {
                           begin: Alignment(-0.6 + (1 - ease) * .3, -1),
                           end: const Alignment(1, 1),
                           colors: [
-                            Colors.white.withOpacity(.96),
-                            Colors.white.withOpacity(.82),
+                            Colors.white.withValues(alpha: .96),
+                            Colors.white.withValues(alpha: .82),
                           ],
                         ),
                       ),
@@ -184,7 +184,7 @@ class CommonAppbar extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(.8),
+            color: Colors.white.withValues(alpha: .8),
             borderRadius: BorderRadius.circular(14),
           ),
           child: child,

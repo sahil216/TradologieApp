@@ -149,18 +149,18 @@ class _NotificationScreenState extends State<NotificationScreen> {
               borderRadius: BorderRadius.circular(18),
 
               /// 💎 ULTRA GLASS BACKGROUND
-              color: Colors.white.withOpacity(.85),
+              color: Colors.white.withValues(alpha: .85),
 
               boxShadow: [
                 BoxShadow(
                   blurRadius: 18,
                   offset: const Offset(0, 10),
-                  color: Colors.black.withOpacity(.05),
+                  color: Colors.black.withValues(alpha: .05),
                 ),
               ],
 
               border: Border.all(
-                color: Colors.black.withOpacity(.04),
+                color: Colors.black.withValues(alpha: .04),
               ),
             ),
             child: Row(

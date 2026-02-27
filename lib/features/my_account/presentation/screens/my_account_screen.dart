@@ -17,7 +17,6 @@ import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
-import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
 import 'package:tradologie_app/features/my_account/domain/entities/company_details.dart';
 import 'package:tradologie_app/features/my_account/presentation/cubit/my_account_cubit.dart';
 import 'package:tradologie_app/features/webview/presentation/screens/in_app_webview_screen.dart';
@@ -25,7 +24,6 @@ import 'package:tradologie_app/features/webview/presentation/screens/viewmodel/w
 import 'package:tradologie_app/features/webview/presentation/screens/webview_screen.dart';
 
 import '../../../../core/api/end_points.dart';
-import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_strings.dart';
 import '../../../../injection_container.dart';
 
@@ -705,12 +703,12 @@ class _UltraGlassTabBarV41State extends State<UltraGlassTabBarV41> {
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               padding: const EdgeInsets.symmetric(horizontal: 6),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(.45),
+                color: Colors.white.withValues(alpha: .45),
                 borderRadius: BorderRadius.circular(34),
-                border: Border.all(color: Colors.white.withOpacity(.5)),
+                border: Border.all(color: Colors.white.withValues(alpha: .5)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(.08),
+                    color: Colors.black.withValues(alpha: .08),
                     blurRadius: 25,
                     offset: const Offset(0, 10),
                   ),

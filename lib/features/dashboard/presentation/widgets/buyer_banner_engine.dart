@@ -159,7 +159,7 @@ class BuyerDashboardBannerCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Colors.black.withOpacity(0.65),
+                      Colors.black.withValues(alpha: 0.65),
                       Colors.transparent,
                     ],
                     begin: Alignment.bottomLeft,
@@ -235,7 +235,7 @@ class BuyerDashboardBannerIndicator extends StatelessWidget {
               height: 8,
               width: width,
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.8),
+                color: Colors.black.withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(20),
               ),
             );

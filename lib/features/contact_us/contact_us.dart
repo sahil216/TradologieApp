@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tradologie_app/core/utils/app_colors.dart';
 import 'package:tradologie_app/core/utils/assets_manager.dart';
-import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_single_child_scroll_view.dart';

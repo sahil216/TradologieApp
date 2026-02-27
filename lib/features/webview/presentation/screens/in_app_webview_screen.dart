@@ -3,11 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:tradologie_app/config/routes/app_router.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
-import 'package:tradologie_app/core/utils/assets_manager.dart';
-import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_appbar.dart';
-import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
 
 import '../../../../injection_container.dart';
 import '../cubit/webview_cubit.dart';

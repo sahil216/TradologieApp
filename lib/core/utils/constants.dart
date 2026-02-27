@@ -67,15 +67,15 @@ class Constants {
                       begin: const Alignment(-0.5, -1),
                       end: const Alignment(1, 1),
                       colors: [
-                        Colors.white.withOpacity(.96),
-                        Colors.white.withOpacity(.82),
+                        Colors.white.withValues(alpha: .96),
+                        Colors.white.withValues(alpha: .82),
                       ],
                     ),
                     boxShadow: boxShadow ??
                         [
                           BoxShadow(
                             blurRadius: 20,
-                            color: Colors.black.withOpacity(.04),
+                            color: Colors.black.withValues(alpha: .04),
                           ),
                         ],
                   ),
@@ -120,7 +120,7 @@ class Constants {
                                     ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(.8),
+                                    color: Colors.white.withValues(alpha: .8),
                                     borderRadius: BorderRadius.circular(14),
                                   ),
                                   child: Image.asset(ImgAssets.menu),
@@ -159,7 +159,7 @@ class Constants {
                       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(.8),
+                          color: Colors.white.withValues(alpha: .8),
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: e,

@@ -31,11 +31,6 @@ class _BuyerDashboardCardState extends State<BuyerDashboardCard> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        ////////////////////////////////////////////////////////////////
-        /// 🧠 ADAPTIVE SIZE ENGINE
-        /// Card becomes compact automatically when width is small
-        ////////////////////////////////////////////////////////////////
-
         final double w = constraints.maxWidth;
 
         // You can tweak these breakpoints anytime
@@ -51,21 +46,18 @@ class _BuyerDashboardCardState extends State<BuyerDashboardCard> {
         final double gapLarge = compact ? 8 : 14;
         final double gapSmall = compact ? 4 : 6;
         final double bottomGap = compact ? 6 : 12;
-
-        ////////////////////////////////////////////////////////////////
-        /// 🌊 DEPTH + LIQUID MOTION
-        ////////////////////////////////////////////////////////////////
         final double scale = _pressed ? .96 : (_hover ? 1.02 : 1);
 
         Widget card = AnimatedContainer(
           duration: const Duration(milliseconds: 220),
           curve: Curves.easeOut,
-          transform: Matrix4.identity()..scale(scale),
+          transform: Matrix4.identity()
+            ..scaleByDouble(scale, scale, scale, scale),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(28),
             boxShadow: [
               BoxShadow(
-                color: widget.color.withOpacity(_hover ? .25 : .12),
+                color: widget.color.withValues(alpha: _hover ? .25 : .12),
                 blurRadius: _hover ? 35 : 22,
                 spreadRadius: _hover ? 1 : 0,
                 offset: const Offset(0, 12),
@@ -76,9 +68,6 @@ class _BuyerDashboardCardState extends State<BuyerDashboardCard> {
             borderRadius: BorderRadius.circular(28),
             child: Stack(
               children: [
-                ////////////////////////////////////////////////////////
-                /// GLASS BACKGROUND
-                ////////////////////////////////////////////////////////
                 BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                   child: Container(
@@ -87,14 +76,14 @@ class _BuyerDashboardCardState extends State<BuyerDashboardCard> {
                       borderRadius: BorderRadius.circular(28),
                       gradient: LinearGradient(
                         colors: [
-                          Colors.white.withOpacity(.40),
-                          Colors.white.withOpacity(.15),
+                          Colors.white.withValues(alpha: .40),
+                          Colors.white.withValues(alpha: .15),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                       border: Border.all(
-                        color: widget.color.withOpacity(.25),
+                        color: widget.color.withValues(alpha: .25),
                         width: 1.2,
                       ),
                     ),
@@ -114,12 +103,12 @@ class _BuyerDashboardCardState extends State<BuyerDashboardCard> {
                             gradient: LinearGradient(
                               colors: [
                                 widget.color,
-                                widget.color.withOpacity(.75),
+                                widget.color.withValues(alpha: .75),
                               ],
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: widget.color.withOpacity(.45),
+                                color: widget.color.withValues(alpha: .45),
                                 blurRadius: 22,
                               )
                             ],
@@ -174,7 +163,7 @@ class _BuyerDashboardCardState extends State<BuyerDashboardCard> {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          widget.color.withOpacity(.5),
+                          widget.color.withValues(alpha: .5),
                           Colors.transparent,
                         ],
                         begin: Alignment.topLeft,

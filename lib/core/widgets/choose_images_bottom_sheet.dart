@@ -180,10 +180,9 @@ class ImagePickerFormField extends FormField<File> {
     required ImagePickerController controller,
     required String label,
     String hint = "Select image",
-    FormFieldValidator<File>? validator,
+    super.validator,
     Function(File?)? onChanged,
   }) : super(
-          validator: validator,
           builder: (state) {
             return _ImagePickerFieldUI(
               controller: controller,

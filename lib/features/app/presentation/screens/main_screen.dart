@@ -10,7 +10,6 @@ import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
-import 'package:tradologie_app/features/app/presentation/widgets/custom_bottom_navigation_bar.dart';
 import 'package:tradologie_app/features/contact_us/more_options_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_dashboard_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/dashboard_screen.dart';
@@ -274,12 +273,12 @@ class CommonFloatingNavBar extends StatelessWidget {
               vertical: 10,
             ),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(.75),
+              color: Colors.white.withValues(alpha: .75),
               borderRadius: BorderRadius.circular(40),
               boxShadow: [
                 BoxShadow(
                   blurRadius: 20,
-                  color: Colors.black.withOpacity(.08),
+                  color: Colors.black.withValues(alpha: .08),
                 ),
               ],
             ),

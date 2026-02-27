@@ -9,7 +9,6 @@ import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/analytics_services.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
-import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
@@ -21,7 +20,6 @@ import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart'
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 import 'package:tradologie_app/features/app/domain/usecases/check_force_update_usecase.dart';
 import 'package:tradologie_app/features/app/presentation/cubit/app_cubit.dart';
-import 'package:tradologie_app/features/app/presentation/screens/drawer.dart';
 import 'package:tradologie_app/features/app/presentation/widgets/input_dialog.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/delete_account_usecase.dart';
 import 'package:tradologie_app/features/authentication/presentation/cubit/authentication_cubit.dart';
@@ -321,12 +319,12 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(.7),
+        color: Colors.white.withValues(alpha: .7),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
             blurRadius: 20,
-            color: Colors.black.withOpacity(.05),
+            color: Colors.black.withValues(alpha: .05),
           ),
         ],
       ),
