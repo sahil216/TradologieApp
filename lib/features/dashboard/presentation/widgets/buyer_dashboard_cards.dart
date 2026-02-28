@@ -118,7 +118,7 @@ class _BuyerDashboardCardState extends State<BuyerDashboardCard> {
                         SizedBox(height: gapLarge),
                         Text(
                           widget.title,
-                          maxLines: 2,
+                          maxLines: 3,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,

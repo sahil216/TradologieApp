@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 
@@ -94,6 +95,12 @@ class _SplashScreenState extends State<SplashScreen>
     } else {
       sl<NavigationService>().pushNamedAndRemoveUntil(Routes.onboardingRoute);
     }
+  }
+
+  @override
+  void dispose() {
+    _screenController.dispose();
+    super.dispose();
   }
 
   void startDelay(BuildContext context) {

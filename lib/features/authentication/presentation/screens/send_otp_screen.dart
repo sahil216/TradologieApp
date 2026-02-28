@@ -33,7 +33,8 @@ class SendOtpScreen extends StatefulWidget {
   State<SendOtpScreen> createState() => _SendOtpScreenState();
 }
 
-class _SendOtpScreenState extends State<SendOtpScreen> {
+class _SendOtpScreenState extends State<SendOtpScreen>
+    with SingleTickerProviderStateMixin {
   final textMobileController = TextEditingController();
   final textFullNameController = TextEditingController();
   List<CountryCodeList>? countryCodeList;
@@ -50,17 +51,52 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
   @override
   void initState() {
     authenticationCubit.getCountryCodeList(NoParams());
+    _screenController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+
+    _screenFade = CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    );
+
+    _screenScale = Tween<double>(
+      begin: 0.97,
+      end: 1,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _screenSlide = Tween<Offset>(
+      begin: const Offset(0, .04),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted) _screenController.forward();
+    });
     super.initState();
   }
 
+  late AnimationController _screenController;
+  late Animation<double> _screenFade;
+  late Animation<double> _screenScale;
+  late Animation<Offset> _screenSlide;
   @override
   void dispose() {
     textMobileController.dispose();
+    _screenController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final r = Responsive(context);
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: AdaptiveScaffold(
@@ -91,411 +127,422 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
           },
           child: Stack(
             children: [
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final r = Responsive(context);
-                  return ScrollConfiguration(
-                    behavior: const ScrollBehavior(),
-                    child: ValueListenableBuilder(
-                        valueListenable: showPassword,
-                        builder: (context, value, child) {
-                          return Column(
-                            children: [
-                              SizedBox(
-                                width: double.infinity,
-                                height: r.value(
-                                  mobile: r.screenHeight * 0.35,
-                                  tablet: r.screenHeight * 0.4,
-                                ),
-                                child: Constants.isBuyer == true
-                                    ? SvgPicture.asset(
-                                        ImgAssets.buyerLoginImage,
-                                        fit: BoxFit.cover,
-                                        width: double.infinity,
-                                        height: double.infinity,
-                                      )
-                                    : SvgPicture.asset(
-                                        ImgAssets.sellerLoginImage,
-                                        fit: BoxFit.cover,
-                                        width: double.infinity,
-                                        height: double.infinity,
+              ValueListenableBuilder(
+                valueListenable: showPassword,
+                builder: (context, value, child) {
+                  return FadeTransition(
+                      opacity: _screenFade,
+                      child: SlideTransition(
+                          position: _screenSlide,
+                          child: ScaleTransition(
+                              scale: _screenScale,
+                              child: CustomScrollView(
+                                keyboardDismissBehavior:
+                                    ScrollViewKeyboardDismissBehavior.onDrag,
+                                physics: const BouncingScrollPhysics(),
+                                slivers: [
+                                  SliverToBoxAdapter(
+                                    child: SizedBox(
+                                      width: double.infinity,
+                                      height: r.value(
+                                        mobile: r.screenHeight * 0.35,
+                                        tablet: r.screenHeight * 0.4,
                                       ),
-                              ),
-                              Expanded(
-                                child: CommonSingleChildScrollView(
-                                  keyboardDismiss: true,
-                                  child: Center(
-                                    child: ConstrainedBox(
-                                      constraints: BoxConstraints(
-                                        maxWidth:
-                                            r.isTablet ? 600 : double.infinity,
-                                      ),
-                                      child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal:
-                                              r.value(mobile: 20, tablet: 32),
+                                      child: Constants.isBuyer == true
+                                          ? Image.asset(
+                                              ImgAssets.buyerLoginImage,
+                                              fit: BoxFit.cover,
+                                              width: double.infinity,
+                                              height: double.infinity,
+                                            )
+                                          : Image.asset(
+                                              ImgAssets.sellerLoginImage,
+                                              fit: BoxFit.cover,
+                                              width: double.infinity,
+                                              height: double.infinity,
+                                            ),
+                                    ),
+                                  ),
+                                  SliverToBoxAdapter(
+                                    child: Center(
+                                      child: ConstrainedBox(
+                                        constraints: BoxConstraints(
+                                          maxWidth: r.isTablet
+                                              ? 600
+                                              : double.infinity,
                                         ),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.stretch,
-                                          children: [
-                                            Form(
-                                              key: formKey,
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.stretch,
-                                                children: [
-                                                  SizedBox(
-                                                      height: r.value(
-                                                          mobile: 16,
-                                                          tablet: 24)),
-                                                  CommonText(
-                                                    CommonStrings
-                                                        .sendOtpPunchLine,
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyleConstants
-                                                        .medium(
-                                                      context,
-                                                      fontSize: r.value(
-                                                          mobile: 24,
-                                                          tablet: 30),
-                                                      color:
-                                                          AppColors.defaultText,
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal:
+                                                r.value(mobile: 20, tablet: 32),
+                                          ),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            children: [
+                                              Form(
+                                                key: formKey,
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment
+                                                          .stretch,
+                                                  children: [
+                                                    SizedBox(
+                                                        height: r.value(
+                                                            mobile: 16,
+                                                            tablet: 24)),
+                                                    CommonText(
+                                                      CommonStrings
+                                                          .sendOtpPunchLine,
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyleConstants
+                                                          .medium(
+                                                        context,
+                                                        fontSize: r.value(
+                                                            mobile: 24,
+                                                            tablet: 30),
+                                                        color: AppColors
+                                                            .defaultText,
+                                                      ),
                                                     ),
-                                                  ),
-                                                  SizedBox(
-                                                      height: r.value(
-                                                          mobile: 16,
-                                                          tablet: 24)),
-                                                  CommonTextField(
-                                                      titleText:
-                                                          CommonStrings.name,
-                                                      hintText: CommonStrings
-                                                          .enterName,
-                                                      textRequired:
-                                                          CommonStrings
-                                                              .enterName,
-                                                      titleStyle: TextStyleConstants
-                                                          .semiBold(context,
-                                                              fontSize: 16,
-                                                              color: AppColors
-                                                                  .defaultText),
-                                                      labalStyle:
-                                                          TextStyleConstants.medium(
-                                                              context,
-                                                              fontSize: 16,
-                                                              color: AppColors
-                                                                  .defaultText),
+                                                    SizedBox(
+                                                        height: r.value(
+                                                            mobile: 16,
+                                                            tablet: 24)),
+                                                    CommonTextField(
+                                                        titleText: CommonStrings
+                                                            .name,
+                                                        hintText: CommonStrings
+                                                            .enterName,
+                                                        textRequired:
+                                                            CommonStrings
+                                                                .enterName,
+                                                        titleStyle:
+                                                            TextStyleConstants.semiBold(
+                                                                context,
+                                                                fontSize: 16,
+                                                                color: AppColors
+                                                                    .defaultText),
+                                                        labalStyle:
+                                                            TextStyleConstants.medium(
+                                                                context,
+                                                                fontSize: 16,
+                                                                color: AppColors
+                                                                    .defaultText),
+                                                        controller:
+                                                            textFullNameController,
+                                                        textInputType:
+                                                            TextInputType.name,
+                                                        isEnable: true,
+                                                        backgroundColor:
+                                                            AppColors
+                                                                .transparent,
+                                                        autovalidateMode:
+                                                            AutovalidateMode
+                                                                .onUserInteraction,
+                                                        validator:
+                                                            (String? value) {
+                                                          if (value == null ||
+                                                              value
+                                                                  .trim()
+                                                                  .isEmpty) {
+                                                            return "Full name is required";
+                                                          }
+
+                                                          return null;
+                                                        }),
+                                                    SizedBox(
+                                                        height: r.value(
+                                                            mobile: 16,
+                                                            tablet: 24)),
+                                                    CountryPhoneField(
+                                                      initialCountry:
+                                                          countryCodeList?.firstWhere(
+                                                                  (element) =>
+                                                                      element
+                                                                          .countryCode ==
+                                                                      "91") ??
+                                                              CountryCodeList(
+                                                                  countryName:
+                                                                      "India",
+                                                                  countryCode:
+                                                                      "91"),
+                                                      countryList:
+                                                          countryCodeList ?? [],
                                                       controller:
-                                                          textFullNameController,
-                                                      textInputType:
-                                                          TextInputType.name,
-                                                      isEnable: true,
-                                                      backgroundColor:
-                                                          AppColors.transparent,
+                                                          textMobileController,
+                                                      hintText: CommonStrings
+                                                          .enterMobileNumber,
+                                                      onChanged: (value) {
+                                                        setState(() {
+                                                          textMobileController
+                                                              .text = value;
+                                                        });
+                                                      },
+                                                      onCountryChanged:
+                                                          (value) {
+                                                        setState(() {
+                                                          countryCode = value;
+                                                        });
+                                                      },
                                                       autovalidateMode:
                                                           AutovalidateMode
                                                               .onUserInteraction,
-                                                      validator:
-                                                          (String? value) {
+                                                      validator: (value) {
                                                         if (value == null ||
-                                                            value
-                                                                .trim()
-                                                                .isEmpty) {
-                                                          return "Full name is required";
+                                                            value.isEmpty) {
+                                                          return "Phone cannot be empty";
                                                         }
-
+                                                        if (value.length < 10 &&
+                                                            countryCode
+                                                                    ?.countryCode ==
+                                                                "91") {
+                                                          return "Phone must be at least 10 digits";
+                                                        }
                                                         return null;
-                                                      }),
-                                                  SizedBox(
-                                                      height: r.value(
-                                                          mobile: 16,
-                                                          tablet: 24)),
-                                                  CountryPhoneField(
-                                                    initialCountry: countryCodeList
-                                                            ?.firstWhere(
-                                                                (element) =>
-                                                                    element
-                                                                        .countryCode ==
-                                                                    "91") ??
-                                                        CountryCodeList(
-                                                            countryName:
-                                                                "India",
-                                                            countryCode: "91"),
-                                                    countryList:
-                                                        countryCodeList ?? [],
-                                                    controller:
-                                                        textMobileController,
-                                                    hintText: CommonStrings
-                                                        .enterMobileNumber,
-                                                    onChanged: (value) {
-                                                      setState(() {
-                                                        textMobileController
-                                                            .text = value;
-                                                      });
-                                                    },
-                                                    onCountryChanged: (value) {
-                                                      setState(() {
-                                                        countryCode = value;
-                                                      });
-                                                    },
-                                                    autovalidateMode:
-                                                        AutovalidateMode
-                                                            .onUserInteraction,
-                                                    validator: (value) {
-                                                      if (value == null ||
-                                                          value.isEmpty) {
-                                                        return "Phone cannot be empty";
-                                                      }
-                                                      if (value.length < 10 &&
-                                                          countryCode
-                                                                  ?.countryCode ==
-                                                              "91") {
-                                                        return "Phone must be at least 10 digits";
-                                                      }
-                                                      return null;
-                                                    },
-                                                  ),
-                                                  SizedBox(
-                                                      height: r.value(
-                                                          mobile: 16,
-                                                          tablet: 24)),
-                                                  ValueListenableBuilder(
-                                                    valueListenable: termsAgree,
-                                                    builder:
-                                                        (context, value, _) {
-                                                      return Row(
-                                                        children: [
-                                                          Checkbox(
-                                                            value: termsAgree
-                                                                .value,
-                                                            onChanged: (value) {
-                                                              setState(() {
-                                                                termsAgree
-                                                                        .value =
-                                                                    value ??
-                                                                        false;
-                                                              });
-                                                            },
-                                                          ),
-                                                          Expanded(
-                                                            child:
-                                                                CustomTextRich(
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .left,
-                                                              children: [
-                                                                TextSpan(
-                                                                  text: CommonStrings
-                                                                      .iAgreeToThe,
-                                                                  style: TextStyleConstants
-                                                                      .regular(
-                                                                    context,
-                                                                    fontSize:
-                                                                        15,
-                                                                  ),
-                                                                ),
-                                                                TextSpan(
-                                                                  recognizer:
-                                                                      TapGestureRecognizer()
-                                                                        ..onTap =
-                                                                            () {
-                                                                          Constants.launch(
-                                                                              EndPoints.privacyUrl);
-                                                                        },
-                                                                  text: CommonStrings
-                                                                      .privacyPolicy,
-                                                                  style: TextStyleConstants
-                                                                      .regular(
-                                                                    context,
-                                                                    fontSize:
-                                                                        15,
-                                                                    decorationThickness:
-                                                                        1,
-                                                                    decorationColor:
-                                                                        AppColors
-                                                                            .black,
-                                                                    decoration:
-                                                                        TextDecoration
-                                                                            .underline,
-                                                                  ),
-                                                                ),
-                                                                TextSpan(
-                                                                  text: " & ",
-                                                                  style: TextStyleConstants
-                                                                      .regular(
-                                                                    context,
-                                                                    fontSize:
-                                                                        15,
-                                                                  ),
-                                                                ),
-                                                                TextSpan(
-                                                                  recognizer:
-                                                                      TapGestureRecognizer()
-                                                                        ..onTap =
-                                                                            () {
-                                                                          Constants
-                                                                              .launch(
-                                                                            EndPoints.termsUrl,
-                                                                          );
-                                                                        },
-                                                                  text: CommonStrings
-                                                                      .termsOfUse,
-                                                                  style: TextStyleConstants
-                                                                      .regular(
-                                                                    context,
-                                                                    fontSize:
-                                                                        15,
-                                                                    decorationThickness:
-                                                                        1,
-                                                                    decorationColor:
-                                                                        AppColors
-                                                                            .black,
-                                                                    decoration:
-                                                                        TextDecoration
-                                                                            .underline,
-                                                                  ),
-                                                                ),
-                                                              ],
+                                                      },
+                                                    ),
+                                                    SizedBox(
+                                                        height: r.value(
+                                                            mobile: 16,
+                                                            tablet: 24)),
+                                                    ValueListenableBuilder(
+                                                      valueListenable:
+                                                          termsAgree,
+                                                      builder:
+                                                          (context, value, _) {
+                                                        return Row(
+                                                          children: [
+                                                            Checkbox(
+                                                              value: termsAgree
+                                                                  .value,
+                                                              onChanged:
+                                                                  (value) {
+                                                                setState(() {
+                                                                  termsAgree
+                                                                          .value =
+                                                                      value ??
+                                                                          false;
+                                                                });
+                                                              },
                                                             ),
-                                                          ),
-                                                        ],
-                                                      );
-                                                    },
-                                                  ),
-                                                  SizedBox(
-                                                      height: r.value(
-                                                          mobile: 16,
-                                                          tablet: 24)),
-                                                  SizedBox(
-                                                    width: r.isTablet
-                                                        ? 420
-                                                        : double.infinity,
-                                                    child: CommonButton(
-                                                      onPressed:
-                                                          termsAgree.value ==
-                                                                  true
-                                                              ? () async {
-                                                                  if (textMobileController
-                                                                          .text
-                                                                          .isNotEmpty &&
-                                                                      textFullNameController
-                                                                          .text
-                                                                          .isNotEmpty) {
-                                                                    params = SendOtpParams(
-                                                                        mobileNo:
-                                                                            textMobileController
-                                                                                .text,
-                                                                        countryCode:
-                                                                            countryCode ??
-                                                                                CountryCodeList(),
-                                                                        name: textFullNameController
-                                                                            .text);
-                                                                    FocusManager
-                                                                        .instance
-                                                                        .primaryFocus
-                                                                        ?.unfocus();
-                                                                    Constants.isBuyer ==
-                                                                            true
-                                                                        ? BlocProvider.of<AuthenticationCubit>(context).sendOtpBuyer(
-                                                                            params,
-                                                                            false)
-                                                                        : BlocProvider.of<AuthenticationCubit>(context).sendOtp(
-                                                                            params,
-                                                                            false);
-                                                                  } else {
-                                                                    CommonToast
-                                                                        .error(
-                                                                            "Please Enter the Details to Continue");
-                                                                  }
-                                                                }
-                                                              : () {
+                                                            Expanded(
+                                                              child:
+                                                                  CustomTextRich(
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .left,
+                                                                children: [
+                                                                  TextSpan(
+                                                                    text: CommonStrings
+                                                                        .iAgreeToThe,
+                                                                    style: TextStyleConstants
+                                                                        .regular(
+                                                                      context,
+                                                                      fontSize:
+                                                                          15,
+                                                                    ),
+                                                                  ),
+                                                                  TextSpan(
+                                                                    recognizer:
+                                                                        TapGestureRecognizer()
+                                                                          ..onTap =
+                                                                              () {
+                                                                            Constants.launch(EndPoints.privacyUrl);
+                                                                          },
+                                                                    text: CommonStrings
+                                                                        .privacyPolicy,
+                                                                    style: TextStyleConstants
+                                                                        .regular(
+                                                                      context,
+                                                                      fontSize:
+                                                                          15,
+                                                                      decorationThickness:
+                                                                          1,
+                                                                      decorationColor:
+                                                                          AppColors
+                                                                              .black,
+                                                                      decoration:
+                                                                          TextDecoration
+                                                                              .underline,
+                                                                    ),
+                                                                  ),
+                                                                  TextSpan(
+                                                                    text: " & ",
+                                                                    style: TextStyleConstants
+                                                                        .regular(
+                                                                      context,
+                                                                      fontSize:
+                                                                          15,
+                                                                    ),
+                                                                  ),
+                                                                  TextSpan(
+                                                                    recognizer:
+                                                                        TapGestureRecognizer()
+                                                                          ..onTap =
+                                                                              () {
+                                                                            Constants.launch(
+                                                                              EndPoints.termsUrl,
+                                                                            );
+                                                                          },
+                                                                    text: CommonStrings
+                                                                        .termsOfUse,
+                                                                    style: TextStyleConstants
+                                                                        .regular(
+                                                                      context,
+                                                                      fontSize:
+                                                                          15,
+                                                                      decorationThickness:
+                                                                          1,
+                                                                      decorationColor:
+                                                                          AppColors
+                                                                              .black,
+                                                                      decoration:
+                                                                          TextDecoration
+                                                                              .underline,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        );
+                                                      },
+                                                    ),
+                                                    SizedBox(
+                                                        height: r.value(
+                                                            mobile: 16,
+                                                            tablet: 24)),
+                                                    SizedBox(
+                                                      width: r.isTablet
+                                                          ? 420
+                                                          : double.infinity,
+                                                      child: CommonButton(
+                                                        onPressed: termsAgree
+                                                                    .value ==
+                                                                true
+                                                            ? () async {
+                                                                if (textMobileController
+                                                                        .text
+                                                                        .isNotEmpty &&
+                                                                    textFullNameController
+                                                                        .text
+                                                                        .isNotEmpty) {
+                                                                  params = SendOtpParams(
+                                                                      mobileNo:
+                                                                          textMobileController
+                                                                              .text,
+                                                                      countryCode:
+                                                                          countryCode ??
+                                                                              CountryCodeList(),
+                                                                      name: textFullNameController
+                                                                          .text);
+                                                                  FocusManager
+                                                                      .instance
+                                                                      .primaryFocus
+                                                                      ?.unfocus();
+                                                                  Constants.isBuyer ==
+                                                                          true
+                                                                      ? BlocProvider.of<AuthenticationCubit>(context).sendOtpBuyer(
+                                                                          params,
+                                                                          false)
+                                                                      : BlocProvider.of<AuthenticationCubit>(context).sendOtp(
+                                                                          params,
+                                                                          false);
+                                                                } else {
                                                                   CommonToast.error(
-                                                                      "Please accept Terms and Conditions");
-                                                                },
-                                                      text: CommonStrings
-                                                          .sendOtpViaWhatsapp,
-                                                      backgroundColor:
-                                                          AppColors.white,
-                                                      borderSide: BorderSide(
-                                                        color: AppColors
-                                                            .green, // or any color you want
-                                                        width: 2,
-                                                      ),
-                                                      icon: Image.asset(
-                                                          ImgAssets
-                                                              .whatsappIcon),
-                                                      textStyle:
-                                                          TextStyleConstants
-                                                              .medium(
-                                                        context,
-                                                        fontSize: 16,
-                                                        color: AppColors.black,
+                                                                      "Please Enter the Details to Continue");
+                                                                }
+                                                              }
+                                                            : () {
+                                                                CommonToast.error(
+                                                                    "Please accept Terms and Conditions");
+                                                              },
+                                                        text: CommonStrings
+                                                            .sendOtpViaWhatsapp,
+                                                        backgroundColor:
+                                                            AppColors.white,
+                                                        borderSide: BorderSide(
+                                                          color: AppColors
+                                                              .green, // or any color you want
+                                                          width: 2,
+                                                        ),
+                                                        icon: Image.asset(
+                                                            ImgAssets
+                                                                .whatsappIcon),
+                                                        textStyle:
+                                                            TextStyleConstants
+                                                                .medium(
+                                                          context,
+                                                          fontSize: 16,
+                                                          color:
+                                                              AppColors.black,
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                                  SizedBox(
-                                                      height: r.value(
-                                                          mobile: 20,
-                                                          tablet: 28)),
-                                                  CustomTextRich(
-                                                    textAlign: TextAlign.center,
-                                                    children: [
-                                                      TextSpan(
-                                                        text: CommonStrings
-                                                            .alreadyHaveAnAccount,
-                                                        style:
-                                                            TextStyleConstants
-                                                                .semiBold(
-                                                          context,
-                                                          fontSize: 15,
+                                                    SizedBox(
+                                                        height: r.value(
+                                                            mobile: 20,
+                                                            tablet: 28)),
+                                                    CustomTextRich(
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      children: [
+                                                        TextSpan(
+                                                          text: CommonStrings
+                                                              .alreadyHaveAnAccount,
+                                                          style:
+                                                              TextStyleConstants
+                                                                  .semiBold(
+                                                            context,
+                                                            fontSize: 15,
+                                                          ),
                                                         ),
-                                                      ),
-                                                      TextSpan(
-                                                        recognizer:
-                                                            TapGestureRecognizer()
-                                                              ..onTap = () {
-                                                                Navigator.pushNamed(
-                                                                    context,
-                                                                    Routes
-                                                                        .signinRoute);
-                                                              },
-                                                        text:
-                                                            CommonStrings.login,
-                                                        style:
-                                                            TextStyleConstants
-                                                                .semiBold(
-                                                          context,
-                                                          fontSize: 15,
-                                                          decorationThickness:
-                                                              1,
-                                                          color:
-                                                              AppColors.orange,
+                                                        TextSpan(
+                                                          recognizer:
+                                                              TapGestureRecognizer()
+                                                                ..onTap = () {
+                                                                  Navigator.pushNamed(
+                                                                      context,
+                                                                      Routes
+                                                                          .signinRoute);
+                                                                },
+                                                          text: CommonStrings
+                                                              .login,
+                                                          style:
+                                                              TextStyleConstants
+                                                                  .semiBold(
+                                                            context,
+                                                            fontSize: 15,
+                                                            decorationThickness:
+                                                                1,
+                                                            color: AppColors
+                                                                .orange,
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  SizedBox(
-                                                      height: r.value(
-                                                          mobile: 20,
-                                                          tablet: 28)),
-                                                ],
+                                                      ],
+                                                    ),
+                                                    SizedBox(
+                                                        height: r.value(
+                                                            mobile: 20,
+                                                            tablet: 28)),
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ),
-                              CommonSocialIcons(),
-                            ],
-                          );
-                        }),
-                  );
+                                  SliverToBoxAdapter(
+                                    child: CommonSocialIcons(),
+                                  ),
+                                ],
+                              ))));
                 },
               ),
               if (Navigator.canPop(context)) ...[

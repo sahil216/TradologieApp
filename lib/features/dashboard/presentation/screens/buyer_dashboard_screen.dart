@@ -235,7 +235,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen>
                                       child: BuyerDashboardCard(
                                         color: Colors.blue,
                                         icon: Icons.description,
-                                        title: "Post Your\nRequirement",
+                                        title: "Post Your Requirement",
                                         subtitle:
                                             "Submit requirement and receive quotes from verified suppliers.",
                                         onTap: () {
@@ -249,7 +249,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen>
                                       child: BuyerDashboardCard(
                                         color: Colors.deepOrange,
                                         icon: Icons.inventory_2,
-                                        title: "Ready to Sell\nStock",
+                                        title: "Ready For Sale",
                                         subtitle:
                                             "View seller ready stock and send enquiries directly to them",
                                         onTap: () {

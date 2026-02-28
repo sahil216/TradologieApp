@@ -43,12 +43,12 @@ class ImgAssets {
   static const String logout = '$imgPath/logout_icon.png';
   static const String appLogo = '$imgPath/app_logo.png';
   static const String notification = '$imgPath/notification_icon.png';
-  static const String buyerLoginImage = 'assets/svg/buyer_login_image.svg';
-  static const String sellerLoginImage = 'assets/svg/seller_login_image.svg';
+  static const String buyerLoginImage = 'assets/svg/buyer_login_image.webp';
+  static const String sellerLoginImage = 'assets/svg/seller_login_image.webp';
   static const String mainScreenImage = '$imgPath/main_screen.jpg';
 
   // svg
-  static const String onboardingImage = 'assets/svg/onboarding_image.svg';
+  static const String onboardingImage = 'assets/svg/onboarding_image.webp';
   static const String postStockListingIcon =
       'assets/svg/post_stock_listing_icon.svg';
 }

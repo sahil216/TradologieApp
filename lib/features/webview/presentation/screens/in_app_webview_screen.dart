@@ -164,9 +164,6 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen>
             ),
           ],
         ),
-        bottomNavigationBar: SizedBox(
-          height: 70,
-        ),
       ),
     );
   }
