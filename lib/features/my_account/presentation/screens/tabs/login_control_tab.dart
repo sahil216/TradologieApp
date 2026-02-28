@@ -26,7 +26,8 @@ class LoginControlTab extends StatefulWidget {
   State<LoginControlTab> createState() => _LoginControlTabState();
 }
 
-class _LoginControlTabState extends State<LoginControlTab> {
+class _LoginControlTabState extends State<LoginControlTab>
+    with SingleTickerProviderStateMixin {
   bool? data = false;
 
   final textFullNameController = TextEditingController();
@@ -50,14 +51,49 @@ class _LoginControlTabState extends State<LoginControlTab> {
 
   final formKey = GlobalKey<FormState>();
 
+  late AnimationController _screenController;
+  late Animation<double> _screenFade;
+  late Animation<double> _screenScale;
+  late Animation<Offset> _screenSlide;
+
   @override
   void initState() {
     super.initState();
     getLoginControl();
+    _screenController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+
+    _screenFade = CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    );
+
+    _screenScale = Tween<double>(
+      begin: 0.97,
+      end: 1,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _screenSlide = Tween<Offset>(
+      begin: const Offset(0, .04),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted) _screenController.forward();
+    });
   }
 
   @override
   void dispose() {
+    _screenController.dispose();
     super.dispose();
   }
 
@@ -106,202 +142,224 @@ class _LoginControlTabState extends State<LoginControlTab> {
             }
             return const CommonLoader();
           }
-          return SafeArea(
-            child: CommonSingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0, vertical: 12.0),
-                child: Column(
-                  children: [
-                    Form(
-                      key: formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          SizedBox(
-                            height: 20,
-                          ),
-                          CommonTextField(
-                              titleText: CommonStrings.fullName,
-                              hintText: CommonStrings.enterFullName,
-                              textRequired: CommonStrings.enterFullName,
-                              controller: textFullNameController,
-                              textInputType: TextInputType.name,
-                              isEnable: true,
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              validator: (String? value) {
-                                if (value == null || value.trim().isEmpty) {
-                                  return "Full name is required";
-                                }
-
-                                return null;
-                              }),
-                          SizedBox(
-                            height: 16,
-                          ),
-                          CommonTextField(
-                            titleText: CommonStrings.emailId,
-                            hintText: CommonStrings.enterEmail,
-                            textRequired: CommonStrings.enterEmail,
-                            controller: textEmailController,
-                            textInputType: TextInputType.emailAddress,
-                            isEnable: true,
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
-                            validator: (String? value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return "Email is required";
-                              }
-                              if (value.isEmailValid == false) {
-                                return "Enter a valid email";
-                              }
-                              return null;
-                            },
-                          ),
-                          SizedBox(height: 16),
-                          CommonTextField(
-                            titleText: CommonStrings.mobileNumber,
-                            hintText: CommonStrings.enterMobileNumber,
-                            textRequired: CommonStrings.enterMobileNumber,
-                            controller: textPhoneController,
-                            textInputType: TextInputType.phone,
-                            isEnable: true,
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
-                            validator: (String? value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return "Phone number is required";
-                              }
-                              if (value.replaceAll(' ', '').length < 10) {
-                                return "Enter a valid phone number";
-                              }
-                              return null;
-                            },
-                          ),
-                          SizedBox(height: 16),
-                          CommonTextField(
-                            titleText: CommonStrings.password,
-                            hintText: CommonStrings.enterPassword,
-                            controller: textPasswordController,
-                            isObsecureText:
-                                showPassword.value == true ? false : true,
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                showPassword.value == true
-                                    ? Icons.visibility_outlined
-                                    : Icons.visibility_off_outlined,
-                                color: AppColors.grayText,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  showPassword.value = !showPassword.value;
-                                });
-                              },
-                            ),
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
-                          ),
-                          SizedBox(height: 16),
-                          CommonTextField(
-                            titleText: CommonStrings.confirmPassword,
-                            hintText: CommonStrings.enterConfirmPassword,
-                            controller: textConfirmPasswordController,
-                            textRequired: "Passwords do not match",
-                            isObsecureText:
-                                showPassword.value == true ? false : true,
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                showPassword.value == true
-                                    ? Icons.visibility_outlined
-                                    : Icons.visibility_off_outlined,
-                                color: AppColors.grayText,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  showPassword.value = !showPassword.value;
-                                });
-                              },
-                            ),
-                            validator: (String? val) {
-                              if (val == null || val.isEmpty) {
-                                return "Confirm Password is required";
-                              }
-                              if (val != textPasswordController.text) {
-                                return "Passwords do not match";
-                              }
-                              return null;
-                            },
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
-                          ),
-                          SizedBox(height: 16),
-                          CommonTextField(
-                            titleText: CommonStrings.profileUpload,
-                            hintText: CommonStrings.enterprofileUpload,
-                            textRequired: CommonStrings.enterprofileUpload,
-                            controller: TextEditingController(),
-                            textInputType: TextInputType.text,
-                            isEnable: true,
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
-                            prefixIcon: GestureDetector(
-                              onTap: () {},
-                              child: Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child: Container(
-                                  padding: EdgeInsets.all(5),
-                                  width: Responsive(context).screenWidth * 0.3,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primary,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Center(
-                                    child: CommonText(
-                                      "Choose File",
-                                      style: TextStyleConstants.semiBold(
-                                          context,
-                                          fontSize: 14,
-                                          color: AppColors.white),
+          return FadeTransition(
+              opacity: _screenFade,
+              child: SlideTransition(
+                  position: _screenSlide,
+                  child: ScaleTransition(
+                      scale: _screenScale,
+                      child: CustomScrollView(slivers: [
+                        SliverSafeArea(
+                          sliver: SliverToBoxAdapter(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 12.0),
+                              child: Form(
+                                key: formKey,
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    SizedBox(
+                                      height: 20,
                                     ),
-                                  ),
+                                    CommonTextField(
+                                        titleText: CommonStrings.fullName,
+                                        hintText: CommonStrings.enterFullName,
+                                        textRequired:
+                                            CommonStrings.enterFullName,
+                                        controller: textFullNameController,
+                                        textInputType: TextInputType.name,
+                                        isEnable: true,
+                                        autovalidateMode:
+                                            AutovalidateMode.onUserInteraction,
+                                        validator: (String? value) {
+                                          if (value == null ||
+                                              value.trim().isEmpty) {
+                                            return "Full name is required";
+                                          }
+
+                                          return null;
+                                        }),
+                                    SizedBox(
+                                      height: 16,
+                                    ),
+                                    CommonTextField(
+                                      titleText: CommonStrings.emailId,
+                                      hintText: CommonStrings.enterEmail,
+                                      textRequired: CommonStrings.enterEmail,
+                                      controller: textEmailController,
+                                      textInputType: TextInputType.emailAddress,
+                                      isEnable: true,
+                                      autovalidateMode:
+                                          AutovalidateMode.onUserInteraction,
+                                      validator: (String? value) {
+                                        if (value == null ||
+                                            value.trim().isEmpty) {
+                                          return "Email is required";
+                                        }
+                                        if (value.isEmailValid == false) {
+                                          return "Enter a valid email";
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                    SizedBox(height: 16),
+                                    CommonTextField(
+                                      titleText: CommonStrings.mobileNumber,
+                                      hintText: CommonStrings.enterMobileNumber,
+                                      textRequired:
+                                          CommonStrings.enterMobileNumber,
+                                      controller: textPhoneController,
+                                      textInputType: TextInputType.phone,
+                                      isEnable: true,
+                                      autovalidateMode:
+                                          AutovalidateMode.onUserInteraction,
+                                      validator: (String? value) {
+                                        if (value == null ||
+                                            value.trim().isEmpty) {
+                                          return "Phone number is required";
+                                        }
+                                        if (value.replaceAll(' ', '').length <
+                                            10) {
+                                          return "Enter a valid phone number";
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                    SizedBox(height: 16),
+                                    CommonTextField(
+                                      titleText: CommonStrings.password,
+                                      hintText: CommonStrings.enterPassword,
+                                      controller: textPasswordController,
+                                      isObsecureText: showPassword.value == true
+                                          ? false
+                                          : true,
+                                      suffixIcon: IconButton(
+                                        icon: Icon(
+                                          showPassword.value == true
+                                              ? Icons.visibility_outlined
+                                              : Icons.visibility_off_outlined,
+                                          color: AppColors.grayText,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            showPassword.value =
+                                                !showPassword.value;
+                                          });
+                                        },
+                                      ),
+                                      autovalidateMode:
+                                          AutovalidateMode.onUserInteraction,
+                                    ),
+                                    SizedBox(height: 16),
+                                    CommonTextField(
+                                      titleText: CommonStrings.confirmPassword,
+                                      hintText:
+                                          CommonStrings.enterConfirmPassword,
+                                      controller: textConfirmPasswordController,
+                                      textRequired: "Passwords do not match",
+                                      isObsecureText: showPassword.value == true
+                                          ? false
+                                          : true,
+                                      suffixIcon: IconButton(
+                                        icon: Icon(
+                                          showPassword.value == true
+                                              ? Icons.visibility_outlined
+                                              : Icons.visibility_off_outlined,
+                                          color: AppColors.grayText,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            showPassword.value =
+                                                !showPassword.value;
+                                          });
+                                        },
+                                      ),
+                                      validator: (String? val) {
+                                        if (val == null || val.isEmpty) {
+                                          return "Confirm Password is required";
+                                        }
+                                        if (val !=
+                                            textPasswordController.text) {
+                                          return "Passwords do not match";
+                                        }
+                                        return null;
+                                      },
+                                      autovalidateMode:
+                                          AutovalidateMode.onUserInteraction,
+                                    ),
+                                    SizedBox(height: 16),
+                                    CommonTextField(
+                                      titleText: CommonStrings.profileUpload,
+                                      hintText:
+                                          CommonStrings.enterprofileUpload,
+                                      textRequired:
+                                          CommonStrings.enterprofileUpload,
+                                      controller: TextEditingController(),
+                                      textInputType: TextInputType.text,
+                                      isEnable: true,
+                                      autovalidateMode:
+                                          AutovalidateMode.onUserInteraction,
+                                      prefixIcon: GestureDetector(
+                                        onTap: () {},
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: Container(
+                                            padding: EdgeInsets.all(5),
+                                            width: Responsive(context)
+                                                    .screenWidth *
+                                                0.3,
+                                            decoration: BoxDecoration(
+                                              color: AppColors.primary,
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            child: Center(
+                                              child: CommonText(
+                                                "Choose File",
+                                                style:
+                                                    TextStyleConstants.semiBold(
+                                                        context,
+                                                        fontSize: 14,
+                                                        color: AppColors.white),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      validator: (String? value) {
+                                        // if (value == null || value.trim().isEmpty) {
+                                        //   return "Email is required";
+                                        // }
+                                        // if (value.isEmailValid == false) {
+                                        //   return "Enter a valid email";
+                                        // }
+                                        return null;
+                                      },
+                                    ),
+                                    SizedBox(
+                                      height: 16,
+                                    ),
+                                    CommonButton(
+                                      onPressed: () {},
+                                      text: CommonStrings.signUp,
+                                      textStyle: TextStyleConstants.medium(
+                                        context,
+                                        fontSize: 16,
+                                        color: AppColors.white,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 30,
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
-                            validator: (String? value) {
-                              // if (value == null || value.trim().isEmpty) {
-                              //   return "Email is required";
-                              // }
-                              // if (value.isEmailValid == false) {
-                              //   return "Enter a valid email";
-                              // }
-                              return null;
-                            },
                           ),
-                          SizedBox(
-                            height: 16,
-                          ),
-                          CommonButton(
-                            onPressed: () {},
-                            text: CommonStrings.signUp,
-                            textStyle: TextStyleConstants.medium(
-                              context,
-                              fontSize: 16,
-                              color: AppColors.white,
-                            ),
-                          ),
-                          SizedBox(
-                            height: 30,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
+                        )
+                      ]))));
         },
       ),
     );

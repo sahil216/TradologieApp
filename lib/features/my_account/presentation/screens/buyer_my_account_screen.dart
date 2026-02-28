@@ -223,10 +223,13 @@ class _BuyerMyAccountScreenState extends State<BuyerMyAccountScreen>
                                       MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    _LuxurySectionTitle(
+                                    LuxurySectionTitle(
                                         title: "Account Information"),
                                     TextButton.icon(
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        sl<NavigationService>().pushNamed(
+                                            Routes.editAccountScreen);
+                                      },
                                       icon: const Icon(Icons.edit, size: 18),
                                       label: const Text("Edit"),
                                     ),
@@ -238,7 +241,7 @@ class _BuyerMyAccountScreenState extends State<BuyerMyAccountScreen>
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 20),
                                 sliver: SliverToBoxAdapter(
-                                  child: _GlassCard(
+                                  child: GlassCard(
                                     child: Column(
                                       children: const [
                                         _LuxuryRow("Mobile No", "7303384866"),
@@ -259,9 +262,12 @@ class _BuyerMyAccountScreenState extends State<BuyerMyAccountScreen>
                                       MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    _LuxurySectionTitle(title: "Addresses"),
+                                    LuxurySectionTitle(title: "Addresses"),
                                     TextButton.icon(
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        sl<NavigationService>()
+                                            .pushNamed(Routes.addAddressScreen);
+                                      },
                                       icon: const Icon(Icons.add, size: 18),
                                       label: const Text("Add Address"),
                                     ),
@@ -294,10 +300,13 @@ class _BuyerMyAccountScreenState extends State<BuyerMyAccountScreen>
                                       MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    _LuxurySectionTitle(
+                                    LuxurySectionTitle(
                                         title: "Enquiry Notifications"),
                                     TextButton.icon(
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        sl<NavigationService>().pushNamed(
+                                            Routes.supplierListScreen);
+                                      },
                                       icon: const Icon(Icons.add, size: 18),
                                       label: const Text("Add Negotiation"),
                                     ),
@@ -333,9 +342,9 @@ class _BuyerMyAccountScreenState extends State<BuyerMyAccountScreen>
   /// 🔹 SECTION HEADER
 }
 
-class _LuxurySectionTitle extends StatelessWidget {
+class LuxurySectionTitle extends StatelessWidget {
   final String title;
-  const _LuxurySectionTitle({required this.title});
+  const LuxurySectionTitle({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -358,9 +367,9 @@ class _LuxurySectionTitle extends StatelessWidget {
 /// 🧊 Glass Card
 ////////////////////////////////////////////////////////////
 
-class _GlassCard extends StatelessWidget {
+class GlassCard extends StatelessWidget {
   final Widget child;
-  const _GlassCard({required this.child});
+  const GlassCard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -438,7 +447,7 @@ class _GlassAddressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _GlassCard(
+    return GlassCard(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -602,7 +611,7 @@ class _LuxuryNotificationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _GlassCard(
+    return GlassCard(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
         decoration: BoxDecoration(

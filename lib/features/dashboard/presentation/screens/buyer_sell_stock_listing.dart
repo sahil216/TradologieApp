@@ -217,7 +217,7 @@ class _BuyerSellStockListingState extends State<BuyerSellStockListing>
                                 physics: const BouncingScrollPhysics(),
                                 slivers: [
                                   const CommonAppbar(
-                                    title: "Ready For Sale",
+                                    title: "Ready To Buy",
                                     showBackButton: true,
                                   ),
                                   if (state is GetVendorStockListingIsLoading ||

@@ -181,7 +181,7 @@ class _CommonTextFieldState extends State<CommonTextField> {
           ),
           decoration: BoxDecoration(
             boxShadow: widget.boxShadow,
-            color: widget.backgroundColor ?? AppColors.white,
+            color: widget.backgroundColor ?? AppColors.transparent,
             borderRadius: BorderRadius.circular(widget.borderRadius),
           ), //
           child: TextFormField(

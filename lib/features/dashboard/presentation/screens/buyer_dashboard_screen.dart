@@ -171,61 +171,6 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen>
                               ),
                               const SliverToBoxAdapter(
                                   child: SizedBox(height: 16)),
-                              // SliverPadding(
-                              //   padding: const EdgeInsets.symmetric(horizontal: 16),
-                              //   sliver: SliverToBoxAdapter(
-                              //     child: InkWell(
-                              //       onTap: () {
-                              //         Constants.isAndroid14OrBelow && Platform.isAndroid
-                              //             ? InAppWebViewScreen(
-                              //                 params: WebviewParams(
-                              //                     url: "https://www.tradologie.com/fmcg/",
-                              //                     canPop: false,
-                              //                     isAppBar: true,
-                              //                     isShowDrawer: true,
-                              //                     isShowNotification: true))
-                              //             : WebViewScreen(
-                              //                 params: WebviewParams(
-                              //                     url: "https://www.tradologie.com/fmcg/",
-                              //                     canPop: false,
-                              //                     isAppBar: true,
-                              //                     isShowDrawer: true,
-                              //                     isShowNotification: true));
-                              //       },
-                              //       child: CachedNetworkImage(
-                              //         imageUrl:
-                              //             "https://www.tradologie.com/DOCS/mobileapp/buyerdashboard-1.webp",
-                              //       ),
-                              //     ),
-                              // BuyerDashboardBannerEngine(
-                              //   banners: [
-                              //     AppBanner(
-                              //       image:
-                              //           "https://www.tradologie.com/DOCS/mobileapp/buyerdashboard-1.webp",
-                              //       title: "FMCG",
-                              //       subtitle: "Coming Soon",
-                              //     ),
-                              //   ],
-                              //   onTap: (banner, index) {
-                              //     Constants.isAndroid14OrBelow && Platform.isAndroid
-                              //         ? InAppWebViewScreen(
-                              //             params: WebviewParams(
-                              //                 url: "https://www.tradologie.com/fmcg/",
-                              //                 canPop: false,
-                              //                 isAppBar: true,
-                              //                 isShowDrawer: true,
-                              //                 isShowNotification: true))
-                              //         : WebViewScreen(
-                              //             params: WebviewParams(
-                              //                 url: "https://www.tradologie.com/fmcg/",
-                              //                 canPop: false,
-                              //                 isAppBar: true,
-                              //                 isShowDrawer: true,
-                              //                 isShowNotification: true));
-                              //   },
-                              // ),
-                              //   ),
-                              // ),
                               SliverPadding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 16),
@@ -249,7 +194,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen>
                                       child: BuyerDashboardCard(
                                         color: Colors.deepOrange,
                                         icon: Icons.inventory_2,
-                                        title: "Ready For Sale",
+                                        title: "Ready To Buy\n",
                                         subtitle:
                                             "View seller ready stock and send enquiries directly to them",
                                         onTap: () {
@@ -275,7 +220,6 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen>
                                   ]),
                                 ),
                               ),
-
                               const SliverToBoxAdapter(
                                   child: SizedBox(height: 16)),
                               SliverToBoxAdapter(
@@ -313,7 +257,6 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen>
                                   ],
                                 ),
                               ),
-
                               const SliverToBoxAdapter(
                                   child: SizedBox(height: 110)),
                             ],

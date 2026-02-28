@@ -12,6 +12,8 @@ import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_pos
 import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_sell_stock_listing.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/post_stock_requirement_screen.dart';
+import 'package:tradologie_app/features/my_account/presentation/screens/buyer_my_account_screens/add_address_screen.dart';
+import 'package:tradologie_app/features/my_account/presentation/screens/buyer_my_account_screens/edit_account_screen.dart';
 import 'package:tradologie_app/features/my_account/presentation/screens/my_account_screen.dart';
 import 'package:tradologie_app/features/negotiation/presentation/screens/buyer_negotiation_screen.dart';
 import 'package:tradologie_app/features/negotiation/presentation/screens/negotiation_screen.dart';
@@ -74,6 +76,9 @@ class Routes {
 
   //! MyAccounts
   static const String myAccountsScreen = '/myAccountsScreen';
+  static const String addAddressScreen = '/addAddressScreen';
+  static const String editAccountScreen = '/editAccountScreen';
+
   //! Contact Us Screen
   static const String contactUsScreen = '/contactUsScreen';
   //! Notifications
@@ -192,6 +197,14 @@ class AppRoutes {
       case Routes.myAccountsScreen:
         return CupertinoPageRoute(builder: (context) {
           return const MyAccountScreen();
+        });
+      case Routes.addAddressScreen:
+        return CupertinoPageRoute(builder: (context) {
+          return const AddAddressScreen();
+        });
+      case Routes.editAccountScreen:
+        return CupertinoPageRoute(builder: (context) {
+          return const EditAccountScreen();
         });
 
       case Routes.contactUsScreen:

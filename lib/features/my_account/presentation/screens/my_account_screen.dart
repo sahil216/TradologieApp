@@ -19,6 +19,10 @@ import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
 import 'package:tradologie_app/features/my_account/domain/entities/company_details.dart';
 import 'package:tradologie_app/features/my_account/presentation/cubit/my_account_cubit.dart';
+import 'package:tradologie_app/features/my_account/presentation/screens/tabs/company_detail_tab.dart';
+import 'package:tradologie_app/features/my_account/presentation/screens/tabs/documents_tab.dart';
+import 'package:tradologie_app/features/my_account/presentation/screens/tabs/information_tab.dart';
+import 'package:tradologie_app/features/my_account/presentation/screens/tabs/login_control_tab.dart';
 import 'package:tradologie_app/features/webview/presentation/screens/in_app_webview_screen.dart';
 import 'package:tradologie_app/features/webview/presentation/screens/viewmodel/webview_params.dart';
 import 'package:tradologie_app/features/webview/presentation/screens/webview_screen.dart';
@@ -296,7 +300,7 @@ class _MyAccountScreenState extends State<MyAccountScreen>
                           SliverPersistentHeader(
                             pinned: true,
                             delegate: _MyAccountTabBarDelegate(
-                              UltraGlassTabBarV41(
+                              CommonTabBarWidget(
                                 controller: _tabController,
                                 tabs: const [
                                   "Login Control",
@@ -681,12 +685,12 @@ class _MyAccountScreenState extends State<MyAccountScreen>
   }
 }
 
-class UltraGlassTabBarV41 extends StatefulWidget {
+class CommonTabBarWidget extends StatefulWidget {
   final TabController controller;
   final List<String> tabs;
   final bool Function(int index)? isEnabled;
 
-  const UltraGlassTabBarV41({
+  const CommonTabBarWidget({
     super.key,
     required this.controller,
     required this.tabs,
@@ -694,10 +698,10 @@ class UltraGlassTabBarV41 extends StatefulWidget {
   });
 
   @override
-  State<UltraGlassTabBarV41> createState() => _UltraGlassTabBarV41State();
+  State<CommonTabBarWidget> createState() => _CommonTabBarWidgetState();
 }
 
-class _UltraGlassTabBarV41State extends State<UltraGlassTabBarV41> {
+class _CommonTabBarWidgetState extends State<CommonTabBarWidget> {
   final ScrollController _scrollController = ScrollController();
   final List<GlobalKey> _keys = [];
 
@@ -769,71 +773,51 @@ class _UltraGlassTabBarV41State extends State<UltraGlassTabBarV41> {
               ),
 
               /// ⭐ SHADER EDGE FADE (NO OVERLAY BLOCKS)
-              child: ShaderMask(
-                shaderCallback: (rect) {
-                  return const LinearGradient(
-                    colors: [
-                      Colors.transparent,
-                      Colors.black,
-                      Colors.black,
-                      Colors.transparent
-                    ],
-                    stops: [0.0, 0.06, 0.94, 1.0],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ).createShader(rect);
-                },
-                blendMode: BlendMode.dstIn,
+              child: ListView.builder(
+                controller: _scrollController,
+                scrollDirection: Axis.horizontal,
+                itemCount: widget.tabs.length,
+                itemBuilder: (context, index) {
+                  final selected = widget.controller.index == index;
+                  final enabled = widget.isEnabled?.call(index) ?? true;
 
-                /// ⭐ SCROLLABLE TABS
-                child: ListView.builder(
-                  controller: _scrollController,
-                  scrollDirection: Axis.horizontal,
-                  itemCount: widget.tabs.length,
-                  itemBuilder: (context, index) {
-                    final selected = widget.controller.index == index;
-                    final enabled = widget.isEnabled?.call(index) ?? true;
+                  final stretch =
+                      (1 - (progress - index).abs()).clamp(0.9, 1.0);
 
-                    final stretch =
-                        (1 - (progress - index).abs()).clamp(0.9, 1.0);
-
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: GestureDetector(
-                        onTap: enabled
-                            ? () => widget.controller.animateTo(index)
-                            : null,
-                        child: Transform.scale(
-                          scale: stretch,
-                          child: AnimatedContainer(
-                            key: _keys[index],
-                            duration: const Duration(milliseconds: 260),
-                            curve: Curves.easeOutCubic,
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color:
-                                  selected ? Colors.black : Colors.transparent,
-                              borderRadius: BorderRadius.circular(26),
-                            ),
-                            child: Opacity(
-                              opacity: enabled ? 1 : .3,
-                              child: Text(
-                                widget.tabs[index],
-                                style: TextStyle(
-                                  color:
-                                      selected ? Colors.white : Colors.black54,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15,
-                                ),
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: GestureDetector(
+                      onTap: enabled
+                          ? () => widget.controller.animateTo(index)
+                          : null,
+                      child: Transform.scale(
+                        scale: stretch,
+                        child: AnimatedContainer(
+                          key: _keys[index],
+                          duration: const Duration(milliseconds: 260),
+                          curve: Curves.easeOutCubic,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: selected ? Colors.black : Colors.transparent,
+                            borderRadius: BorderRadius.circular(26),
+                          ),
+                          child: Opacity(
+                            opacity: enabled ? 1 : .3,
+                            child: Text(
+                              widget.tabs[index],
+                              style: TextStyle(
+                                color: selected ? Colors.white : Colors.black54,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
                               ),
                             ),
                           ),
                         ),
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               ),
             ),
           ),
