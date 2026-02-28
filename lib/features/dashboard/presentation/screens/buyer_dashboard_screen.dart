@@ -151,20 +151,23 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen>
                                     AppBanner(
                                       image:
                                           "https://www.tradologie.com/DOCS/mobileapp/buyerdashboard-1.webp",
-                                      title: "Source Quality\nBuy Globally",
-                                      subtitle: "B2B Marketplace",
+                                      title:
+                                          "Source Bulk FMCG & Agro Globally — Smarter. Faster. Verified",
+                                      subtitle: "",
                                     ),
                                     AppBanner(
                                       image:
                                           "https://www.tradologie.com/DOCS/mobileapp/buyerdashboard-2.webp",
-                                      title: "Trade Smart\nTrade Fast",
-                                      subtitle: "Global Suppliers",
+                                      title:
+                                          "Access 1M+ Verified Global Suppliers in One Place",
+                                      subtitle: "",
                                     ),
                                     AppBanner(
                                       image:
                                           "https://www.tradologie.com/DOCS/mobileapp/buyerdashboard-3.webp",
-                                      title: "Trade Smart\nTrade Fast",
-                                      subtitle: "Global Suppliers",
+                                      title:
+                                          "Post Your Requirement. Get Qualified Quotes. Close Faster.",
+                                      subtitle: "",
                                     ),
                                   ],
                                 ),
