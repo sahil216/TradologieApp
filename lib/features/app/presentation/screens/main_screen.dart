@@ -96,39 +96,39 @@ class _MainScreenState extends State<MainScreen>
           name: 'Negotiation',
           height: 20,
           page: const BuyerNegotiationScreen()),
-      TabViewModel(
-        icon: _appCubit.bottomNavIndex == 2
-            ? Icon(Icons.person)
-            : Icon(Icons.person_outline),
-        name: 'My Account',
-        height: 20,
-        page: Constants.isAndroid14OrBelow && Platform.isAndroid
-            ? InAppWebViewScreen(
-                params: WebviewParams(
-                    url:
-                        "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
-                    canPop: false,
-                    isAppBar: true,
-                    isShowDrawer: true,
-                    isShowNotification: true))
-            : WebViewScreen(
-                params: WebviewParams(
-                    url:
-                        "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
-                    canPop: false,
-                    isAppBar: true,
-                    isShowDrawer: true,
-                    isShowNotification: true),
-              ), // const OrdersScreen(),
-      ),
       // TabViewModel(
       //   icon: _appCubit.bottomNavIndex == 2
       //       ? Icon(Icons.person)
       //       : Icon(Icons.person_outline),
       //   name: 'My Account',
       //   height: 20,
-      //   page: BuyerMyAccountScreen(),
+      //   page: Constants.isAndroid14OrBelow && Platform.isAndroid
+      //       ? InAppWebViewScreen(
+      //           params: WebviewParams(
+      //               url:
+      //                   "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
+      //               canPop: false,
+      //               isAppBar: true,
+      //               isShowDrawer: true,
+      //               isShowNotification: true))
+      //       : WebViewScreen(
+      //           params: WebviewParams(
+      //               url:
+      //                   "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
+      //               canPop: false,
+      //               isAppBar: true,
+      //               isShowDrawer: true,
+      //               isShowNotification: true),
+      //         ), // const OrdersScreen(),
       // ),
+      TabViewModel(
+        icon: _appCubit.bottomNavIndex == 2
+            ? Icon(Icons.person)
+            : Icon(Icons.person_outline),
+        name: 'My Account',
+        height: 20,
+        page: BuyerMyAccountScreen(),
+      ),
       TabViewModel(
         icon:
             _appCubit.bottomNavIndex == 3 ? Icon(Icons.menu) : Icon(Icons.menu),

@@ -16,21 +16,70 @@ class SellingLocationTab extends StatefulWidget {
   State<SellingLocationTab> createState() => _SellingLocationTabState();
 }
 
-class _SellingLocationTabState extends State<SellingLocationTab> {
+class _SellingLocationTabState extends State<SellingLocationTab>
+    with SingleTickerProviderStateMixin {
   bool? data = false;
 
   MyAccountCubit get cubit => BlocProvider.of<MyAccountCubit>(context);
 
   void getSellingLocation() {}
 
+  String? selectedState;
+  String? selectedCity;
+
+  final List<Map<String, dynamic>> locations = [
+    {"state": "Abu Dhabi", "city": "All City"},
+    {"state": "Alexandria", "city": "Ein El Sokhna"},
+    {"state": "Delhi", "city": "Ghaziabad"},
+    {"state": "ISTANBUL", "city": "Izmir"},
+    {"state": "Jebel Ali", "city": "Jebel Ali Port"},
+    {"state": "Uttar Pradesh", "city": "Mahura"},
+    {"state": "WESTERN CAPE", "city": "CAPE TOWN"},
+  ];
+
+  late AnimationController _screenController;
+  late Animation<double> _screenFade;
+  late Animation<double> _screenScale;
+  late Animation<Offset> _screenSlide;
+
   @override
   void initState() {
     super.initState();
     getSellingLocation();
+    _screenController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+
+    _screenFade = CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    );
+
+    _screenScale = Tween<double>(
+      begin: 0.97,
+      end: 1,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _screenSlide = Tween<Offset>(
+      begin: const Offset(0, .04),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _screenController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted) _screenController.forward();
+    });
   }
 
   @override
   void dispose() {
+    _screenController.dispose();
     super.dispose();
   }
 
@@ -60,31 +109,167 @@ class _SellingLocationTabState extends State<SellingLocationTab> {
           return result;
         },
         builder: (context, state) {
-          if (data == null) {
-            if (state is SellingLocationError) {
-              if (state.failure is NetworkFailure) {
-                return CustomErrorNetworkWidget(
-                  onPress: () {
-                    getSellingLocation();
-                  },
-                );
-              } else if (state.failure is UserFailure) {
-                return CustomErrorWidget(
-                  onPress: () {
-                    getSellingLocation();
-                  },
-                  errorText: state.failure.msg,
-                );
-              }
-            }
-            return const CommonLoader();
-          }
-          return SafeArea(
-            child: Column(
-              children: [],
-            ),
-          );
+          return FadeTransition(
+              opacity: _screenFade,
+              child: SlideTransition(
+                  position: _screenSlide,
+                  child: ScaleTransition(
+                      scale: _screenScale,
+                      child: CustomScrollView(slivers: [
+                        SliverPadding(
+                          padding: const EdgeInsets.all(16),
+                          sliver: SliverToBoxAdapter(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _label("State/Province"),
+                                const SizedBox(height: 6),
+                                _dropdown(
+                                  hint: "--Select State--",
+                                  value: selectedState,
+                                  onChanged: (val) =>
+                                      setState(() => selectedState = val),
+                                ),
+                                const SizedBox(height: 16),
+                                _label("City"),
+                                const SizedBox(height: 6),
+                                _dropdown(
+                                  hint: "--Select City--",
+                                  value: selectedCity,
+                                  onChanged: (val) =>
+                                      setState(() => selectedCity = val),
+                                ),
+                                const SizedBox(height: 20),
+                                _submitButton(),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SliverToBoxAdapter(
+                          child: Container(
+                            height: 8,
+                            color: Colors.grey.shade200,
+                          ),
+                        ),
+                        SliverPadding(
+                          padding: const EdgeInsets.all(16),
+                          sliver: SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) =>
+                                  _locationCard(index, locations[index]),
+                              childCount: locations.length,
+                            ),
+                          ),
+                        ),
+                      ]))));
         },
+      ),
+    );
+  }
+
+  Widget _label(String text) {
+    return Text(
+      text,
+      style: const TextStyle(
+        fontWeight: FontWeight.w600,
+        fontSize: 14,
+      ),
+    );
+  }
+
+  /// Dropdown
+  Widget _dropdown({
+    required String hint,
+    required String? value,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return DropdownButtonFormField<String>(
+      value: value,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+      hint: Text(hint),
+      items: const [
+        DropdownMenuItem(value: "1", child: Text("Option 1")),
+        DropdownMenuItem(value: "2", child: Text("Option 2")),
+      ],
+      onChanged: onChanged,
+    );
+  }
+
+  /// Submit Button
+  Widget _submitButton() {
+    return SizedBox(
+      width: double.infinity,
+      height: 50,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        onPressed: () {},
+        child: const Text("Submit"),
+      ),
+    );
+  }
+
+  /// Card instead of Table (Mobile Optimized)
+  Widget _locationCard(int index, Map<String, dynamic> data) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 14),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// Top Row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "S.No: ${index + 1}",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.edit, size: 20),
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                      icon:
+                          const Icon(Icons.delete, size: 20, color: Colors.red),
+                      onPressed: () {},
+                    ),
+                  ],
+                )
+              ],
+            ),
+
+            const SizedBox(height: 10),
+
+            Text("State: ${data["state"]}"),
+            const SizedBox(height: 4),
+            Text("City: ${data["city"]}"),
+            const SizedBox(height: 8),
+
+            Row(
+              children: const [
+                Icon(Icons.check_circle, color: Colors.green, size: 18),
+                SizedBox(width: 6),
+                Text("Active"),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
