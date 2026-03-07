@@ -5,6 +5,7 @@ class AppStrings {
   static const String appSession = 'authorization';
   static const String locale = 'locale';
   static const String isBuyer = 'is_buyer';
+  static const String isFmcg = 'is_fmcg';
 
   static const String userId = 'user_id';
   static const String vendorId = 'vendor_id';
@@ -19,6 +20,8 @@ class AppStrings {
   static const String fcmToken = 'fcm_token';
   static const String customerId = 'customer_id';
   static const String customerName = 'customer_name';
+  static const String loginId = 'login_id';
+  static const String brandId = 'brand_id';
 
   static const String sessionExpired =
       'Your Session is Expired, Please Login Again';

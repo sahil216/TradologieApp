@@ -1,6 +1,6 @@
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
 
 import 'package:tradologie_app/config/routes/app_router.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
@@ -8,16 +8,16 @@ import 'package:tradologie_app/core/utils/analytics_services.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
-import 'package:tradologie_app/core/utils/responsive.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
+import 'package:tradologie_app/core/widgets/common_drop_down.dart';
 import 'package:tradologie_app/core/widgets/custom_button.dart';
 import 'package:tradologie_app/features/app/injection_container_app.dart';
+import 'package:tradologie_app/features/app/presentation/widgets/animated_rotating_image.dart';
 
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/widgets/custom_text/text_style_constants.dart';
-import '../widgets/animated_rotating_image.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -32,6 +32,16 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   late Animation<double> _screenFade;
   late Animation<double> _screenScale;
   late Animation<Offset> _screenSlide;
+
+  List<String> productCategoryList = ["AgroCommodity", "FMCG and Packed Foods"];
+  List<String> userTypeList = ["Buyer", "Seller"];
+  Key productKey = UniqueKey();
+  Key userKey = UniqueKey();
+
+  String? selectedProduct;
+  String? selectedUserType;
+
+  TradeType? selectedTradeType;
   @override
   void initState() {
     super.initState();
@@ -73,6 +83,22 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     });
   }
 
+  List<String> selectProductType(String filter, LoadProps? loadProps) {
+    final allItems = productCategoryList;
+    if (filter.isEmpty) return allItems;
+    return allItems
+        .where((e) => e.toLowerCase().contains(filter.toLowerCase()))
+        .toList();
+  }
+
+  List<String> selectUserType(String filter, LoadProps? loadProps) {
+    final allItems = userTypeList;
+    if (filter.isEmpty) return allItems;
+    return allItems
+        .where((e) => e.toLowerCase().contains(filter.toLowerCase()))
+        .toList();
+  }
+
   Future<void> nameUpdate() async {
     SecureStorageService secureStorage = SecureStorageService();
     Constants.name = Constants.isBuyer == true
@@ -107,12 +133,6 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                             ImgAssets.onboardingImage,
                           ),
                         ),
-                        // SvgPicture.asset(
-                        //   ImgAssets.onboardingImage,
-                        //   width: Responsive(context).screenWidth,
-                        //   fit: BoxFit.cover,
-                        //   allowDrawingOutsideViewBox: true,
-                        // ),
                         SliverFillRemaining(
                           hasScrollBody: false,
                           child: Padding(
@@ -120,9 +140,9 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                 const EdgeInsets.symmetric(horizontal: 20.0),
                             child: Column(
                               children: [
-                                SizedBox(height: 30),
+                                SizedBox(height: 20),
                                 CircularImageRotator(),
-                                SizedBox(height: 30),
+                                SizedBox(height: 15),
                                 Text(CommonStrings.getStarted.toUpperCase(),
                                     style: TextStyleConstants.medium(
                                       context,
@@ -130,63 +150,132 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                       fontSize: 30,
                                     )),
                                 SizedBox(height: 8),
-                                Text(
-                                  CommonStrings.getStartedText,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyleConstants.medium(
-                                    context,
-                                    color: AppColors.defaultText,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                SizedBox(height: 30),
-                                CommonButton(
-                                  onPressed: () async {
-                                    SecureStorageService secureStorage =
-                                        SecureStorageService();
-                                    Constants.isBuyer = false;
-                                    await secureStorage.write(
-                                        AppStrings.isBuyer, "false");
-                                    sl<NavigationService>()
-                                        .pushNamed(Routes.sendOtpScreen);
-                                    AnalyticsService.logEvent(
-                                        "seller_button_clicked");
+                                CommonDropdown<String>(
+                                  label: '',
+                                  hint: 'Select Product Type',
+                                  dropdownKey: productKey,
+                                  asyncItems: (filter, loadProps) {
+                                    return selectProductType(filter, loadProps);
                                   },
-                                  text: CommonStrings.sellerText,
-                                  width: double.infinity,
-                                  borderRadius: BorderRadius.circular(8),
-                                  backgroundColor: AppColors.primary,
-                                  padding: EdgeInsets.zero,
-                                  textStyle: TextStyleConstants.medium(
-                                    context,
-                                    color: AppColors.white,
-                                    fontSize: 16,
-                                  ),
+                                  selectedItem: null,
+                                  itemAsString: (item) => item,
+                                  onChanged: (item) {
+                                    selectedProduct = item;
+                                    setState(() {});
+                                  },
+                                  compareFn: (a, b) => a == b,
                                 ),
+                                SizedBox(height: 8),
+                                // selectedProduct == "AgroCommodity"
+                                //     ? CommonDropdown<String>(
+                                //         label: '',
+                                //         hint: 'Select User Type',
+                                //         dropdownKey: userKey,
+                                //         asyncItems: (filter, loadProps) {
+                                //           return selectUserType(
+                                //               filter, loadProps);
+                                //         },
+                                //         selectedItem: null,
+                                //         itemAsString: (item) => item,
+                                //         onChanged: (item) {
+                                //           selectedUserType = item;
+                                //         },
+                                //         compareFn: (a, b) => a == b,
+                                //       )
+                                //     : SizedBox.shrink(),
+                                // SizedBox(height: 12),
+
+                                // Column(
+                                //   children: [
+                                // SizedBox(height: 30),
+                                // Text(
+                                //   "Choose Role to Continue.",
+                                //   textAlign: TextAlign.center,
+                                //   style: TextStyleConstants.regular(
+                                //     context,
+                                //     color: AppColors.defaultText,
+                                //     fontSize: 16,
+                                //   ),
+                                // ),
+                                SizedBox(height: 20),
+                                selectedProduct == null
+                                    ? SizedBox()
+                                    : CommonButton(
+                                        onPressed: selectedProduct ==
+                                                "AgroCommodity"
+                                            ? () async {
+                                                SecureStorageService
+                                                    secureStorage =
+                                                    SecureStorageService();
+                                                Constants.isBuyer = false;
+                                                await secureStorage.write(
+                                                    AppStrings.isBuyer,
+                                                    "false");
+                                                await secureStorage.write(
+                                                    AppStrings.isFmcg, "false");
+                                                sl<NavigationService>()
+                                                    .pushNamed(
+                                                        Routes.sendOtpScreen);
+                                                AnalyticsService.logEvent(
+                                                    "seller_button_clicked");
+                                              }
+                                            : () async {
+                                                SecureStorageService
+                                                    secureStorage =
+                                                    SecureStorageService();
+                                                Constants.isBuyer = false;
+                                                await secureStorage.write(
+                                                    AppStrings.isFmcg, "true");
+                                                await secureStorage.write(
+                                                    AppStrings.isBuyer,
+                                                    "false");
+                                                sl<NavigationService>()
+                                                    .pushNamed(
+                                                        Routes.fmcgSignIn);
+                                              },
+                                        text: CommonStrings.sellerText,
+                                        width: double.infinity,
+                                        borderRadius: BorderRadius.circular(8),
+                                        backgroundColor: AppColors.primary,
+                                        padding: EdgeInsets.zero,
+                                        textStyle: TextStyleConstants.medium(
+                                          context,
+                                          color: AppColors.white,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                //   ],
+                                // ),
                                 SizedBox(height: 16),
-                                CommonButton(
-                                  onPressed: () async {
-                                    SecureStorageService secureStorage =
-                                        SecureStorageService();
-                                    Constants.isBuyer = true;
-                                    await secureStorage.write(
-                                        AppStrings.isBuyer, "true");
-                                    sl<NavigationService>()
-                                        .pushNamed(Routes.sendOtpScreen);
-                                    AnalyticsService.logEvent(
-                                        "buyer_button_clicked");
-                                  },
-                                  text: CommonStrings.buyerText,
-                                  width: double.infinity,
-                                  borderRadius: BorderRadius.circular(8),
-                                  backgroundColor: AppColors.blueLight,
-                                  padding: EdgeInsets.zero,
-                                  textStyle: TextStyleConstants.medium(
-                                    context,
-                                    color: AppColors.blueDark,
-                                    fontSize: 16,
-                                  ),
-                                ),
+
+                                selectedProduct == "AgroCommodity"
+                                    ? CommonButton(
+                                        onPressed: () async {
+                                          SecureStorageService secureStorage =
+                                              SecureStorageService();
+                                          Constants.isBuyer = true;
+                                          await secureStorage.write(
+                                              AppStrings.isBuyer, "true");
+                                          await secureStorage.write(
+                                              AppStrings.isFmcg, "false");
+                                          sl<NavigationService>()
+                                              .pushNamed(Routes.sendOtpScreen);
+                                          AnalyticsService.logEvent(
+                                              "buyer_button_clicked");
+                                        },
+                                        text: CommonStrings.buyerText,
+                                        width: double.infinity,
+                                        borderRadius: BorderRadius.circular(8),
+                                        backgroundColor: AppColors.blueLight,
+                                        padding: EdgeInsets.zero,
+                                        textStyle: TextStyleConstants.medium(
+                                          context,
+                                          color: AppColors.blueDark,
+                                          fontSize: 16,
+                                        ),
+                                      )
+                                    : SizedBox.shrink(),
+
                                 Spacer(),
                                 Text(
                                   CommonStrings.bottomInfoBeAssured,
@@ -206,44 +295,81 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   ),
                 ))));
   }
-}
 
-class CachedSvgHeader extends SliverPersistentHeaderDelegate {
-  final String assetPath;
-  final double aspectRatio; // width / height from SVG
-
-  CachedSvgHeader({
-    required this.assetPath,
-    required this.aspectRatio,
-  });
-
-  @override
-  double get minExtent => 0;
-
-  @override
-  double get maxExtent {
-    // Auto height based on screen width
-    final screenWidth = WidgetsBinding
-            .instance.platformDispatcher.views.first.physicalSize.width /
-        WidgetsBinding.instance.platformDispatcher.views.first.devicePixelRatio;
-
-    return screenWidth / aspectRatio;
-  }
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return RepaintBoundary(
-      child: SvgPicture.asset(
-        assetPath,
-        fit: BoxFit.fitWidth,
-        width: double.infinity,
-      ),
+  Widget _tradeTypeSelector() {
+    return Row(
+      children: [
+        Expanded(
+          child: _tradeCard(
+            title: "Commodity",
+            icon: Icons.agriculture,
+            value: TradeType.commodity,
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: _tradeCard(
+            title: "FMCG",
+            icon: Icons.shopping_bag,
+            value: TradeType.fmcg,
+          ),
+        ),
+      ],
     );
   }
 
-  @override
-  bool shouldRebuild(covariant CachedSvgHeader oldDelegate) =>
-      oldDelegate.assetPath != assetPath ||
-      oldDelegate.aspectRatio != aspectRatio;
+  Widget _tradeCard({
+    required String title,
+    required IconData icon,
+    required TradeType value,
+  }) {
+    final bool isSelected = selectedTradeType == value;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedTradeType = value;
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary.withOpacity(.08) : Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : Colors.grey.shade300,
+            width: isSelected ? 2 : 1,
+          ),
+          boxShadow: [
+            if (isSelected)
+              BoxShadow(
+                color: AppColors.primary.withOpacity(.15),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              )
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              title,
+              style: TextStyleConstants.medium(
+                context,
+                fontSize: 16,
+                color: isSelected ? AppColors.primary : AppColors.defaultText,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+enum TradeType {
+  commodity,
+  fmcg,
 }

@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 
@@ -87,10 +86,18 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _goNext(BuildContext context) async {
     nameUpdate();
     if (Constants.isLogin) {
-      if (Constants.isBuyer == true) {
-        sl<NavigationService>().pushNamedAndRemoveUntil(Routes.mainRoute);
+      if (Constants.isFmcg == true) {
+        if (Constants.isBuyer == true) {
+        } else {
+          sl<NavigationService>()
+              .pushNamedAndRemoveUntil(Routes.chatListScreen);
+        }
       } else {
-        sl<NavigationService>().pushNamedAndRemoveUntil(Routes.mainRoute);
+        if (Constants.isBuyer == true) {
+          sl<NavigationService>().pushNamedAndRemoveUntil(Routes.mainRoute);
+        } else {
+          sl<NavigationService>().pushNamedAndRemoveUntil(Routes.mainRoute);
+        }
       }
     } else {
       sl<NavigationService>().pushNamedAndRemoveUntil(Routes.onboardingRoute);

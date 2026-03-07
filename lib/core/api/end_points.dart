@@ -36,6 +36,8 @@ class EndPoints {
 
   static String countryCodeList = '$baseUrlSupplier/GetOTPCountry';
 
+  static String fmcgSellerSignin = "$baseUrl/FMCG/FMCGSellerLogin";
+
   // Verify
   static String verifyOtp(UserType userType) {
     return '$baseUrl/${userType.name}/VerifyOTPForLogin';
@@ -85,6 +87,9 @@ class EndPoints {
       '$baseUrlBuyer/GetReadyStockDataByRequirementID';
   static String getAuctionUnit = '$baseUrlBuyer/GetAuctionUnit';
   static String addVendorStockEnquiry = '$baseUrlBuyer/AddVendorStockEnquiry';
+
+  static String getChatList = '$baseUrl/FMCG/FMCGBuyersSellerWise';
+  static String chatData = '$baseUrl/FMCG/FMCGDirectChatHistory';
 
   // Negotiation
   static String getNegotiation(UserType userType) {

@@ -21,6 +21,9 @@ class CommonAppbar extends StatelessWidget {
   final Widget? addAction; // 👈 pill button
   final Brightness statusBarBrightness;
   final Brightness statusBarIconBrightness;
+  final bool? showSuffixIcon;
+  final VoidCallback? onSuffixIconTap;
+  final IconData? suffixIcon;
 
   const CommonAppbar({
     super.key,
@@ -34,6 +37,9 @@ class CommonAppbar extends StatelessWidget {
     this.statusBarIconBrightness = Brightness.dark,
     this.addAction,
     this.showLogo = false,
+    this.showSuffixIcon,
+    this.onSuffixIconTap,
+    this.suffixIcon,
   });
 
   @override
@@ -163,6 +169,17 @@ class CommonAppbar extends StatelessWidget {
                                   .pushNamed(Routes.notificationScreen);
                             },
                             child: const Icon(Icons.notifications_none),
+                          ),
+                        ),
+                      ),
+                    if (showSuffixIcon == true)
+                      Positioned(
+                        right: 12,
+                        bottom: baseline,
+                        child: _glassActionWrapper(
+                          GestureDetector(
+                            onTap: onSuffixIconTap,
+                            child: Icon(suffixIcon),
                           ),
                         ),
                       ),

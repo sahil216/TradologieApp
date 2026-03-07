@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/utils/analytics_observer.dart';
 
 import 'package:tradologie_app/features/add_negotiation/presentation/cubit/add_negotiation_cubit.dart';
+import 'package:tradologie_app/features/chat/presentation/cubit/chat_cubit.dart';
 import 'package:tradologie_app/features/notification/presentation/cubit/notification_cubit.dart';
 import 'package:tradologie_app/features/my_account/presentation/cubit/my_account_cubit.dart';
 import 'package:tradologie_app/features/webview/presentation/cubit/webview_cubit.dart';
@@ -32,6 +33,7 @@ class MainApp extends StatelessWidget {
         BlocProvider(create: (context) => sl<MyAccountCubit>()),
         BlocProvider(create: (context) => sl<NotificationCubit>()),
         BlocProvider(create: (context) => sl<AddNegotiationCubit>()),
+        BlocProvider(create: (context) => sl<ChatCubit>()),
       ],
       child: MultiBlocListener(
         listeners: [

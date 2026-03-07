@@ -1,6 +1,7 @@
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/delete_account_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_signin_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/verify_otp_usecase.dart';
 
 import '../../../../core/api/api_consumer.dart';
@@ -22,6 +23,8 @@ abstract class AuthenticationRemoteDataSource {
   Future<ResponseWrapper<dynamic>?> signOut(NoParams params);
   Future<ResponseWrapper<dynamic>?> deleteAccount(DeleteAccountParams params);
   Future<ResponseWrapper<dynamic>?> getCountryCodeList(NoParams params);
+  Future<ResponseWrapper<dynamic>?> fmcgSellerSignIn(
+      FmcgSellerSigninParams params);
 }
 
 class AuthenticationRemoteDataSourceImpl
@@ -115,6 +118,15 @@ class AuthenticationRemoteDataSourceImpl
     return await apiConsumer.post(
       EndPoints.countryCodeList,
       body: {"Token": "2018APR031848"},
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> fmcgSellerSignIn(
+      FmcgSellerSigninParams params) async {
+    return await apiConsumer.post(
+      EndPoints.fmcgSellerSignin,
+      body: await params.toJson(),
     );
   }
 }

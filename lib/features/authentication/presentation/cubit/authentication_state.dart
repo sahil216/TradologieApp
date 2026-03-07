@@ -158,3 +158,23 @@ class GetCountryCodeListError extends AuthenticationState {
   @override
   List<Object> get props => [failure];
 }
+
+class FmcgSellerSigninIsLoading extends AuthenticationState {}
+
+class FmcgSellerSigninSuccess extends AuthenticationState {
+  final FmcgSellerSigninResponse data;
+
+  const FmcgSellerSigninSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class FmcgSellerSigninError extends AuthenticationState {
+  final Failure failure;
+
+  const FmcgSellerSigninError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}

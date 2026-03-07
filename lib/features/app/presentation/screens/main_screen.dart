@@ -10,6 +10,7 @@ import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
+import 'package:tradologie_app/features/chat/presentation/screens/chat_list_screen.dart';
 import 'package:tradologie_app/features/contact_us/more_options_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_dashboard_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/dashboard_screen.dart';
@@ -77,6 +78,41 @@ class _MainScreenState extends State<MainScreen>
     ];
   }
 
+  List<TabViewModel> get fmcgSupplierTabsList {
+    return [
+      TabViewModel(
+        icon: _appCubit.bottomNavIndex == 0
+            ? Icon(Icons.chat)
+            : Icon(Icons.chat_outlined),
+        name: 'Chat',
+        height: 20,
+        page: const ChatListScreen(),
+      ),
+      TabViewModel(
+        icon:
+            _appCubit.bottomNavIndex == 1 ? Icon(Icons.menu) : Icon(Icons.menu),
+        name: 'More',
+        height: 20,
+        page: const MoreOptionsScreen(),
+      ),
+      // TabViewModel(
+      //   icon: _appCubit.bottomNavIndex == 2
+      //       ? Icon(Icons.person)
+      //       : Icon(Icons.person_outline),
+      //   name: 'My Account',
+      //   height: 20,
+      //   page: MyAccountScreen(),
+      // ),
+      // TabViewModel(
+      //   icon:
+      //       _appCubit.bottomNavIndex == 3 ? Icon(Icons.menu) : Icon(Icons.menu),
+      //   name: 'More',
+      //   height: 20,
+      //   page: MoreOptionsScreen(),
+      // ),
+    ];
+  }
+
   List<TabViewModel> get buyerTabsList {
     if (token == null) {
       return []; // or loader
@@ -96,39 +132,39 @@ class _MainScreenState extends State<MainScreen>
           name: 'Negotiation',
           height: 20,
           page: const BuyerNegotiationScreen()),
-      // TabViewModel(
-      //   icon: _appCubit.bottomNavIndex == 2
-      //       ? Icon(Icons.person)
-      //       : Icon(Icons.person_outline),
-      //   name: 'My Account',
-      //   height: 20,
-      //   page: Constants.isAndroid14OrBelow && Platform.isAndroid
-      //       ? InAppWebViewScreen(
-      //           params: WebviewParams(
-      //               url:
-      //                   "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
-      //               canPop: false,
-      //               isAppBar: true,
-      //               isShowDrawer: true,
-      //               isShowNotification: true))
-      //       : WebViewScreen(
-      //           params: WebviewParams(
-      //               url:
-      //                   "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
-      //               canPop: false,
-      //               isAppBar: true,
-      //               isShowDrawer: true,
-      //               isShowNotification: true),
-      //         ), // const OrdersScreen(),
-      // ),
       TabViewModel(
         icon: _appCubit.bottomNavIndex == 2
             ? Icon(Icons.person)
             : Icon(Icons.person_outline),
         name: 'My Account',
         height: 20,
-        page: BuyerMyAccountScreen(),
+        page: Constants.isAndroid14OrBelow && Platform.isAndroid
+            ? InAppWebViewScreen(
+                params: WebviewParams(
+                    url:
+                        "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
+                    canPop: false,
+                    isAppBar: true,
+                    isShowDrawer: true,
+                    isShowNotification: true))
+            : WebViewScreen(
+                params: WebviewParams(
+                    url:
+                        "${EndPoints.buyerUrlWeb}/Account/MyAccountForAPI/$token",
+                    canPop: false,
+                    isAppBar: true,
+                    isShowDrawer: true,
+                    isShowNotification: true),
+              ), // const OrdersScreen(),
       ),
+      // TabViewModel(
+      //   icon: _appCubit.bottomNavIndex == 2
+      //       ? Icon(Icons.person)
+      //       : Icon(Icons.person_outline),
+      //   name: 'My Account',
+      //   height: 20,
+      //   page: BuyerMyAccountScreen(),
+      // ),
       TabViewModel(
         icon:
             _appCubit.bottomNavIndex == 3 ? Icon(Icons.menu) : Icon(Icons.menu),
@@ -240,7 +276,6 @@ class _MainScreenState extends State<MainScreen>
                   ],
                 ),
 
-                /// 💎 ULTRA FLOATING NAVBAR V5
                 CommonFloatingNavBar(
                   index: _appCubit.bottomNavIndex,
                   onTap: (i) {

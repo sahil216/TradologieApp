@@ -1,65 +1,47 @@
-import 'dart:io';
-
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:tradologie_app/core/utils/analytics_services.dart';
-import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
-import 'package:tradologie_app/core/utils/constants.dart';
-import 'package:tradologie_app/core/utils/extensions.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
-import 'package:tradologie_app/features/authentication/domain/usecases/sign_in_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_signin_usecase.dart';
 
 import '../../../../config/routes/app_router.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../../../core/widgets/common_loader.dart';
-import '../../../../core/widgets/common_single_child_scroll_view.dart';
 import '../../../../core/widgets/common_social_icons.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../cubit/authentication_cubit.dart';
 
-class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+class FmcgSellerSignin extends StatefulWidget {
+  const FmcgSellerSignin({super.key});
 
   @override
-  State<SignInScreen> createState() => _SignInScreenState();
+  State<FmcgSellerSignin> createState() => _FmcgSellerSigninState();
 }
 
-class _SignInScreenState extends State<SignInScreen>
+class _FmcgSellerSigninState extends State<FmcgSellerSignin>
     with SingleTickerProviderStateMixin {
   final textEmailController = TextEditingController();
   final textPasswordController = TextEditingController();
-
-  final deviceInfoPlugin = DeviceInfoPlugin();
 
   SecureStorageService secureStorageService = SecureStorageService();
 
   bool isSubmitted = false;
 
-  String model = '';
-  String osVersionRelease = '';
-  String deviceId = '';
-  String manufacturer = '';
-  String appVersion = '';
-
   @override
   void initState() {
     super.initState();
-    initPlatformState();
-    initPackageInfo();
+
     _screenController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
@@ -96,55 +78,6 @@ class _SignInScreenState extends State<SignInScreen>
   late Animation<double> _screenScale;
   late Animation<Offset> _screenSlide;
 
-  Future<void> initPackageInfo() async {
-    final info = await PackageInfo.fromPlatform();
-    setState(() {
-      appVersion = info.version;
-    });
-  }
-
-  Future<void> initPlatformState() async {
-    try {
-      switch (defaultTargetPlatform) {
-        case TargetPlatform.android:
-          _readAndroidBuildData(
-            await deviceInfoPlugin.androidInfo,
-          );
-          break;
-
-        case TargetPlatform.iOS:
-          _readIosDeviceInfo(
-            await deviceInfoPlugin.iosInfo,
-          );
-          break;
-
-        default:
-          throw UnimplementedError(
-            'Platform not supported',
-          );
-      }
-    } on PlatformException catch (e) {
-      debugPrint('Failed to get device info: $e');
-    }
-
-    if (!mounted) return;
-    setState(() {});
-  }
-
-  void _readAndroidBuildData(AndroidDeviceInfo build) {
-    manufacturer = build.manufacturer;
-    model = build.model;
-    osVersionRelease = build.version.release;
-    deviceId = build.id;
-  }
-
-  void _readIosDeviceInfo(IosDeviceInfo data) {
-    manufacturer = "Apple";
-    model = data.modelName;
-    osVersionRelease = data.systemVersion;
-    deviceId = data.identifierForVendor ?? "";
-  }
-
   final showPassword = ValueNotifier(false);
   final formKey = GlobalKey<FormState>();
 
@@ -162,61 +95,18 @@ class _SignInScreenState extends State<SignInScreen>
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: AdaptiveScaffold(
-        // resizeToAvoidBottomInset: false,
-        // appBar: Constants.appBar(
-        //   context,
-        //   boxShadow: [],
-        //   centerTitle: true,
-        //   titleWidget: Image.asset(
-        //     ImgAssets.companyLogo,
-        //     height: 40,
-        //   ),
-        // ),
         body: BlocListener<AuthenticationCubit, AuthenticationState>(
           listenWhen: (previous, current) => previous != current,
           listener: (context, state) async {
-            if (state is SigninSuccess) {
-              AnalyticsService.logEvent("seller_email_login_success");
+            if (state is FmcgSellerSigninSuccess) {
               Navigator.pushNamedAndRemoveUntil(
                 context,
-                Routes.mainRoute,
+                Routes.chatListScreen,
                 (route) => false,
               );
-
-              // SecureStorageService secureStorage = SecureStorageService();
-
-              // Navigator.pushReplacementNamed(
-              //   context,
-              //   Routes.webViewRoute,
-              //   arguments: Uri.parse(
-              //     "${EndPoints.supplierWebsiteurl}Mobile_login.aspx",
-              //   ).replace(
-              //     queryParameters: {
-              //       "USERID": state.data?.userId.toString(),
-              //       "VendorNAME": state.data?.vendorName.toString(),
-              //       "Password": await secureStorage.read(
-              //         AppStrings.password,
-              //       ),
-              //       "VendorID": state.data?.vendorId.toString(),
-              //       "ImageExist": state.data?.imageExist?.toString().toString(),
-              //       "SellerTimeZone": state.data?.sellerTimeZone.toString(),
-              //       "RegistrationStatus":
-              //           state.data?.registrationStatus.toString(),
-              //       "Project_Type": "Seller Control Panel",
-              //     },
-              //   ).toString(),
-              // );
             }
-            if (state is SigninError) {
+            if (state is FmcgSellerSigninError) {
               CommonToast.showFailureToast(state.failure);
-            }
-            if (state is BuyerSigninSuccess) {
-              AnalyticsService.logEvent("buyer_email_login_success");
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                Routes.mainRoute,
-                (route) => false,
-              );
             }
           },
           child: Stack(
@@ -276,12 +166,9 @@ class _SignInScreenState extends State<SignInScreen>
                                                   validator: (String? value) {
                                                     if (value == null ||
                                                         value.trim().isEmpty) {
-                                                      return "Email is required";
+                                                      return "Required";
                                                     }
-                                                    if (value.isEmailValid ==
-                                                        false) {
-                                                      return "Enter a valid email";
-                                                    }
+
                                                     return null;
                                                   },
                                                 ),
@@ -345,33 +232,21 @@ class _SignInScreenState extends State<SignInScreen>
                                                 SizedBox(height: 20),
                                                 CommonButton(
                                                   onPressed: () async {
-                                                    late SigninParams params;
+                                                    late FmcgSellerSigninParams
+                                                        params;
                                                     if (textEmailController
                                                             .text.isNotEmpty &&
                                                         textPasswordController
                                                             .text.isNotEmpty) {
-                                                      params = SigninParams(
-                                                        username:
+                                                      params =
+                                                          FmcgSellerSigninParams(
+                                                        userId:
                                                             textEmailController
                                                                 .text,
                                                         password:
                                                             textPasswordController
                                                                 .text,
-                                                        deviceId: deviceId,
-                                                        osType:
-                                                            Platform.isAndroid
-                                                                ? "Android"
-                                                                : "iOS",
-                                                        fcmToken: await secureStorageService
-                                                                .read(AppStrings
-                                                                    .fcmToken) ??
-                                                            "",
-                                                        manufacturer:
-                                                            manufacturer,
-                                                        model: model,
-                                                        osVersionRelease:
-                                                            osVersionRelease,
-                                                        appVersion: appVersion,
+                                                        token: "2018APR031848",
                                                       );
                                                       if (!context.mounted) {
                                                         return;
@@ -380,19 +255,11 @@ class _SignInScreenState extends State<SignInScreen>
                                                           .instance.primaryFocus
                                                           ?.unfocus();
 
-                                                      if (Constants.isBuyer ==
-                                                          true) {
-                                                        BlocProvider.of<
-                                                                    AuthenticationCubit>(
-                                                                context)
-                                                            .buyerSignIn(
-                                                                params);
-                                                      } else {
-                                                        BlocProvider.of<
-                                                                    AuthenticationCubit>(
-                                                                context)
-                                                            .signIn(params);
-                                                      }
+                                                      BlocProvider.of<
+                                                                  AuthenticationCubit>(
+                                                              context)
+                                                          .fmcgSellerSignin(
+                                                              params);
                                                     }
                                                   },
                                                   text: CommonStrings.login,
@@ -459,7 +326,7 @@ class _SignInScreenState extends State<SignInScreen>
                   }),
               BlocBuilder<AuthenticationCubit, AuthenticationState>(
                 builder: (context, state) {
-                  if (state is SigninIsLoading) {
+                  if (state is FmcgSellerSigninIsLoading) {
                     return Positioned.fill(child: const CommonLoader());
                   }
                   return SizedBox.shrink();

@@ -1,0 +1,36 @@
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_user_detail.dart';
+
+class FmcgUserDetailModel extends FmcgUserDetail {
+  const FmcgUserDetailModel({
+    super.loginId,
+    super.userId,
+    super.accountType,
+    super.titleId,
+    super.titleName,
+    super.fullName,
+    super.genderId,
+    super.genderName,
+    super.mobile,
+    super.email,
+    super.dob,
+    super.apiVerificationCode,
+    super.brandId,
+  });
+
+  factory FmcgUserDetailModel.fromJson(Map<String, dynamic> json) =>
+      FmcgUserDetailModel(
+        loginId: json["LoginID"].toString(),
+        userId: json["UserID"].toString(),
+        accountType: json["AccountType"].toString(),
+        titleId: json["TitleID"].toString(),
+        titleName: json["TitleName"].toString(),
+        fullName: json["FullName"].toString(),
+        genderId: json["GenderID"].toString(),
+        genderName: json["GenderName"].toString(),
+        mobile: json["Mobile"].toString(),
+        email: json["Email"].toString(),
+        dob: json["DOB"].toString(),
+        apiVerificationCode: json["ApiVerificationCode"].toString(),
+        brandId: json["BrandID"].toString(),
+      );
+}

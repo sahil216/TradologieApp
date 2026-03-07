@@ -6,6 +6,10 @@ import 'package:tradologie_app/features/add_negotiation/presentation/screens/sup
 import 'package:tradologie_app/features/add_negotiation/presentation/viewmodel/add_product_params.dart';
 import 'package:tradologie_app/features/app/presentation/screens/main_screen.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/send_otp_usecase.dart';
+import 'package:tradologie_app/features/authentication/presentation/screens/fmcg_seller_signin.dart';
+import 'package:tradologie_app/features/chat/domain/entities/chat_list.dart';
+import 'package:tradologie_app/features/chat/presentation/screens/chat_list_screen.dart';
+import 'package:tradologie_app/features/chat/presentation/screens/chat_screen.dart';
 import 'package:tradologie_app/features/contact_us/contact_us.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_dashboard_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_post_requirement_screen.dart';
@@ -46,6 +50,7 @@ class Routes {
   static const String otpRoute = '/otp';
   static const String signinRoute = '/signin';
   static const String signupRoute = '/signup';
+  static const String fmcgSignIn = '/fmcgsignin';
 
   //! login with whatsapp route
   static const String sendOtpScreen = '/sendOtpScreen';
@@ -83,6 +88,10 @@ class Routes {
   static const String contactUsScreen = '/contactUsScreen';
   //! Notifications
   static const String notificationScreen = '/notificationScreen';
+
+  //! Chat
+  static const String chatListScreen = '/chatListScreen';
+  static const String chatScreen = '/chatScreen';
 }
 
 class AppRoutes {
@@ -106,6 +115,10 @@ class AppRoutes {
       case Routes.signinRoute:
         return CupertinoPageRoute(builder: (context) {
           return const SignInScreen();
+        });
+      case Routes.fmcgSignIn:
+        return CupertinoPageRoute(builder: (context) {
+          return const FmcgSellerSignin();
         });
       case Routes.signupRoute:
         return CupertinoPageRoute(builder: (context) {
@@ -218,6 +231,16 @@ class AppRoutes {
       case Routes.notificationScreen:
         return CupertinoPageRoute(builder: (context) {
           return const NotificationScreen();
+        });
+      case Routes.chatListScreen:
+        return CupertinoPageRoute(builder: (context) {
+          return const ChatListScreen();
+        });
+      case Routes.chatScreen:
+        return CupertinoPageRoute(builder: (context) {
+          return ChatScreen(
+            chat: routeSettings.arguments as ChatList,
+          );
         });
 
       default:
