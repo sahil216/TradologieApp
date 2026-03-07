@@ -111,14 +111,26 @@ extension ListValues on List {
 }
 
 extension DateTimeValues on DateTime {
-  String get dateFormat {
-    return DateFormat('yyyy-MM-dd').format(this).replaceArabicNumerals;
+  String get dateTimeFormat {
+    return DateFormat('dd-MM-yyyy HH:mm').format(this);
   }
 
   String get dateStringFormat {
     return DateFormat(
       'EEEE, d MMMM y',
-    ).format(this).replaceArabicNumerals;
+    ).format(this);
+  }
+}
+
+extension DateValues on DateTime {
+  String get dateFormat {
+    return DateFormat('dd-MM-yyyy').format(this);
+  }
+
+  String get dateStringFormat {
+    return DateFormat(
+      'EEEE, d MMMM y',
+    ).format(this);
   }
 }
 

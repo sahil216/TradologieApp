@@ -22,8 +22,7 @@ class CommonAppbar extends StatelessWidget {
   final Brightness statusBarBrightness;
   final Brightness statusBarIconBrightness;
   final bool? showSuffixIcon;
-  final VoidCallback? onSuffixIconTap;
-  final IconData? suffixIcon;
+  final Widget? suffixIcon;
 
   const CommonAppbar({
     super.key,
@@ -38,7 +37,6 @@ class CommonAppbar extends StatelessWidget {
     this.addAction,
     this.showLogo = false,
     this.showSuffixIcon,
-    this.onSuffixIconTap,
     this.suffixIcon,
   });
 
@@ -91,11 +89,13 @@ class CommonAppbar extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          begin: Alignment(-0.6 + (1 - ease) * .3, -1),
-                          end: const Alignment(1, 1),
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                           colors: [
-                            Colors.white.withValues(alpha: .96),
-                            Colors.white.withValues(alpha: .82),
+                            Color(0xFFE3F2FD), // very light blue
+                            Color(0xFFE3F2FD), // very light blue
+                            // light sky blue
+                            Color(0xFFE1F5FE), // light blue
                           ],
                         ),
                       ),
@@ -177,10 +177,7 @@ class CommonAppbar extends StatelessWidget {
                         right: 12,
                         bottom: baseline,
                         child: _glassActionWrapper(
-                          GestureDetector(
-                            onTap: onSuffixIconTap,
-                            child: Icon(suffixIcon),
-                          ),
+                          suffixIcon ?? SizedBox(),
                         ),
                       ),
                   ],

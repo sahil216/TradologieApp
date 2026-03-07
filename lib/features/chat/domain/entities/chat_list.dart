@@ -11,6 +11,7 @@ class ChatList extends Equatable {
   final String? brandName;
   final String? insertedDate;
   final String? updatedDate;
+  final String? chatInsertedDate;
 
   const ChatList({
     this.quotationUserId,
@@ -23,6 +24,7 @@ class ChatList extends Equatable {
     this.brandName,
     this.insertedDate,
     this.updatedDate,
+    this.chatInsertedDate,
   });
 
   @override
@@ -37,5 +39,6 @@ class ChatList extends Equatable {
         brandName,
         insertedDate,
         updatedDate,
+        chatInsertedDate,
       ];
 }

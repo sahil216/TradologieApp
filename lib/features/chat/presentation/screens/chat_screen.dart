@@ -4,16 +4,13 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tradologie_app/config/routes/app_router.dart';
-import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
-import 'package:tradologie_app/core/utils/constants.dart';
+import 'package:tradologie_app/core/utils/extensions.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
-import 'package:tradologie_app/features/app/injection_container_app.dart';
 import 'package:tradologie_app/features/chat/domain/entities/chat_data.dart';
 import 'package:tradologie_app/features/chat/domain/entities/chat_list.dart';
 import 'package:tradologie_app/features/chat/domain/usecases/chat_data_usecase.dart';
@@ -60,7 +57,7 @@ class _ChatScreenState extends State<ChatScreen>
     _isFetching = true;
 
     try {
-      getData("");
+      getData("", "0");
     } catch (e) {
       if (kDebugMode) {
         print(e);
@@ -70,12 +67,13 @@ class _ChatScreenState extends State<ChatScreen>
     }
   }
 
-  void getData(String? message) async {
+  void getData(String? message, String? chatId) async {
     token = await secureStorage.read(AppStrings.apiVerificationCode) ?? "";
     loginId = await secureStorage.read(AppStrings.loginId) ?? "";
     ChatDataParams params = ChatDataParams(
       token: token,
       contents: message ?? "",
+      chatID: chatId ?? "0",
       buyerID: widget.chat.quotationUserId ?? "",
       sellerID: loginId,
     );
@@ -88,7 +86,7 @@ class _ChatScreenState extends State<ChatScreen>
   @override
   void initState() {
     super.initState();
-    getData("");
+    getData("", "0");
     _startPolling();
 
     _screenController = AnimationController(
@@ -178,6 +176,9 @@ class _ChatScreenState extends State<ChatScreen>
                               CommonAppbar(
                                 title: widget.chat.name ?? "",
                                 showBackButton: true,
+                                onBackTap: () {
+                                  Navigator.pop(context, true);
+                                },
                                 showNotification: false,
                               ),
 
@@ -193,8 +194,17 @@ class _ChatScreenState extends State<ChatScreen>
                                                   "seller"
                                               ? true
                                               : false;
-                                      Map<String, dynamic> data =
-                                          jsonDecode(msg?.msgContent ?? "");
+                                      Map<String, dynamic>? data;
+
+                                      try {
+                                        if (msg?.msgContent != null &&
+                                            (msg?.msgContent ?? "")
+                                                .isNotEmpty) {
+                                          data = jsonDecode(msg!.msgContent!);
+                                        }
+                                      } catch (e) {
+                                        data = null;
+                                      }
 
                                       return Align(
                                         alignment: isMe
@@ -207,22 +217,41 @@ class _ChatScreenState extends State<ChatScreen>
                                               horizontal: 14, vertical: 10),
                                           decoration: BoxDecoration(
                                             color: isMe
-                                                ? Theme.of(context)
-                                                    .colorScheme
-                                                    .primary
+                                                ? Colors.lightGreen.shade300
                                                 : Colors.grey.shade200,
                                             borderRadius:
                                                 BorderRadius.circular(18),
                                           ),
-                                          child: Text(
-                                            data["Message"] ?? "",
-                                            style: TextStyleConstants.medium(
-                                              context,
-                                              color: isMe
-                                                  ? Colors.white
-                                                  : Colors.black87,
-                                              fontSize: 16,
-                                            ),
+                                          child: Column(
+                                            crossAxisAlignment: isMe
+                                                ? CrossAxisAlignment.end
+                                                : CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                data?["Message"] ?? "",
+                                                style:
+                                                    TextStyleConstants.medium(
+                                                  context,
+                                                  color: isMe
+                                                      ? Colors.black87
+                                                      : Colors.black87,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                              Text(
+                                                DateTime.tryParse(
+                                                            msg?.insertedDate ??
+                                                                "")
+                                                        ?.dateTimeFormat ??
+                                                    "",
+                                                style:
+                                                    TextStyleConstants.medium(
+                                                  context,
+                                                  color: Colors.grey.shade600,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       );
@@ -274,9 +303,11 @@ class _ChatScreenState extends State<ChatScreen>
                             icon: Icon(Icons.send),
                             onPressed: () {
                               setState(() {
-                                getData(controller.text.isEmpty
-                                    ? null
-                                    : controller.text);
+                                getData(
+                                    controller.text.isEmpty
+                                        ? null
+                                        : controller.text,
+                                    chatData?.last.chatId.toString());
                                 controller.clear();
                                 WidgetsBinding.instance
                                     .addPostFrameCallback((_) {

@@ -11,6 +11,8 @@ import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/features/chat/presentation/screens/chat_list_screen.dart';
+import 'package:tradologie_app/features/contact_us/coming_soon_screen.dart';
+import 'package:tradologie_app/features/contact_us/contact_us.dart';
 import 'package:tradologie_app/features/contact_us/more_options_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_dashboard_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/dashboard_screen.dart';
@@ -89,11 +91,12 @@ class _MainScreenState extends State<MainScreen>
         page: const ChatListScreen(),
       ),
       TabViewModel(
-        icon:
-            _appCubit.bottomNavIndex == 1 ? Icon(Icons.menu) : Icon(Icons.menu),
-        name: 'More',
+        icon: _appCubit.bottomNavIndex == 1
+            ? Icon(Icons.dashboard_outlined)
+            : Icon(Icons.dashboard_outlined),
+        name: 'Dashboard',
         height: 20,
-        page: const MoreOptionsScreen(),
+        page: const ComingSoonScreen(),
       ),
       // TabViewModel(
       //   icon: _appCubit.bottomNavIndex == 2

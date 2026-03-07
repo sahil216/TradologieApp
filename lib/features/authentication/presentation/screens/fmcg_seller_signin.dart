@@ -2,9 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tradologie_app/core/utils/app_strings.dart';
 
 import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
+import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_appbar.dart';
@@ -99,6 +101,8 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
           listenWhen: (previous, current) => previous != current,
           listener: (context, state) async {
             if (state is FmcgSellerSigninSuccess) {
+              Constants.isFmcg = true;
+              secureStorageService.write(AppStrings.isFmcg, "true");
               Navigator.pushNamedAndRemoveUntil(
                 context,
                 Routes.chatListScreen,
@@ -271,47 +275,47 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
                                                   ),
                                                 ),
                                                 SizedBox(height: 20),
-                                                Center(
-                                                  child: CommonText(
-                                                    "OR",
-                                                    style: TextStyleConstants
-                                                        .regular(
-                                                      context,
-                                                      fontSize: 16,
-                                                      color:
-                                                          AppColors.defaultText,
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(height: 20),
-                                                SizedBox(
-                                                  width: r.isTablet
-                                                      ? 420
-                                                      : double.infinity,
-                                                  child: CommonButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                    },
-                                                    text: CommonStrings
-                                                        .sendOtpViaWhatsapp,
-                                                    backgroundColor:
-                                                        AppColors.white,
-                                                    borderSide: BorderSide(
-                                                      color: AppColors
-                                                          .green, // or any color you want
-                                                      width: 2,
-                                                    ),
-                                                    icon: Image.asset(
-                                                        ImgAssets.whatsappIcon),
-                                                    textStyle:
-                                                        TextStyleConstants
-                                                            .medium(
-                                                      context,
-                                                      fontSize: 16,
-                                                      color: AppColors.black,
-                                                    ),
-                                                  ),
-                                                ),
+                                                // Center(
+                                                //   child: CommonText(
+                                                //     "OR",
+                                                //     style: TextStyleConstants
+                                                //         .regular(
+                                                //       context,
+                                                //       fontSize: 16,
+                                                //       color:
+                                                //           AppColors.defaultText,
+                                                //     ),
+                                                //   ),
+                                                // ),
+                                                // SizedBox(height: 20),
+                                                // SizedBox(
+                                                //   width: r.isTablet
+                                                //       ? 420
+                                                //       : double.infinity,
+                                                //   child: CommonButton(
+                                                //     onPressed: () {
+                                                //       Navigator.pop(context);
+                                                //     },
+                                                //     text: CommonStrings
+                                                //         .sendOtpViaWhatsapp,
+                                                //     backgroundColor:
+                                                //         AppColors.white,
+                                                //     borderSide: BorderSide(
+                                                //       color: AppColors
+                                                //           .green, // or any color you want
+                                                //       width: 2,
+                                                //     ),
+                                                //     icon: Image.asset(
+                                                //         ImgAssets.whatsappIcon),
+                                                //     textStyle:
+                                                //         TextStyleConstants
+                                                //             .medium(
+                                                //       context,
+                                                //       fontSize: 16,
+                                                //       color: AppColors.black,
+                                                //     ),
+                                                //   ),
+                                                // ),
                                               ],
                                             ),
                                           ),

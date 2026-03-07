@@ -33,7 +33,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   late Animation<double> _screenScale;
   late Animation<Offset> _screenSlide;
 
-  List<String> productCategoryList = ["AgroCommodity", "FMCG and Packed Foods"];
+  List<String> productCategoryList = ["Agro Commodity", "FMCG & Packaged Food"];
   List<String> userTypeList = ["Buyer", "Seller"];
   Key productKey = UniqueKey();
   Key userKey = UniqueKey();
@@ -202,7 +202,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                     ? SizedBox()
                                     : CommonButton(
                                         onPressed: selectedProduct ==
-                                                "AgroCommodity"
+                                                "Agro Commodity"
                                             ? () async {
                                                 SecureStorageService
                                                     secureStorage =
@@ -248,7 +248,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                 // ),
                                 SizedBox(height: 16),
 
-                                selectedProduct == "AgroCommodity"
+                                selectedProduct == "Agro Commodity"
                                     ? CommonButton(
                                         onPressed: () async {
                                           SecureStorageService secureStorage =

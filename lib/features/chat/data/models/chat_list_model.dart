@@ -12,6 +12,7 @@ class ChatListModel extends ChatList {
     super.brandName,
     super.insertedDate,
     super.updatedDate,
+    super.chatInsertedDate,
   });
 
   factory ChatListModel.fromJson(Map<String, dynamic> json) => ChatListModel(
@@ -25,5 +26,6 @@ class ChatListModel extends ChatList {
         brandName: json["BrandName"].toString(),
         insertedDate: json["InsertedDate"].toString(),
         updatedDate: json["UpdatedDate"].toString(),
+        chatInsertedDate: json["ChatInsertedDate"].toString(),
       );
 }

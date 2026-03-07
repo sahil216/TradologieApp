@@ -4,6 +4,7 @@ import 'package:tradologie_app/config/routes/app_router.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
+import 'package:tradologie_app/core/utils/extensions.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_appbar.dart';
@@ -11,10 +12,13 @@ import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 import 'package:tradologie_app/features/app/injection_container_app.dart';
+import 'package:tradologie_app/features/app/presentation/screens/main_screen.dart';
 import 'package:tradologie_app/features/chat/domain/entities/chat_list.dart';
 import 'package:tradologie_app/features/chat/domain/usecases/chat_list_usecase.dart';
 import 'package:tradologie_app/features/chat/presentation/cubit/chat_cubit.dart';
 import 'package:tradologie_app/features/chat/presentation/screens/chat_screen.dart';
+import 'package:tradologie_app/features/chat/presentation/screens/fmcg_main_screen.dart';
+import 'package:tradologie_app/features/contact_us/coming_soon_screen.dart';
 
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
@@ -90,6 +94,7 @@ class _ChatListScreenState extends State<ChatListScreen>
     super.dispose();
   }
 
+  int navIndex = 0;
   @override
   Widget build(BuildContext context) {
     return AdaptiveScaffold(
@@ -105,152 +110,212 @@ class _ChatListScreenState extends State<ChatListScreen>
         },
         child: Stack(
           children: [
-            BlocBuilder<ChatCubit, ChatState>(
-              builder: (context, state) {
-                return FadeTransition(
-                  opacity: _screenFade,
-                  child: SlideTransition(
-                    position: _screenSlide,
-                    child: ScaleTransition(
-                      scale: _screenScale,
-                      child: RefreshIndicator(
-                        onRefresh: _refreshChats,
-                        child: CustomScrollView(
-                          physics: AlwaysScrollableScrollPhysics(),
-                          slivers: [
-                            /// App Bar
-                            CommonAppbar(
-                              title: "Chats",
-                              showBackButton: false,
-                              showNotification: false,
-                              showSuffixIcon: true,
-                              suffixIcon: Icons.logout,
-                              onSuffixIconTap: () {
-                                CommonToast.success("Signed Out Successfully");
-                                Constants.isLogin = false;
-                                Constants.isBuyer = false;
-                                Constants.isFmcg = false;
+            navIndex == 0
+                ? BlocBuilder<ChatCubit, ChatState>(
+                    builder: (context, state) {
+                      return FadeTransition(
+                        opacity: _screenFade,
+                        child: SlideTransition(
+                          position: _screenSlide,
+                          child: ScaleTransition(
+                            scale: _screenScale,
+                            child: RefreshIndicator(
+                              onRefresh: _refreshChats,
+                              child: CustomScrollView(
+                                physics: AlwaysScrollableScrollPhysics(),
+                                slivers: [
+                                  /// App Bar
+                                  CommonAppbar(
+                                    title: "Chats",
+                                    showBackButton: false,
+                                    showNotification: false,
+                                    showSuffixIcon: true,
+                                    suffixIcon: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        IconButton(
+                                            onPressed: () async {
+                                              await _refreshChats();
+                                            },
+                                            icon: Icon(
+                                              Icons.refresh,
+                                              color: Colors.green,
+                                            )),
+                                        IconButton(
+                                            onPressed: () {
+                                              CommonToast.success(
+                                                  "Signed Out Successfully");
+                                              Constants.isLogin = false;
+                                              Constants.isBuyer = false;
+                                              Constants.isFmcg = false;
 
-                                SecureStorageService secureStorage =
-                                    SecureStorageService();
-                                secureStorage.delete(AppStrings.isBuyer);
+                                              SecureStorageService
+                                                  secureStorage =
+                                                  SecureStorageService();
+                                              secureStorage
+                                                  .delete(AppStrings.isBuyer);
 
-                                secureStorage
-                                    .delete(AppStrings.apiVerificationCode);
-                                secureStorage.write(
-                                    AppStrings.appSession, false.toString());
+                                              secureStorage.delete(AppStrings
+                                                  .apiVerificationCode);
+                                              secureStorage.write(
+                                                  AppStrings.appSession,
+                                                  false.toString());
 
-                                sl<NavigationService>().pushNamedAndRemoveUntil(
-                                  Routes.onboardingRoute,
-                                );
-                              },
-                            ),
+                                              sl<NavigationService>()
+                                                  .pushNamedAndRemoveUntil(
+                                                Routes.onboardingRoute,
+                                              );
+                                            },
+                                            icon: Icon(Icons.logout,
+                                                color: Colors.red)),
+                                      ],
+                                    ),
+                                  ),
 
-                            /// Chat List
-                            SliverPadding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 8),
-                              sliver: SliverList(
-                                delegate: SliverChildBuilderDelegate(
-                                  (context, index) {
-                                    final chat = chatList?[index];
+                                  /// Chat List
+                                  SliverPadding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 8),
+                                    sliver: SliverList(
+                                      delegate: SliverChildBuilderDelegate(
+                                        (context, index) {
+                                          final chat = chatList?[index];
 
-                                    return Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 10),
-                                      child: Material(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(16),
-                                        elevation: 1,
-                                        child: InkWell(
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => ChatScreen(
-                                                  chat: chat ?? ChatList(),
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 14,
-                                              vertical: 12,
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                const SizedBox(width: 12),
-
-                                                /// Name + Message
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        chat?.name ?? "",
-                                                        style:
-                                                            TextStyleConstants
-                                                                .semiBold(
-                                                                    context),
+                                          return Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 10),
+                                            child: Material(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              elevation: 1,
+                                              child: InkWell(
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
+                                                onTap: () async {
+                                                  final shouldRefresh =
+                                                      await Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (_) =>
+                                                          ChatScreen(
+                                                        chat:
+                                                            chat ?? ChatList(),
                                                       ),
-                                                      const SizedBox(height: 4),
-                                                      Text(
-                                                        chat?.updatedDate ?? "",
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: TextStyleConstants
-                                                                .medium(context)
-                                                            .copyWith(
-                                                                color: Colors
-                                                                    .grey[600]),
+                                                    ),
+                                                  );
+
+                                                  if (shouldRefresh == true) {
+                                                    await _refreshChats();
+                                                  }
+                                                },
+                                                child: Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                    horizontal: 14,
+                                                    vertical: 12,
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      const SizedBox(width: 12),
+
+                                                      /// Name + Message
+                                                      Expanded(
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Row(
+                                                              children: [
+                                                                Text(
+                                                                  chat?.name ??
+                                                                      "",
+                                                                  style: TextStyleConstants
+                                                                      .semiBold(
+                                                                          context),
+                                                                ),
+                                                                Text(
+                                                                  " - ${chat?.mobile}",
+                                                                  style: TextStyleConstants
+                                                                      .semiBold(
+                                                                          context),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            const SizedBox(
+                                                                height: 4),
+                                                            Text(
+                                                              DateTime.parse(
+                                                                      chat?.chatInsertedDate ??
+                                                                          "")
+                                                                  .dateTimeFormat,
+                                                              maxLines: 1,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style: TextStyleConstants
+                                                                      .medium(
+                                                                          context)
+                                                                  .copyWith(
+                                                                      color: Colors
+                                                                              .grey[
+                                                                          600]),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+
+                                                      /// Time + unread
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .end,
+                                                        children: [
+                                                          Icon(
+                                                            Icons
+                                                                .keyboard_arrow_right,
+                                                          ),
+                                                          const SizedBox(
+                                                              height: 6),
+                                                        ],
                                                       ),
                                                     ],
                                                   ),
                                                 ),
-
-                                                /// Time + unread
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.end,
-                                                  children: [
-                                                    Icon(
-                                                      Icons
-                                                          .keyboard_arrow_right,
-                                                    ),
-                                                    const SizedBox(height: 6),
-                                                  ],
-                                                ),
-                                              ],
+                                              ),
                                             ),
-                                          ),
-                                        ),
+                                          );
+                                        },
+                                        childCount: chatList?.length ?? 0,
                                       ),
-                                    );
-                                  },
-                                  childCount: chatList?.length ?? 0,
-                                ),
+                                    ),
+                                  )
+                                ],
                               ),
-                            )
-                          ],
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
+                      );
+                    },
+                  )
+                : ComingSoonScreen(),
             BlocBuilder<ChatCubit, ChatState>(
               builder: (context, state) {
                 if (state is GetChatListIsLoading) {
                   return Positioned.fill(child: const CommonLoader());
                 }
                 return SizedBox.shrink();
+              },
+            ),
+            CommonFMCGFloatingNavBar(
+              index: navIndex,
+              onTap: (i) {
+                setState(() {
+                  navIndex = i;
+                });
               },
             ),
           ],

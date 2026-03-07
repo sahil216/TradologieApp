@@ -8,16 +8,20 @@ import 'package:tradologie_app/features/chat/domain/repositories/chat_repositori
 class ChatDataParams {
   final String contents;
   final String buyerID;
+  final String chatID;
   final String sellerID;
   final String token;
+
   ChatDataParams(
       {required this.contents,
       required this.buyerID,
+      required this.chatID,
       required this.sellerID,
       required this.token});
 
   Map<String, dynamic> toJson() => {
         "BuyerID": buyerID,
+        "ChatID": chatID,
         "SellerID": sellerID,
         "Contents": contents,
         "Token": token

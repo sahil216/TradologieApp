@@ -16,16 +16,14 @@ class ChatDataModel extends ChatData {
   });
 
   factory ChatDataModel.fromJson(Map<String, dynamic> json) => ChatDataModel(
-        tranId: json["TranID"],
-        chatId: json["ChatID"],
-        buyerId: json["BuyerID"],
-        sellerId: json["SellerID"],
-        msgType: json["MsgType"],
-        msgContent: json["MsgContent"],
-        insertedId: json["InsertedID"],
-        insertedDate: json["InsertedDate"] == null
-            ? null
-            : DateTime.parse(json["InsertedDate"]),
-        ipAddress: json["IPAddress"],
+        tranId: json["TranID"].toString(),
+        chatId: json["ChatID"].toString(),
+        buyerId: json["BuyerID"].toString(),
+        sellerId: json["SellerID"].toString(),
+        msgType: json["MsgType"].toString(),
+        msgContent: json["MsgContent"].toString(),
+        insertedId: json["InsertedID"].toString(),
+        insertedDate: json["InsertedDate"].toString(),
+        ipAddress: json["IPAddress"].toString(),
       );
 }

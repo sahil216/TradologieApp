@@ -1,14 +1,14 @@
 import 'package:equatable/equatable.dart';
 
 class ChatData extends Equatable {
-  final int? tranId;
-  final int? chatId;
-  final int? buyerId;
-  final int? sellerId;
+  final String? tranId;
+  final String? chatId;
+  final String? buyerId;
+  final String? sellerId;
   final String? msgType;
   final String? msgContent;
   final String? insertedId;
-  final DateTime? insertedDate;
+  final String? insertedDate;
   final dynamic ipAddress;
 
   const ChatData({

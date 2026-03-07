@@ -54,14 +54,15 @@ class AdaptiveScaffold extends StatelessWidget {
   }
 
   Widget _buildContent(BuildContext context, Responsive r) {
-    final content = Align(
-      alignment: Alignment.topCenter,
+    final content = Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(
           maxWidth: maxContentWidth ??
               (r.isTablet ? r.screenWidth * 0.9 : double.infinity),
         ),
-        child: body,
+        child: SizedBox.expand(
+          child: body,
+        ),
       ),
     );
 
@@ -73,10 +74,9 @@ class AdaptiveScaffold extends StatelessWidget {
     end: Alignment.bottomCenter,
     colors: [
       Color(0xFFFFFFFF),
-      Color(0xFFF7FBFF),
-      Color(0xFFEAF4FF),
-      Color(0xFFDCEEFF),
+      Color(0xFFF7FAFF),
+      Color(0xFFEFF5FF),
+      Color(0xFFE6F0FF),
     ],
-    stops: [0.0, 0.4, 0.7, 1.0],
   );
 }
