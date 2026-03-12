@@ -52,3 +52,25 @@ class ChatDataError extends ChatState {
   @override
   List<Object> get props => [failure];
 }
+
+class DistributorListIsLoading extends ChatState {}
+
+class DistributorListSuccess extends ChatState {
+  final List<DistributorEnquiryList> data;
+
+  const DistributorListSuccess({
+    required this.data,
+  });
+
+  @override
+  List<Object> get props => [data];
+}
+
+class DistributorListError extends ChatState {
+  final Failure failure;
+
+  const DistributorListError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}

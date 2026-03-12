@@ -206,54 +206,87 @@ class _ChatScreenState extends State<ChatScreen>
                                         data = null;
                                       }
 
-                                      return Align(
-                                        alignment: isMe
-                                            ? Alignment.centerRight
-                                            : Alignment.centerLeft,
-                                        child: Container(
-                                          margin: const EdgeInsets.symmetric(
-                                              vertical: 6),
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 14, vertical: 10),
-                                          decoration: BoxDecoration(
-                                            color: isMe
-                                                ? Colors.lightGreen.shade300
-                                                : Colors.grey.shade200,
-                                            borderRadius:
-                                                BorderRadius.circular(18),
-                                          ),
-                                          child: Column(
-                                            crossAxisAlignment: isMe
-                                                ? CrossAxisAlignment.end
-                                                : CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                data?["Message"] ?? "",
-                                                style:
-                                                    TextStyleConstants.medium(
-                                                  context,
-                                                  color: isMe
-                                                      ? Colors.black87
-                                                      : Colors.black87,
-                                                  fontSize: 16,
-                                                ),
+                                      return Column(
+                                        children: [
+                                          (msg?.displayDate ?? "").isNotEmpty
+                                              ? Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(vertical: 12),
+                                                  child: Center(
+                                                    child: Container(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 12,
+                                                          vertical: 6),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors
+                                                            .grey.shade300,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(12),
+                                                      ),
+                                                      child: Text(
+                                                        msg?.displayDate ?? "",
+                                                        style: const TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                )
+                                              : SizedBox.shrink(),
+                                          Align(
+                                            alignment: isMe
+                                                ? Alignment.centerRight
+                                                : Alignment.centerLeft,
+                                            child: Container(
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 6),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 14,
+                                                      vertical: 10),
+                                              decoration: BoxDecoration(
+                                                color: isMe
+                                                    ? Colors.lightGreen.shade300
+                                                    : Colors.grey.shade200,
+                                                borderRadius:
+                                                    BorderRadius.circular(18),
                                               ),
-                                              Text(
-                                                DateTime.tryParse(
-                                                            msg?.insertedDate ??
-                                                                "")
-                                                        ?.dateTimeFormat ??
-                                                    "",
-                                                style:
-                                                    TextStyleConstants.medium(
-                                                  context,
-                                                  color: Colors.grey.shade600,
-                                                  fontSize: 12,
-                                                ),
+                                              child: Column(
+                                                crossAxisAlignment: isMe
+                                                    ? CrossAxisAlignment.end
+                                                    : CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    data?["Message"] ?? "",
+                                                    style: TextStyleConstants
+                                                        .medium(
+                                                      context,
+                                                      color: isMe
+                                                          ? Colors.black87
+                                                          : Colors.black87,
+                                                      fontSize: 16,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    msg?.displayTime ?? "",
+                                                    style: TextStyleConstants
+                                                        .medium(
+                                                      context,
+                                                      color:
+                                                          Colors.grey.shade600,
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                            ],
-                                          ),
-                                        ),
+                                            ),
+                                          )
+                                        ],
                                       );
                                     },
                                     childCount: chatData?.length,
@@ -327,5 +360,40 @@ class _ChatScreenState extends State<ChatScreen>
         ),
       ),
     );
+  }
+}
+
+class DateHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final String date;
+
+  DateHeaderDelegate(this.date);
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade300,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          date,
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+        ),
+      ),
+    );
+  }
+
+  @override
+  double get maxExtent => 40;
+
+  @override
+  double get minExtent => 40;
+
+  @override
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
+    return true;
   }
 }

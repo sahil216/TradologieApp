@@ -88,17 +88,17 @@ class CommonAppbar extends StatelessWidget {
                     ),
                     child: Container(
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Color(0xFFE3F2FD), // very light blue
-                            Color(0xFFE3F2FD), // very light blue
-                            // light sky blue
-                            Color(0xFFE1F5FE), // light blue
-                          ],
-                        ),
-                      ),
+                          // gradient: LinearGradient(
+                          //   begin: Alignment.topLeft,
+                          //   end: Alignment.bottomRight,
+                          //   colors: [
+                          //     Color(0xFFE3F2FD), // very light blue
+                          //     Color(0xFFE3F2FD), // very light blue
+                          //     // light sky blue
+                          //     Color(0xFFE1F5FE), // light blue
+                          //   ],
+                          // ),
+                          ),
                     ),
                   ),
                 ),

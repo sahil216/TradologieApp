@@ -6,6 +6,7 @@ import 'package:tradologie_app/features/add_negotiation/presentation/screens/sup
 import 'package:tradologie_app/features/add_negotiation/presentation/viewmodel/add_product_params.dart';
 import 'package:tradologie_app/features/app/presentation/screens/main_screen.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/send_otp_usecase.dart';
+import 'package:tradologie_app/features/authentication/presentation/screens/fmcg_register_seller_form.dart';
 import 'package:tradologie_app/features/authentication/presentation/screens/fmcg_seller_signin.dart';
 import 'package:tradologie_app/features/chat/domain/entities/chat_list.dart';
 import 'package:tradologie_app/features/chat/presentation/screens/chat_list_screen.dart';
@@ -51,6 +52,8 @@ class Routes {
   static const String signinRoute = '/signin';
   static const String signupRoute = '/signup';
   static const String fmcgSignIn = '/fmcgsignin';
+  static const String fmcgRegisterSellerDistributorForm =
+      '/fmcgRegisterSellerDistributorForm';
 
   //! login with whatsapp route
   static const String sendOtpScreen = '/sendOtpScreen';
@@ -235,6 +238,12 @@ class AppRoutes {
       case Routes.chatListScreen:
         return CupertinoPageRoute(builder: (context) {
           return const ChatListScreen();
+        });
+      case Routes.fmcgRegisterSellerDistributorForm:
+        return CupertinoPageRoute(builder: (context) {
+          return FmcgRegisterSellerDistributorForm(
+            isDistributor: routeSettings.arguments as bool,
+          );
         });
       case Routes.chatScreen:
         return CupertinoPageRoute(builder: (context) {

@@ -14,6 +14,8 @@ class FmcgUserDetail extends Equatable {
   final String? dob;
   final String? apiVerificationCode;
   final String? brandId;
+  final String? fromDate;
+  final String? toDate;
 
   const FmcgUserDetail({
     this.loginId,
@@ -29,6 +31,8 @@ class FmcgUserDetail extends Equatable {
     this.dob,
     this.apiVerificationCode,
     this.brandId,
+    this.fromDate,
+    this.toDate,
   });
 
   @override
@@ -46,5 +50,7 @@ class FmcgUserDetail extends Equatable {
         dob,
         apiVerificationCode,
         brandId,
+        fromDate,
+        toDate
       ];
 }

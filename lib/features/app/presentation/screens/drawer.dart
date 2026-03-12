@@ -94,6 +94,7 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
                     Constants.isLogin = false;
                     SecureStorageService secureStorage = SecureStorageService();
                     secureStorage.delete(AppStrings.apiVerificationCode);
+                    Constants.token = "";
                     secureStorage.write(
                         AppStrings.appSession, false.toString());
 

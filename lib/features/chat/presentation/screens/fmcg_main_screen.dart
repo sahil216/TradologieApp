@@ -40,8 +40,9 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _item(0, Icons.chat_outlined, "Chats"),
-                _item(1, Icons.dashboard_outlined, "Dashboard"),
+                _item(0, Icons.dashboard_outlined, "Dashboard"),
+                _item(1, Icons.chat_outlined, "Chats"),
+                _item(2, Icons.payment_outlined, "Membership"),
               ],
             ),
           ),

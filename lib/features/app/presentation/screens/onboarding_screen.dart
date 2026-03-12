@@ -233,7 +233,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                                     .pushNamed(
                                                         Routes.fmcgSignIn);
                                               },
-                                        text: CommonStrings.sellerText,
+                                        text:
+                                            selectedProduct == "Agro Commodity"
+                                                ? CommonStrings.sellerText
+                                                : "Register Your Brand",
                                         width: double.infinity,
                                         borderRadius: BorderRadius.circular(8),
                                         backgroundColor: AppColors.primary,
@@ -248,22 +251,36 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                 // ),
                                 SizedBox(height: 16),
 
-                                selectedProduct == "Agro Commodity"
-                                    ? CommonButton(
-                                        onPressed: () async {
-                                          SecureStorageService secureStorage =
-                                              SecureStorageService();
-                                          Constants.isBuyer = true;
-                                          await secureStorage.write(
-                                              AppStrings.isBuyer, "true");
-                                          await secureStorage.write(
-                                              AppStrings.isFmcg, "false");
-                                          sl<NavigationService>()
-                                              .pushNamed(Routes.sendOtpScreen);
-                                          AnalyticsService.logEvent(
-                                              "buyer_button_clicked");
-                                        },
-                                        text: CommonStrings.buyerText,
+                                selectedProduct == null
+                                    ? SizedBox()
+                                    : CommonButton(
+                                        onPressed: selectedProduct ==
+                                                "Agro Commodity"
+                                            ? () async {
+                                                SecureStorageService
+                                                    secureStorage =
+                                                    SecureStorageService();
+                                                Constants.isBuyer = true;
+                                                await secureStorage.write(
+                                                    AppStrings.isBuyer, "true");
+                                                await secureStorage.write(
+                                                    AppStrings.isFmcg, "false");
+                                                sl<NavigationService>()
+                                                    .pushNamed(
+                                                        Routes.sendOtpScreen);
+                                                AnalyticsService.logEvent(
+                                                    "buyer_button_clicked");
+                                              }
+                                            : () async {
+                                                sl<NavigationService>().pushNamed(
+                                                    Routes
+                                                        .fmcgRegisterSellerDistributorForm,
+                                                    arguments: true);
+                                              },
+                                        text:
+                                            selectedProduct == "Agro Commodity"
+                                                ? CommonStrings.buyerText
+                                                : "Apply for Distributorship",
                                         width: double.infinity,
                                         borderRadius: BorderRadius.circular(8),
                                         backgroundColor: AppColors.blueLight,
@@ -273,8 +290,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                           color: AppColors.blueDark,
                                           fontSize: 16,
                                         ),
-                                      )
-                                    : SizedBox.shrink(),
+                                      ),
 
                                 Spacer(),
                                 Text(

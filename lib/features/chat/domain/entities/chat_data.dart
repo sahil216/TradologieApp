@@ -10,6 +10,8 @@ class ChatData extends Equatable {
   final String? insertedId;
   final String? insertedDate;
   final dynamic ipAddress;
+  final String? displayDate;
+  final String? displayTime;
 
   const ChatData({
     this.tranId,
@@ -21,6 +23,8 @@ class ChatData extends Equatable {
     this.insertedId,
     this.insertedDate,
     this.ipAddress,
+    this.displayDate,
+    this.displayTime,
   });
 
   @override
@@ -33,6 +37,8 @@ class ChatData extends Equatable {
         msgContent,
         insertedId,
         insertedDate,
-        ipAddress
+        ipAddress,
+        displayDate,
+        displayTime
       ];
 }

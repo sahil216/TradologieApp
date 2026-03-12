@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 
 import 'package:tradologie_app/core/utils/assets_manager.dart';
@@ -14,6 +15,7 @@ import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_signin_usecase.dart';
+import 'package:tradologie_app/injection_container.dart';
 
 import '../../../../config/routes/app_router.dart';
 import '../../../../core/utils/app_colors.dart';
@@ -103,6 +105,14 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
             if (state is FmcgSellerSigninSuccess) {
               Constants.isFmcg = true;
               secureStorageService.write(AppStrings.isFmcg, "true");
+              if (state.data.fmcgUserDetail?.fromDate != "-" &&
+                  state.data.fmcgUserDetail?.toDate != "-") {
+                Constants().hideSensitiveData = Constants().isTodayInRange(
+                    DateTime.parse(state.data.fmcgUserDetail?.fromDate ?? ""),
+                    DateTime.parse(state.data.fmcgUserDetail?.toDate ?? ""));
+              } else {
+                Constants().hideSensitiveData = true;
+              }
               Navigator.pushNamedAndRemoveUntil(
                 context,
                 Routes.chatListScreen,
@@ -275,18 +285,28 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
                                                   ),
                                                 ),
                                                 SizedBox(height: 20),
-                                                // Center(
-                                                //   child: CommonText(
-                                                //     "OR",
-                                                //     style: TextStyleConstants
-                                                //         .regular(
-                                                //       context,
-                                                //       fontSize: 16,
-                                                //       color:
-                                                //           AppColors.defaultText,
-                                                //     ),
-                                                //   ),
-                                                // ),
+
+                                                InkWell(
+                                                  onTap: () {
+                                                    sl<NavigationService>()
+                                                        .pushNamed(
+                                                            Routes
+                                                                .fmcgRegisterSellerDistributorForm,
+                                                            arguments: false);
+                                                  },
+                                                  child: Center(
+                                                    child: CommonText(
+                                                      "Register New Brand",
+                                                      style: TextStyleConstants
+                                                          .regular(
+                                                        context,
+                                                        fontSize: 16,
+                                                        color: AppColors
+                                                            .defaultText,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
                                                 // SizedBox(height: 20),
                                                 // SizedBox(
                                                 //   width: r.isTablet

@@ -58,6 +58,7 @@ class AppIntercepters extends Interceptor {
       SecureStorageService secureStorage = SecureStorageService();
       secureStorage.delete(AppStrings.apiVerificationCode);
       secureStorage.delete(AppStrings.appSession);
+      Constants.token = "";
       Constants.isLogin = false;
       navigationService.pushNamedAndRemoveUntil(Routes.onboardingRoute);
 

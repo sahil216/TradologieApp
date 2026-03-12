@@ -128,6 +128,8 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
                 Constants.isLogin = false;
                 SecureStorageService secureStorage = SecureStorageService();
                 secureStorage.delete(AppStrings.apiVerificationCode);
+                Constants.token = "";
+
                 secureStorage.write(AppStrings.appSession, false.toString());
 
                 sl<NavigationService>().pushNamedAndRemoveUntil(

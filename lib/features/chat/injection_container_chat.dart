@@ -4,6 +4,7 @@ import 'package:tradologie_app/features/chat/data/repositories/chat_repository_i
 import 'package:tradologie_app/features/chat/domain/repositories/chat_repositories.dart';
 import 'package:tradologie_app/features/chat/domain/usecases/chat_data_usecase.dart';
 import 'package:tradologie_app/features/chat/domain/usecases/chat_list_usecase.dart';
+import 'package:tradologie_app/features/chat/domain/usecases/get_distributor_list_usecase.dart';
 import 'package:tradologie_app/features/chat/presentation/cubit/chat_cubit.dart';
 
 final sl = GetIt.instance;
@@ -13,6 +14,7 @@ Future<void> init() async {
   sl.registerFactory<ChatCubit>(() => ChatCubit(
         chatListUsecase: sl(),
         chatDataUsecase: sl(),
+        getDistributorListUsecase: sl(),
       ));
 
   //! Use cases
@@ -20,6 +22,8 @@ Future<void> init() async {
       () => ChatListUsecase(chatRepository: sl()));
   sl.registerLazySingleton<ChatDataUsecase>(
       () => ChatDataUsecase(chatRepository: sl()));
+  sl.registerLazySingleton<GetDistributorListUsecase>(
+      () => GetDistributorListUsecase(chatRepository: sl()));
 
   //! Repository
   sl.registerLazySingleton<ChatRepository>(() => ChatRepositoryImpl(

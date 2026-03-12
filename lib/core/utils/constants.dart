@@ -20,10 +20,23 @@ class Constants {
   static bool isLogin = false;
   static bool isBuyer = false;
   static bool isFmcg = false;
+  static String token = "";
+
+  bool? hideSensitiveData;
 
   static String timeZone = "";
 
   static String name = "";
+
+  bool isTodayInRange(DateTime fromDate, DateTime toDate) {
+    final now = DateTime.now();
+
+    final today = DateTime(now.year, now.month, now.day);
+    final start = DateTime(fromDate.year, fromDate.month, fromDate.day);
+    final end = DateTime(toDate.year, toDate.month, toDate.day);
+
+    return !today.isBefore(start) && !today.isAfter(end);
+  }
 
   static PreferredSizeWidget appBar(
     BuildContext context, {
@@ -225,6 +238,35 @@ class Constants {
     } catch (e) {
       debugPrint('❌ URL launch exception: $e');
     }
+  }
+
+  String maskPhone(String phone) {
+    if (phone.length <= 4) return "xxxx";
+    return "${phone.substring(0, 2)}xxxxxxxx";
+  }
+
+  String maskEmail(String email) {
+    final parts = email.split("@");
+    if (parts.length != 2) return "xxxx@xxxx.com";
+
+    String name = parts[0];
+    String domain = parts[1];
+
+    String maskedName = name.length <= 2 ? "xx" : "${name.substring(0, 2)}xxxx";
+    String maskedDomain = domain.length <= 2 ? "xx" : "xxxx";
+
+    return "$maskedName@$maskedDomain";
+  }
+
+  String maskName(String name) {
+    if (name.isEmpty) return "";
+
+    List<String> parts = name.split(" ");
+
+    return parts.map((part) {
+      if (part.length <= 1) return "x";
+      return part[0] + part[1] + "x" * (part.length - 2);
+    }).join(" ");
   }
 
   static void showWarningDialog({

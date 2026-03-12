@@ -2,15 +2,21 @@ import 'package:dartz/dartz.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/features/authentication/data/models/country_code_list_model.dart';
+import 'package:tradologie_app/features/authentication/data/models/fmcg_brand_list_model.dart';
+import 'package:tradologie_app/features/authentication/data/models/fmcg_country_code_list_model.dart';
 import 'package:tradologie_app/features/authentication/data/models/fmcg_seller_signin_response_model.dart';
 import 'package:tradologie_app/features/authentication/data/models/login_success_model.dart';
 import 'package:tradologie_app/features/authentication/data/models/send_otp_result_model.dart';
 import 'package:tradologie_app/features/authentication/data/models/verify_otp_result_model.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/buyer_login_success.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/country_code_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_brands_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_country_code_list.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_signin_response.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/send_otp_result.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/delete_account_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_register_distributor_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_register_seller_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_signin_usecase.dart';
 import 'package:tradologie_app/features/authentication/presentation/screens/fmcg_seller_signin.dart';
 
@@ -58,6 +64,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       final response = await authenticationRemoteDataSource.verifyOtp(params);
       if (response != null && response.success) {
         Constants.isLogin = true;
+        Constants.token = response.data["APIVerificationCode"] ?? "";
         SecureStorageService secureStorage = SecureStorageService();
 
         await secureStorage.write(AppStrings.appSession, "true");
@@ -122,6 +129,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
         SecureStorageService secureStorage = SecureStorageService();
 
         await secureStorage.write(AppStrings.appSession, "true");
+        Constants.token = response.data["APIVerificationCode"] ?? "";
 
         await secureStorage.write(AppStrings.apiVerificationCode,
             response.data["APIVerificationCode"] ?? "");
@@ -162,6 +170,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
         SecureStorageService secureStorage = SecureStorageService();
 
         await secureStorage.write(AppStrings.appSession, "true");
+        Constants.token = response.data["APIVerificationCode"] ?? "";
 
         await secureStorage.write(AppStrings.apiVerificationCode,
             response.data["APIVerificationCode"] ?? "");
@@ -211,6 +220,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
             FmcgSellerSigninResponseModel.fromJson(response.data);
 
         await secureStorage.write(AppStrings.appSession, "true");
+        Constants.token = data.fmcgUserDetail?.apiVerificationCode ?? "";
 
         await secureStorage.write(AppStrings.apiVerificationCode,
             data.fmcgUserDetail?.apiVerificationCode ?? "");
@@ -248,6 +258,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
         SecureStorageService secureStorage = SecureStorageService();
 
         await secureStorage.write(AppStrings.appSession, "true");
+        Constants.token = response.data["APIVerificationCode"] ?? "";
 
         await secureStorage.write(AppStrings.apiVerificationCode,
             response.data["APIVerificationCode"] ?? "");
@@ -331,6 +342,96 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
         return Right((response.data as List)
             .map((e) => CountryCodeListModel.fromJson(e))
             .toList());
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, FmcgSellerSigninResponse>> fmcgRegisterSeller(
+      FmcgRegisterSellerParams params) async {
+    try {
+      final response =
+          await authenticationRemoteDataSource.fmcgRegisterSeller(params);
+      if (response != null && response.success) {
+        Constants.isLogin = true;
+        SecureStorageService secureStorage = SecureStorageService();
+        FmcgSellerSigninResponse data =
+            FmcgSellerSigninResponseModel.fromJson(response.data);
+
+        await secureStorage.write(AppStrings.appSession, "true");
+        Constants.token = data.fmcgUserDetail?.apiVerificationCode ?? "";
+
+        await secureStorage.write(AppStrings.apiVerificationCode,
+            data.fmcgUserDetail?.apiVerificationCode ?? "");
+
+        await secureStorage.write(
+            AppStrings.mobileNo, data.fmcgUserDetail?.mobile ?? "");
+
+        await secureStorage.write(
+            AppStrings.userId, data.fmcgUserDetail?.userId ?? "");
+
+        await secureStorage.write(
+            AppStrings.vendorName, data.fmcgUserDetail?.fullName ?? "");
+
+        await secureStorage.write(
+            AppStrings.loginId, data.fmcgUserDetail?.loginId ?? "");
+
+        await secureStorage.write(
+            AppStrings.brandId, data.fmcgUserDetail?.brandId ?? "");
+
+        return Right(data);
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<FmcgCountryCodeList>>> fmcgGetCountryCodeList(
+      NoParams params) async {
+    try {
+      final response =
+          await authenticationRemoteDataSource.fmcgGetCountryCodeList(params);
+      if (response != null && response.success) {
+        return Right((response.data as List)
+            .map((e) => FmcgCountryCodeListModel.fromJson(e))
+            .toList());
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<FmcgBrandsList>>> fmcgBrandsList(
+      NoParams params) async {
+    try {
+      final response =
+          await authenticationRemoteDataSource.fmcgBrandsList(params);
+      if (response != null && response.success) {
+        return Right((response.data as List)
+            .map((e) => FmcgBrandsListModel.fromJson(e))
+            .toList());
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> fmcgRegisterDistributor(
+      FmcgRegisterDistributorParams params) async {
+    try {
+      final response =
+          await authenticationRemoteDataSource.fmcgRegisterDistributor(params);
+      if (response != null && response.success) {
+        return Right(response.data);
       }
       return Left(UserFailure(response?.message, response?.code));
     } on Failure catch (e) {

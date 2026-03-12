@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/buyer_login_success.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/country_code_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_brands_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_country_code_list.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_signin_response.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/login_success.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/send_otp_result.dart';
@@ -11,9 +13,14 @@ import 'package:tradologie_app/features/authentication/domain/usecases/buyer_sen
 import 'package:tradologie_app/features/authentication/domain/usecases/buyer_signin_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/buyer_verify_otp_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/delete_account_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_brands_list_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_country_code_list_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_register_distributor_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_register_seller_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_signin_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/get_country_code_list_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/sign_out_usecase.dart';
+import 'package:tradologie_app/features/authentication/presentation/screens/fmcg_register_seller_form.dart';
 import 'package:tradologie_app/features/authentication/presentation/screens/fmcg_seller_signin.dart';
 
 import '../../../../core/error/failures.dart';
@@ -37,6 +44,10 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   final DeleteAccountUsecase deleteAccountUsecase;
   final GetCountryCodeListUsecase getCountryCodeListUsecase;
   final FmcgSellerSigninUsecase fmcgSellerSigninUsecase;
+  final FmcgRegisterDistributorUsecase fmcgRegisterDistributorUsecase;
+  final FmcgRegisterSellerUsecase fmcgRegisterSellerUsecase;
+  final FmcgCountryCodeListUsecase fmcgCountryCodeListUsecase;
+  final FmcgBrandsListUsecase fmcgBrandsListUsecase;
 
   AuthenticationCubit({
     required this.sendOtpUsecase,
@@ -50,6 +61,10 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     required this.deleteAccountUsecase,
     required this.getCountryCodeListUsecase,
     required this.fmcgSellerSigninUsecase,
+    required this.fmcgRegisterDistributorUsecase,
+    required this.fmcgRegisterSellerUsecase,
+    required this.fmcgCountryCodeListUsecase,
+    required this.fmcgBrandsListUsecase,
   }) : super(AuthenticationInitial());
 
   Future<void> sendOtp(SendOtpParams params, bool isResend) async {
@@ -160,6 +175,47 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       (res) => DeleteAccountSuccess(
         success: res,
       ),
+    ));
+  }
+
+  Future<void> fmcgGetCountryCodeList(NoParams params) async {
+    emit(FmcgCountryCodeListIsLoading());
+    Either<Failure, List<FmcgCountryCodeList>> response =
+        await fmcgCountryCodeListUsecase(params);
+    emit(response.fold(
+      (failure) => FmcgCountryCodeListError(failure: failure),
+      (res) => FmcgCountryCodeListSuccess(data: res),
+    ));
+  }
+
+  Future<void> fmcgBrandsList(NoParams params) async {
+    emit(FmcgBrandsListIsLoading());
+    Either<Failure, List<FmcgBrandsList>> response =
+        await fmcgBrandsListUsecase(params);
+    emit(response.fold(
+      (failure) => FmcgBrandsListError(failure: failure),
+      (res) => FmcgBrandsListSuccess(data: res),
+    ));
+  }
+
+  Future<void> fmcgRegisterSeller(FmcgRegisterSellerParams params) async {
+    emit(FmcgRegisterSellerIsLoading());
+    Either<Failure, FmcgSellerSigninResponse> response =
+        await fmcgRegisterSellerUsecase(params);
+    emit(response.fold(
+      (failure) => FmcgRegisterSellerError(failure: failure),
+      (res) => FmcgRegisterSellerSuccess(data: res),
+    ));
+  }
+
+  Future<void> fmcgRegisterDistributor(
+      FmcgRegisterDistributorParams params) async {
+    emit(FmcgRegisterDistributorIsLoading());
+    Either<Failure, bool> response =
+        await fmcgRegisterDistributorUsecase(params);
+    emit(response.fold(
+      (failure) => FmcgRegisterDistributorError(failure: failure),
+      (res) => FmcgRegisterDistributorSuccess(data: res),
     ));
   }
 }

@@ -15,6 +15,8 @@ class FmcgUserDetailModel extends FmcgUserDetail {
     super.dob,
     super.apiVerificationCode,
     super.brandId,
+    super.fromDate,
+    super.toDate,
   });
 
   factory FmcgUserDetailModel.fromJson(Map<String, dynamic> json) =>
@@ -32,5 +34,7 @@ class FmcgUserDetailModel extends FmcgUserDetail {
         dob: json["DOB"].toString(),
         apiVerificationCode: json["ApiVerificationCode"].toString(),
         brandId: json["BrandID"].toString(),
+        fromDate: json["FromDate"].toString(),
+        toDate: json["ToDate"].toString(),
       );
 }

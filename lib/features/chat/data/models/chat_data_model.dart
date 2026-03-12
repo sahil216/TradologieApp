@@ -13,6 +13,8 @@ class ChatDataModel extends ChatData {
     super.insertedId,
     super.insertedDate,
     super.ipAddress,
+    super.displayDate,
+    super.displayTime,
   });
 
   factory ChatDataModel.fromJson(Map<String, dynamic> json) => ChatDataModel(
@@ -25,5 +27,7 @@ class ChatDataModel extends ChatData {
         insertedId: json["InsertedID"].toString(),
         insertedDate: json["InsertedDate"].toString(),
         ipAddress: json["IPAddress"].toString(),
+        displayDate: json["DisplayDate"],
+        displayTime: json["DisplayTime"],
       );
 }

@@ -178,3 +178,83 @@ class FmcgSellerSigninError extends AuthenticationState {
   @override
   List<Object> get props => [failure];
 }
+
+class FmcgRegisterSellerIsLoading extends AuthenticationState {}
+
+class FmcgRegisterSellerSuccess extends AuthenticationState {
+  final FmcgSellerSigninResponse data;
+
+  const FmcgRegisterSellerSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class FmcgRegisterSellerError extends AuthenticationState {
+  final Failure failure;
+
+  const FmcgRegisterSellerError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class FmcgRegisterDistributorIsLoading extends AuthenticationState {}
+
+class FmcgRegisterDistributorSuccess extends AuthenticationState {
+  final bool data;
+
+  const FmcgRegisterDistributorSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class FmcgRegisterDistributorError extends AuthenticationState {
+  final Failure failure;
+
+  const FmcgRegisterDistributorError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class FmcgCountryCodeListIsLoading extends AuthenticationState {}
+
+class FmcgCountryCodeListSuccess extends AuthenticationState {
+  final List<FmcgCountryCodeList> data;
+
+  const FmcgCountryCodeListSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class FmcgCountryCodeListError extends AuthenticationState {
+  final Failure failure;
+
+  const FmcgCountryCodeListError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class FmcgBrandsListIsLoading extends AuthenticationState {}
+
+class FmcgBrandsListSuccess extends AuthenticationState {
+  final List<FmcgBrandsList> data;
+
+  const FmcgBrandsListSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class FmcgBrandsListError extends AuthenticationState {
+  final Failure failure;
+
+  const FmcgBrandsListError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}

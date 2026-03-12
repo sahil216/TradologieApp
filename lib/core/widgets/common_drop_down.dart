@@ -42,7 +42,7 @@ class CommonDropdown<T> extends StatelessWidget {
         label.isNotEmpty
             ? CommonText(
                 label,
-                style: TextStyleConstants.semiBold(context, fontSize: 16),
+                style: TextStyleConstants.medium(context, fontSize: 15),
               )
             : const SizedBox.shrink(),
         // CommonText(
