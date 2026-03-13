@@ -42,7 +42,8 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
               children: [
                 _item(0, Icons.dashboard_outlined, "Dashboard"),
                 _item(1, Icons.chat_outlined, "Chats"),
-                _item(2, Icons.payment_outlined, "Membership"),
+                _item(2, Icons.account_circle_outlined, "My Account"),
+                _item(3, Icons.payment_outlined, "Membership"),
               ],
             ),
           ),

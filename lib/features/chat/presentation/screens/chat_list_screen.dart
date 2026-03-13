@@ -17,10 +17,12 @@ import 'package:tradologie_app/features/chat/domain/entities/chat_list.dart';
 import 'package:tradologie_app/features/chat/domain/usecases/chat_list_usecase.dart';
 import 'package:tradologie_app/features/chat/presentation/cubit/chat_cubit.dart';
 import 'package:tradologie_app/features/chat/presentation/screens/chat_screen.dart';
+import 'package:tradologie_app/features/chat/presentation/screens/fmcg_account_screen.dart';
 import 'package:tradologie_app/features/chat/presentation/screens/fmcg_main_screen.dart';
 import 'package:tradologie_app/features/chat/presentation/screens/fmcg_my_account_screen.dart';
 import 'package:tradologie_app/features/chat/presentation/screens/fmcg_seller_dashboard_screen.dart';
 import 'package:tradologie_app/features/contact_us/coming_soon_screen.dart';
+import 'package:tradologie_app/features/my_account/presentation/screens/my_account_screen.dart';
 
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
@@ -298,6 +300,7 @@ class _ChatListScreenState extends State<ChatListScreen>
                   );
                 },
               ),
+            if (navIndex == 2) RegistrationScreen(),
             BlocBuilder<ChatCubit, ChatState>(
               builder: (context, state) {
                 if (state is GetChatListIsLoading) {
@@ -309,7 +312,7 @@ class _ChatListScreenState extends State<ChatListScreen>
             CommonFMCGFloatingNavBar(
               index: navIndex,
               onTap: (i) {
-                if (i == 2) {
+                if (i == 3) {
                   Constants.launch(
                       "https://www.tradologie.com/brand-membership/");
                 } else {
