@@ -2,7 +2,6 @@ import 'package:dartz/dartz.dart';
 import 'package:tradologie_app/core/error/failures.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/repositories/authentication_repository.dart';
-import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_register_seller_usecase.dart';
 
 class FmcgRegisterDistributorUsecase
     implements UseCase<bool, FmcgRegisterDistributorParams> {

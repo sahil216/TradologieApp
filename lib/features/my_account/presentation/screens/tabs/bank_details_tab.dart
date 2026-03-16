@@ -24,50 +24,10 @@ class _BankDetailsTabState extends State<BankDetailsTab>
 
   void getBankDetails() {}
 
-  late AnimationController _screenController;
-  late Animation<double> _screenFade;
-  late Animation<double> _screenScale;
-  late Animation<Offset> _screenSlide;
-
   @override
   void initState() {
     super.initState();
     getBankDetails();
-    _screenController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-
-    _screenFade = CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    );
-
-    _screenScale = Tween<double>(
-      begin: 0.97,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _screenSlide = Tween<Offset>(
-      begin: const Offset(0, .04),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    Future.delayed(const Duration(milliseconds: 150), () {
-      if (mounted) _screenController.forward();
-    });
-  }
-
-  @override
-  void dispose() {
-    _screenController.dispose();
-    super.dispose();
   }
 
   @override
@@ -115,62 +75,53 @@ class _BankDetailsTabState extends State<BankDetailsTab>
             }
             return const CommonLoader();
           }
-          return FadeTransition(
-              opacity: _screenFade,
-              child: SlideTransition(
-                  position: _screenSlide,
-                  child: ScaleTransition(
-                      scale: _screenScale,
-                      child: CustomScrollView(slivers: [
-                        SliverSafeArea(
-                            sliver: SliverPadding(
-                                padding: const EdgeInsets.all(12),
-                                sliver: SliverPadding(
-                                  padding: const EdgeInsets.all(16),
-                                  sliver: SliverToBoxAdapter(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        _buildLabel("Account Name"),
-                                        _buildTextField(
-                                          hint:
-                                              "Chamy Engineering And Lubrication Pvt Ltd",
-                                        ),
-                                        const SizedBox(height: 16),
-                                        _buildLabel("Account Number"),
-                                        _buildTextField(
-                                          hint: "546475685338569",
-                                          keyboardType: TextInputType.number,
-                                        ),
-                                        const SizedBox(height: 16),
-                                        _buildLabel("Bank Name"),
-                                        _buildTextField(
-                                          hint: "BANK OF MAHARASHTRA",
-                                        ),
-                                        const SizedBox(height: 16),
-                                        _buildLabel("Branch"),
-                                        _buildTextField(
-                                          hint:
-                                              "LAW KINS INDUSTRIES GHODBUNDER RD THA",
-                                        ),
-                                        const SizedBox(height: 16),
-                                        _buildLabel("IFSC Code"),
-                                        _buildTextField(
-                                          hint: "MAHB0001302",
-                                        ),
-                                        const SizedBox(height: 24),
-                                        _buildLabel("Upload Cancel Cheque"),
-                                        const SizedBox(height: 8),
-                                        _buildUploadBox(),
-                                        const SizedBox(height: 32),
-                                        _buildSubmitButton(),
-                                        const SizedBox(height: 40),
-                                      ],
-                                    ),
-                                  ),
-                                )))
-                      ]))));
+          return CustomScrollView(slivers: [
+            SliverSafeArea(
+                sliver: SliverPadding(
+                    padding: const EdgeInsets.all(12),
+                    sliver: SliverPadding(
+                      padding: const EdgeInsets.all(16),
+                      sliver: SliverToBoxAdapter(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildLabel("Account Name"),
+                            _buildTextField(
+                              hint: "Chamy Engineering And Lubrication Pvt Ltd",
+                            ),
+                            const SizedBox(height: 16),
+                            _buildLabel("Account Number"),
+                            _buildTextField(
+                              hint: "546475685338569",
+                              keyboardType: TextInputType.number,
+                            ),
+                            const SizedBox(height: 16),
+                            _buildLabel("Bank Name"),
+                            _buildTextField(
+                              hint: "BANK OF MAHARASHTRA",
+                            ),
+                            const SizedBox(height: 16),
+                            _buildLabel("Branch"),
+                            _buildTextField(
+                              hint: "LAW KINS INDUSTRIES GHODBUNDER RD THA",
+                            ),
+                            const SizedBox(height: 16),
+                            _buildLabel("IFSC Code"),
+                            _buildTextField(
+                              hint: "MAHB0001302",
+                            ),
+                            const SizedBox(height: 24),
+                            _buildLabel("Upload Cancel Cheque"),
+                            const SizedBox(height: 8),
+                            _buildUploadBox(),
+                            const SizedBox(height: 32),
+                            _buildSubmitButton(),
+                            const SizedBox(height: 40),
+                          ],
+                        ),
+                      ),
+                    )))
+          ]);
         },
       ),
     );

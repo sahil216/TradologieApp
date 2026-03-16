@@ -51,50 +51,10 @@ class _CommodityTabState extends State<CommodityTab>
 
   void getCommodity() {}
 
-  late AnimationController _screenController;
-  late Animation<double> _screenFade;
-  late Animation<double> _screenScale;
-  late Animation<Offset> _screenSlide;
-
   @override
   void initState() {
     super.initState();
     getCommodity();
-    _screenController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-
-    _screenFade = CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    );
-
-    _screenScale = Tween<double>(
-      begin: 0.97,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _screenSlide = Tween<Offset>(
-      begin: const Offset(0, .04),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    Future.delayed(const Duration(milliseconds: 150), () {
-      if (mounted) _screenController.forward();
-    });
-  }
-
-  @override
-  void dispose() {
-    _screenController.dispose();
-    super.dispose();
   }
 
   @override
@@ -142,129 +102,123 @@ class _CommodityTabState extends State<CommodityTab>
             }
             return const CommonLoader();
           }
-          return FadeTransition(
-              opacity: _screenFade,
-              child: SlideTransition(
-                  position: _screenSlide,
-                  child: ScaleTransition(
-                      scale: _screenScale,
-                      child: CustomScrollView(slivers: [
-                        SliverPadding(
-                          padding: const EdgeInsets.all(16),
-                          sliver: SliverToBoxAdapter(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  "Product",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-                                DropdownButtonFormField<String>(
-                                  value: selectedProduct,
-                                  decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                  hint: const Text("-- Select Product --"),
-                                  items: products
-                                      .map((e) => DropdownMenuItem(
-                                            value: e["product"],
-                                            child: Text(e["product"]!),
-                                          ))
-                                      .toList(),
-                                  onChanged: (val) {
-                                    setState(() => selectedProduct = val);
-                                  },
-                                ),
-                                const SizedBox(height: 16),
-                                SizedBox(
-                                  width: double.infinity,
-                                  height: 48,
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                    ),
-                                    onPressed: () {},
-                                    child: const Text("Submit"),
-                                  ),
-                                ),
-                              ],
-                            ),
+          return CustomScrollView(slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.all(16),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Product",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    DropdownButtonFormField<String>(
+                      value: selectedProduct,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      hint: const Text("-- Select Product --"),
+                      items: products
+                          .map((e) => DropdownMenuItem(
+                                value: e["product"],
+                                child: Text(e["product"]!),
+                              ))
+                          .toList(),
+                      onChanged: (val) {
+                        setState(() => selectedProduct = val);
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
                         ),
+                        onPressed: () {},
+                        child: const Text("Submit"),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
 
-                        /// Divider
-                        SliverToBoxAdapter(
-                          child: Container(
-                            height: 8,
-                            color: Colors.grey.shade200,
-                          ),
-                        ),
+            /// Divider
+            SliverToBoxAdapter(
+              child: Container(
+                height: 8,
+                color: Colors.grey.shade200,
+              ),
+            ),
 
-                        /// List Header
-                        SliverToBoxAdapter(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 10),
-                            color: Colors.grey.shade300,
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(flex: 3, child: Text("Product")),
-                                Expanded(flex: 2, child: Text("Type")),
-                                Expanded(flex: 2, child: Text("SubType")),
-                              ],
-                            ),
-                          ),
-                        ),
+            /// List Header
+            SliverToBoxAdapter(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                color: Colors.grey.shade300,
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(flex: 3, child: Text("Product")),
+                    Expanded(flex: 2, child: Text("Type")),
+                    Expanded(flex: 2, child: Text("SubType")),
+                  ],
+                ),
+              ),
+            ),
 
-                        /// Product List
-                        SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) {
-                              final item = products[index];
-                              return Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 14),
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color: Colors.grey.shade300,
-                                    ),
-                                  ),
-                                  color: Colors.white,
-                                ),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      flex: 3,
-                                      child: Text(item["product"]!),
-                                    ),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Text(item["type"]!),
-                                    ),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Text(item["subType"]!),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                            childCount: products.length,
-                          ),
+            /// Product List
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final item = products[index];
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.grey.shade300,
                         ),
-                      ]))));
+                      ),
+                      color: Colors.white,
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: Text(item["product"]!),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Text(item["type"]!),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Text(item["subType"]!),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                childCount: products.length,
+              ),
+            ),
+          ]);
         },
       ),
     );

@@ -2,7 +2,6 @@ import 'package:dartz/dartz.dart';
 import 'package:tradologie_app/core/error/failures.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_brands_list.dart';
-import 'package:tradologie_app/features/authentication/domain/entities/fmcg_country_code_list.dart';
 import 'package:tradologie_app/features/authentication/domain/repositories/authentication_repository.dart';
 
 class FmcgBrandsListUsecase implements UseCase<List<FmcgBrandsList>, NoParams> {

@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
 import 'package:tradologie_app/core/utils/responsive.dart';
-import 'package:tradologie_app/core/widgets/common_single_child_scroll_view.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 import 'package:tradologie_app/features/my_account/domain/entities/get_information_detail.dart';
@@ -41,49 +40,11 @@ class _InformationTabState extends State<InformationTab>
   }
 
   final formKey = GlobalKey<FormState>();
-  late AnimationController _screenController;
-  late Animation<double> _screenFade;
-  late Animation<double> _screenScale;
-  late Animation<Offset> _screenSlide;
 
   @override
   void initState() {
     super.initState();
     getInformation();
-    _screenController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-
-    _screenFade = CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    );
-
-    _screenScale = Tween<double>(
-      begin: 0.97,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _screenSlide = Tween<Offset>(
-      begin: const Offset(0, .04),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    Future.delayed(const Duration(milliseconds: 150), () {
-      if (mounted) _screenController.forward();
-    });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   @override
@@ -140,356 +101,321 @@ class _InformationTabState extends State<InformationTab>
             }
             return const CommonLoader();
           }
-          return FadeTransition(
-              opacity: _screenFade,
-              child: SlideTransition(
-                  position: _screenSlide,
-                  child: ScaleTransition(
-                      scale: _screenScale,
-                      child: CustomScrollView(slivers: [
-                        SliverSafeArea(
-                            sliver: SliverToBoxAdapter(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16.0, vertical: 12.0),
-                            child: Form(
-                              key: formKey,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                  CommonTextField(
-                                      titleText: CommonStrings.name,
-                                      hintText: CommonStrings.enterName,
-                                      textRequired: CommonStrings.enterName,
-                                      controller: TextEditingController(),
-                                      textInputType: TextInputType.name,
-                                      isEnable: true,
-                                      autovalidateMode:
-                                          AutovalidateMode.onUserInteraction,
-                                      validator: (String? value) {
-                                        if (value == null ||
-                                            value.trim().isEmpty) {
-                                          return "Full name is required";
-                                        }
+          return CustomScrollView(
+            slivers: [
+              SliverSafeArea(
+                  sliver: SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 12.0),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SizedBox(
+                          height: 20,
+                        ),
+                        CommonTextField(
+                            titleText: CommonStrings.name,
+                            hintText: CommonStrings.enterName,
+                            textRequired: CommonStrings.enterName,
+                            controller: TextEditingController(),
+                            textInputType: TextInputType.name,
+                            isEnable: true,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            validator: (String? value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return "Full name is required";
+                              }
 
-                                        return null;
-                                      }),
-                                  SizedBox(
-                                    height: 16,
+                              return null;
+                            }),
+                        SizedBox(
+                          height: 16,
+                        ),
+                        CommonTextField(
+                          titleText: CommonStrings.vendorCode,
+                          hintText: CommonStrings.enterVendorCode,
+                          textRequired: CommonStrings.enterVendorCode,
+                          controller: TextEditingController(),
+                          textInputType: TextInputType.text,
+                          isEnable: true,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (String? value) {
+                            // if (value == null || value.trim().isEmpty) {
+                            //   return "Email is required";
+                            // }
+                            // if (value.isEmailValid == false) {
+                            //   return "Enter a valid email";
+                            // }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 16),
+                        CommonTextField(
+                          height: 100,
+                          titleText: CommonStrings.description,
+                          hintText: CommonStrings.enterdescription,
+                          textRequired: CommonStrings.enterdescription,
+                          controller: TextEditingController(),
+                          textInputType: TextInputType.text,
+                          maxLines: 5,
+                          isEnable: true,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (String? value) {
+                            // if (value == null || value.trim().isEmpty) {
+                            //   return "Phone number is required";
+                            // }
+                            // if (value.replaceAll(' ', '').length < 10) {
+                            //   return "Enter a valid phone number";
+                            // }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 16),
+                        CommonTextField(
+                          titleText: CommonStrings.vendorLogo,
+                          hintText: CommonStrings.enterVendorLogo,
+                          textRequired: CommonStrings.enterVendorLogo,
+                          controller: TextEditingController(),
+                          textInputType: TextInputType.text,
+                          isEnable: true,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          prefixIcon: GestureDetector(
+                            onTap: () {},
+                            child: Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Container(
+                                padding: EdgeInsets.all(5),
+                                width: Responsive(context).screenWidth * 0.3,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Center(
+                                  child: CommonText(
+                                    "Choose File",
+                                    style: TextStyleConstants.semiBold(context,
+                                        fontSize: 14, color: AppColors.white),
                                   ),
-                                  CommonTextField(
-                                    titleText: CommonStrings.vendorCode,
-                                    hintText: CommonStrings.enterVendorCode,
-                                    textRequired: CommonStrings.enterVendorCode,
-                                    controller: TextEditingController(),
-                                    textInputType: TextInputType.text,
-                                    isEnable: true,
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    validator: (String? value) {
-                                      // if (value == null || value.trim().isEmpty) {
-                                      //   return "Email is required";
-                                      // }
-                                      // if (value.isEmailValid == false) {
-                                      //   return "Enter a valid email";
-                                      // }
-                                      return null;
-                                    },
-                                  ),
-                                  SizedBox(height: 16),
-                                  CommonTextField(
-                                    height: 100,
-                                    titleText: CommonStrings.description,
-                                    hintText: CommonStrings.enterdescription,
-                                    textRequired:
-                                        CommonStrings.enterdescription,
-                                    controller: TextEditingController(),
-                                    textInputType: TextInputType.text,
-                                    maxLines: 5,
-                                    isEnable: true,
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    validator: (String? value) {
-                                      // if (value == null || value.trim().isEmpty) {
-                                      //   return "Phone number is required";
-                                      // }
-                                      // if (value.replaceAll(' ', '').length < 10) {
-                                      //   return "Enter a valid phone number";
-                                      // }
-                                      return null;
-                                    },
-                                  ),
-                                  SizedBox(height: 16),
-                                  CommonTextField(
-                                    titleText: CommonStrings.vendorLogo,
-                                    hintText: CommonStrings.enterVendorLogo,
-                                    textRequired: CommonStrings.enterVendorLogo,
-                                    controller: TextEditingController(),
-                                    textInputType: TextInputType.text,
-                                    isEnable: true,
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    prefixIcon: GestureDetector(
-                                      onTap: () {},
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(5.0),
-                                        child: Container(
-                                          padding: EdgeInsets.all(5),
-                                          width:
-                                              Responsive(context).screenWidth *
-                                                  0.3,
-                                          decoration: BoxDecoration(
-                                            color: AppColors.primary,
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
-                                          child: Center(
-                                            child: CommonText(
-                                              "Choose File",
-                                              style:
-                                                  TextStyleConstants.semiBold(
-                                                      context,
-                                                      fontSize: 14,
-                                                      color: AppColors.white),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    validator: (String? value) {
-                                      // if (value == null || value.trim().isEmpty) {
-                                      //   return "Email is required";
-                                      // }
-                                      // if (value.isEmailValid == false) {
-                                      //   return "Enter a valid email";
-                                      // }
-                                      return null;
-                                    },
-                                  ),
-                                  SizedBox(
-                                    height: 16,
-                                  ),
-                                  CommonTextField(
-                                    titleText: CommonStrings.eBrochure,
-                                    hintText: CommonStrings.entereBrochure,
-                                    textRequired: CommonStrings.entereBrochure,
-                                    controller: TextEditingController(),
-                                    textInputType: TextInputType.text,
-                                    isEnable: true,
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    prefixIcon: GestureDetector(
-                                      onTap: () {},
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(5.0),
-                                        child: Container(
-                                          padding: EdgeInsets.all(5),
-                                          width:
-                                              Responsive(context).screenWidth *
-                                                  0.3,
-                                          decoration: BoxDecoration(
-                                            color: AppColors.primary,
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
-                                          child: Center(
-                                            child: CommonText(
-                                              "Choose File",
-                                              style:
-                                                  TextStyleConstants.semiBold(
-                                                      context,
-                                                      fontSize: 14,
-                                                      color: AppColors.white),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    validator: (String? value) {
-                                      // if (value == null || value.trim().isEmpty) {
-                                      //   return "Email is required";
-                                      // }
-                                      // if (value.isEmailValid == false) {
-                                      //   return "Enter a valid email";
-                                      // }
-                                      return null;
-                                    },
-                                  ),
-                                  SizedBox(
-                                    height: 16,
-                                  ),
-                                  CommonTextField(
-                                    titleText: CommonStrings.annualTurnOver,
-                                    hintText: CommonStrings.enterannualTurnOver,
-                                    textRequired:
-                                        CommonStrings.enterannualTurnOver,
-                                    controller: TextEditingController(),
-                                    textInputType: TextInputType.text,
-                                    isEnable: true,
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    validator: (String? value) {
-                                      // if (value == null || value.trim().isEmpty) {
-                                      //   return "Email is required";
-                                      // }
-                                      // if (value.isEmailValid == false) {
-                                      //   return "Enter a valid email";
-                                      // }
-                                      return null;
-                                    },
-                                  ),
-                                  SizedBox(
-                                    height: 16,
-                                  ),
-                                  CommonTextField(
-                                    titleText:
-                                        CommonStrings.yearOfEstablishment,
-                                    hintText:
-                                        CommonStrings.enteryearOfEstablishment,
-                                    textRequired:
-                                        CommonStrings.enteryearOfEstablishment,
-                                    controller: TextEditingController(),
-                                    textInputType: TextInputType.text,
-                                    isEnable: true,
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    validator: (String? value) {
-                                      // if (value == null || value.trim().isEmpty) {
-                                      //   return "Email is required";
-                                      // }
-                                      // if (value.isEmailValid == false) {
-                                      //   return "Enter a valid email";
-                                      // }
-                                      return null;
-                                    },
-                                  ),
-                                  SizedBox(
-                                    height: 16,
-                                  ),
-                                  CommonTextField(
-                                    titleText: CommonStrings.certifications,
-                                    hintText: CommonStrings.entercertifications,
-                                    textRequired:
-                                        CommonStrings.entercertifications,
-                                    controller: TextEditingController(),
-                                    textInputType: TextInputType.text,
-                                    isEnable: true,
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    validator: (String? value) {
-                                      // if (value == null || value.trim().isEmpty) {
-                                      //   return "Email is required";
-                                      // }
-                                      // if (value.isEmailValid == false) {
-                                      //   return "Enter a valid email";
-                                      // }
-                                      return null;
-                                    },
-                                  ),
-                                  SizedBox(
-                                    height: 16,
-                                  ),
-                                  CommonTextField(
-                                    titleText: CommonStrings.areaOfOperation,
-                                    hintText:
-                                        CommonStrings.enterareaOfOperation,
-                                    textRequired:
-                                        CommonStrings.enterareaOfOperation,
-                                    controller: TextEditingController(),
-                                    textInputType: TextInputType.text,
-                                    isEnable: true,
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    validator: (String? value) {
-                                      // if (value == null || value.trim().isEmpty) {
-                                      //   return "Email is required";
-                                      // }
-                                      // if (value.isEmailValid == false) {
-                                      //   return "Enter a valid email";
-                                      // }
-                                      return null;
-                                    },
-                                  ),
-                                  SizedBox(
-                                    height: 16,
-                                  ),
-                                  SizedBox(
-                                    height: 60,
-                                    width: double.infinity,
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          flex: 2,
-                                          child: CommonText(
-                                              CommonStrings.manufacturer),
-                                        ),
-                                        Expanded(
-                                          flex: 3,
-                                          child: CommonToggleButton(
-                                            labels: const ["Yes", "No"],
-                                            selectedIndex: selectedManufacturer,
-                                            onChanged: (int value) {
-                                              setState(() {
-                                                selectedManufacturer = value;
-                                              });
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 16,
-                                  ),
-                                  SizedBox(
-                                    height: 60,
-                                    width: double.infinity,
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          flex: 2,
-                                          child:
-                                              CommonText(CommonStrings.trader),
-                                        ),
-                                        Expanded(
-                                          flex: 3,
-                                          child: CommonToggleButton(
-                                            labels: const ["Yes", "No"],
-                                            selectedIndex: selectedTrader,
-                                            onChanged: (int value) {
-                                              setState(() {
-                                                selectedTrader = value;
-                                              });
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 16,
-                                  ),
-                                  CommonButton(
-                                    onPressed: () {},
-                                    text: CommonStrings.submit,
-                                    textStyle: TextStyleConstants.medium(
-                                      context,
-                                      fontSize: 16,
-                                      color: AppColors.white,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 30,
-                                  ),
-                                ],
+                                ),
                               ),
                             ),
                           ),
-                        ))
-                      ]))));
+                          validator: (String? value) {
+                            // if (value == null || value.trim().isEmpty) {
+                            //   return "Email is required";
+                            // }
+                            // if (value.isEmailValid == false) {
+                            //   return "Enter a valid email";
+                            // }
+                            return null;
+                          },
+                        ),
+                        SizedBox(
+                          height: 16,
+                        ),
+                        CommonTextField(
+                          titleText: CommonStrings.eBrochure,
+                          hintText: CommonStrings.entereBrochure,
+                          textRequired: CommonStrings.entereBrochure,
+                          controller: TextEditingController(),
+                          textInputType: TextInputType.text,
+                          isEnable: true,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          prefixIcon: GestureDetector(
+                            onTap: () {},
+                            child: Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Container(
+                                padding: EdgeInsets.all(5),
+                                width: Responsive(context).screenWidth * 0.3,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Center(
+                                  child: CommonText(
+                                    "Choose File",
+                                    style: TextStyleConstants.semiBold(context,
+                                        fontSize: 14, color: AppColors.white),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          validator: (String? value) {
+                            // if (value == null || value.trim().isEmpty) {
+                            //   return "Email is required";
+                            // }
+                            // if (value.isEmailValid == false) {
+                            //   return "Enter a valid email";
+                            // }
+                            return null;
+                          },
+                        ),
+                        SizedBox(
+                          height: 16,
+                        ),
+                        CommonTextField(
+                          titleText: CommonStrings.annualTurnOver,
+                          hintText: CommonStrings.enterannualTurnOver,
+                          textRequired: CommonStrings.enterannualTurnOver,
+                          controller: TextEditingController(),
+                          textInputType: TextInputType.text,
+                          isEnable: true,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (String? value) {
+                            // if (value == null || value.trim().isEmpty) {
+                            //   return "Email is required";
+                            // }
+                            // if (value.isEmailValid == false) {
+                            //   return "Enter a valid email";
+                            // }
+                            return null;
+                          },
+                        ),
+                        SizedBox(
+                          height: 16,
+                        ),
+                        CommonTextField(
+                          titleText: CommonStrings.yearOfEstablishment,
+                          hintText: CommonStrings.enteryearOfEstablishment,
+                          textRequired: CommonStrings.enteryearOfEstablishment,
+                          controller: TextEditingController(),
+                          textInputType: TextInputType.text,
+                          isEnable: true,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (String? value) {
+                            // if (value == null || value.trim().isEmpty) {
+                            //   return "Email is required";
+                            // }
+                            // if (value.isEmailValid == false) {
+                            //   return "Enter a valid email";
+                            // }
+                            return null;
+                          },
+                        ),
+                        SizedBox(
+                          height: 16,
+                        ),
+                        CommonTextField(
+                          titleText: CommonStrings.certifications,
+                          hintText: CommonStrings.entercertifications,
+                          textRequired: CommonStrings.entercertifications,
+                          controller: TextEditingController(),
+                          textInputType: TextInputType.text,
+                          isEnable: true,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (String? value) {
+                            // if (value == null || value.trim().isEmpty) {
+                            //   return "Email is required";
+                            // }
+                            // if (value.isEmailValid == false) {
+                            //   return "Enter a valid email";
+                            // }
+                            return null;
+                          },
+                        ),
+                        SizedBox(
+                          height: 16,
+                        ),
+                        CommonTextField(
+                          titleText: CommonStrings.areaOfOperation,
+                          hintText: CommonStrings.enterareaOfOperation,
+                          textRequired: CommonStrings.enterareaOfOperation,
+                          controller: TextEditingController(),
+                          textInputType: TextInputType.text,
+                          isEnable: true,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (String? value) {
+                            // if (value == null || value.trim().isEmpty) {
+                            //   return "Email is required";
+                            // }
+                            // if (value.isEmailValid == false) {
+                            //   return "Enter a valid email";
+                            // }
+                            return null;
+                          },
+                        ),
+                        SizedBox(
+                          height: 16,
+                        ),
+                        SizedBox(
+                          height: 60,
+                          width: double.infinity,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 2,
+                                child: CommonText(CommonStrings.manufacturer),
+                              ),
+                              Expanded(
+                                flex: 3,
+                                child: CommonToggleButton(
+                                  labels: const ["Yes", "No"],
+                                  selectedIndex: selectedManufacturer,
+                                  onChanged: (int value) {
+                                    setState(() {
+                                      selectedManufacturer = value;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 16,
+                        ),
+                        SizedBox(
+                          height: 60,
+                          width: double.infinity,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 2,
+                                child: CommonText(CommonStrings.trader),
+                              ),
+                              Expanded(
+                                flex: 3,
+                                child: CommonToggleButton(
+                                  labels: const ["Yes", "No"],
+                                  selectedIndex: selectedTrader,
+                                  onChanged: (int value) {
+                                    setState(() {
+                                      selectedTrader = value;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 16,
+                        ),
+                        CommonButton(
+                          onPressed: () {},
+                          text: CommonStrings.submit,
+                          textStyle: TextStyleConstants.medium(
+                            context,
+                            fontSize: 16,
+                            color: AppColors.white,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 30,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ))
+            ],
+          );
         },
       ),
     );

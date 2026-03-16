@@ -41,11 +41,8 @@ class _BuyerDashboardCardState extends State<BuyerDashboardCard> {
         final double iconSize = compact ? 14 : (medium ? 18 : 20);
 
         final double titleSize = compact ? 14 : (medium ? 14 : 14);
-        final double subtitleSize = compact ? 10 : (medium ? 12 : 13);
 
         final double gapLarge = compact ? 8 : 14;
-        final double gapSmall = compact ? 4 : 6;
-        final double bottomGap = compact ? 6 : 12;
         final double scale = _pressed ? .96 : (_hover ? 1.02 : 1);
 
         Widget card = AnimatedContainer(

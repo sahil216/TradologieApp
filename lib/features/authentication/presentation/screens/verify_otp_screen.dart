@@ -10,13 +10,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pinput/pinput.dart';
 import 'package:tradologie_app/core/utils/analytics_services.dart';
-import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_appbar.dart';
-import 'package:tradologie_app/core/widgets/common_single_child_scroll_view.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
@@ -64,44 +62,11 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen>
   @override
   void initState() {
     super.initState();
-    _screenController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
 
-    _screenFade = CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    );
-
-    _screenScale = Tween<double>(
-      begin: 0.97,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _screenSlide = Tween<Offset>(
-      begin: const Offset(0, .04),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    Future.delayed(const Duration(milliseconds: 150), () {
-      if (mounted) _screenController.forward();
-    });
     initPlatformState();
     initPackageInfo();
     _startTimer();
   }
-
-  late AnimationController _screenController;
-  late Animation<double> _screenFade;
-  late Animation<double> _screenScale;
-  late Animation<Offset> _screenSlide;
 
   Future<void> initPackageInfo() async {
     final info = await PackageInfo.fromPlatform();
@@ -182,7 +147,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen>
   @override
   void dispose() {
     _timer?.cancel();
-    _screenController.dispose();
+
     super.dispose();
   }
 
@@ -259,232 +224,208 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen>
               ValueListenableBuilder(
                   valueListenable: showPassword,
                   builder: (context, value, child) {
-                    return FadeTransition(
-                      opacity: _screenFade,
-                      child: SlideTransition(
-                        position: _screenSlide,
-                        child: ScaleTransition(
-                          scale: _screenScale,
-                          child: CustomScrollView(
-                            keyboardDismissBehavior:
-                                ScrollViewKeyboardDismissBehavior.onDrag,
-                            physics: const BouncingScrollPhysics(
-                              parent: AlwaysScrollableScrollPhysics(),
-                            ),
-                            slivers: [
-                              CommonAppbar(
-                                title: CommonStrings.verifyOtp,
-                                showBackButton: true,
-                                showNotification: false,
-                              ),
-                              SliverToBoxAdapter(
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
+                    return CustomScrollView(
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      physics: const BouncingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics(),
+                      ),
+                      slivers: [
+                        CommonAppbar(
+                          title: CommonStrings.verifyOtp,
+                          showBackButton: true,
+                          showNotification: false,
+                        ),
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 20),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Form(
+                                  key: formKey,
                                   child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.stretch,
                                     children: [
-                                      Form(
-                                        key: formKey,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.stretch,
-                                          children: [
-                                            SizedBox(
-                                              height: 20,
-                                            ),
-                                            CommonText(
-                                              CommonStrings.enter6digitMobile,
-                                              textAlign: TextAlign.center,
-                                              style: TextStyleConstants.regular(
-                                                context,
-                                                fontSize: 14,
-                                                color: AppColors.defaultText,
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: 20,
-                                            ),
-                                            CommonText(
-                                              "+${widget.params.countryCode.countryCode} ${widget.params.mobileNo}",
-                                              textAlign: TextAlign.center,
-                                              style:
-                                                  TextStyleConstants.semiBold(
-                                                context,
-                                                fontSize: 16,
-                                                color: AppColors.defaultText,
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: 20,
-                                            ),
-                                            GestureDetector(
-                                              onTap: () {
-                                                Navigator.pop(context);
-                                              },
-                                              child: CommonText(
-                                                CommonStrings.changeNumber,
-                                                textAlign: TextAlign.center,
-                                                style:
-                                                    TextStyleConstants.regular(
-                                                  context,
-                                                  fontSize: 16,
-                                                  color: AppColors.orange,
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: 20,
-                                            ),
-                                            Center(
-                                              child: Pinput(
-                                                length: 6,
-                                                autofocus: true,
-                                                showCursor: true,
-                                                toolbarEnabled: false,
-                                                controller: textCodeController,
-                                                scrollPadding: EdgeInsets.zero,
-                                                keyboardType:
-                                                    TextInputType.number,
-                                                textInputAction:
-                                                    TextInputAction.send,
-                                                separatorBuilder: (index) {
-                                                  return SizedBox(
-                                                    width: 8,
-                                                  );
-                                                },
-                                                onCompleted: (value) {
-                                                  // BlocProvider.of<AuthenticationCubit>(context)
-                                                  //     .verify(
-                                                  //   SigninParams(
-                                                  //     username: '',
-                                                  //     password: '',
-                                                  //   ),
-                                                  // );
-                                                },
-                                                defaultPinTheme: PinTheme(
-                                                  height: 60,
-                                                  width: 60,
-                                                  textStyle: TextStyleConstants
-                                                      .semiBold(
-                                                    context,
-                                                    fontSize: 16,
-                                                    color: AppColors.black,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    color: AppColors.white,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                    border: Border.all(
-                                                      color: AppColors.border,
-                                                      width: 1,
-                                                    ),
-                                                  ),
-                                                ),
-                                                submittedPinTheme: PinTheme(
-                                                  height: 60,
-                                                  width: 60,
-                                                  textStyle:
-                                                      TextStyleConstants.medium(
-                                                    context,
-                                                    fontSize: 16,
-                                                    color: AppColors.black,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    color: AppColors.white,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                    border: Border.all(
-                                                      color: AppColors.border,
-                                                      width: 1,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: 20,
-                                            ),
-                                            TextButton(
-                                              onPressed: _canResend
-                                                  ? _onResendTap
-                                                  : null,
-                                              child: Text(
-                                                _canResend
-                                                    ? "Resend OTP"
-                                                    : "Resend Code in $_secondsLeft sec",
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: 20,
-                                            ),
-                                            CommonButton(
-                                              onPressed: () async {
-                                                late VerifyOtpParams params;
-                                                if (!formKey.currentState!
-                                                    .validate()) {
-                                                  return;
-                                                }
-
-                                                params = VerifyOtpParams(
-                                                  mobileNo:
-                                                      widget.params.mobileNo,
-                                                  otp: textCodeController.text,
-                                                  deviceId: deviceId,
-                                                  osType: Platform.isAndroid
-                                                      ? "Android"
-                                                      : "iOS",
-                                                  fcmToken:
-                                                      await secureStorageService
-                                                              .read(AppStrings
-                                                                  .fcmToken) ??
-                                                          "",
-                                                  manufacturer: manufacturer,
-                                                  model: model,
-                                                  osVersionRelease:
-                                                      osVersionRelease,
-                                                  appVersion: appVersion,
-                                                );
-                                                if (!context.mounted) return;
-
-                                                FocusManager
-                                                    .instance.primaryFocus
-                                                    ?.unfocus();
-                                                Constants.isBuyer == true
-                                                    ? BlocProvider.of<
-                                                                AuthenticationCubit>(
-                                                            context)
-                                                        .verifyOtpBuyer(params)
-                                                    : BlocProvider.of<
-                                                                AuthenticationCubit>(
-                                                            context)
-                                                        .verifyOtp(params);
-                                              },
-                                              text: CommonStrings
-                                                  .verifyAndContinue,
-                                              textStyle:
-                                                  TextStyleConstants.medium(
-                                                context,
-                                                fontSize: 16,
-                                                color: AppColors.white,
-                                              ),
-                                            ),
-                                            SizedBox(height: 20),
-                                          ],
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      CommonText(
+                                        CommonStrings.enter6digitMobile,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyleConstants.regular(
+                                          context,
+                                          fontSize: 14,
+                                          color: AppColors.defaultText,
                                         ),
                                       ),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      CommonText(
+                                        "+${widget.params.countryCode.countryCode} ${widget.params.mobileNo}",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyleConstants.semiBold(
+                                          context,
+                                          fontSize: 16,
+                                          color: AppColors.defaultText,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: CommonText(
+                                          CommonStrings.changeNumber,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyleConstants.regular(
+                                            context,
+                                            fontSize: 16,
+                                            color: AppColors.orange,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      Center(
+                                        child: Pinput(
+                                          length: 6,
+                                          autofocus: true,
+                                          showCursor: true,
+                                          toolbarEnabled: false,
+                                          controller: textCodeController,
+                                          scrollPadding: EdgeInsets.zero,
+                                          keyboardType: TextInputType.number,
+                                          textInputAction: TextInputAction.send,
+                                          separatorBuilder: (index) {
+                                            return SizedBox(
+                                              width: 8,
+                                            );
+                                          },
+                                          onCompleted: (value) {
+                                            // BlocProvider.of<AuthenticationCubit>(context)
+                                            //     .verify(
+                                            //   SigninParams(
+                                            //     username: '',
+                                            //     password: '',
+                                            //   ),
+                                            // );
+                                          },
+                                          defaultPinTheme: PinTheme(
+                                            height: 60,
+                                            width: 60,
+                                            textStyle:
+                                                TextStyleConstants.semiBold(
+                                              context,
+                                              fontSize: 16,
+                                              color: AppColors.black,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              border: Border.all(
+                                                color: AppColors.border,
+                                                width: 1,
+                                              ),
+                                            ),
+                                          ),
+                                          submittedPinTheme: PinTheme(
+                                            height: 60,
+                                            width: 60,
+                                            textStyle:
+                                                TextStyleConstants.medium(
+                                              context,
+                                              fontSize: 16,
+                                              color: AppColors.black,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              border: Border.all(
+                                                color: AppColors.border,
+                                                width: 1,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      TextButton(
+                                        onPressed:
+                                            _canResend ? _onResendTap : null,
+                                        child: Text(
+                                          _canResend
+                                              ? "Resend OTP"
+                                              : "Resend Code in $_secondsLeft sec",
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      CommonButton(
+                                        onPressed: () async {
+                                          late VerifyOtpParams params;
+                                          if (!formKey.currentState!
+                                              .validate()) {
+                                            return;
+                                          }
+
+                                          params = VerifyOtpParams(
+                                            mobileNo: widget.params.mobileNo,
+                                            otp: textCodeController.text,
+                                            deviceId: deviceId,
+                                            osType: Platform.isAndroid
+                                                ? "Android"
+                                                : "iOS",
+                                            fcmToken:
+                                                await secureStorageService.read(
+                                                        AppStrings.fcmToken) ??
+                                                    "",
+                                            manufacturer: manufacturer,
+                                            model: model,
+                                            osVersionRelease: osVersionRelease,
+                                            appVersion: appVersion,
+                                          );
+                                          if (!context.mounted) return;
+
+                                          FocusManager.instance.primaryFocus
+                                              ?.unfocus();
+                                          Constants.isBuyer == true
+                                              ? BlocProvider.of<
+                                                          AuthenticationCubit>(
+                                                      context)
+                                                  .verifyOtpBuyer(params)
+                                              : BlocProvider.of<
+                                                          AuthenticationCubit>(
+                                                      context)
+                                                  .verifyOtp(params);
+                                        },
+                                        text: CommonStrings.verifyAndContinue,
+                                        textStyle: TextStyleConstants.medium(
+                                          context,
+                                          fontSize: 16,
+                                          color: AppColors.white,
+                                        ),
+                                      ),
+                                      SizedBox(height: 20),
                                     ],
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     );
                   }),
             ],

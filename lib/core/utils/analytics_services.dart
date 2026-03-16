@@ -4,11 +4,8 @@ class AnalyticsService {
   AnalyticsService._();
 
   static final FirebaseAnalytics _analytics = FirebaseAnalytics.instance;
-  static bool _ready = false;
 
-  static Future<void> init() async {
-    _ready = true;
-  }
+  static Future<void> init() async {}
 
   static Future<void> logScreen(String screenName) async {
     await _analytics.logScreenView(
@@ -21,6 +18,5 @@ class AnalyticsService {
     Map<String, Object>? parameters,
   }) async {
     await _analytics.logEvent(name: name, parameters: parameters);
-    print("Analytics event fired: $name");
   }
 }

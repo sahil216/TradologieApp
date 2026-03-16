@@ -10,13 +10,11 @@ import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
-import 'package:tradologie_app/features/chat/presentation/screens/chat_list_screen.dart';
+import 'package:tradologie_app/features/fmcg/presentation/screens/chat_list_screen.dart';
 import 'package:tradologie_app/features/contact_us/coming_soon_screen.dart';
-import 'package:tradologie_app/features/contact_us/contact_us.dart';
 import 'package:tradologie_app/features/contact_us/more_options_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_dashboard_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/dashboard_screen.dart';
-import 'package:tradologie_app/features/my_account/presentation/screens/buyer_my_account_screen.dart';
 import 'package:tradologie_app/features/my_account/presentation/screens/my_account_screen.dart';
 import 'package:tradologie_app/features/negotiation/presentation/screens/buyer_negotiation_screen.dart';
 import 'package:tradologie_app/features/negotiation/presentation/screens/negotiation_screen.dart';

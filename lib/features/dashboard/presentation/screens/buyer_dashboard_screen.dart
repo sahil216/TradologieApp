@@ -37,11 +37,6 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen>
   double pointerX = 0;
   double pointerY = 0;
 
-  late AnimationController _screenController;
-  late Animation<double> _screenFade;
-  late Animation<double> _screenScale;
-  late Animation<Offset> _screenSlide;
-
   Future<void> getCommodityData() async {
     await dashboardCubit.getCommodityList(NoParams());
   }
@@ -50,41 +45,10 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen>
   @override
   void initState() {
     super.initState();
-
-    _screenController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-
-    _screenFade = CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    );
-
-    _screenScale = Tween<double>(
-      begin: 0.97,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _screenSlide = Tween<Offset>(
-      begin: const Offset(0, .04),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    Future.delayed(const Duration(milliseconds: 150), () {
-      if (mounted) _screenController.forward();
-    });
   }
 
   @override
   void dispose() {
-    _screenController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -130,142 +94,128 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen>
                       });
                       return false;
                     },
-                    child: FadeTransition(
-                      opacity: _screenFade,
-                      child: SlideTransition(
-                        position: _screenSlide,
-                        child: ScaleTransition(
-                          scale: _screenScale,
-                          child: CustomScrollView(
-                            controller: _scroll,
-                            physics: const BouncingScrollPhysics(),
-                            slivers: [
-                              CommonAppbar(
-                                title: "Dashboard",
-                                showBackButton: false,
-                                showNotification: true,
+                    child: CustomScrollView(
+                      controller: _scroll,
+                      physics: const BouncingScrollPhysics(),
+                      slivers: [
+                        CommonAppbar(
+                          title: "Dashboard",
+                          showBackButton: false,
+                          showNotification: true,
+                        ),
+                        const SliverToBoxAdapter(
+                          child: BuyerDashboardBannerEngine(
+                            banners: [
+                              AppBanner(
+                                image:
+                                    "https://www.tradologie.com/DOCS/mobileapp/buyerdashboard-1.webp",
+                                title:
+                                    "Source Bulk FMCG & Agro Globally — Smarter. Faster. Verified",
+                                subtitle: "",
                               ),
-                              const SliverToBoxAdapter(
-                                child: BuyerDashboardBannerEngine(
-                                  banners: [
-                                    AppBanner(
-                                      image:
-                                          "https://www.tradologie.com/DOCS/mobileapp/buyerdashboard-1.webp",
-                                      title:
-                                          "Source Bulk FMCG & Agro Globally — Smarter. Faster. Verified",
-                                      subtitle: "",
-                                    ),
-                                    AppBanner(
-                                      image:
-                                          "https://www.tradologie.com/DOCS/mobileapp/buyerdashboard-2.webp",
-                                      title:
-                                          "Access 1M+ Verified Global Suppliers in One Place",
-                                      subtitle: "",
-                                    ),
-                                    AppBanner(
-                                      image:
-                                          "https://www.tradologie.com/DOCS/mobileapp/buyerdashboard-3.webp",
-                                      title:
-                                          "Post Your Requirement. Get Qualified Quotes. Close Faster.",
-                                      subtitle: "",
-                                    ),
-                                  ],
-                                ),
+                              AppBanner(
+                                image:
+                                    "https://www.tradologie.com/DOCS/mobileapp/buyerdashboard-2.webp",
+                                title:
+                                    "Access 1M+ Verified Global Suppliers in One Place",
+                                subtitle: "",
                               ),
-                              const SliverToBoxAdapter(
-                                  child: SizedBox(height: 16)),
-                              SliverPadding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 16),
-                                sliver: SliverToBoxAdapter(
-                                  child: Row(children: [
-                                    Expanded(
-                                      child: BuyerDashboardCard(
-                                        color: Colors.blue,
-                                        icon: Icons.description,
-                                        title: "Post Your Requirement",
-                                        subtitle:
-                                            "Submit requirement and receive quotes from verified suppliers.",
-                                        onTap: () {
-                                          sl<NavigationService>().pushNamed(
-                                              Routes.buyerPostRequirementRoute);
-                                        },
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: BuyerDashboardCard(
-                                        color: Colors.deepOrange,
-                                        icon: Icons.inventory_2,
-                                        title: "Ready To Buy\n",
-                                        subtitle:
-                                            "View seller ready stock and send enquiries directly to them",
-                                        onTap: () {
-                                          sl<NavigationService>().pushNamed(
-                                              Routes.buyerSellStockListing);
-                                        },
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: BuyerDashboardCard(
-                                        color: Colors.lightGreen,
-                                        icon: Icons.add,
-                                        title: "Create Negotiation",
-                                        subtitle:
-                                            "Start a live negotiation with verified suppliers and finalize best price.",
-                                        onTap: () {
-                                          sl<NavigationService>().pushNamed(
-                                              Routes.supplierListScreen);
-                                        },
-                                      ),
-                                    ),
-                                  ]),
-                                ),
+                              AppBanner(
+                                image:
+                                    "https://www.tradologie.com/DOCS/mobileapp/buyerdashboard-3.webp",
+                                title:
+                                    "Post Your Requirement. Get Qualified Quotes. Close Faster.",
+                                subtitle: "",
                               ),
-                              const SliverToBoxAdapter(
-                                  child: SizedBox(height: 16)),
-                              SliverToBoxAdapter(
-                                child: BuyerDashboardBannerEngine(
-                                  onTap: (banner, index) {
-                                    Constants.isAndroid14OrBelow &&
-                                            Platform.isAndroid
-                                        ? Navigator.pushNamed(
-                                            context, Routes.inAppWebViewRoute,
-                                            arguments: WebviewParams(
-                                                url:
-                                                    "https://www.tradologie.com/fmcg-view",
-                                                canPop: true,
-                                                isAppBar: true,
-                                                isShowDrawer: false,
-                                                isShowNotification: false))
-                                        : Navigator.pushNamed(
-                                            context, Routes.webViewRoute,
-                                            arguments: WebviewParams(
-                                                url:
-                                                    "https://www.tradologie.com/fmcg-view",
-                                                canPop: true,
-                                                isAppBar: true,
-                                                isShowDrawer: false,
-                                                isShowNotification: false));
-                                  },
-                                  banners: [
-                                    AppBanner(
-                                      image:
-                                          "https://www.tradologie.com/DOCS/mobileapp/fmcg-banner.webp",
-                                      title:
-                                          "Source FMCG Products in Bulk from Verified Global Suppliers",
-                                      subtitle: "",
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SliverToBoxAdapter(
-                                  child: SizedBox(height: 110)),
                             ],
                           ),
                         ),
-                      ),
+                        const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                        SliverPadding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          sliver: SliverToBoxAdapter(
+                            child: Row(children: [
+                              Expanded(
+                                child: BuyerDashboardCard(
+                                  color: Colors.blue,
+                                  icon: Icons.description,
+                                  title: "Post Your Requirement",
+                                  subtitle:
+                                      "Submit requirement and receive quotes from verified suppliers.",
+                                  onTap: () {
+                                    sl<NavigationService>().pushNamed(
+                                        Routes.buyerPostRequirementRoute);
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: BuyerDashboardCard(
+                                  color: Colors.deepOrange,
+                                  icon: Icons.inventory_2,
+                                  title: "Ready To Buy\n",
+                                  subtitle:
+                                      "View seller ready stock and send enquiries directly to them",
+                                  onTap: () {
+                                    sl<NavigationService>().pushNamed(
+                                        Routes.buyerSellStockListing);
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: BuyerDashboardCard(
+                                  color: Colors.lightGreen,
+                                  icon: Icons.add,
+                                  title: "Create Negotiation",
+                                  subtitle:
+                                      "Start a live negotiation with verified suppliers and finalize best price.",
+                                  onTap: () {
+                                    sl<NavigationService>()
+                                        .pushNamed(Routes.supplierListScreen);
+                                  },
+                                ),
+                              ),
+                            ]),
+                          ),
+                        ),
+                        const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                        SliverToBoxAdapter(
+                          child: BuyerDashboardBannerEngine(
+                            onTap: (banner, index) {
+                              Constants.isAndroid14OrBelow && Platform.isAndroid
+                                  ? Navigator.pushNamed(
+                                      context, Routes.inAppWebViewRoute,
+                                      arguments: WebviewParams(
+                                          url:
+                                              "https://www.tradologie.com/fmcg-view",
+                                          canPop: true,
+                                          isAppBar: true,
+                                          isShowDrawer: false,
+                                          isShowNotification: false))
+                                  : Navigator.pushNamed(
+                                      context, Routes.webViewRoute,
+                                      arguments: WebviewParams(
+                                          url:
+                                              "https://www.tradologie.com/fmcg-view",
+                                          canPop: true,
+                                          isAppBar: true,
+                                          isShowDrawer: false,
+                                          isShowNotification: false));
+                            },
+                            banners: [
+                              AppBanner(
+                                image:
+                                    "https://www.tradologie.com/DOCS/mobileapp/fmcg-banner.webp",
+                                title:
+                                    "Source FMCG Products in Bulk from Verified Global Suppliers",
+                                subtitle: "",
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SliverToBoxAdapter(child: SizedBox(height: 110)),
+                      ],
                     ),
                   ),
                 ),

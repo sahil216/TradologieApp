@@ -1,12 +1,10 @@
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
-import 'package:tradologie_app/features/authentication/domain/entities/fmcg_country_code_list.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/delete_account_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_register_distributor_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_register_seller_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_signin_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/verify_otp_usecase.dart';
-import 'package:tradologie_app/features/authentication/presentation/screens/fmcg_register_seller_form.dart';
 
 import '../../../../core/api/api_consumer.dart';
 import '../../../../core/api/end_points.dart';

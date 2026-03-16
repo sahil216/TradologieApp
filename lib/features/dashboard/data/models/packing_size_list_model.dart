@@ -1,7 +1,7 @@
 import 'package:tradologie_app/features/dashboard/domain/entities/packing_size_list.dart';
 
 class PackingSizeListModel extends PackingSizeList {
-  PackingSizeListModel({
+  const PackingSizeListModel({
     super.packingSizeId,
     super.packingSizeValue,
   });

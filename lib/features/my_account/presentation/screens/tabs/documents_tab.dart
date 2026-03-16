@@ -31,50 +31,11 @@ class _DocumentsTabState extends State<DocumentsTab>
   MyAccountCubit get cubit => BlocProvider.of<MyAccountCubit>(context);
 
   void getDocuments() {}
-  late AnimationController _screenController;
-  late Animation<double> _screenFade;
-  late Animation<double> _screenScale;
-  late Animation<Offset> _screenSlide;
 
   @override
   void initState() {
     super.initState();
     getDocuments();
-    _screenController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-
-    _screenFade = CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    );
-
-    _screenScale = Tween<double>(
-      begin: 0.97,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _screenSlide = Tween<Offset>(
-      begin: const Offset(0, .04),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    Future.delayed(const Duration(milliseconds: 150), () {
-      if (mounted) _screenController.forward();
-    });
-  }
-
-  @override
-  void dispose() {
-    _screenController.dispose();
-    super.dispose();
   }
 
   final List<DocumentItem> documents = [
@@ -129,30 +90,23 @@ class _DocumentsTabState extends State<DocumentsTab>
             }
             return const CommonLoader();
           }
-          return FadeTransition(
-              opacity: _screenFade,
-              child: SlideTransition(
-                  position: _screenSlide,
-                  child: ScaleTransition(
-                      scale: _screenScale,
-                      child: CustomScrollView(
-                        slivers: [
-                          SliverSafeArea(
-                            sliver: SliverPadding(
-                              padding: const EdgeInsets.all(12),
-                              sliver: SliverList(
-                                delegate: SliverChildBuilderDelegate(
-                                  (context, index) {
-                                    return _documentCard(
-                                        documents[index], index);
-                                  },
-                                  childCount: documents.length,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ))));
+          return CustomScrollView(
+            slivers: [
+              SliverSafeArea(
+                sliver: SliverPadding(
+                  padding: const EdgeInsets.all(12),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        return _documentCard(documents[index], index);
+                      },
+                      childCount: documents.length,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
         },
       ),
     );

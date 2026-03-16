@@ -7,7 +7,6 @@ import 'package:tradologie_app/features/my_account/presentation/cubit/my_account
 import '../../../../../core/error/network_failure.dart';
 import '../../../../../core/error/user_failure.dart';
 import '../../../../../core/widgets/common_loader.dart';
-import '../../../../../core/widgets/common_single_child_scroll_view.dart';
 import '../../../../../core/widgets/custom_error_network_widget.dart';
 import '../../../../../core/widgets/custom_error_widget.dart';
 import '../../../../../core/widgets/custom_text_field.dart';
@@ -29,50 +28,11 @@ class _CompanyDetailTabState extends State<CompanyDetailTab>
   DateTime? selectedDate;
 
   void getCompanyDetail() {}
-  late AnimationController _screenController;
-  late Animation<double> _screenFade;
-  late Animation<double> _screenScale;
-  late Animation<Offset> _screenSlide;
 
   @override
   void initState() {
     super.initState();
     getCompanyDetail();
-    _screenController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-
-    _screenFade = CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    );
-
-    _screenScale = Tween<double>(
-      begin: 0.97,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _screenSlide = Tween<Offset>(
-      begin: const Offset(0, .04),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    Future.delayed(const Duration(milliseconds: 150), () {
-      if (mounted) _screenController.forward();
-    });
-  }
-
-  @override
-  void dispose() {
-    _screenController.dispose();
-    super.dispose();
   }
 
   @override
@@ -120,308 +80,287 @@ class _CompanyDetailTabState extends State<CompanyDetailTab>
             }
             return const CommonLoader();
           }
-          return FadeTransition(
-              opacity: _screenFade,
-              child: SlideTransition(
-                  position: _screenSlide,
-                  child: ScaleTransition(
-                      scale: _screenScale,
-                      child: CustomScrollView(slivers: [
-                        SliverSafeArea(
-                          sliver: SliverToBoxAdapter(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16.0, vertical: 12.0),
-                              child: Column(
-                                children: [
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                  CommonTextField(
-                                      titleText: CommonStrings.vendorShortName,
-                                      hintText:
-                                          CommonStrings.entervendorShortName,
-                                      textRequired:
-                                          CommonStrings.entervendorShortName,
-                                      controller: TextEditingController(),
-                                      textInputType: TextInputType.name,
-                                      isEnable: true,
-                                      autovalidateMode:
-                                          AutovalidateMode.onUserInteraction,
-                                      validator: (String? value) {
-                                        if (value == null ||
-                                            value.trim().isEmpty) {
-                                          return "Full name is required";
-                                        }
+          return CustomScrollView(slivers: [
+            SliverSafeArea(
+              sliver: SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 12.0),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 20,
+                      ),
+                      CommonTextField(
+                          titleText: CommonStrings.vendorShortName,
+                          hintText: CommonStrings.entervendorShortName,
+                          textRequired: CommonStrings.entervendorShortName,
+                          controller: TextEditingController(),
+                          textInputType: TextInputType.name,
+                          isEnable: true,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (String? value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return "Full name is required";
+                            }
 
-                                        return null;
-                                      }),
-                                  SizedBox(
-                                    height: 16,
-                                  ),
-                                  CommonTextField(
-                                    titleText: CommonStrings.companyName,
-                                    hintText: CommonStrings.entercompanyName,
-                                    textRequired:
-                                        CommonStrings.entercompanyName,
-                                    controller: TextEditingController(),
-                                    textInputType: TextInputType.text,
-                                    isEnable: true,
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    validator: (String? value) {
-                                      // if (value == null || value.trim().isEmpty) {
-                                      //   return "Email is required";
-                                      // }
-                                      // if (value.isEmailValid == false) {
-                                      //   return "Enter a valid email";
-                                      // }
-                                      return null;
-                                    },
-                                  ),
-                                  SizedBox(
-                                    height: 16,
-                                  ),
-                                  // CommonBottomSheetSearchDropdown<String>(
-                                  //   label: CommonStrings.companyType,
-                                  //   hint: CommonStrings.selectcompanyType,
-                                  //   selectedItem: selectedCountry,
-                                  //   itemAsString: (item) => item,
-                                  //   onSearch: (value) async {
-                                  //     return [];
-                                  //   },
-                                  //   onChanged: (value) {
-                                  //     // selectedCountry = value;
-                                  //   },
-                                  //   validator: (value) {
-                                  //     // if (value == null) {
-                                  //     //   return "Country is required";
-                                  //     // }
-                                  //     return null;
-                                  //   },
-                                  // ),
-                                  // SizedBox(
-                                  //   height: 16,
-                                  // ),
-                                  CommonTextField(
-                                    titleText: CommonStrings.companyGstNumber,
-                                    hintText:
-                                        CommonStrings.entercompanyGstNumber,
-                                    textRequired:
-                                        CommonStrings.entercompanyGstNumber,
-                                    controller: TextEditingController(),
-                                    textInputType: TextInputType.text,
-                                    isEnable: true,
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    validator: (String? value) {
-                                      // if (value == null || value.trim().isEmpty) {
-                                      //   return "Email is required";
-                                      // }
-                                      // if (value.isEmailValid == false) {
-                                      //   return "Enter a valid email";
-                                      // }
-                                      return null;
-                                    },
-                                  ),
-                                  SizedBox(height: 16),
-                                  CommonTextField(
-                                    titleText: CommonStrings.companyPanNumber,
-                                    hintText:
-                                        CommonStrings.entercompanyPanNumber,
-                                    textRequired:
-                                        CommonStrings.entercompanyPanNumber,
-                                    controller: TextEditingController(),
-                                    textInputType: TextInputType.text,
-                                    isEnable: true,
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    validator: (String? value) {
-                                      // if (value == null || value.trim().isEmpty) {
-                                      //   return "Email is required";
-                                      // }
-                                      // if (value.isEmailValid == false) {
-                                      //   return "Enter a valid email";
-                                      // }
-                                      return null;
-                                    },
-                                  ),
-                                  SizedBox(height: 16),
-                                  // CommonCupertinoDatePicker(
-                                  //   mode: CupertinoDatePickerMode.date,
-                                  //   label: CommonStrings.inCorporationDate,
-                                  //   hint: CommonStrings.selectinCorporationDate,
-                                  //   selectedDate: selectedDate,
-                                  //   minimumDate: DateTime(1900),
-                                  //   maximumDate: DateTime.now(),
-                                  //   onDateSelected: (date) {
-                                  //     selectedDate = date;
-                                  //     setState(() {});
-                                  //   },
-                                  //   validator: (date) {
-                                  //     if (date == null) {
-                                  //       return "Date of birth is required";
-                                  //     }
-                                  //     return null;
-                                  //   },
-                                  //   dateFormat: DateFormat('dd-MMM-yyyy'),
-                                  // ),
-                                  SizedBox(height: 16),
-                                  // CommonBottomSheetSearchDropdown<String>(
-                                  //   label: CommonStrings.timeZone,
-                                  //   hint: CommonStrings.selecttimeZone,
-                                  //   selectedItem: selectedCountry,
-                                  //   itemAsString: (item) => item,
-                                  //   onSearch: (value) async {
-                                  //     return [];
-                                  //   },
-                                  //   onChanged: (value) {
-                                  //     // selectedCountry = value;
-                                  //   },
-                                  //   validator: (value) {
-                                  //     // if (value == null) {
-                                  //     //   return "Country is required";
-                                  //     // }
-                                  //     return null;
-                                  //   },
-                                  // ),
-                                  // SizedBox(
-                                  //   height: 16,
-                                  // ),
-                                  // CommonBottomSheetSearchDropdown<String>(
-                                  //   label: CommonStrings.country,
-                                  //   hint: CommonStrings.selectcountry,
-                                  //   selectedItem: selectedCountry,
-                                  //   itemAsString: (item) => item,
-                                  //   onSearch: (value) async {
-                                  //     return [];
-                                  //   },
-                                  //   onChanged: (value) {
-                                  //     // selectedCountry = value;
-                                  //   },
-                                  //   validator: (value) {
-                                  //     // if (value == null) {
-                                  //     //   return "Country is required";
-                                  //     // }
-                                  //     return null;
-                                  //   },
-                                  // ),
-                                  // SizedBox(
-                                  //   height: 16,
-                                  // ),
-                                  // CommonBottomSheetSearchDropdown<String>(
-                                  //   label: CommonStrings.stateProvince,
-                                  //   hint: CommonStrings.selectstateProvince,
-                                  //   selectedItem: selectedCountry,
-                                  //   itemAsString: (item) => item,
-                                  //   onSearch: (value) async {
-                                  //     return [];
-                                  //   },
-                                  //   onChanged: (value) {
-                                  //     // selectedCountry = value;
-                                  //   },
-                                  //   validator: (value) {
-                                  //     // if (value == null) {
-                                  //     //   return "Country is required";
-                                  //     // }
-                                  //     return null;
-                                  //   },
-                                  // ),
-                                  // SizedBox(
-                                  //   height: 16,
-                                  // ),
-                                  // CommonBottomSheetSearchDropdown<String>(
-                                  //   label: CommonStrings.city,
-                                  //   hint: CommonStrings.selectcity,
-                                  //   selectedItem: selectedCountry,
-                                  //   itemAsString: (item) => item,
-                                  //   onSearch: (value) async {
-                                  //     return [];
-                                  //   },
-                                  //   onChanged: (value) {
-                                  //     // selectedCountry = value;
-                                  //   },
-                                  //   validator: (value) {
-                                  //     // if (value == null) {
-                                  //     //   return "Country is required";
-                                  //     // }
-                                  //     return null;
-                                  //   },
-                                  // ),
-                                  // SizedBox(
-                                  //   height: 16,
-                                  // ),
-                                  // CommonBottomSheetSearchDropdown<String>(
-                                  //   label: CommonStrings.area,
-                                  //   hint: CommonStrings.selectarea,
-                                  //   selectedItem: selectedCountry,
-                                  //   itemAsString: (item) => item,
-                                  //   onSearch: (value) async {
-                                  //     return [];
-                                  //   },
-                                  //   onChanged: (value) {
-                                  //     // selectedCountry = value;
-                                  //   },
-                                  //   validator: (value) {
-                                  //     // if (value == null) {
-                                  //     //   return "Country is required";
-                                  //     // }
-                                  //     return null;
-                                  //   },
-                                  // ),
-                                  SizedBox(
-                                    height: 16,
-                                  ),
-                                  SizedBox(height: 16),
-                                  CommonTextField(
-                                    titleText: CommonStrings.address,
-                                    hintText: CommonStrings.enteraddress,
-                                    textRequired: CommonStrings.enteraddress,
-                                    controller: TextEditingController(),
-                                    textInputType: TextInputType.text,
-                                    maxLines: 5,
-                                    height: 100,
-                                    isEnable: true,
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    validator: (String? value) {
-                                      // if (value == null || value.trim().isEmpty) {
-                                      //   return "Email is required";
-                                      // }
-                                      // if (value.isEmailValid == false) {
-                                      //   return "Enter a valid email";
-                                      // }
-                                      return null;
-                                    },
-                                  ),
-                                  SizedBox(height: 16),
-                                  CommonTextField(
-                                    titleText: CommonStrings.zipPostalCode,
-                                    hintText: CommonStrings.enterzipPostalCode,
-                                    textRequired:
-                                        CommonStrings.enterzipPostalCode,
-                                    controller: TextEditingController(),
-                                    textInputType: TextInputType.text,
-                                    isEnable: true,
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    validator: (String? value) {
-                                      // if (value == null || value.trim().isEmpty) {
-                                      //   return "Email is required";
-                                      // }
-                                      // if (value.isEmailValid == false) {
-                                      //   return "Enter a valid email";
-                                      // }
-                                      return null;
-                                    },
-                                  ),
-                                  SizedBox(height: 16),
-                                ],
-                              ),
-                            ),
-                          ),
-                        )
-                      ]))));
+                            return null;
+                          }),
+                      SizedBox(
+                        height: 16,
+                      ),
+                      CommonTextField(
+                        titleText: CommonStrings.companyName,
+                        hintText: CommonStrings.entercompanyName,
+                        textRequired: CommonStrings.entercompanyName,
+                        controller: TextEditingController(),
+                        textInputType: TextInputType.text,
+                        isEnable: true,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (String? value) {
+                          // if (value == null || value.trim().isEmpty) {
+                          //   return "Email is required";
+                          // }
+                          // if (value.isEmailValid == false) {
+                          //   return "Enter a valid email";
+                          // }
+                          return null;
+                        },
+                      ),
+                      SizedBox(
+                        height: 16,
+                      ),
+                      // CommonBottomSheetSearchDropdown<String>(
+                      //   label: CommonStrings.companyType,
+                      //   hint: CommonStrings.selectcompanyType,
+                      //   selectedItem: selectedCountry,
+                      //   itemAsString: (item) => item,
+                      //   onSearch: (value) async {
+                      //     return [];
+                      //   },
+                      //   onChanged: (value) {
+                      //     // selectedCountry = value;
+                      //   },
+                      //   validator: (value) {
+                      //     // if (value == null) {
+                      //     //   return "Country is required";
+                      //     // }
+                      //     return null;
+                      //   },
+                      // ),
+                      // SizedBox(
+                      //   height: 16,
+                      // ),
+                      CommonTextField(
+                        titleText: CommonStrings.companyGstNumber,
+                        hintText: CommonStrings.entercompanyGstNumber,
+                        textRequired: CommonStrings.entercompanyGstNumber,
+                        controller: TextEditingController(),
+                        textInputType: TextInputType.text,
+                        isEnable: true,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (String? value) {
+                          // if (value == null || value.trim().isEmpty) {
+                          //   return "Email is required";
+                          // }
+                          // if (value.isEmailValid == false) {
+                          //   return "Enter a valid email";
+                          // }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 16),
+                      CommonTextField(
+                        titleText: CommonStrings.companyPanNumber,
+                        hintText: CommonStrings.entercompanyPanNumber,
+                        textRequired: CommonStrings.entercompanyPanNumber,
+                        controller: TextEditingController(),
+                        textInputType: TextInputType.text,
+                        isEnable: true,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (String? value) {
+                          // if (value == null || value.trim().isEmpty) {
+                          //   return "Email is required";
+                          // }
+                          // if (value.isEmailValid == false) {
+                          //   return "Enter a valid email";
+                          // }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 16),
+                      // CommonCupertinoDatePicker(
+                      //   mode: CupertinoDatePickerMode.date,
+                      //   label: CommonStrings.inCorporationDate,
+                      //   hint: CommonStrings.selectinCorporationDate,
+                      //   selectedDate: selectedDate,
+                      //   minimumDate: DateTime(1900),
+                      //   maximumDate: DateTime.now(),
+                      //   onDateSelected: (date) {
+                      //     selectedDate = date;
+                      //     setState(() {});
+                      //   },
+                      //   validator: (date) {
+                      //     if (date == null) {
+                      //       return "Date of birth is required";
+                      //     }
+                      //     return null;
+                      //   },
+                      //   dateFormat: DateFormat('dd-MMM-yyyy'),
+                      // ),
+                      SizedBox(height: 16),
+                      // CommonBottomSheetSearchDropdown<String>(
+                      //   label: CommonStrings.timeZone,
+                      //   hint: CommonStrings.selecttimeZone,
+                      //   selectedItem: selectedCountry,
+                      //   itemAsString: (item) => item,
+                      //   onSearch: (value) async {
+                      //     return [];
+                      //   },
+                      //   onChanged: (value) {
+                      //     // selectedCountry = value;
+                      //   },
+                      //   validator: (value) {
+                      //     // if (value == null) {
+                      //     //   return "Country is required";
+                      //     // }
+                      //     return null;
+                      //   },
+                      // ),
+                      // SizedBox(
+                      //   height: 16,
+                      // ),
+                      // CommonBottomSheetSearchDropdown<String>(
+                      //   label: CommonStrings.country,
+                      //   hint: CommonStrings.selectcountry,
+                      //   selectedItem: selectedCountry,
+                      //   itemAsString: (item) => item,
+                      //   onSearch: (value) async {
+                      //     return [];
+                      //   },
+                      //   onChanged: (value) {
+                      //     // selectedCountry = value;
+                      //   },
+                      //   validator: (value) {
+                      //     // if (value == null) {
+                      //     //   return "Country is required";
+                      //     // }
+                      //     return null;
+                      //   },
+                      // ),
+                      // SizedBox(
+                      //   height: 16,
+                      // ),
+                      // CommonBottomSheetSearchDropdown<String>(
+                      //   label: CommonStrings.stateProvince,
+                      //   hint: CommonStrings.selectstateProvince,
+                      //   selectedItem: selectedCountry,
+                      //   itemAsString: (item) => item,
+                      //   onSearch: (value) async {
+                      //     return [];
+                      //   },
+                      //   onChanged: (value) {
+                      //     // selectedCountry = value;
+                      //   },
+                      //   validator: (value) {
+                      //     // if (value == null) {
+                      //     //   return "Country is required";
+                      //     // }
+                      //     return null;
+                      //   },
+                      // ),
+                      // SizedBox(
+                      //   height: 16,
+                      // ),
+                      // CommonBottomSheetSearchDropdown<String>(
+                      //   label: CommonStrings.city,
+                      //   hint: CommonStrings.selectcity,
+                      //   selectedItem: selectedCountry,
+                      //   itemAsString: (item) => item,
+                      //   onSearch: (value) async {
+                      //     return [];
+                      //   },
+                      //   onChanged: (value) {
+                      //     // selectedCountry = value;
+                      //   },
+                      //   validator: (value) {
+                      //     // if (value == null) {
+                      //     //   return "Country is required";
+                      //     // }
+                      //     return null;
+                      //   },
+                      // ),
+                      // SizedBox(
+                      //   height: 16,
+                      // ),
+                      // CommonBottomSheetSearchDropdown<String>(
+                      //   label: CommonStrings.area,
+                      //   hint: CommonStrings.selectarea,
+                      //   selectedItem: selectedCountry,
+                      //   itemAsString: (item) => item,
+                      //   onSearch: (value) async {
+                      //     return [];
+                      //   },
+                      //   onChanged: (value) {
+                      //     // selectedCountry = value;
+                      //   },
+                      //   validator: (value) {
+                      //     // if (value == null) {
+                      //     //   return "Country is required";
+                      //     // }
+                      //     return null;
+                      //   },
+                      // ),
+                      SizedBox(
+                        height: 16,
+                      ),
+                      SizedBox(height: 16),
+                      CommonTextField(
+                        titleText: CommonStrings.address,
+                        hintText: CommonStrings.enteraddress,
+                        textRequired: CommonStrings.enteraddress,
+                        controller: TextEditingController(),
+                        textInputType: TextInputType.text,
+                        maxLines: 5,
+                        height: 100,
+                        isEnable: true,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (String? value) {
+                          // if (value == null || value.trim().isEmpty) {
+                          //   return "Email is required";
+                          // }
+                          // if (value.isEmailValid == false) {
+                          //   return "Enter a valid email";
+                          // }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 16),
+                      CommonTextField(
+                        titleText: CommonStrings.zipPostalCode,
+                        hintText: CommonStrings.enterzipPostalCode,
+                        textRequired: CommonStrings.enterzipPostalCode,
+                        controller: TextEditingController(),
+                        textInputType: TextInputType.text,
+                        isEnable: true,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (String? value) {
+                          // if (value == null || value.trim().isEmpty) {
+                          //   return "Email is required";
+                          // }
+                          // if (value.isEmailValid == false) {
+                          //   return "Enter a valid email";
+                          // }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 16),
+                    ],
+                  ),
+                ),
+              ),
+            )
+          ]);
         },
       ),
     );

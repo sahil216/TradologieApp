@@ -28,50 +28,9 @@ class _EditAccountScreenState extends State<EditAccountScreen>
     }
   }
 
-  late AnimationController _screenController;
-  late Animation<double> _screenFade;
-  late Animation<double> _screenScale;
-  late Animation<Offset> _screenSlide;
   @override
   void initState() {
     super.initState();
-
-    _screenController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-
-    _screenFade = CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    );
-
-    _screenScale = Tween<double>(
-      begin: 0.97,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _screenSlide = Tween<Offset>(
-      begin: const Offset(0, .04),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    Future.delayed(const Duration(milliseconds: 150), () {
-      if (mounted) _screenController.forward();
-    });
-  }
-
-  @override
-  void dispose() {
-    _screenController.dispose();
-
-    super.dispose();
   }
 
   void _showImageSourceSheet() {
@@ -114,108 +73,99 @@ class _EditAccountScreenState extends State<EditAccountScreen>
   @override
   Widget build(BuildContext context) {
     return AdaptiveScaffold(
-        body: FadeTransition(
-            opacity: _screenFade,
-            child: SlideTransition(
-                position: _screenSlide,
-                child: ScaleTransition(
-                  scale: _screenScale,
-                  child: CustomScrollView(
-                    slivers: [
-                      CommonAppbar(title: "Edit Profile", showBackButton: true),
+      body: CustomScrollView(
+        slivers: [
+          CommonAppbar(title: "Edit Profile", showBackButton: true),
 
-                      /// ---------------- PROFILE IMAGE ----------------
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 30, bottom: 20),
-                          child: Center(
-                            child: GestureDetector(
-                              onTap: _showImageSourceSheet,
-                              child: Stack(
-                                alignment: Alignment.bottomRight,
-                                children: [
-                                  Container(
-                                    height: 150,
-                                    width: 150,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.white,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(.08),
-                                          blurRadius: 15,
-                                          offset: const Offset(0, 6),
-                                        )
-                                      ],
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: _selectedImage != null
-                                          ? Image.file(
-                                              _selectedImage!,
-                                              fit: BoxFit.cover,
-                                            )
-                                          : Image.network(
-                                              "https://images.unsplash.com/photo-1607746882042-944635dfe10e",
-                                              fit: BoxFit.cover,
-                                            ),
-                                    ),
-                                  ),
-
-                                  /// Camera Overlay Button
-                                  Container(
-                                    height: 40,
-                                    width: 40,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF2E7CF6),
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                          color: Colors.white, width: 3),
-                                    ),
-                                    child: const Icon(
-                                      Icons.camera_alt,
-                                      color: Colors.white,
-                                      size: 20,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+          /// ---------------- PROFILE IMAGE ----------------
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 30, bottom: 20),
+              child: Center(
+                child: GestureDetector(
+                  onTap: _showImageSourceSheet,
+                  child: Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      Container(
+                        height: 150,
+                        width: 150,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: .08),
+                              blurRadius: 15,
+                              offset: const Offset(0, 6),
+                            )
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: _selectedImage != null
+                              ? Image.file(
+                                  _selectedImage!,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.network(
+                                  "https://images.unsplash.com/photo-1607746882042-944635dfe10e",
+                                  fit: BoxFit.cover,
+                                ),
                         ),
                       ),
 
-                      /// ---------------- FORM CARD ----------------
-                      SliverPadding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        sliver: SliverToBoxAdapter(
-                          child: GlassCard(
-                            child: Column(
-                              children: [
-                                _textField("Name", "TRD(DEMO)"),
-                                _textField("Mobile No.", "7303384866"),
-                                _textField("Company Name", "tradologie.com"),
-                                _textField(
-                                    "PAN No/Company Registration No.", "NA"),
-                                _textField(
-                                    "Company Import/Export License", "NA"),
-                                _categoryField(),
-                              ],
-                            ),
-                          ),
+                      /// Camera Overlay Button
+                      Container(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF2E7CF6),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 3),
                         ),
-                      ),
-
-                      /// ---------------- SAVE BUTTON ----------------
-                      SliverPadding(
-                        padding: const EdgeInsets.fromLTRB(16, 30, 16, 50),
-                        sliver: SliverToBoxAdapter(
-                          child: _saveButton(),
+                        child: const Icon(
+                          Icons.camera_alt,
+                          color: Colors.white,
+                          size: 20,
                         ),
                       ),
                     ],
                   ),
-                ))));
+                ),
+              ),
+            ),
+          ),
+
+          /// ---------------- FORM CARD ----------------
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: GlassCard(
+                child: Column(
+                  children: [
+                    _textField("Name", "TRD(DEMO)"),
+                    _textField("Mobile No.", "7303384866"),
+                    _textField("Company Name", "tradologie.com"),
+                    _textField("PAN No/Company Registration No.", "NA"),
+                    _textField("Company Import/Export License", "NA"),
+                    _categoryField(),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          /// ---------------- SAVE BUTTON ----------------
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 30, 16, 50),
+            sliver: SliverToBoxAdapter(
+              child: _saveButton(),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _textField(String label, String value) {

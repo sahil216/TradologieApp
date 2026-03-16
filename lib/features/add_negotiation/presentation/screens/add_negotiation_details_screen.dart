@@ -159,52 +159,12 @@ class _AddNegotiationDetailsScreenState
     });
   }
 
-  late AnimationController _screenController;
-  late Animation<double> _screenFade;
-  late Animation<double> _screenScale;
-  late Animation<Offset> _screenSlide;
-
   @override
   void initState() {
     createAuction();
     // auctionDetailForEdit();
-    _screenController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
 
-    _screenFade = CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    );
-
-    _screenScale = Tween<double>(
-      begin: 0.97,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _screenSlide = Tween<Offset>(
-      begin: const Offset(0, .04),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    Future.delayed(const Duration(milliseconds: 200), () {
-      if (mounted) _screenController.forward();
-    });
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _screenController.dispose();
-
-    super.dispose();
   }
 
   @override
@@ -268,388 +228,349 @@ class _AddNegotiationDetailsScreenState
 
               return Stack(
                 children: [
-                  FadeTransition(
-                    opacity: _screenFade,
-                    child: SlideTransition(
-                      position: _screenSlide,
-                      child: ScaleTransition(
-                        scale: _screenScale,
-                        child: CustomScrollView(
-                          slivers: [
-                            CommonAppbar(
-                              title: "Add Negotiation",
-                              showBackButton: true,
-                              showNotification: false,
-                            ),
-                            SliverToBoxAdapter(
-                              child: Form(
-                                key: _formKey,
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 12),
-                                  child: CommonSingleChildScrollView(
-                                    child: Column(
-                                      children: [
-                                        const SizedBox(height: 12),
-                                        CommonTextField(
-                                          titleText:
-                                              "Negotiation Reference Code",
-                                          titleStyle:
-                                              TextStyleConstants.semiBold(
-                                                  context),
-                                          hintText:
-                                              "Enter Negotiation Reference Code",
-                                          textRequired:
-                                              "Enter Negotiation Reference Code",
-                                          controller: auctionCodeController,
-                                          backgroundColor:
-                                              AppColors.transparent,
-                                          textInputType: TextInputType.text,
-                                          inputFormatters: [],
-                                          isEnable: false,
-                                          autovalidateMode: AutovalidateMode
-                                              .onUserInteraction,
-                                          validator: (String? value) {
-                                            return null;
-                                          },
-                                        ),
-                                        const SizedBox(height: 12),
-                                        CommonTextField(
-                                          titleText: "Negotiation Name",
-                                          titleStyle:
-                                              TextStyleConstants.semiBold(
-                                                  context),
-                                          hintText: "Enter Negotiation Name",
-                                          textRequired:
-                                              "Enter Negotiation Name",
-                                          controller: negotiationNameController,
-                                          backgroundColor:
-                                              AppColors.transparent,
-                                          textInputType: TextInputType.text,
-                                          inputFormatters: [],
-                                          isEnable: true,
-                                          autovalidateMode: AutovalidateMode
-                                              .onUserInteraction,
-                                          validator: (String? value) {
-                                            if (value == null ||
-                                                value.trim().isEmpty) {
-                                              return "Required";
-                                            }
-
-                                            return null;
-                                          },
-                                        ),
-                                        const SizedBox(height: 12),
-                                        CommonDropdown<InspectionAgencyList>(
-                                          label: 'Inspection Agency ',
-                                          hint: 'Select Inspection Agency',
-                                          dropdownKey: categoryKey,
-                                          asyncItems: (filter, loadProps) {
-                                            return fetchInspectionAgency(
-                                                filter, loadProps);
-                                          },
-                                          validator: (value) =>
-                                              value == null ? "Required" : null,
-                                          selectedItem: null,
-                                          itemAsString: (item) =>
-                                              item.inspectionCompanyName ?? "",
-                                          onChanged: (item) async {
-                                            selectedInspectionAgency = item;
-                                          },
-                                          compareFn: (a, b) =>
-                                              a.inspectionAgencyId ==
-                                              b.inspectionAgencyId,
-                                        ),
-                                        const SizedBox(height: 12),
-                                        CommonDropdown<CustomerAddressList>(
-                                          label: 'Location of Delivery',
-                                          hint: 'Select Location of Delivery',
-                                          dropdownKey: categoryKey,
-                                          asyncItems: (filter, loadProps) {
-                                            return fetchAddress(
-                                                filter, loadProps);
-                                          },
-                                          validator: (value) =>
-                                              value == null ? "Required" : null,
-                                          selectedItem: null,
-                                          itemAsString: (item) =>
-                                              item.address ?? "",
-                                          onChanged: (item) async {
-                                            selectedLocationDelivery = item;
-                                          },
-                                          compareFn: (a, b) =>
-                                              a.address == b.address,
-                                        ),
-                                        const SizedBox(height: 12),
-                                        CommonTextField(
-                                          titleText: "State of Delivery",
-                                          titleStyle:
-                                              TextStyleConstants.semiBold(
-                                                  context),
-                                          hintText: "Enter State of Delivery",
-                                          textRequired:
-                                              "Enter State of Delivery",
-                                          controller: stateOfDeliveryController,
-                                          backgroundColor:
-                                              AppColors.transparent,
-                                          textInputType: TextInputType.text,
-                                          inputFormatters: [],
-                                          isEnable: true,
-                                          autovalidateMode: AutovalidateMode
-                                              .onUserInteraction,
-                                          validator: (String? value) {
-                                            if (value == null ||
-                                                value.trim().isEmpty) {
-                                              return "Required";
-                                            }
-
-                                            return null;
-                                          },
-                                        ),
-                                        const SizedBox(height: 12),
-                                        CommonTextField(
-                                          titleText: "Port of Discharge",
-                                          titleStyle:
-                                              TextStyleConstants.semiBold(
-                                                  context),
-                                          hintText: "Enter Port of Discharge",
-                                          textRequired:
-                                              "Enter Port of Discharge",
-                                          controller: portOfDischargeController,
-                                          backgroundColor:
-                                              AppColors.transparent,
-                                          textInputType: TextInputType.text,
-                                          inputFormatters: [],
-                                          isEnable: true,
-                                          autovalidateMode: AutovalidateMode
-                                              .onUserInteraction,
-                                          validator: (String? value) {
-                                            if (value == null ||
-                                                value.trim().isEmpty) {
-                                              return "Required";
-                                            }
-
-                                            return null;
-                                          },
-                                        ),
-                                        const SizedBox(height: 12),
-                                        CommonDropdown<String>(
-                                          label: 'Payment Term',
-                                          hint: 'Select Payment Term',
-                                          dropdownKey: categoryKey,
-                                          asyncItems: (filter, loadProps) {
-                                            return fetchPaymentTerm(
-                                                filter, loadProps);
-                                          },
-                                          validator: (value) =>
-                                              value == null ? "Required" : null,
-                                          selectedItem: null,
-                                          itemAsString: (item) => item,
-                                          onChanged: (item) async {
-                                            selectedPaymentTerm = item ?? "";
-                                            setState(() {});
-                                          },
-                                          compareFn: (a, b) => a == b,
-                                        ),
-                                        selectedPaymentTerm == "LC"
-                                            ? Padding(
-                                                padding: const EdgeInsets.only(
-                                                    top: 12.0),
-                                                child: CommonTextField(
-                                                  titleText:
-                                                      "Banker Name and Address",
-                                                  titleStyle: TextStyleConstants
-                                                      .semiBold(context),
-                                                  hintText:
-                                                      "Enter Banker Name and Address",
-                                                  textRequired:
-                                                      "Enter Banker Name and Address",
-                                                  controller:
-                                                      bankerNameAndAddressController,
-                                                  backgroundColor:
-                                                      AppColors.transparent,
-                                                  textInputType:
-                                                      TextInputType.text,
-                                                  inputFormatters: [],
-                                                  isEnable: true,
-                                                  autovalidateMode:
-                                                      AutovalidateMode
-                                                          .onUserInteraction,
-                                                  validator: (String? value) {
-                                                    if (value == null ||
-                                                        value.trim().isEmpty) {
-                                                      return "Required";
-                                                    }
-
-                                                    return null;
-                                                  },
-                                                ),
-                                              )
-                                            : SizedBox.shrink(),
-                                        const SizedBox(height: 12),
-                                        CommonDropdown<CurrencyList>(
-                                          label: 'Currency',
-                                          hint: 'Select Currency',
-                                          dropdownKey: categoryKey,
-                                          asyncItems: (filter, loadProps) {
-                                            return fetchCurrency(
-                                                filter, loadProps);
-                                          },
-                                          validator: (value) =>
-                                              value == null ? "Required" : null,
-                                          selectedItem: null,
-                                          itemAsString: (item) =>
-                                              item.currencyName ?? "",
-                                          onChanged: (item) async {
-                                            selectedCurrency = item;
-                                          },
-                                          compareFn: (a, b) =>
-                                              a.currencyName == b.currencyName,
-                                        ),
-                                        const SizedBox(height: 12),
-                                        CommonDropdown<String>(
-                                          label: 'Partial Delivery',
-                                          hint: 'Select Partial Delivery',
-                                          dropdownKey: categoryKey,
-                                          asyncItems: (filter, loadProps) {
-                                            return fetchPartialDelivery(
-                                                filter, loadProps);
-                                          },
-                                          validator: (value) =>
-                                              value == null ? "Required" : null,
-                                          selectedItem: null,
-                                          itemAsString: (item) => item,
-                                          onChanged: (item) async {
-                                            selectedPartialDelivery =
-                                                item ?? "";
-                                          },
-                                          compareFn: (a, b) => a == b,
-                                        ),
-                                        const SizedBox(height: 12),
-                                        CommonDatePicker(
-                                          label:
-                                              "Preferred Date and Time of Enquiry ",
-                                          hint: "(yyyy/mm/dd HH:mm)",
-                                          type: PickerType.dateTime,
-                                          firstDate: DateTime.now(),
-                                          onChanged: (value) {
-                                            enquiryDate = value;
-                                          },
-                                          validator: (value) {
-                                            if (value == null)
-                                              return "Required";
-                                            return null;
-                                          },
-                                        ),
-                                        CommonTextField(
-                                          titleText: "Total quantity",
-                                          titleStyle:
-                                              TextStyleConstants.semiBold(
-                                                  context),
-                                          hintText: "Enter Total quantity",
-                                          textRequired: "Enter Total quantity",
-                                          controller: totalQuantityController,
-                                          backgroundColor:
-                                              AppColors.transparent,
-                                          textInputType: TextInputType.number,
-                                          inputFormatters: [
-                                            FilteringTextInputFormatter
-                                                .digitsOnly,
-                                          ],
-                                          isEnable: true,
-                                          autovalidateMode: AutovalidateMode
-                                              .onUserInteraction,
-                                          validator: (String? value) {
-                                            if (value == null ||
-                                                value.trim().isEmpty) {
-                                              return "Required";
-                                            }
-
-                                            return null;
-                                          },
-                                        ),
-                                        const SizedBox(height: 12),
-                                        CommonTextField(
-                                          titleText:
-                                              "Min Order Quantity per Supplier",
-                                          titleStyle:
-                                              TextStyleConstants.semiBold(
-                                                  context),
-                                          hintText:
-                                              "Enter Min Order Quantity per Supplier",
-                                          textRequired:
-                                              "Enter Min Order Quantity per Supplier",
-                                          controller:
-                                              minOrderQuantityController,
-                                          backgroundColor:
-                                              AppColors.transparent,
-                                          textInputType: TextInputType.number,
-                                          inputFormatters: [
-                                            FilteringTextInputFormatter
-                                                .digitsOnly,
-                                          ],
-                                          isEnable: true,
-                                          autovalidateMode: AutovalidateMode
-                                              .onUserInteraction,
-                                          validator: (String? value) {
-                                            if (value == null ||
-                                                value.trim().isEmpty) {
-                                              return "Required";
-                                            }
-
-                                            return null;
-                                          },
-                                        ),
-                                        const SizedBox(height: 12),
-                                        CommonDatePicker(
-                                          label: "Last Date of Dispatch",
-                                          hint: "yyyy/mm/dd",
-                                          type: PickerType.date,
-                                          firstDate: DateTime.now(),
-                                          onChanged: (value) {
-                                            dispatchDate = value;
-                                          },
-                                          validator: (value) {
-                                            if (value == null)
-                                              return "Required";
-                                            return null;
-                                          },
-                                        ),
-                                        CommonTextField(
-                                          titleText: "Delivery Terms",
-                                          hintText: "Enter Delivery Terms",
-                                          titleStyle:
-                                              TextStyleConstants.semiBold(
-                                                  context),
-                                          textRequired: "Enter Delivery Terms",
-                                          controller: deliveryTermsController,
-                                          textInputType: TextInputType.text,
-                                          isEnable: true,
-                                          backgroundColor:
-                                              AppColors.transparent,
-                                          height: 100,
-                                          autovalidateMode:
-                                              AutovalidateMode.disabled,
-                                          validator: (String? value) {
-                                            if (value == null ||
-                                                value.trim().isEmpty) {
-                                              return "Required";
-                                            }
-
-                                            return null;
-                                          },
-                                        ),
-                                        const SizedBox(height: 12),
-                                      ],
-                                    ),
+                  CustomScrollView(
+                    slivers: [
+                      CommonAppbar(
+                        title: "Add Negotiation",
+                        showBackButton: true,
+                        showNotification: false,
+                      ),
+                      SliverToBoxAdapter(
+                        child: Form(
+                          key: _formKey,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
+                            child: CommonSingleChildScrollView(
+                              child: Column(
+                                children: [
+                                  const SizedBox(height: 12),
+                                  CommonTextField(
+                                    titleText: "Negotiation Reference Code",
+                                    titleStyle:
+                                        TextStyleConstants.semiBold(context),
+                                    hintText:
+                                        "Enter Negotiation Reference Code",
+                                    textRequired:
+                                        "Enter Negotiation Reference Code",
+                                    controller: auctionCodeController,
+                                    backgroundColor: AppColors.transparent,
+                                    textInputType: TextInputType.text,
+                                    inputFormatters: [],
+                                    isEnable: false,
+                                    autovalidateMode:
+                                        AutovalidateMode.onUserInteraction,
+                                    validator: (String? value) {
+                                      return null;
+                                    },
                                   ),
-                                ),
+                                  const SizedBox(height: 12),
+                                  CommonTextField(
+                                    titleText: "Negotiation Name",
+                                    titleStyle:
+                                        TextStyleConstants.semiBold(context),
+                                    hintText: "Enter Negotiation Name",
+                                    textRequired: "Enter Negotiation Name",
+                                    controller: negotiationNameController,
+                                    backgroundColor: AppColors.transparent,
+                                    textInputType: TextInputType.text,
+                                    inputFormatters: [],
+                                    isEnable: true,
+                                    autovalidateMode:
+                                        AutovalidateMode.onUserInteraction,
+                                    validator: (String? value) {
+                                      if (value == null ||
+                                          value.trim().isEmpty) {
+                                        return "Required";
+                                      }
+
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 12),
+                                  CommonDropdown<InspectionAgencyList>(
+                                    label: 'Inspection Agency ',
+                                    hint: 'Select Inspection Agency',
+                                    dropdownKey: categoryKey,
+                                    asyncItems: (filter, loadProps) {
+                                      return fetchInspectionAgency(
+                                          filter, loadProps);
+                                    },
+                                    validator: (value) =>
+                                        value == null ? "Required" : null,
+                                    selectedItem: null,
+                                    itemAsString: (item) =>
+                                        item.inspectionCompanyName ?? "",
+                                    onChanged: (item) async {
+                                      selectedInspectionAgency = item;
+                                    },
+                                    compareFn: (a, b) =>
+                                        a.inspectionAgencyId ==
+                                        b.inspectionAgencyId,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  CommonDropdown<CustomerAddressList>(
+                                    label: 'Location of Delivery',
+                                    hint: 'Select Location of Delivery',
+                                    dropdownKey: categoryKey,
+                                    asyncItems: (filter, loadProps) {
+                                      return fetchAddress(filter, loadProps);
+                                    },
+                                    validator: (value) =>
+                                        value == null ? "Required" : null,
+                                    selectedItem: null,
+                                    itemAsString: (item) => item.address ?? "",
+                                    onChanged: (item) async {
+                                      selectedLocationDelivery = item;
+                                    },
+                                    compareFn: (a, b) => a.address == b.address,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  CommonTextField(
+                                    titleText: "State of Delivery",
+                                    titleStyle:
+                                        TextStyleConstants.semiBold(context),
+                                    hintText: "Enter State of Delivery",
+                                    textRequired: "Enter State of Delivery",
+                                    controller: stateOfDeliveryController,
+                                    backgroundColor: AppColors.transparent,
+                                    textInputType: TextInputType.text,
+                                    inputFormatters: [],
+                                    isEnable: true,
+                                    autovalidateMode:
+                                        AutovalidateMode.onUserInteraction,
+                                    validator: (String? value) {
+                                      if (value == null ||
+                                          value.trim().isEmpty) {
+                                        return "Required";
+                                      }
+
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 12),
+                                  CommonTextField(
+                                    titleText: "Port of Discharge",
+                                    titleStyle:
+                                        TextStyleConstants.semiBold(context),
+                                    hintText: "Enter Port of Discharge",
+                                    textRequired: "Enter Port of Discharge",
+                                    controller: portOfDischargeController,
+                                    backgroundColor: AppColors.transparent,
+                                    textInputType: TextInputType.text,
+                                    inputFormatters: [],
+                                    isEnable: true,
+                                    autovalidateMode:
+                                        AutovalidateMode.onUserInteraction,
+                                    validator: (String? value) {
+                                      if (value == null ||
+                                          value.trim().isEmpty) {
+                                        return "Required";
+                                      }
+
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 12),
+                                  CommonDropdown<String>(
+                                    label: 'Payment Term',
+                                    hint: 'Select Payment Term',
+                                    dropdownKey: categoryKey,
+                                    asyncItems: (filter, loadProps) {
+                                      return fetchPaymentTerm(
+                                          filter, loadProps);
+                                    },
+                                    validator: (value) =>
+                                        value == null ? "Required" : null,
+                                    selectedItem: null,
+                                    itemAsString: (item) => item,
+                                    onChanged: (item) async {
+                                      selectedPaymentTerm = item ?? "";
+                                      setState(() {});
+                                    },
+                                    compareFn: (a, b) => a == b,
+                                  ),
+                                  selectedPaymentTerm == "LC"
+                                      ? Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 12.0),
+                                          child: CommonTextField(
+                                            titleText:
+                                                "Banker Name and Address",
+                                            titleStyle:
+                                                TextStyleConstants.semiBold(
+                                                    context),
+                                            hintText:
+                                                "Enter Banker Name and Address",
+                                            textRequired:
+                                                "Enter Banker Name and Address",
+                                            controller:
+                                                bankerNameAndAddressController,
+                                            backgroundColor:
+                                                AppColors.transparent,
+                                            textInputType: TextInputType.text,
+                                            inputFormatters: [],
+                                            isEnable: true,
+                                            autovalidateMode: AutovalidateMode
+                                                .onUserInteraction,
+                                            validator: (String? value) {
+                                              if (value == null ||
+                                                  value.trim().isEmpty) {
+                                                return "Required";
+                                              }
+
+                                              return null;
+                                            },
+                                          ),
+                                        )
+                                      : SizedBox.shrink(),
+                                  const SizedBox(height: 12),
+                                  CommonDropdown<CurrencyList>(
+                                    label: 'Currency',
+                                    hint: 'Select Currency',
+                                    dropdownKey: categoryKey,
+                                    asyncItems: (filter, loadProps) {
+                                      return fetchCurrency(filter, loadProps);
+                                    },
+                                    validator: (value) =>
+                                        value == null ? "Required" : null,
+                                    selectedItem: null,
+                                    itemAsString: (item) =>
+                                        item.currencyName ?? "",
+                                    onChanged: (item) async {
+                                      selectedCurrency = item;
+                                    },
+                                    compareFn: (a, b) =>
+                                        a.currencyName == b.currencyName,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  CommonDropdown<String>(
+                                    label: 'Partial Delivery',
+                                    hint: 'Select Partial Delivery',
+                                    dropdownKey: categoryKey,
+                                    asyncItems: (filter, loadProps) {
+                                      return fetchPartialDelivery(
+                                          filter, loadProps);
+                                    },
+                                    validator: (value) =>
+                                        value == null ? "Required" : null,
+                                    selectedItem: null,
+                                    itemAsString: (item) => item,
+                                    onChanged: (item) async {
+                                      selectedPartialDelivery = item ?? "";
+                                    },
+                                    compareFn: (a, b) => a == b,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  CommonDatePicker(
+                                    label:
+                                        "Preferred Date and Time of Enquiry ",
+                                    hint: "(yyyy/mm/dd HH:mm)",
+                                    type: PickerType.dateTime,
+                                    firstDate: DateTime.now(),
+                                    onChanged: (value) {
+                                      enquiryDate = value;
+                                    },
+                                    validator: (value) {
+                                      if (value == null) return "Required";
+                                      return null;
+                                    },
+                                  ),
+                                  CommonTextField(
+                                    titleText: "Total quantity",
+                                    titleStyle:
+                                        TextStyleConstants.semiBold(context),
+                                    hintText: "Enter Total quantity",
+                                    textRequired: "Enter Total quantity",
+                                    controller: totalQuantityController,
+                                    backgroundColor: AppColors.transparent,
+                                    textInputType: TextInputType.number,
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                    ],
+                                    isEnable: true,
+                                    autovalidateMode:
+                                        AutovalidateMode.onUserInteraction,
+                                    validator: (String? value) {
+                                      if (value == null ||
+                                          value.trim().isEmpty) {
+                                        return "Required";
+                                      }
+
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 12),
+                                  CommonTextField(
+                                    titleText:
+                                        "Min Order Quantity per Supplier",
+                                    titleStyle:
+                                        TextStyleConstants.semiBold(context),
+                                    hintText:
+                                        "Enter Min Order Quantity per Supplier",
+                                    textRequired:
+                                        "Enter Min Order Quantity per Supplier",
+                                    controller: minOrderQuantityController,
+                                    backgroundColor: AppColors.transparent,
+                                    textInputType: TextInputType.number,
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                    ],
+                                    isEnable: true,
+                                    autovalidateMode:
+                                        AutovalidateMode.onUserInteraction,
+                                    validator: (String? value) {
+                                      if (value == null ||
+                                          value.trim().isEmpty) {
+                                        return "Required";
+                                      }
+
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 12),
+                                  CommonDatePicker(
+                                    label: "Last Date of Dispatch",
+                                    hint: "yyyy/mm/dd",
+                                    type: PickerType.date,
+                                    firstDate: DateTime.now(),
+                                    onChanged: (value) {
+                                      dispatchDate = value;
+                                    },
+                                    validator: (value) {
+                                      if (value == null) return "Required";
+                                      return null;
+                                    },
+                                  ),
+                                  CommonTextField(
+                                    titleText: "Delivery Terms",
+                                    hintText: "Enter Delivery Terms",
+                                    titleStyle:
+                                        TextStyleConstants.semiBold(context),
+                                    textRequired: "Enter Delivery Terms",
+                                    controller: deliveryTermsController,
+                                    textInputType: TextInputType.text,
+                                    isEnable: true,
+                                    backgroundColor: AppColors.transparent,
+                                    height: 100,
+                                    autovalidateMode: AutovalidateMode.disabled,
+                                    validator: (String? value) {
+                                      if (value == null ||
+                                          value.trim().isEmpty) {
+                                        return "Required";
+                                      }
+
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 12),
+                                ],
                               ),
                             ),
-                          ],
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                   BlocBuilder<AddNegotiationCubit, AddNegotiationState>(
                     buildWhen: (previous, current) {

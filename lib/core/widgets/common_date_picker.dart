@@ -210,8 +210,7 @@ class _CommonDatePickerState extends FormFieldState<DateTime> {
     }
 
     if (result != null) {
-      (field as FormFieldState<DateTime>)
-          .didChange(result); // ⭐ TRIGGERS VALIDATION
+      (field).didChange(result); // ⭐ TRIGGERS VALIDATION
       onChanged(result);
     }
   }

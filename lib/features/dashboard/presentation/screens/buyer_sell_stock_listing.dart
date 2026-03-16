@@ -90,52 +90,19 @@ class _BuyerSellStockListingState extends State<BuyerSellStockListing>
         .toList();
   }
 
-  late AnimationController _screenController;
-  late Animation<double> _screenFade;
-  late Animation<double> _screenScale;
-  late Animation<Offset> _screenSlide;
-
   @override
   void initState() {
     getStockListing();
     getAuctionUnitList();
     authenticationCubit.getCountryCodeList(NoParams());
-    _screenController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
 
-    _screenFade = CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    );
-
-    _screenScale = Tween<double>(
-      begin: 0.97,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _screenSlide = Tween<Offset>(
-      begin: const Offset(0, .04),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    Future.delayed(const Duration(milliseconds: 200), () {
-      if (mounted) _screenController.forward();
-    });
     super.initState();
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
-    _screenController.dispose();
+
     super.dispose();
   }
 
@@ -206,48 +173,42 @@ class _BuyerSellStockListingState extends State<BuyerSellStockListing>
             return Stack(
               children: [
                 SafeArea(
-                  child: FadeTransition(
-                      opacity: _screenFade,
-                      child: SlideTransition(
-                          position: _screenSlide,
-                          child: ScaleTransition(
-                              scale: _screenScale,
-                              child: CustomScrollView(
-                                controller: _scrollController,
-                                physics: const BouncingScrollPhysics(),
-                                slivers: [
-                                  const CommonAppbar(
-                                    title: "Ready To Buy",
-                                    showBackButton: true,
-                                  ),
-                                  if (state is GetVendorStockListingIsLoading ||
-                                      state is GetAuctionUnitListIsLoading)
-                                    const RiceShimmerSliver()
-                                  else
-                                    SliverPadding(
-                                      padding: const EdgeInsets.all(16),
-                                      sliver: SliverGrid(
-                                        delegate: SliverChildBuilderDelegate(
-                                          (context, index) {
-                                            final item = stockList?[index];
-                                            return categoryUltraCard(
-                                              item: item,
-                                              heroTag: "category_$index",
-                                            );
-                                          },
-                                          childCount: stockList?.length,
-                                        ),
-                                        gridDelegate:
-                                            const SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: 2,
-                                          mainAxisSpacing: 18,
-                                          crossAxisSpacing: 14,
-                                          childAspectRatio: .80,
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              )))),
+                  child: CustomScrollView(
+                    controller: _scrollController,
+                    physics: const BouncingScrollPhysics(),
+                    slivers: [
+                      const CommonAppbar(
+                        title: "Ready To Buy",
+                        showBackButton: true,
+                      ),
+                      if (state is GetVendorStockListingIsLoading ||
+                          state is GetAuctionUnitListIsLoading)
+                        const RiceShimmerSliver()
+                      else
+                        SliverPadding(
+                          padding: const EdgeInsets.all(16),
+                          sliver: SliverGrid(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) {
+                                final item = stockList?[index];
+                                return categoryUltraCard(
+                                  item: item,
+                                  heroTag: "category_$index",
+                                );
+                              },
+                              childCount: stockList?.length,
+                            ),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 18,
+                              crossAxisSpacing: 14,
+                              childAspectRatio: .80,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ],
             );

@@ -39,7 +39,7 @@ import 'features/my_account/injection_container_my_account.dart'
 
 import 'features/notification/injection_container_notification.dart'
     as di_notification;
-import 'features/chat/injection_container_chat.dart' as di_chat;
+import 'features/fmcg/injection_container_chat.dart' as di_chat;
 
 import 'core/utils/app_strings.dart';
 import 'core/utils/constants.dart';

@@ -25,7 +25,6 @@ import '../../../../config/routes/app_router.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../../../core/widgets/common_loader.dart';
-import '../../../../core/widgets/common_single_child_scroll_view.dart';
 import '../../../../core/widgets/common_social_icons.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
@@ -60,41 +59,7 @@ class _SignInScreenState extends State<SignInScreen>
     super.initState();
     initPlatformState();
     initPackageInfo();
-    _screenController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-
-    _screenFade = CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    );
-
-    _screenScale = Tween<double>(
-      begin: 0.97,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _screenSlide = Tween<Offset>(
-      begin: const Offset(0, .04),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    Future.delayed(const Duration(milliseconds: 150), () {
-      if (mounted) _screenController.forward();
-    });
   }
-
-  late AnimationController _screenController;
-  late Animation<double> _screenFade;
-  late Animation<double> _screenScale;
-  late Animation<Offset> _screenSlide;
 
   Future<void> initPackageInfo() async {
     final info = await PackageInfo.fromPlatform();
@@ -152,7 +117,7 @@ class _SignInScreenState extends State<SignInScreen>
   void dispose() {
     textEmailController.dispose();
     textPasswordController.dispose();
-    _screenController.dispose();
+
     super.dispose();
   }
 
@@ -224,238 +189,201 @@ class _SignInScreenState extends State<SignInScreen>
               ValueListenableBuilder(
                   valueListenable: showPassword,
                   builder: (context, value, child) {
-                    return FadeTransition(
-                        opacity: _screenFade,
-                        child: SlideTransition(
-                            position: _screenSlide,
-                            child: ScaleTransition(
-                              scale: _screenScale,
-                              child: CustomScrollView(
-                                keyboardDismissBehavior:
-                                    ScrollViewKeyboardDismissBehavior.onDrag,
-                                physics: const BouncingScrollPhysics(
-                                  parent: AlwaysScrollableScrollPhysics(),
-                                ),
-                                slivers: [
-                                  CommonAppbar(
-                                    title: CommonStrings.signIn,
-                                    showBackButton: true,
-                                    showNotification: false,
-                                  ),
-                                  SliverToBoxAdapter(
-                                    child: Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 20),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          Form(
-                                            key: formKey,
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.stretch,
-                                              children: [
-                                                SizedBox(
-                                                  height: 20,
-                                                ),
-                                                CommonTextField(
-                                                  titleText:
-                                                      CommonStrings.emailId,
-                                                  hintText:
-                                                      CommonStrings.enterEmail,
-                                                  controller:
-                                                      textEmailController,
-                                                  textInputType: TextInputType
-                                                      .emailAddress,
-                                                  autovalidateMode:
-                                                      AutovalidateMode
-                                                          .onUserInteraction,
-                                                  validator: (String? value) {
-                                                    if (value == null ||
-                                                        value.trim().isEmpty) {
-                                                      return "Email is required";
-                                                    }
-                                                    if (value.isEmailValid ==
-                                                        false) {
-                                                      return "Enter a valid email";
-                                                    }
-                                                    return null;
-                                                  },
-                                                ),
-                                                SizedBox(height: 12),
-                                                CommonTextField(
-                                                  titleText:
-                                                      CommonStrings.password,
-                                                  hintText: CommonStrings
-                                                      .enterPassword,
-                                                  controller:
-                                                      textPasswordController,
-                                                  isObsecureText:
-                                                      showPassword.value
-                                                          ? false
-                                                          : true,
-                                                  suffixIcon: IconButton(
-                                                    icon: Icon(
-                                                      showPassword.value
-                                                          ? Icons
-                                                              .visibility_outlined
-                                                          : Icons
-                                                              .visibility_off_outlined,
-                                                      color: AppColors.grayText,
-                                                    ),
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        showPassword.value =
-                                                            !showPassword.value;
-                                                      });
-                                                    },
-                                                  ),
-                                                  autovalidateMode:
-                                                      AutovalidateMode
-                                                          .onUserInteraction,
-                                                  validator: (String? val) {
-                                                    if (val == null ||
-                                                        val.isEmpty) {
-                                                      return "Password is required";
-                                                    }
-
-                                                    return null;
-                                                  },
-                                                ),
-                                                // SizedBox(height: 12),
-                                                // Align(
-                                                //   alignment: Alignment.centerRight,
-                                                //   child: GestureDetector(
-                                                //     onTap: () {},
-                                                //     child: Text(
-                                                //       CommonStrings.forgotPassword,
-                                                //       style: TextStyleConstants.regular(
-                                                //         context,
-                                                //         fontSize: 14,
-                                                //         decoration:
-                                                //             TextDecoration.underline,
-                                                //         color: AppColors.orange,
-                                                //       ),
-                                                //     ),
-                                                //   ),
-                                                // ),
-                                                SizedBox(height: 20),
-                                                CommonButton(
-                                                  onPressed: () async {
-                                                    late SigninParams params;
-                                                    if (textEmailController
-                                                            .text.isNotEmpty &&
-                                                        textPasswordController
-                                                            .text.isNotEmpty) {
-                                                      params = SigninParams(
-                                                        username:
-                                                            textEmailController
-                                                                .text,
-                                                        password:
-                                                            textPasswordController
-                                                                .text,
-                                                        deviceId: deviceId,
-                                                        osType:
-                                                            Platform.isAndroid
-                                                                ? "Android"
-                                                                : "iOS",
-                                                        fcmToken: await secureStorageService
-                                                                .read(AppStrings
-                                                                    .fcmToken) ??
-                                                            "",
-                                                        manufacturer:
-                                                            manufacturer,
-                                                        model: model,
-                                                        osVersionRelease:
-                                                            osVersionRelease,
-                                                        appVersion: appVersion,
-                                                      );
-                                                      if (!context.mounted) {
-                                                        return;
-                                                      }
-                                                      FocusManager
-                                                          .instance.primaryFocus
-                                                          ?.unfocus();
-
-                                                      if (Constants.isBuyer ==
-                                                          true) {
-                                                        BlocProvider.of<
-                                                                    AuthenticationCubit>(
-                                                                context)
-                                                            .buyerSignIn(
-                                                                params);
-                                                      } else {
-                                                        BlocProvider.of<
-                                                                    AuthenticationCubit>(
-                                                                context)
-                                                            .signIn(params);
-                                                      }
-                                                    }
-                                                  },
-                                                  text: CommonStrings.login,
-                                                  textStyle:
-                                                      TextStyleConstants.medium(
-                                                    context,
-                                                    fontSize: 16,
-                                                    color: AppColors.white,
-                                                  ),
-                                                ),
-                                                SizedBox(height: 20),
-                                                Center(
-                                                  child: CommonText(
-                                                    "OR",
-                                                    style: TextStyleConstants
-                                                        .regular(
-                                                      context,
-                                                      fontSize: 16,
-                                                      color:
-                                                          AppColors.defaultText,
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(height: 20),
-                                                SizedBox(
-                                                  width: r.isTablet
-                                                      ? 420
-                                                      : double.infinity,
-                                                  child: CommonButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                    },
-                                                    text: CommonStrings
-                                                        .sendOtpViaWhatsapp,
-                                                    backgroundColor:
-                                                        AppColors.white,
-                                                    borderSide: BorderSide(
-                                                      color: AppColors
-                                                          .green, // or any color you want
-                                                      width: 2,
-                                                    ),
-                                                    icon: Image.asset(
-                                                        ImgAssets.whatsappIcon),
-                                                    textStyle:
-                                                        TextStyleConstants
-                                                            .medium(
-                                                      context,
-                                                      fontSize: 16,
-                                                      color: AppColors.black,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          CommonSocialIcons(),
-                                        ],
+                    return CustomScrollView(
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      physics: const BouncingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics(),
+                      ),
+                      slivers: [
+                        CommonAppbar(
+                          title: CommonStrings.signIn,
+                          showBackButton: true,
+                          showNotification: false,
+                        ),
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 20),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Form(
+                                  key: formKey,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      SizedBox(
+                                        height: 20,
                                       ),
-                                    ),
+                                      CommonTextField(
+                                        titleText: CommonStrings.emailId,
+                                        hintText: CommonStrings.enterEmail,
+                                        controller: textEmailController,
+                                        textInputType:
+                                            TextInputType.emailAddress,
+                                        autovalidateMode:
+                                            AutovalidateMode.onUserInteraction,
+                                        validator: (String? value) {
+                                          if (value == null ||
+                                              value.trim().isEmpty) {
+                                            return "Email is required";
+                                          }
+                                          if (value.isEmailValid == false) {
+                                            return "Enter a valid email";
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                      SizedBox(height: 12),
+                                      CommonTextField(
+                                        titleText: CommonStrings.password,
+                                        hintText: CommonStrings.enterPassword,
+                                        controller: textPasswordController,
+                                        isObsecureText:
+                                            showPassword.value ? false : true,
+                                        suffixIcon: IconButton(
+                                          icon: Icon(
+                                            showPassword.value
+                                                ? Icons.visibility_outlined
+                                                : Icons.visibility_off_outlined,
+                                            color: AppColors.grayText,
+                                          ),
+                                          onPressed: () {
+                                            setState(() {
+                                              showPassword.value =
+                                                  !showPassword.value;
+                                            });
+                                          },
+                                        ),
+                                        autovalidateMode:
+                                            AutovalidateMode.onUserInteraction,
+                                        validator: (String? val) {
+                                          if (val == null || val.isEmpty) {
+                                            return "Password is required";
+                                          }
+
+                                          return null;
+                                        },
+                                      ),
+                                      // SizedBox(height: 12),
+                                      // Align(
+                                      //   alignment: Alignment.centerRight,
+                                      //   child: GestureDetector(
+                                      //     onTap: () {},
+                                      //     child: Text(
+                                      //       CommonStrings.forgotPassword,
+                                      //       style: TextStyleConstants.regular(
+                                      //         context,
+                                      //         fontSize: 14,
+                                      //         decoration:
+                                      //             TextDecoration.underline,
+                                      //         color: AppColors.orange,
+                                      //       ),
+                                      //     ),
+                                      //   ),
+                                      // ),
+                                      SizedBox(height: 20),
+                                      CommonButton(
+                                        onPressed: () async {
+                                          late SigninParams params;
+                                          if (textEmailController
+                                                  .text.isNotEmpty &&
+                                              textPasswordController
+                                                  .text.isNotEmpty) {
+                                            params = SigninParams(
+                                              username:
+                                                  textEmailController.text,
+                                              password:
+                                                  textPasswordController.text,
+                                              deviceId: deviceId,
+                                              osType: Platform.isAndroid
+                                                  ? "Android"
+                                                  : "iOS",
+                                              fcmToken:
+                                                  await secureStorageService
+                                                          .read(AppStrings
+                                                              .fcmToken) ??
+                                                      "",
+                                              manufacturer: manufacturer,
+                                              model: model,
+                                              osVersionRelease:
+                                                  osVersionRelease,
+                                              appVersion: appVersion,
+                                            );
+                                            if (!context.mounted) {
+                                              return;
+                                            }
+                                            FocusManager.instance.primaryFocus
+                                                ?.unfocus();
+
+                                            if (Constants.isBuyer == true) {
+                                              BlocProvider.of<
+                                                          AuthenticationCubit>(
+                                                      context)
+                                                  .buyerSignIn(params);
+                                            } else {
+                                              BlocProvider.of<
+                                                          AuthenticationCubit>(
+                                                      context)
+                                                  .signIn(params);
+                                            }
+                                          }
+                                        },
+                                        text: CommonStrings.login,
+                                        textStyle: TextStyleConstants.medium(
+                                          context,
+                                          fontSize: 16,
+                                          color: AppColors.white,
+                                        ),
+                                      ),
+                                      SizedBox(height: 20),
+                                      Center(
+                                        child: CommonText(
+                                          "OR",
+                                          style: TextStyleConstants.regular(
+                                            context,
+                                            fontSize: 16,
+                                            color: AppColors.defaultText,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: 20),
+                                      SizedBox(
+                                        width:
+                                            r.isTablet ? 420 : double.infinity,
+                                        child: CommonButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          text:
+                                              CommonStrings.sendOtpViaWhatsapp,
+                                          backgroundColor: AppColors.white,
+                                          borderSide: BorderSide(
+                                            color: AppColors
+                                                .green, // or any color you want
+                                            width: 2,
+                                          ),
+                                          icon: Image.asset(
+                                              ImgAssets.whatsappIcon),
+                                          textStyle: TextStyleConstants.medium(
+                                            context,
+                                            fontSize: 16,
+                                            color: AppColors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            )));
+                                ),
+                                CommonSocialIcons(),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
                   }),
               BlocBuilder<AuthenticationCubit, AuthenticationState>(
                 builder: (context, state) {

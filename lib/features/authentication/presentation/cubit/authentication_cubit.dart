@@ -20,8 +20,6 @@ import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_regi
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_signin_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/get_country_code_list_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/sign_out_usecase.dart';
-import 'package:tradologie_app/features/authentication/presentation/screens/fmcg_register_seller_form.dart';
-import 'package:tradologie_app/features/authentication/presentation/screens/fmcg_seller_signin.dart';
 
 import '../../../../core/error/failures.dart';
 import '../../domain/entities/verify_otp_result.dart';

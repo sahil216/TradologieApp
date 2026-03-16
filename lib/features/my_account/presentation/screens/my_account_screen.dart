@@ -19,17 +19,6 @@ import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
 import 'package:tradologie_app/features/my_account/domain/entities/company_details.dart';
 import 'package:tradologie_app/features/my_account/presentation/cubit/my_account_cubit.dart';
-import 'package:tradologie_app/features/my_account/presentation/screens/tabs/authorized_person_tab.dart';
-import 'package:tradologie_app/features/my_account/presentation/screens/tabs/bank_details_tab.dart';
-import 'package:tradologie_app/features/my_account/presentation/screens/tabs/bulk_and_retail_tab.dart';
-import 'package:tradologie_app/features/my_account/presentation/screens/tabs/commodity_tab.dart';
-import 'package:tradologie_app/features/my_account/presentation/screens/tabs/company_detail_tab.dart';
-import 'package:tradologie_app/features/my_account/presentation/screens/tabs/documents_tab.dart';
-import 'package:tradologie_app/features/my_account/presentation/screens/tabs/information_tab.dart';
-import 'package:tradologie_app/features/my_account/presentation/screens/tabs/legal_documents_tab.dart';
-import 'package:tradologie_app/features/my_account/presentation/screens/tabs/login_control_tab.dart';
-import 'package:tradologie_app/features/my_account/presentation/screens/tabs/membership_tab.dart';
-import 'package:tradologie_app/features/my_account/presentation/screens/tabs/selling_location_tab.dart';
 import 'package:tradologie_app/features/webview/presentation/screens/in_app_webview_screen.dart';
 import 'package:tradologie_app/features/webview/presentation/screens/viewmodel/webview_params.dart';
 import 'package:tradologie_app/features/webview/presentation/screens/webview_screen.dart';
@@ -98,35 +87,6 @@ class _MyAccountScreenState extends State<MyAccountScreen>
         _handleTabChange(_tabController.index);
       }
     });
-    _screenController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-
-    _screenFade = CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    );
-
-    _screenScale = Tween<double>(
-      begin: 0.97,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _screenSlide = Tween<Offset>(
-      begin: const Offset(0, .04),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    Future.delayed(const Duration(milliseconds: 200), () {
-      if (mounted) _screenController.forward();
-    });
   }
 
   void _handleTabChange(int newIndex) {
@@ -175,14 +135,9 @@ class _MyAccountScreenState extends State<MyAccountScreen>
   @override
   void dispose() {
     _tabController.dispose();
-    _screenController.dispose();
+
     super.dispose();
   }
-
-  late AnimationController _screenController;
-  late Animation<double> _screenFade;
-  late Animation<double> _screenScale;
-  late Animation<Offset> _screenSlide;
 
   Future<void> _loadToken() async {
     final _token = await _secureStorage.read(AppStrings.apiVerificationCode);
@@ -283,417 +238,399 @@ class _MyAccountScreenState extends State<MyAccountScreen>
           //     ),
           //   ),
           // ),
-          body: FadeTransition(
-              opacity: _screenFade,
-              child: SlideTransition(
-                  position: _screenSlide,
-                  child: ScaleTransition(
-                      scale: _screenScale,
-                      child: CustomScrollView(
-                        physics: NeverScrollableScrollPhysics(),
-                        slivers: [
-                          /// ⭐ ULTRA COMMON APPBAR
-                          CommonAppbar(
-                            title: "My Account",
-                            showNotification: true,
-                            onNotificationTap: () {
-                              sl<NavigationService>().pushNamed(
-                                Routes.notificationScreen,
-                              );
-                            },
-                          ),
+          body: CustomScrollView(
+            physics: NeverScrollableScrollPhysics(),
+            slivers: [
+              /// ⭐ ULTRA COMMON APPBAR
+              CommonAppbar(
+                title: "My Account",
+                showNotification: true,
+                onNotificationTap: () {
+                  sl<NavigationService>().pushNamed(
+                    Routes.notificationScreen,
+                  );
+                },
+              ),
 
-                          /// ⭐ PINNED TABBAR (EXACT SAME UI)
-                          SliverPersistentHeader(
-                            pinned: true,
-                            delegate: _MyAccountTabBarDelegate(
-                              CommonTabBarWidget(
-                                controller: _tabController,
-                                tabs: const [
-                                  "Login Control",
-                                  "Information",
-                                  "Company Details",
-                                  "Documents",
-                                  "Authorized Person",
-                                  "Legal Documents",
-                                  "Bank Details",
-                                  "Selling Location",
-                                  "Bulk & Retail",
-                                  "Membership Type",
-                                  "Commodity",
-                                ],
-                                isEnabled: (index) {
-                                  if (index == 9 &&
-                                      companyDetails?.countryId == 0) {
-                                    return false;
-                                  }
-                                  return true;
-                                },
+              /// ⭐ PINNED TABBAR (EXACT SAME UI)
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _MyAccountTabBarDelegate(
+                  CommonTabBarWidget(
+                    controller: _tabController,
+                    tabs: const [
+                      "Login Control",
+                      "Information",
+                      "Company Details",
+                      "Documents",
+                      "Authorized Person",
+                      "Legal Documents",
+                      "Bank Details",
+                      "Selling Location",
+                      "Bulk & Retail",
+                      "Membership Type",
+                      "Commodity",
+                    ],
+                    isEnabled: (index) {
+                      if (index == 9 && companyDetails?.countryId == 0) {
+                        return false;
+                      }
+                      return true;
+                    },
+                  ),
+                ),
+              ),
+              SliverFillRemaining(
+                child: BlocBuilder<MyAccountCubit, MyAccountState>(
+                  buildWhen: (previous, current) {
+                    bool result = previous != current;
+                    result = result &&
+                        (current is CompanyDetailsSuccess ||
+                            current is CompanyDetailsError ||
+                            current is CompanyDetailsIsLoading);
+                    return result;
+                  },
+                  builder: (context, state) {
+                    if (state is CompanyDetailsError) {
+                      if (state.failure is NetworkFailure) {
+                        return CustomErrorNetworkWidget(
+                          onPress: () {
+                            getCompanyDetails();
+                          },
+                        );
+                      } else if (state.failure is UserFailure) {
+                        return CustomErrorWidget(
+                          onPress: () {
+                            getCompanyDetails();
+                          },
+                          errorText: state.failure.msg,
+                        );
+                      }
+                    }
+
+                    /// 👇 KEEP YOUR ORIGINAL TABBARVIEW EXACTLY SAME
+                    return TabBarView(
+                      controller: _tabController,
+                      physics: NeverScrollableScrollPhysics(),
+                      children: [
+                        Constants.isAndroid14OrBelow && Platform.isAndroid
+                            ? InAppWebViewScreen(
+                                params: WebviewParams(
+                                  isAppBar: false,
+                                  canPop: true,
+                                  url: Uri.parse(
+                                          "${EndPoints.supplierImageurl}/supplier/VendorLoginControlForAPI.aspx?")
+                                      .replace(
+                                    queryParameters: {
+                                      "Token": token,
+                                    },
+                                  ).toString(),
+                                ),
+                              )
+                            : WebViewScreen(
+                                params: WebviewParams(
+                                  isAppBar: false,
+                                  canPop: true,
+                                  url: Uri.parse(
+                                          "${EndPoints.supplierImageurl}/supplier/VendorLoginControlForAPI.aspx?")
+                                      .replace(
+                                    queryParameters: {
+                                      "Token": token,
+                                    },
+                                  ).toString(),
+                                ),
                               ),
-                            ),
-                          ),
-                          SliverFillRemaining(
-                            child: BlocBuilder<MyAccountCubit, MyAccountState>(
-                              buildWhen: (previous, current) {
-                                bool result = previous != current;
-                                result = result &&
-                                    (current is CompanyDetailsSuccess ||
-                                        current is CompanyDetailsError ||
-                                        current is CompanyDetailsIsLoading);
-                                return result;
-                              },
-                              builder: (context, state) {
-                                if (state is CompanyDetailsError) {
-                                  if (state.failure is NetworkFailure) {
-                                    return CustomErrorNetworkWidget(
-                                      onPress: () {
-                                        getCompanyDetails();
-                                      },
-                                    );
-                                  } else if (state.failure is UserFailure) {
-                                    return CustomErrorWidget(
-                                      onPress: () {
-                                        getCompanyDetails();
-                                      },
-                                      errorText: state.failure.msg,
-                                    );
-                                  }
-                                }
+                        // LoginControlTab(),
+                        Constants.isAndroid14OrBelow && Platform.isAndroid
+                            ? InAppWebViewScreen(
+                                params: WebviewParams(
+                                  isAppBar: false,
+                                  canPop: true,
+                                  url: Uri.parse(
+                                          "${EndPoints.supplierImageurl}/supplier/VendorAddForAPI.aspx?")
+                                      .replace(
+                                    queryParameters: {
+                                      "Token": token,
+                                    },
+                                  ).toString(),
+                                ),
+                              )
+                            : WebViewScreen(
+                                params: WebviewParams(
+                                  isAppBar: false,
+                                  canPop: true,
+                                  url: Uri.parse(
+                                          "${EndPoints.supplierImageurl}/supplier/VendorAddForAPI.aspx?")
+                                      .replace(
+                                    queryParameters: {
+                                      "Token": token,
+                                    },
+                                  ).toString(),
+                                ),
+                              ),
+                        // InformationTab(),
+                        Constants.isAndroid14OrBelow && Platform.isAndroid
+                            ? InAppWebViewScreen(
+                                params: WebviewParams(
+                                  isAppBar: false,
+                                  canPop: true,
+                                  url: Uri.parse(
+                                          "${EndPoints.supplierImageurl}/supplier/VendorCompanyDetailForAPI.aspx?")
+                                      .replace(
+                                    queryParameters: {
+                                      "Token": token,
+                                    },
+                                  ).toString(),
+                                ),
+                              )
+                            : WebViewScreen(
+                                params: WebviewParams(
+                                  isAppBar: false,
+                                  canPop: true,
+                                  url: Uri.parse(
+                                          "${EndPoints.supplierImageurl}/supplier/VendorCompanyDetailForAPI.aspx?")
+                                      .replace(
+                                    queryParameters: {
+                                      "Token": token,
+                                    },
+                                  ).toString(),
+                                ),
+                              ),
+                        // CompanyDetailTab(),
+                        Constants.isAndroid14OrBelow && Platform.isAndroid
+                            ? InAppWebViewScreen(
+                                params: WebviewParams(
+                                  isAppBar: false,
+                                  canPop: true,
+                                  url: Uri.parse(
+                                          "${EndPoints.supplierImageurl}/supplier/VendorDocumentForAPI.aspx?")
+                                      .replace(
+                                    queryParameters: {
+                                      "Token": token,
+                                    },
+                                  ).toString(),
+                                ),
+                              )
+                            : WebViewScreen(
+                                params: WebviewParams(
+                                  isAppBar: false,
+                                  canPop: true,
+                                  url: Uri.parse(
+                                          "${EndPoints.supplierImageurl}/supplier/VendorDocumentForAPI.aspx?")
+                                      .replace(
+                                    queryParameters: {
+                                      "Token": token,
+                                    },
+                                  ).toString(),
+                                ),
+                              ),
+                        // DocumentsTab(),
+                        Constants.isAndroid14OrBelow && Platform.isAndroid
+                            ? InAppWebViewScreen(
+                                params: WebviewParams(
+                                  isAppBar: false,
+                                  canPop: true,
+                                  url: Uri.parse(
+                                          "${EndPoints.supplierImageurl}/supplier/VendorAuthorizedPersonForAPI.aspx?")
+                                      .replace(
+                                    queryParameters: {
+                                      "Token": token,
+                                    },
+                                  ).toString(),
+                                ),
+                              )
+                            : WebViewScreen(
+                                params: WebviewParams(
+                                  isAppBar: false,
+                                  canPop: true,
+                                  url: Uri.parse(
+                                          "${EndPoints.supplierImageurl}/supplier/VendorAuthorizedPersonForAPI.aspx?")
+                                      .replace(
+                                    queryParameters: {
+                                      "Token": token,
+                                    },
+                                  ).toString(),
+                                ),
+                              ),
+                        // AuthorizedPersonTab(),
+                        Constants.isAndroid14OrBelow && Platform.isAndroid
+                            ? InAppWebViewScreen(
+                                params: WebviewParams(
+                                  isAppBar: false,
+                                  canPop: true,
+                                  url: Uri.parse(
+                                          "${EndPoints.supplierImageurl}/supplier/VendorLegalDocsForAPI.aspx?")
+                                      .replace(
+                                    queryParameters: {
+                                      "Token": token,
+                                    },
+                                  ).toString(),
+                                ),
+                              )
+                            : WebViewScreen(
+                                params: WebviewParams(
+                                  isAppBar: false,
+                                  canPop: true,
+                                  url: Uri.parse(
+                                          "${EndPoints.supplierImageurl}/supplier/VendorLegalDocsForAPI.aspx?")
+                                      .replace(
+                                    queryParameters: {
+                                      "Token": token,
+                                    },
+                                  ).toString(),
+                                ),
+                              ),
+                        // LegalDocumentsTab(),
+                        Constants.isAndroid14OrBelow && Platform.isAndroid
+                            ? InAppWebViewScreen(
+                                params: WebviewParams(
+                                  isAppBar: false,
+                                  canPop: true,
+                                  url: Uri.parse(
+                                          "${EndPoints.supplierImageurl}/supplier/VendorBankDetailForAPI.aspx?")
+                                      .replace(
+                                    queryParameters: {
+                                      "Token": token,
+                                    },
+                                  ).toString(),
+                                ),
+                              )
+                            : WebViewScreen(
+                                params: WebviewParams(
+                                  isAppBar: false,
+                                  canPop: true,
+                                  url: Uri.parse(
+                                          "${EndPoints.supplierImageurl}/supplier/VendorBankDetailForAPI.aspx?")
+                                      .replace(
+                                    queryParameters: {
+                                      "Token": token,
+                                    },
+                                  ).toString(),
+                                ),
+                              ),
+                        // BankDetailsTab(),
 
-                                /// 👇 KEEP YOUR ORIGINAL TABBARVIEW EXACTLY SAME
-                                return TabBarView(
-                                  controller: _tabController,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  children: [
-                                    Constants.isAndroid14OrBelow &&
-                                            Platform.isAndroid
-                                        ? InAppWebViewScreen(
-                                            params: WebviewParams(
-                                              isAppBar: false,
-                                              canPop: true,
-                                              url: Uri.parse(
-                                                      "${EndPoints.supplierImageurl}/supplier/VendorLoginControlForAPI.aspx?")
-                                                  .replace(
-                                                queryParameters: {
-                                                  "Token": token,
-                                                },
-                                              ).toString(),
-                                            ),
-                                          )
-                                        : WebViewScreen(
-                                            params: WebviewParams(
-                                              isAppBar: false,
-                                              canPop: true,
-                                              url: Uri.parse(
-                                                      "${EndPoints.supplierImageurl}/supplier/VendorLoginControlForAPI.aspx?")
-                                                  .replace(
-                                                queryParameters: {
-                                                  "Token": token,
-                                                },
-                                              ).toString(),
-                                            ),
-                                          ),
-                                    // LoginControlTab(),
-                                    Constants.isAndroid14OrBelow &&
-                                            Platform.isAndroid
-                                        ? InAppWebViewScreen(
-                                            params: WebviewParams(
-                                              isAppBar: false,
-                                              canPop: true,
-                                              url: Uri.parse(
-                                                      "${EndPoints.supplierImageurl}/supplier/VendorAddForAPI.aspx?")
-                                                  .replace(
-                                                queryParameters: {
-                                                  "Token": token,
-                                                },
-                                              ).toString(),
-                                            ),
-                                          )
-                                        : WebViewScreen(
-                                            params: WebviewParams(
-                                              isAppBar: false,
-                                              canPop: true,
-                                              url: Uri.parse(
-                                                      "${EndPoints.supplierImageurl}/supplier/VendorAddForAPI.aspx?")
-                                                  .replace(
-                                                queryParameters: {
-                                                  "Token": token,
-                                                },
-                                              ).toString(),
-                                            ),
-                                          ),
-                                    // InformationTab(),
-                                    Constants.isAndroid14OrBelow &&
-                                            Platform.isAndroid
-                                        ? InAppWebViewScreen(
-                                            params: WebviewParams(
-                                              isAppBar: false,
-                                              canPop: true,
-                                              url: Uri.parse(
-                                                      "${EndPoints.supplierImageurl}/supplier/VendorCompanyDetailForAPI.aspx?")
-                                                  .replace(
-                                                queryParameters: {
-                                                  "Token": token,
-                                                },
-                                              ).toString(),
-                                            ),
-                                          )
-                                        : WebViewScreen(
-                                            params: WebviewParams(
-                                              isAppBar: false,
-                                              canPop: true,
-                                              url: Uri.parse(
-                                                      "${EndPoints.supplierImageurl}/supplier/VendorCompanyDetailForAPI.aspx?")
-                                                  .replace(
-                                                queryParameters: {
-                                                  "Token": token,
-                                                },
-                                              ).toString(),
-                                            ),
-                                          ),
-                                    // CompanyDetailTab(),
-                                    Constants.isAndroid14OrBelow &&
-                                            Platform.isAndroid
-                                        ? InAppWebViewScreen(
-                                            params: WebviewParams(
-                                              isAppBar: false,
-                                              canPop: true,
-                                              url: Uri.parse(
-                                                      "${EndPoints.supplierImageurl}/supplier/VendorDocumentForAPI.aspx?")
-                                                  .replace(
-                                                queryParameters: {
-                                                  "Token": token,
-                                                },
-                                              ).toString(),
-                                            ),
-                                          )
-                                        : WebViewScreen(
-                                            params: WebviewParams(
-                                              isAppBar: false,
-                                              canPop: true,
-                                              url: Uri.parse(
-                                                      "${EndPoints.supplierImageurl}/supplier/VendorDocumentForAPI.aspx?")
-                                                  .replace(
-                                                queryParameters: {
-                                                  "Token": token,
-                                                },
-                                              ).toString(),
-                                            ),
-                                          ),
-                                    // DocumentsTab(),
-                                    Constants.isAndroid14OrBelow &&
-                                            Platform.isAndroid
-                                        ? InAppWebViewScreen(
-                                            params: WebviewParams(
-                                              isAppBar: false,
-                                              canPop: true,
-                                              url: Uri.parse(
-                                                      "${EndPoints.supplierImageurl}/supplier/VendorAuthorizedPersonForAPI.aspx?")
-                                                  .replace(
-                                                queryParameters: {
-                                                  "Token": token,
-                                                },
-                                              ).toString(),
-                                            ),
-                                          )
-                                        : WebViewScreen(
-                                            params: WebviewParams(
-                                              isAppBar: false,
-                                              canPop: true,
-                                              url: Uri.parse(
-                                                      "${EndPoints.supplierImageurl}/supplier/VendorAuthorizedPersonForAPI.aspx?")
-                                                  .replace(
-                                                queryParameters: {
-                                                  "Token": token,
-                                                },
-                                              ).toString(),
-                                            ),
-                                          ),
-                                    // AuthorizedPersonTab(),
-                                    Constants.isAndroid14OrBelow &&
-                                            Platform.isAndroid
-                                        ? InAppWebViewScreen(
-                                            params: WebviewParams(
-                                              isAppBar: false,
-                                              canPop: true,
-                                              url: Uri.parse(
-                                                      "${EndPoints.supplierImageurl}/supplier/VendorLegalDocsForAPI.aspx?")
-                                                  .replace(
-                                                queryParameters: {
-                                                  "Token": token,
-                                                },
-                                              ).toString(),
-                                            ),
-                                          )
-                                        : WebViewScreen(
-                                            params: WebviewParams(
-                                              isAppBar: false,
-                                              canPop: true,
-                                              url: Uri.parse(
-                                                      "${EndPoints.supplierImageurl}/supplier/VendorLegalDocsForAPI.aspx?")
-                                                  .replace(
-                                                queryParameters: {
-                                                  "Token": token,
-                                                },
-                                              ).toString(),
-                                            ),
-                                          ),
-                                    // LegalDocumentsTab(),
-                                    Constants.isAndroid14OrBelow &&
-                                            Platform.isAndroid
-                                        ? InAppWebViewScreen(
-                                            params: WebviewParams(
-                                              isAppBar: false,
-                                              canPop: true,
-                                              url: Uri.parse(
-                                                      "${EndPoints.supplierImageurl}/supplier/VendorBankDetailForAPI.aspx?")
-                                                  .replace(
-                                                queryParameters: {
-                                                  "Token": token,
-                                                },
-                                              ).toString(),
-                                            ),
-                                          )
-                                        : WebViewScreen(
-                                            params: WebviewParams(
-                                              isAppBar: false,
-                                              canPop: true,
-                                              url: Uri.parse(
-                                                      "${EndPoints.supplierImageurl}/supplier/VendorBankDetailForAPI.aspx?")
-                                                  .replace(
-                                                queryParameters: {
-                                                  "Token": token,
-                                                },
-                                              ).toString(),
-                                            ),
-                                          ),
-                                    // BankDetailsTab(),
-
-                                    Constants.isAndroid14OrBelow &&
-                                            Platform.isAndroid
-                                        ? InAppWebViewScreen(
-                                            params: WebviewParams(
-                                              isAppBar: false,
-                                              canPop: true,
-                                              url: Uri.parse(
-                                                      "${EndPoints.supplierImageurl}/supplier/VendorSellingLocationForAPI.aspx?")
-                                                  .replace(
-                                                queryParameters: {
-                                                  "Token": token,
-                                                },
-                                              ).toString(),
-                                            ),
-                                          )
-                                        : WebViewScreen(
-                                            params: WebviewParams(
-                                              isAppBar: false,
-                                              canPop: true,
-                                              url: Uri.parse(
-                                                      "${EndPoints.supplierImageurl}/supplier/VendorSellingLocationForAPI.aspx?")
-                                                  .replace(
-                                                queryParameters: {
-                                                  "Token": token,
-                                                },
-                                              ).toString(),
-                                            ),
-                                          ),
-                                    // SellingLocationTab(),
-                                    Constants.isAndroid14OrBelow &&
-                                            Platform.isAndroid
-                                        ? InAppWebViewScreen(
-                                            params: WebviewParams(
-                                              isAppBar: false,
-                                              canPop: true,
-                                              url: Uri.parse(
-                                                      "${EndPoints.supplierImageurl}/supplier/BulkRetailForAPI.aspx?")
-                                                  .replace(
-                                                queryParameters: {
-                                                  "Token": token,
-                                                },
-                                              ).toString(),
-                                            ),
-                                          )
-                                        : WebViewScreen(
-                                            params: WebviewParams(
-                                              isAppBar: false,
-                                              canPop: true,
-                                              url: Uri.parse(
-                                                      "${EndPoints.supplierImageurl}/supplier/BulkRetailForAPI.aspx?")
-                                                  .replace(
-                                                queryParameters: {
-                                                  "Token": token,
-                                                },
-                                              ).toString(),
-                                            ),
-                                          ),
-                                    // BulkAndRetailTab(),
-                                    companyDetails?.countryId == 0
-                                        ? Container()
-                                        : Constants.isAndroid14OrBelow &&
-                                                Platform.isAndroid
-                                            ? InAppWebViewScreen(
-                                                params: WebviewParams(
-                                                  isAppBar: false,
-                                                  canPop: true,
-                                                  url: Uri.parse(
-                                                          "${EndPoints.supplierImageurl}/supplier/MembershipTypeDetailForAPI.aspx?")
-                                                      .replace(
-                                                    queryParameters: {
-                                                      "Token": token,
-                                                    },
-                                                  ).toString(),
-                                                ),
-                                              )
-                                            : WebViewScreen(
-                                                params: WebviewParams(
-                                                  isAppBar: false,
-                                                  canPop: true,
-                                                  url: Uri.parse(
-                                                          "${EndPoints.supplierImageurl}/supplier/MembershipTypeDetailForAPI.aspx?")
-                                                      .replace(
-                                                    queryParameters: {
-                                                      "Token": token,
-                                                    },
-                                                  ).toString(),
-                                                ),
-                                              ),
-                                    // MembershipTab(),
-                                    Constants.isAndroid14OrBelow &&
-                                            Platform.isAndroid
-                                        ? InAppWebViewScreen(
-                                            params: WebviewParams(
-                                              isAppBar: false,
-                                              canPop: true,
-                                              url: Uri.parse(
-                                                      "${EndPoints.supplierImageurl}/supplier/CommodityForAPI.aspx?")
-                                                  .replace(
-                                                queryParameters: {
-                                                  "Token": token,
-                                                },
-                                              ).toString(),
-                                            ),
-                                          )
-                                        : WebViewScreen(
-                                            params: WebviewParams(
-                                              isAppBar: false,
-                                              canPop: true,
-                                              url: Uri.parse(
-                                                      "${EndPoints.supplierImageurl}/supplier/CommodityForAPI.aspx?")
-                                                  .replace(
-                                                queryParameters: {
-                                                  "Token": token,
-                                                },
-                                              ).toString(),
-                                            ),
-                                          ),
-                                    // CommodityTab(),
-                                  ],
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      )))),
+                        Constants.isAndroid14OrBelow && Platform.isAndroid
+                            ? InAppWebViewScreen(
+                                params: WebviewParams(
+                                  isAppBar: false,
+                                  canPop: true,
+                                  url: Uri.parse(
+                                          "${EndPoints.supplierImageurl}/supplier/VendorSellingLocationForAPI.aspx?")
+                                      .replace(
+                                    queryParameters: {
+                                      "Token": token,
+                                    },
+                                  ).toString(),
+                                ),
+                              )
+                            : WebViewScreen(
+                                params: WebviewParams(
+                                  isAppBar: false,
+                                  canPop: true,
+                                  url: Uri.parse(
+                                          "${EndPoints.supplierImageurl}/supplier/VendorSellingLocationForAPI.aspx?")
+                                      .replace(
+                                    queryParameters: {
+                                      "Token": token,
+                                    },
+                                  ).toString(),
+                                ),
+                              ),
+                        // SellingLocationTab(),
+                        Constants.isAndroid14OrBelow && Platform.isAndroid
+                            ? InAppWebViewScreen(
+                                params: WebviewParams(
+                                  isAppBar: false,
+                                  canPop: true,
+                                  url: Uri.parse(
+                                          "${EndPoints.supplierImageurl}/supplier/BulkRetailForAPI.aspx?")
+                                      .replace(
+                                    queryParameters: {
+                                      "Token": token,
+                                    },
+                                  ).toString(),
+                                ),
+                              )
+                            : WebViewScreen(
+                                params: WebviewParams(
+                                  isAppBar: false,
+                                  canPop: true,
+                                  url: Uri.parse(
+                                          "${EndPoints.supplierImageurl}/supplier/BulkRetailForAPI.aspx?")
+                                      .replace(
+                                    queryParameters: {
+                                      "Token": token,
+                                    },
+                                  ).toString(),
+                                ),
+                              ),
+                        // BulkAndRetailTab(),
+                        companyDetails?.countryId == 0
+                            ? Container()
+                            : Constants.isAndroid14OrBelow && Platform.isAndroid
+                                ? InAppWebViewScreen(
+                                    params: WebviewParams(
+                                      isAppBar: false,
+                                      canPop: true,
+                                      url: Uri.parse(
+                                              "${EndPoints.supplierImageurl}/supplier/MembershipTypeDetailForAPI.aspx?")
+                                          .replace(
+                                        queryParameters: {
+                                          "Token": token,
+                                        },
+                                      ).toString(),
+                                    ),
+                                  )
+                                : WebViewScreen(
+                                    params: WebviewParams(
+                                      isAppBar: false,
+                                      canPop: true,
+                                      url: Uri.parse(
+                                              "${EndPoints.supplierImageurl}/supplier/MembershipTypeDetailForAPI.aspx?")
+                                          .replace(
+                                        queryParameters: {
+                                          "Token": token,
+                                        },
+                                      ).toString(),
+                                    ),
+                                  ),
+                        // MembershipTab(),
+                        Constants.isAndroid14OrBelow && Platform.isAndroid
+                            ? InAppWebViewScreen(
+                                params: WebviewParams(
+                                  isAppBar: false,
+                                  canPop: true,
+                                  url: Uri.parse(
+                                          "${EndPoints.supplierImageurl}/supplier/CommodityForAPI.aspx?")
+                                      .replace(
+                                    queryParameters: {
+                                      "Token": token,
+                                    },
+                                  ).toString(),
+                                ),
+                              )
+                            : WebViewScreen(
+                                params: WebviewParams(
+                                  isAppBar: false,
+                                  canPop: true,
+                                  url: Uri.parse(
+                                          "${EndPoints.supplierImageurl}/supplier/CommodityForAPI.aspx?")
+                                      .replace(
+                                    queryParameters: {
+                                      "Token": token,
+                                    },
+                                  ).toString(),
+                                ),
+                              ),
+                        // CommodityTab(),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
           bottomNavigationBar: SizedBox(
             height: 70,
           ),

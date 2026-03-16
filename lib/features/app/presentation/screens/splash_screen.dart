@@ -34,42 +34,8 @@ class _SplashScreenState extends State<SplashScreen>
       Constants().checkAndroidVersion();
     });
 
-    _screenController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-
-    _screenFade = CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    );
-
-    _screenScale = Tween<double>(
-      begin: 0.97,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _screenSlide = Tween<Offset>(
-      begin: const Offset(0, .04),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    Future.delayed(const Duration(milliseconds: 150), () {
-      if (mounted) _screenController.forward();
-    });
     startDelay(context);
   }
-
-  late AnimationController _screenController;
-  late Animation<double> _screenFade;
-  late Animation<double> _screenScale;
-  late Animation<Offset> _screenSlide;
 
   Future<String> getAppVersion() async {
     final info = await PackageInfo.fromPlatform();
@@ -90,7 +56,7 @@ class _SplashScreenState extends State<SplashScreen>
         if (Constants.isBuyer == true) {
         } else {
           sl<NavigationService>()
-              .pushNamedAndRemoveUntil(Routes.chatListScreen);
+              .pushNamedAndRemoveUntil(Routes.fmcgMainScreen);
         }
       } else {
         if (Constants.isBuyer == true) {
@@ -102,12 +68,6 @@ class _SplashScreenState extends State<SplashScreen>
     } else {
       sl<NavigationService>().pushNamedAndRemoveUntil(Routes.onboardingRoute);
     }
-  }
-
-  @override
-  void dispose() {
-    _screenController.dispose();
-    super.dispose();
   }
 
   void startDelay(BuildContext context) {
@@ -146,28 +106,19 @@ class _SplashScreenState extends State<SplashScreen>
                   return const SizedBox.shrink();
                 },
               ),
-              FadeTransition(
-                opacity: _screenFade,
-                child: SlideTransition(
-                  position: _screenSlide,
-                  child: ScaleTransition(
-                    scale: _screenScale,
-                    child: CustomScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      slivers: [
-                        SliverToBoxAdapter(
-                          child: Center(
-                            child: Image.asset(
-                              ImgAssets.companyLogo,
-                              height: 386,
-                              width: 391,
-                            ),
-                          ),
-                        ),
-                      ],
+              CustomScrollView(
+                physics: const BouncingScrollPhysics(),
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Center(
+                      child: Image.asset(
+                        ImgAssets.companyLogo,
+                        height: 386,
+                        width: 391,
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
               Positioned(
                 bottom: 1,

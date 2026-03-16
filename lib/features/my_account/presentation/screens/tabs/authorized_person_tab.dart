@@ -24,50 +24,11 @@ class _AuthorizedPersonTabState extends State<AuthorizedPersonTab>
   MyAccountCubit get cubit => BlocProvider.of<MyAccountCubit>(context);
 
   void getAuthorizedPerson() {}
-  late AnimationController _screenController;
-  late Animation<double> _screenFade;
-  late Animation<double> _screenScale;
-  late Animation<Offset> _screenSlide;
 
   @override
   void initState() {
     super.initState();
     getAuthorizedPerson();
-    _screenController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-
-    _screenFade = CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    );
-
-    _screenScale = Tween<double>(
-      begin: 0.97,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _screenSlide = Tween<Offset>(
-      begin: const Offset(0, .04),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    Future.delayed(const Duration(milliseconds: 150), () {
-      if (mounted) _screenController.forward();
-    });
-  }
-
-  @override
-  void dispose() {
-    _screenController.dispose();
-    super.dispose();
   }
 
   @override
@@ -115,72 +76,63 @@ class _AuthorizedPersonTabState extends State<AuthorizedPersonTab>
             }
             return const CommonLoader();
           }
-          return FadeTransition(
-            opacity: _screenFade,
-            child: SlideTransition(
-              position: _screenSlide,
-              child: ScaleTransition(
-                scale: _screenScale,
-                child: CustomScrollView(
-                  slivers: [
-                    /// FORM SECTION
-                    SliverSafeArea(
-                      sliver: SliverPadding(
-                        padding: const EdgeInsets.all(12),
-                        sliver: SliverToBoxAdapter(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _label("Authorize Person Name"),
-                              _textField(),
-                              const SizedBox(height: 16),
-                              _label("Designation"),
-                              _textField(),
-                              const SizedBox(height: 16),
-                              _label("Mobile No."),
-                              _textField(keyboard: TextInputType.phone),
-                              const SizedBox(height: 16),
-                              _label("Email ID"),
-                              _textField(keyboard: TextInputType.emailAddress),
-                              const SizedBox(height: 24),
-                              _label("Upload Authorization Document"),
-                              const SizedBox(height: 8),
-                              _uploadBox(),
-                              const SizedBox(height: 24),
-                              _label("Enabled"),
-                              const SizedBox(height: 8),
-                              _yesNoToggle(),
-                              const SizedBox(height: 24),
-                              _submitButton(),
-                              const SizedBox(height: 30),
-                            ],
-                          ),
-                        ),
-                      ),
+          return CustomScrollView(
+            slivers: [
+              /// FORM SECTION
+              SliverSafeArea(
+                sliver: SliverPadding(
+                  padding: const EdgeInsets.all(12),
+                  sliver: SliverToBoxAdapter(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _label("Authorize Person Name"),
+                        _textField(),
+                        const SizedBox(height: 16),
+                        _label("Designation"),
+                        _textField(),
+                        const SizedBox(height: 16),
+                        _label("Mobile No."),
+                        _textField(keyboard: TextInputType.phone),
+                        const SizedBox(height: 16),
+                        _label("Email ID"),
+                        _textField(keyboard: TextInputType.emailAddress),
+                        const SizedBox(height: 24),
+                        _label("Upload Authorization Document"),
+                        const SizedBox(height: 8),
+                        _uploadBox(),
+                        const SizedBox(height: 24),
+                        _label("Enabled"),
+                        const SizedBox(height: 8),
+                        _yesNoToggle(),
+                        const SizedBox(height: 24),
+                        _submitButton(),
+                        const SizedBox(height: 30),
+                      ],
                     ),
-
-                    /// Divider
-                    SliverToBoxAdapter(
-                      child: Container(
-                        height: 10,
-                        color: Colors.grey.shade200,
-                      ),
-                    ),
-
-                    /// LIST SECTION
-                    SliverPadding(
-                      padding: const EdgeInsets.all(16),
-                      sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) => _authorizedPersonCard(),
-                          childCount: 1,
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ),
+
+              /// Divider
+              SliverToBoxAdapter(
+                child: Container(
+                  height: 10,
+                  color: Colors.grey.shade200,
+                ),
+              ),
+
+              /// LIST SECTION
+              SliverPadding(
+                padding: const EdgeInsets.all(16),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => _authorizedPersonCard(),
+                    childCount: 1,
+                  ),
+                ),
+              ),
+            ],
           );
         },
       ),

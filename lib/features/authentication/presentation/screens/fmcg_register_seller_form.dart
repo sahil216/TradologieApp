@@ -20,7 +20,6 @@ import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_regi
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_register_seller_usecase.dart';
 
 import '../../../../core/utils/app_colors.dart';
-import '../../../../core/utils/responsive.dart';
 import '../../../../core/widgets/common_loader.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
@@ -71,7 +70,7 @@ class _FmcgRegisterSellerDistributorFormState
 
   List<FmcgCountryCodeList> fetchCountryCode(
       String filter, LoadProps? loadProps) {
-    final allItems = countryCodeList ?? [];
+    final allItems = countryCodeList;
     if (filter.isEmpty) return allItems;
     return allItems
         .where(
@@ -80,7 +79,7 @@ class _FmcgRegisterSellerDistributorFormState
   }
 
   List<FmcgBrandsList> fetchBrands(String filter, LoadProps? loadProps) {
-    final allItems = brandsList ?? [];
+    final allItems = brandsList;
     if (filter.isEmpty) return allItems;
     return allItems
         .where((e) =>
@@ -101,55 +100,13 @@ class _FmcgRegisterSellerDistributorFormState
 
     authenticationCubit.fmcgGetCountryCodeList(NoParams());
     authenticationCubit.fmcgBrandsList(NoParams());
-
-    _screenController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-
-    _screenFade = CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    );
-
-    _screenScale = Tween<double>(
-      begin: 0.97,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _screenSlide = Tween<Offset>(
-      begin: const Offset(0, .04),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    Future.delayed(const Duration(milliseconds: 150), () {
-      if (mounted) _screenController.forward();
-    });
   }
-
-  late AnimationController _screenController;
-  late Animation<double> _screenFade;
-  late Animation<double> _screenScale;
-  late Animation<Offset> _screenSlide;
 
   final showPassword = ValueNotifier(false);
   final formKey = GlobalKey<FormState>();
 
   @override
-  void dispose() {
-    _screenController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final r = Responsive(context);
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: AdaptiveScaffold(
@@ -174,7 +131,7 @@ class _FmcgRegisterSellerDistributorFormState
 
               Navigator.pushNamedAndRemoveUntil(
                 context,
-                Routes.chatListScreen,
+                Routes.fmcgMainScreen,
                 (route) => false,
               );
               clearForm();
@@ -213,426 +170,366 @@ class _FmcgRegisterSellerDistributorFormState
           },
           child: Stack(
             children: [
-              FadeTransition(
-                  opacity: _screenFade,
-                  child: SlideTransition(
-                    position: _screenSlide,
-                    child: ScaleTransition(
-                      scale: _screenScale,
-                      child: CustomScrollView(
-                        keyboardDismissBehavior:
-                            ScrollViewKeyboardDismissBehavior.onDrag,
-                        physics: const BouncingScrollPhysics(
-                          parent: AlwaysScrollableScrollPhysics(),
-                        ),
-                        slivers: [
-                          CommonAppbar(
-                            title: widget.isDistributor
-                                ? "Apply for Distributorship"
-                                : "Register Your Brand",
-                            showBackButton: true,
-                            showNotification: false,
-                          ),
-                          SliverToBoxAdapter(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 20),
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  widget.isDistributor
-                                      ? Form(
-                                          key: formKey,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.stretch,
-                                            children: [
-                                              SizedBox(
-                                                height: 20,
-                                              ),
-                                              CommonTextField(
-                                                titleText: "Full Name",
-                                                hintText: "Enter Full Name",
-                                                controller: nameController,
-                                                textInputType:
-                                                    TextInputType.emailAddress,
-                                                autovalidateMode:
-                                                    AutovalidateMode
-                                                        .onUserInteraction,
-                                                validator: (String? value) {
-                                                  if (value == null ||
-                                                      value.trim().isEmpty) {
-                                                    return "Required";
-                                                  }
+              CustomScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                physics: const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics(),
+                ),
+                slivers: [
+                  CommonAppbar(
+                    title: widget.isDistributor
+                        ? "Apply for Distributorship"
+                        : "Register Your Brand",
+                    showBackButton: true,
+                    showNotification: false,
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          widget.isDistributor
+                              ? Form(
+                                  key: formKey,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      CommonTextField(
+                                        titleText: "Full Name",
+                                        hintText: "Enter Full Name",
+                                        controller: nameController,
+                                        textInputType:
+                                            TextInputType.emailAddress,
+                                        autovalidateMode:
+                                            AutovalidateMode.onUserInteraction,
+                                        validator: (String? value) {
+                                          if (value == null ||
+                                              value.trim().isEmpty) {
+                                            return "Required";
+                                          }
 
-                                                  return null;
-                                                },
-                                              ),
-                                              SizedBox(height: 12),
-                                              CommonTextField(
-                                                titleText: "Company Name ",
-                                                hintText: "Enter Company Name ",
-                                                controller:
-                                                    companyNameController,
-                                                autovalidateMode:
-                                                    AutovalidateMode
-                                                        .onUserInteraction,
-                                                validator: (String? val) {
-                                                  if (val == null ||
-                                                      val.isEmpty) {
-                                                    return "Required";
-                                                  }
+                                          return null;
+                                        },
+                                      ),
+                                      SizedBox(height: 12),
+                                      CommonTextField(
+                                        titleText: "Company Name ",
+                                        hintText: "Enter Company Name ",
+                                        controller: companyNameController,
+                                        autovalidateMode:
+                                            AutovalidateMode.onUserInteraction,
+                                        validator: (String? val) {
+                                          if (val == null || val.isEmpty) {
+                                            return "Required";
+                                          }
 
-                                                  return null;
-                                                },
-                                              ),
-                                              SizedBox(height: 12),
-                                              CommonTextField(
-                                                titleText: "Email",
-                                                hintText: "Enter Email",
-                                                controller: emailController,
-                                                autovalidateMode:
-                                                    AutovalidateMode
-                                                        .onUserInteraction,
-                                                validator: (String? val) {
-                                                  if (val == null ||
-                                                      val.isEmpty) {
-                                                    return "Required";
-                                                  }
+                                          return null;
+                                        },
+                                      ),
+                                      SizedBox(height: 12),
+                                      CommonTextField(
+                                        titleText: "Email",
+                                        hintText: "Enter Email",
+                                        controller: emailController,
+                                        autovalidateMode:
+                                            AutovalidateMode.onUserInteraction,
+                                        validator: (String? val) {
+                                          if (val == null || val.isEmpty) {
+                                            return "Required";
+                                          }
 
-                                                  return null;
-                                                },
-                                              ),
-                                              SizedBox(height: 12),
-                                              CommonDropdown<
-                                                  FmcgCountryCodeList>(
-                                                label: 'Country Code',
-                                                hint: 'Select Country Code',
-                                                dropdownKey: countryCodeKey,
-                                                asyncItems:
-                                                    (filter, loadProps) {
-                                                  return fetchCountryCode(
-                                                      filter, loadProps);
-                                                },
-                                                selectedItem: null,
-                                                itemAsString: (item) =>
-                                                    item.countryText ?? "",
-                                                onChanged: (item) {
-                                                  selectedCountryCode = item;
-                                                },
-                                                compareFn: (a, b) =>
-                                                    a.countryText ==
-                                                    b.countryText,
-                                              ),
-                                              SizedBox(height: 12),
-                                              CommonTextField(
-                                                titleText: "Mobile",
-                                                hintText: "Enter Mobile",
-                                                controller: mobileController,
-                                                textInputType:
-                                                    TextInputType.phone,
-                                                inputFormatters: [
-                                                  FilteringTextInputFormatter
-                                                      .digitsOnly
-                                                ],
-                                                autovalidateMode:
-                                                    AutovalidateMode
-                                                        .onUserInteraction,
-                                                validator: (String? val) {
-                                                  if (val == null ||
-                                                      val.isEmpty) {
-                                                    return "Required";
-                                                  }
+                                          return null;
+                                        },
+                                      ),
+                                      SizedBox(height: 12),
+                                      CommonDropdown<FmcgCountryCodeList>(
+                                        label: 'Country Code',
+                                        hint: 'Select Country Code',
+                                        dropdownKey: countryCodeKey,
+                                        asyncItems: (filter, loadProps) {
+                                          return fetchCountryCode(
+                                              filter, loadProps);
+                                        },
+                                        selectedItem: null,
+                                        itemAsString: (item) =>
+                                            item.countryText ?? "",
+                                        onChanged: (item) {
+                                          selectedCountryCode = item;
+                                        },
+                                        compareFn: (a, b) =>
+                                            a.countryText == b.countryText,
+                                      ),
+                                      SizedBox(height: 12),
+                                      CommonTextField(
+                                        titleText: "Mobile",
+                                        hintText: "Enter Mobile",
+                                        controller: mobileController,
+                                        textInputType: TextInputType.phone,
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
+                                        autovalidateMode:
+                                            AutovalidateMode.onUserInteraction,
+                                        validator: (String? val) {
+                                          if (val == null || val.isEmpty) {
+                                            return "Required";
+                                          }
 
-                                                  return null;
-                                                },
-                                              ),
-                                              SizedBox(height: 12),
-                                              CommonDropdown<FmcgBrandsList>(
-                                                label: 'Brand Name of Interest',
-                                                hint:
-                                                    'Select Brand Name of Interest',
-                                                dropdownKey: countryCodeKey,
-                                                asyncItems:
-                                                    (filter, loadProps) {
-                                                  return fetchBrands(
-                                                      filter, loadProps);
-                                                },
-                                                selectedItem: null,
-                                                itemAsString: (item) =>
-                                                    item.brandName ?? "",
-                                                onChanged: (item) {
-                                                  selectedBrand = item;
-                                                  setState(() {});
-                                                },
-                                                compareFn: (a, b) =>
-                                                    a.brandName == b.brandName,
-                                              ),
-                                              SizedBox(height: 12),
-                                              selectedBrand?.brandName ==
-                                                      "Other"
-                                                  ? CommonTextField(
-                                                      titleText: "Brand Name",
-                                                      hintText:
-                                                          "Enter Brand Name",
-                                                      controller:
-                                                          brandNameController,
-                                                      autovalidateMode:
-                                                          AutovalidateMode
-                                                              .onUserInteraction,
-                                                      validator: (String? val) {
-                                                        if (val == null ||
-                                                            val.isEmpty) {
-                                                          return "Required";
-                                                        }
+                                          return null;
+                                        },
+                                      ),
+                                      SizedBox(height: 12),
+                                      CommonDropdown<FmcgBrandsList>(
+                                        label: 'Brand Name of Interest',
+                                        hint: 'Select Brand Name of Interest',
+                                        dropdownKey: countryCodeKey,
+                                        asyncItems: (filter, loadProps) {
+                                          return fetchBrands(filter, loadProps);
+                                        },
+                                        selectedItem: null,
+                                        itemAsString: (item) =>
+                                            item.brandName ?? "",
+                                        onChanged: (item) {
+                                          selectedBrand = item;
+                                          setState(() {});
+                                        },
+                                        compareFn: (a, b) =>
+                                            a.brandName == b.brandName,
+                                      ),
+                                      SizedBox(height: 12),
+                                      selectedBrand?.brandName == "Other"
+                                          ? CommonTextField(
+                                              titleText: "Brand Name",
+                                              hintText: "Enter Brand Name",
+                                              controller: brandNameController,
+                                              autovalidateMode: AutovalidateMode
+                                                  .onUserInteraction,
+                                              validator: (String? val) {
+                                                if (val == null ||
+                                                    val.isEmpty) {
+                                                  return "Required";
+                                                }
 
-                                                        return null;
-                                                      },
-                                                    )
-                                                  : SizedBox.shrink(),
-                                              SizedBox(height: 12),
-                                              CommonTextField(
-                                                titleText:
-                                                    "Preferred Distributorship Location",
-                                                hintText:
-                                                    "Enter Preferred Distributorship Location",
-                                                controller:
-                                                    distributionLocationController,
-                                                autovalidateMode:
-                                                    AutovalidateMode
-                                                        .onUserInteraction,
-                                                validator: (String? val) {
-                                                  if (val == null ||
-                                                      val.isEmpty) {
-                                                    return "Required";
-                                                  }
+                                                return null;
+                                              },
+                                            )
+                                          : SizedBox.shrink(),
+                                      SizedBox(height: 12),
+                                      CommonTextField(
+                                        titleText:
+                                            "Preferred Distributorship Location",
+                                        hintText:
+                                            "Enter Preferred Distributorship Location",
+                                        controller:
+                                            distributionLocationController,
+                                        autovalidateMode:
+                                            AutovalidateMode.onUserInteraction,
+                                        validator: (String? val) {
+                                          if (val == null || val.isEmpty) {
+                                            return "Required";
+                                          }
 
-                                                  return null;
-                                                },
-                                              ),
-                                              SizedBox(height: 20),
-                                              CommonButton(
-                                                onPressed: () async {
-                                                  late FmcgRegisterDistributorParams
-                                                      params;
-                                                  if (formKey.currentState!
-                                                      .validate()) {
-                                                    params = FmcgRegisterDistributorParams(
-                                                        name:
-                                                            nameController.text,
-                                                        mobile: mobileController
-                                                            .text,
-                                                        email: emailController
-                                                            .text,
-                                                        companyName:
-                                                            companyNameController
-                                                                .text,
-                                                        interestedBrandName:
-                                                            (selectedBrand
-                                                                        ?.brandName ==
-                                                                    "Other")
-                                                                ? brandNameController
-                                                                    .text
-                                                                : selectedBrand
-                                                                        ?.brandName ??
-                                                                    "",
-                                                        perferredLocation:
-                                                            distributionLocationController
-                                                                .text,
-                                                        countryCode:
-                                                            selectedCountryCode
-                                                                    ?.countryCode ??
-                                                                '');
-                                                    if (!context.mounted) {
-                                                      return;
-                                                    }
-                                                    FocusManager
-                                                        .instance.primaryFocus
-                                                        ?.unfocus();
+                                          return null;
+                                        },
+                                      ),
+                                      SizedBox(height: 20),
+                                      CommonButton(
+                                        onPressed: () async {
+                                          late FmcgRegisterDistributorParams
+                                              params;
+                                          if (formKey.currentState!
+                                              .validate()) {
+                                            params = FmcgRegisterDistributorParams(
+                                                name: nameController.text,
+                                                mobile: mobileController.text,
+                                                email: emailController.text,
+                                                companyName:
+                                                    companyNameController.text,
+                                                interestedBrandName:
+                                                    (selectedBrand?.brandName ==
+                                                            "Other")
+                                                        ? brandNameController
+                                                            .text
+                                                        : selectedBrand
+                                                                ?.brandName ??
+                                                            "",
+                                                perferredLocation:
+                                                    distributionLocationController
+                                                        .text,
+                                                countryCode: selectedCountryCode
+                                                        ?.countryCode ??
+                                                    '');
+                                            if (!context.mounted) {
+                                              return;
+                                            }
+                                            FocusManager.instance.primaryFocus
+                                                ?.unfocus();
 
-                                                    BlocProvider.of<
-                                                                AuthenticationCubit>(
-                                                            context)
-                                                        .fmcgRegisterDistributor(
-                                                            params);
-                                                  }
-                                                },
-                                                text: "Register",
-                                                textStyle:
-                                                    TextStyleConstants.medium(
-                                                  context,
-                                                  fontSize: 16,
-                                                  color: AppColors.white,
-                                                ),
-                                              ),
-                                              SizedBox(height: 20),
-                                            ],
-                                          ),
-                                        )
-                                      : Form(
-                                          key: formKey,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.stretch,
-                                            children: [
-                                              SizedBox(
-                                                height: 20,
-                                              ),
-                                              CommonTextField(
-                                                titleText: "Brand Name",
-                                                hintText: "Enter Brand Name",
-                                                controller: brandNameController,
-                                                textInputType:
-                                                    TextInputType.emailAddress,
-                                                autovalidateMode:
-                                                    AutovalidateMode
-                                                        .onUserInteraction,
-                                                validator: (String? value) {
-                                                  if (value == null ||
-                                                      value.trim().isEmpty) {
-                                                    return "Required";
-                                                  }
-
-                                                  return null;
-                                                },
-                                              ),
-                                              SizedBox(height: 12),
-                                              CommonTextField(
-                                                titleText: "Name/Firm name",
-                                                hintText:
-                                                    "Enter Name/Firm name",
-                                                controller: nameController,
-                                                autovalidateMode:
-                                                    AutovalidateMode
-                                                        .onUserInteraction,
-                                                validator: (String? val) {
-                                                  if (val == null ||
-                                                      val.isEmpty) {
-                                                    return "Required";
-                                                  }
-
-                                                  return null;
-                                                },
-                                              ),
-                                              SizedBox(height: 12),
-                                              CommonTextField(
-                                                titleText: "Email",
-                                                hintText: "Enter Email",
-                                                controller: emailController,
-                                                autovalidateMode:
-                                                    AutovalidateMode
-                                                        .onUserInteraction,
-                                                validator: (String? val) {
-                                                  if (val == null ||
-                                                      val.isEmpty) {
-                                                    return "Required";
-                                                  }
-
-                                                  return null;
-                                                },
-                                              ),
-                                              SizedBox(height: 12),
-                                              CommonDropdown<
-                                                  FmcgCountryCodeList>(
-                                                label: 'Country Code',
-                                                hint: 'Select Country Code',
-                                                dropdownKey: countryCodeKey,
-                                                asyncItems:
-                                                    (filter, loadProps) {
-                                                  return fetchCountryCode(
-                                                      filter, loadProps);
-                                                },
-                                                selectedItem: null,
-                                                itemAsString: (item) =>
-                                                    item.countryText ?? "",
-                                                onChanged: (item) {
-                                                  selectedCountryCode = item;
-                                                },
-                                                compareFn: (a, b) =>
-                                                    a.countryText ==
-                                                    b.countryText,
-                                              ),
-                                              SizedBox(height: 12),
-                                              CommonTextField(
-                                                titleText: "Mobile",
-                                                hintText: "Enter Mobile",
-                                                controller: mobileController,
-                                                autovalidateMode:
-                                                    AutovalidateMode
-                                                        .onUserInteraction,
-                                                textInputType:
-                                                    TextInputType.phone,
-                                                inputFormatters: [
-                                                  FilteringTextInputFormatter
-                                                      .digitsOnly
-                                                ],
-                                                validator: (String? val) {
-                                                  if (val == null ||
-                                                      val.isEmpty) {
-                                                    return "Required";
-                                                  }
-
-                                                  return null;
-                                                },
-                                              ),
-                                              SizedBox(height: 20),
-                                              CommonButton(
-                                                onPressed: () async {
-                                                  late FmcgRegisterSellerParams
-                                                      params;
-                                                  if (formKey.currentState!
-                                                      .validate()) {
-                                                    params = FmcgRegisterSellerParams(
-                                                        token: "2018APR031848",
-                                                        brandName:
-                                                            brandNameController
-                                                                .text,
-                                                        contactName:
-                                                            nameController.text,
-                                                        countryCode:
-                                                            selectedCountryCode
-                                                                    ?.countryCode ??
-                                                                '',
-                                                        emailId: emailController
-                                                            .text,
-                                                        mobileNo:
-                                                            mobileController
-                                                                .text);
-                                                    if (!context.mounted) {
-                                                      return;
-                                                    }
-                                                    FocusManager
-                                                        .instance.primaryFocus
-                                                        ?.unfocus();
-
-                                                    BlocProvider.of<
-                                                                AuthenticationCubit>(
-                                                            context)
-                                                        .fmcgRegisterSeller(
-                                                            params);
-                                                  }
-                                                },
-                                                text: "Register",
-                                                textStyle:
-                                                    TextStyleConstants.medium(
-                                                  context,
-                                                  fontSize: 16,
-                                                  color: AppColors.white,
-                                                ),
-                                              ),
-                                              SizedBox(height: 20),
-                                            ],
-                                          ),
+                                            BlocProvider.of<
+                                                        AuthenticationCubit>(
+                                                    context)
+                                                .fmcgRegisterDistributor(
+                                                    params);
+                                          }
+                                        },
+                                        text: "Register",
+                                        textStyle: TextStyleConstants.medium(
+                                          context,
+                                          fontSize: 16,
+                                          color: AppColors.white,
                                         ),
-                                ],
-                              ),
-                            ),
-                          ),
+                                      ),
+                                      SizedBox(height: 20),
+                                    ],
+                                  ),
+                                )
+                              : Form(
+                                  key: formKey,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      CommonTextField(
+                                        titleText: "Brand Name",
+                                        hintText: "Enter Brand Name",
+                                        controller: brandNameController,
+                                        textInputType:
+                                            TextInputType.emailAddress,
+                                        autovalidateMode:
+                                            AutovalidateMode.onUserInteraction,
+                                        validator: (String? value) {
+                                          if (value == null ||
+                                              value.trim().isEmpty) {
+                                            return "Required";
+                                          }
+
+                                          return null;
+                                        },
+                                      ),
+                                      SizedBox(height: 12),
+                                      CommonTextField(
+                                        titleText: "Name/Firm name",
+                                        hintText: "Enter Name/Firm name",
+                                        controller: nameController,
+                                        autovalidateMode:
+                                            AutovalidateMode.onUserInteraction,
+                                        validator: (String? val) {
+                                          if (val == null || val.isEmpty) {
+                                            return "Required";
+                                          }
+
+                                          return null;
+                                        },
+                                      ),
+                                      SizedBox(height: 12),
+                                      CommonTextField(
+                                        titleText: "Email",
+                                        hintText: "Enter Email",
+                                        controller: emailController,
+                                        autovalidateMode:
+                                            AutovalidateMode.onUserInteraction,
+                                        validator: (String? val) {
+                                          if (val == null || val.isEmpty) {
+                                            return "Required";
+                                          }
+
+                                          return null;
+                                        },
+                                      ),
+                                      SizedBox(height: 12),
+                                      CommonDropdown<FmcgCountryCodeList>(
+                                        label: 'Country Code',
+                                        hint: 'Select Country Code',
+                                        dropdownKey: countryCodeKey,
+                                        asyncItems: (filter, loadProps) {
+                                          return fetchCountryCode(
+                                              filter, loadProps);
+                                        },
+                                        selectedItem: null,
+                                        itemAsString: (item) =>
+                                            item.countryText ?? "",
+                                        onChanged: (item) {
+                                          selectedCountryCode = item;
+                                        },
+                                        compareFn: (a, b) =>
+                                            a.countryText == b.countryText,
+                                      ),
+                                      SizedBox(height: 12),
+                                      CommonTextField(
+                                        titleText: "Mobile",
+                                        hintText: "Enter Mobile",
+                                        controller: mobileController,
+                                        autovalidateMode:
+                                            AutovalidateMode.onUserInteraction,
+                                        textInputType: TextInputType.phone,
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
+                                        validator: (String? val) {
+                                          if (val == null || val.isEmpty) {
+                                            return "Required";
+                                          }
+
+                                          return null;
+                                        },
+                                      ),
+                                      SizedBox(height: 20),
+                                      CommonButton(
+                                        onPressed: () async {
+                                          late FmcgRegisterSellerParams params;
+                                          if (formKey.currentState!
+                                              .validate()) {
+                                            params = FmcgRegisterSellerParams(
+                                                token: "2018APR031848",
+                                                brandName:
+                                                    brandNameController.text,
+                                                contactName:
+                                                    nameController.text,
+                                                countryCode: selectedCountryCode
+                                                        ?.countryCode ??
+                                                    '',
+                                                emailId: emailController.text,
+                                                mobileNo:
+                                                    mobileController.text);
+                                            if (!context.mounted) {
+                                              return;
+                                            }
+                                            FocusManager.instance.primaryFocus
+                                                ?.unfocus();
+
+                                            BlocProvider.of<
+                                                        AuthenticationCubit>(
+                                                    context)
+                                                .fmcgRegisterSeller(params);
+                                          }
+                                        },
+                                        text: "Register",
+                                        textStyle: TextStyleConstants.medium(
+                                          context,
+                                          fontSize: 16,
+                                          color: AppColors.white,
+                                        ),
+                                      ),
+                                      SizedBox(height: 20),
+                                    ],
+                                  ),
+                                ),
                         ],
                       ),
                     ),
-                  )),
+                  ),
+                ],
+              ),
               BlocBuilder<AuthenticationCubit, AuthenticationState>(
                 builder: (context, state) {
                   if (state is FmcgRegisterSellerIsLoading ||

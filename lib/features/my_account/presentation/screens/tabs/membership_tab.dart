@@ -23,49 +23,11 @@ class _MembershipTabState extends State<MembershipTab>
   MyAccountCubit get cubit => BlocProvider.of<MyAccountCubit>(context);
 
   void getMembership() {}
-  late AnimationController _screenController;
-  late Animation<double> _screenFade;
-  late Animation<double> _screenScale;
-  late Animation<Offset> _screenSlide;
+
   @override
   void initState() {
     super.initState();
     getMembership();
-    _screenController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-
-    _screenFade = CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    );
-
-    _screenScale = Tween<double>(
-      begin: 0.97,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _screenSlide = Tween<Offset>(
-      begin: const Offset(0, .04),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    Future.delayed(const Duration(milliseconds: 150), () {
-      if (mounted) _screenController.forward();
-    });
-  }
-
-  @override
-  void dispose() {
-    _screenController.dispose();
-    super.dispose();
   }
 
   @override
@@ -113,36 +75,30 @@ class _MembershipTabState extends State<MembershipTab>
             }
             return const CommonLoader();
           }
-          return FadeTransition(
-              opacity: _screenFade,
-              child: SlideTransition(
-                  position: _screenSlide,
-                  child: ScaleTransition(
-                      scale: _screenScale,
-                      child: CustomScrollView(slivers: [
-                        SliverSafeArea(
-                            sliver: SliverPadding(
-                                padding: const EdgeInsets.all(12),
-                                sliver: SliverList(
-                                    delegate: SliverChildBuilderDelegate(
-                                  (context, index) => Column(
-                                    children: [
-                                      _introText(),
-                                      const SizedBox(height: 16),
-                                      _membershipPlanCard(),
-                                      const SizedBox(height: 16),
-                                      _inauguralOfferCard(),
-                                      const SizedBox(height: 16),
-                                      _videoCard(),
-                                      const SizedBox(height: 16),
-                                      _bankDetailsCard(),
-                                      const SizedBox(height: 24),
-                                      _paymentSection(),
-                                      const SizedBox(height: 24),
-                                    ],
-                                  ),
-                                ))))
-                      ]))));
+          return CustomScrollView(slivers: [
+            SliverSafeArea(
+                sliver: SliverPadding(
+                    padding: const EdgeInsets.all(12),
+                    sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                      (context, index) => Column(
+                        children: [
+                          _introText(),
+                          const SizedBox(height: 16),
+                          _membershipPlanCard(),
+                          const SizedBox(height: 16),
+                          _inauguralOfferCard(),
+                          const SizedBox(height: 16),
+                          _videoCard(),
+                          const SizedBox(height: 16),
+                          _bankDetailsCard(),
+                          const SizedBox(height: 24),
+                          _paymentSection(),
+                          const SizedBox(height: 24),
+                        ],
+                      ),
+                    ))))
+          ]);
         },
       ),
     );

@@ -8,9 +8,10 @@ import 'package:tradologie_app/features/app/presentation/screens/main_screen.dar
 import 'package:tradologie_app/features/authentication/domain/usecases/send_otp_usecase.dart';
 import 'package:tradologie_app/features/authentication/presentation/screens/fmcg_register_seller_form.dart';
 import 'package:tradologie_app/features/authentication/presentation/screens/fmcg_seller_signin.dart';
-import 'package:tradologie_app/features/chat/domain/entities/chat_list.dart';
-import 'package:tradologie_app/features/chat/presentation/screens/chat_list_screen.dart';
-import 'package:tradologie_app/features/chat/presentation/screens/chat_screen.dart';
+import 'package:tradologie_app/features/fmcg/domain/entities/chat_list.dart';
+import 'package:tradologie_app/features/fmcg/presentation/screens/chat_list_screen.dart';
+import 'package:tradologie_app/features/fmcg/presentation/screens/chat_screen.dart';
+import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_main_screen.dart';
 import 'package:tradologie_app/features/contact_us/contact_us.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_dashboard_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_post_requirement_screen.dart';
@@ -95,6 +96,7 @@ class Routes {
   //! Chat
   static const String chatListScreen = '/chatListScreen';
   static const String chatScreen = '/chatScreen';
+  static const String fmcgMainScreen = '/fmcgMainScreen';
 }
 
 class AppRoutes {
@@ -250,6 +252,10 @@ class AppRoutes {
           return ChatScreen(
             chat: routeSettings.arguments as ChatList,
           );
+        });
+      case Routes.fmcgMainScreen:
+        return CupertinoPageRoute(builder: (context) {
+          return FMCGMainScreen();
         });
 
       default:

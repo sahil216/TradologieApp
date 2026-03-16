@@ -14,7 +14,6 @@ import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_regi
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_signin_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/send_otp_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/verify_otp_usecase.dart';
-import 'package:tradologie_app/features/authentication/presentation/screens/fmcg_register_seller_form.dart';
 
 import '../../../../core/error/failures.dart';
 import '../usecases/register_usecase.dart';

@@ -31,50 +31,10 @@ class _SellingLocationTabState extends State<SellingLocationTab>
     {"state": "WESTERN CAPE", "city": "CAPE TOWN"},
   ];
 
-  late AnimationController _screenController;
-  late Animation<double> _screenFade;
-  late Animation<double> _screenScale;
-  late Animation<Offset> _screenSlide;
-
   @override
   void initState() {
     super.initState();
     getSellingLocation();
-    _screenController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-
-    _screenFade = CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    );
-
-    _screenScale = Tween<double>(
-      begin: 0.97,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _screenSlide = Tween<Offset>(
-      begin: const Offset(0, .04),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    Future.delayed(const Duration(milliseconds: 150), () {
-      if (mounted) _screenController.forward();
-    });
-  }
-
-  @override
-  void dispose() {
-    _screenController.dispose();
-    super.dispose();
   }
 
   @override
@@ -103,59 +63,50 @@ class _SellingLocationTabState extends State<SellingLocationTab>
           return result;
         },
         builder: (context, state) {
-          return FadeTransition(
-              opacity: _screenFade,
-              child: SlideTransition(
-                  position: _screenSlide,
-                  child: ScaleTransition(
-                      scale: _screenScale,
-                      child: CustomScrollView(slivers: [
-                        SliverPadding(
-                          padding: const EdgeInsets.all(16),
-                          sliver: SliverToBoxAdapter(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _label("State/Province"),
-                                const SizedBox(height: 6),
-                                _dropdown(
-                                  hint: "--Select State--",
-                                  value: selectedState,
-                                  onChanged: (val) =>
-                                      setState(() => selectedState = val),
-                                ),
-                                const SizedBox(height: 16),
-                                _label("City"),
-                                const SizedBox(height: 6),
-                                _dropdown(
-                                  hint: "--Select City--",
-                                  value: selectedCity,
-                                  onChanged: (val) =>
-                                      setState(() => selectedCity = val),
-                                ),
-                                const SizedBox(height: 20),
-                                _submitButton(),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SliverToBoxAdapter(
-                          child: Container(
-                            height: 8,
-                            color: Colors.grey.shade200,
-                          ),
-                        ),
-                        SliverPadding(
-                          padding: const EdgeInsets.all(16),
-                          sliver: SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) =>
-                                  _locationCard(index, locations[index]),
-                              childCount: locations.length,
-                            ),
-                          ),
-                        ),
-                      ]))));
+          return CustomScrollView(slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.all(16),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _label("State/Province"),
+                    const SizedBox(height: 6),
+                    _dropdown(
+                      hint: "--Select State--",
+                      value: selectedState,
+                      onChanged: (val) => setState(() => selectedState = val),
+                    ),
+                    const SizedBox(height: 16),
+                    _label("City"),
+                    const SizedBox(height: 6),
+                    _dropdown(
+                      hint: "--Select City--",
+                      value: selectedCity,
+                      onChanged: (val) => setState(() => selectedCity = val),
+                    ),
+                    const SizedBox(height: 20),
+                    _submitButton(),
+                  ],
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Container(
+                height: 8,
+                color: Colors.grey.shade200,
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.all(16),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) => _locationCard(index, locations[index]),
+                  childCount: locations.length,
+                ),
+              ),
+            ),
+          ]);
         },
       ),
     );
