@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
+import 'package:tradologie_app/core/utils/hex_color.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_appbar.dart';
@@ -175,7 +176,7 @@ class _ChatScreenState extends State<ChatScreen>
                                                         horizontal: 12,
                                                         vertical: 6),
                                                 decoration: BoxDecoration(
-                                                  color: Colors.grey.shade300,
+                                                  color: HexColor('#0079D3'),
                                                   borderRadius:
                                                       BorderRadius.circular(12),
                                                 ),
@@ -200,12 +201,28 @@ class _ChatScreenState extends State<ChatScreen>
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 14, vertical: 10),
                                         decoration: BoxDecoration(
-                                          color: isMe
-                                              ? Colors.lightGreen.shade300
-                                              : Colors.grey.shade200,
-                                          borderRadius:
-                                              BorderRadius.circular(18),
-                                        ),
+                                            color: isMe
+                                                ? HexColor('#0079D3')
+                                                : Colors.grey.shade200,
+                                            borderRadius: isMe
+                                                ? BorderRadius.only(
+                                                    topRight:
+                                                        Radius.circular(8),
+                                                    topLeft: Radius.circular(8),
+                                                    bottomLeft:
+                                                        Radius.circular(8),
+                                                    bottomRight:
+                                                        Radius.circular(0),
+                                                  )
+                                                : BorderRadius.only(
+                                                    topRight:
+                                                        Radius.circular(8),
+                                                    topLeft: Radius.circular(8),
+                                                    bottomLeft:
+                                                        Radius.circular(0),
+                                                    bottomRight:
+                                                        Radius.circular(8),
+                                                  )),
                                         child: Column(
                                           crossAxisAlignment: isMe
                                               ? CrossAxisAlignment.end
@@ -216,8 +233,8 @@ class _ChatScreenState extends State<ChatScreen>
                                               style: TextStyleConstants.medium(
                                                 context,
                                                 color: isMe
-                                                    ? Colors.black87
-                                                    : Colors.black87,
+                                                    ? Colors.white
+                                                    : Colors.black,
                                                 fontSize: 16,
                                               ),
                                             ),
@@ -225,7 +242,9 @@ class _ChatScreenState extends State<ChatScreen>
                                               msg?.displayTime ?? "",
                                               style: TextStyleConstants.medium(
                                                 context,
-                                                color: Colors.grey.shade600,
+                                                color: isMe
+                                                    ? Colors.white
+                                                    : Colors.grey.shade600,
                                                 fontSize: 12,
                                               ),
                                             ),
