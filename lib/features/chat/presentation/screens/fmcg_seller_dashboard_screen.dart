@@ -212,7 +212,7 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen>
                                                 children: [
                                                   Expanded(
                                                     child: Text(
-                                                      "${(Constants().hideSensitiveData ?? true) ? Constants().maskName(item?.companyName ?? "") : (item?.companyName ?? "")} | ${item?.perferredLocation ?? ""}",
+                                                      "${(Constants().hideSensitiveData ?? true) ? Constants().maskName(item?.companyName ?? "") : (item?.companyName ?? "")} | ${item?.perferredLocation ?? ""} | ${item?.interestedBrandName ?? ""}",
                                                       style: const TextStyle(
                                                         fontSize: 16,
                                                         fontWeight:
@@ -299,7 +299,7 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen>
                                                             const SizedBox(
                                                                 height: 10),
                                                             Text(
-                                                              (item?.updatedDate)
+                                                              (item?.interestedBrandName)
                                                                   .toString(),
                                                               style:
                                                                   const TextStyle(
