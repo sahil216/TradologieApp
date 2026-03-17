@@ -44,9 +44,7 @@ class AdaptiveScaffold extends StatelessWidget {
       extendBody: true,
       body: SizedBox.expand(
         child: DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: backgroundGradient ?? _defaultGradient,
-          ),
+          decoration: BoxDecoration(),
           child: _buildContent(context, r),
         ),
       ),

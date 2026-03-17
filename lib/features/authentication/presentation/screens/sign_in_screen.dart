@@ -127,16 +127,6 @@ class _SignInScreenState extends State<SignInScreen>
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: AdaptiveScaffold(
-        // resizeToAvoidBottomInset: false,
-        // appBar: Constants.appBar(
-        //   context,
-        //   boxShadow: [],
-        //   centerTitle: true,
-        //   titleWidget: Image.asset(
-        //     ImgAssets.companyLogo,
-        //     height: 40,
-        //   ),
-        // ),
         body: BlocListener<AuthenticationCubit, AuthenticationState>(
           listenWhen: (previous, current) => previous != current,
           listener: (context, state) async {

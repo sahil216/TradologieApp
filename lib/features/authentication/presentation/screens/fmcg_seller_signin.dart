@@ -1,5 +1,11 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 
@@ -38,9 +44,68 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
 
   bool isSubmitted = false;
 
+  String model = '';
+  String osVersionRelease = '';
+  String deviceId = '';
+  String manufacturer = '';
+  String appVersion = '';
+
   @override
   void initState() {
     super.initState();
+    initPlatformState();
+    initPackageInfo();
+  }
+
+  Future<void> initPackageInfo() async {
+    final info = await PackageInfo.fromPlatform();
+    setState(() {
+      appVersion = info.version;
+    });
+  }
+
+  final deviceInfoPlugin = DeviceInfoPlugin();
+
+  Future<void> initPlatformState() async {
+    try {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          _readAndroidBuildData(
+            await deviceInfoPlugin.androidInfo,
+          );
+          break;
+
+        case TargetPlatform.iOS:
+          _readIosDeviceInfo(
+            await deviceInfoPlugin.iosInfo,
+          );
+          break;
+
+        default:
+          throw UnimplementedError(
+            'Platform not supported',
+          );
+      }
+    } on PlatformException catch (e) {
+      debugPrint('Failed to get device info: $e');
+    }
+
+    if (!mounted) return;
+    setState(() {});
+  }
+
+  void _readAndroidBuildData(AndroidDeviceInfo build) {
+    manufacturer = build.manufacturer;
+    model = build.model;
+    osVersionRelease = build.version.release;
+    deviceId = build.id;
+  }
+
+  void _readIosDeviceInfo(IosDeviceInfo data) {
+    manufacturer = "Apple";
+    model = data.modelName;
+    osVersionRelease = data.systemVersion;
+    deviceId = data.identifierForVendor ?? "";
   }
 
   final showPassword = ValueNotifier(false);
@@ -164,23 +229,7 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
                                           return null;
                                         },
                                       ),
-                                      // SizedBox(height: 12),
-                                      // Align(
-                                      //   alignment: Alignment.centerRight,
-                                      //   child: GestureDetector(
-                                      //     onTap: () {},
-                                      //     child: Text(
-                                      //       CommonStrings.forgotPassword,
-                                      //       style: TextStyleConstants.regular(
-                                      //         context,
-                                      //         fontSize: 14,
-                                      //         decoration:
-                                      //             TextDecoration.underline,
-                                      //         color: AppColors.orange,
-                                      //       ),
-                                      //     ),
-                                      //   ),
-                                      // ),
+
                                       SizedBox(height: 20),
                                       CommonButton(
                                         onPressed: () async {
@@ -194,6 +243,20 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
                                               password:
                                                   textPasswordController.text,
                                               token: "2018APR031848",
+                                              osType: Platform.isAndroid
+                                                  ? "Android"
+                                                  : "iOS",
+                                              fcmToken:
+                                                  await secureStorageService
+                                                          .read(AppStrings
+                                                              .fcmToken) ??
+                                                      "",
+                                              manufacturer: manufacturer,
+                                              model: model,
+                                              osVersionRelease:
+                                                  osVersionRelease,
+                                              appVersion: appVersion,
+                                              deviceId: deviceId,
                                             );
                                             if (!context.mounted) {
                                               return;

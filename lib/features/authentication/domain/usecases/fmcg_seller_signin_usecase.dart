@@ -20,11 +20,25 @@ class FmcgSellerSigninParams extends Equatable {
   final String userId;
   final String password;
   final String token;
+  final String manufacturer;
+  final String model;
+  final String osVersionRelease;
+  final String appVersion;
+  final String fcmToken;
+  final String osType;
+  final String deviceId;
 
   const FmcgSellerSigninParams({
     required this.userId,
     required this.password,
     required this.token,
+    required this.manufacturer,
+    required this.model,
+    required this.osVersionRelease,
+    required this.appVersion,
+    required this.fcmToken,
+    required this.osType,
+    required this.deviceId,
   });
 
   @override
@@ -33,5 +47,12 @@ class FmcgSellerSigninParams extends Equatable {
         "UserID": userId,
         "Password": password,
         "Token": token,
+        "Manufacturer": "Samsung",
+        "Model": "S23",
+        "OSVersionRelease": "13",
+        "AppVersion": "1.0.5",
+        "FcmToken": "2018APR031848",
+        "OSType": "Android",
+        "DeviceID": "device-001"
       };
 }

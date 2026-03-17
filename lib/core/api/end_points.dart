@@ -35,12 +35,20 @@ class EndPoints {
   }
 
   static String countryCodeList = '$baseUrlSupplier/GetOTPCountry';
-
+  // FMCG
   static String fmcgSellerSignin = "$baseUrl/FMCG/FMCGSellerLogin";
+  static String fmcgBuyerSignin = "$baseUrl/FMCG/FMCGBuyerLogin";
   static String fmcgCountryCodeList = "$baseUrl/FMCG/FMCGReqCountryList";
   static String fmcgRegisterDistributor = "$baseUrl/FMCG/FMCGDistributorship";
   static String fmcgRegisterSeller = "$baseUrl/FMCG/FMCGReqEnquiry";
   static String fmcgGetAllBrandList = "$baseUrl/FMCG/FMCGGetAllBrand";
+  static String fmcgLogout = "$baseUrl/FMCG/FMCGLogout";
+  static String fmcgUpdateSellerDocuments =
+      "$baseUrl/FMCG/FMCGUpdateSellerDocuments";
+  static String fmcgGetSellerDocuments = "$baseUrl/FMCG/FMCGGetSellerDocuments";
+  static String fmcgUpdateSellerProfile =
+      "$baseUrl/FMCG/FMCGUpdateSellerProfile";
+  static String fmcgGetSellerProfile = "$baseUrl/FMCG/FMCGGetSellerProfile";
 
   // Verify
   static String verifyOtp(UserType userType) {

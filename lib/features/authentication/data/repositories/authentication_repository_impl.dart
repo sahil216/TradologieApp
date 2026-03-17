@@ -18,7 +18,6 @@ import 'package:tradologie_app/features/authentication/domain/usecases/delete_ac
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_register_distributor_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_register_seller_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_signin_usecase.dart';
-import 'package:tradologie_app/features/authentication/presentation/screens/fmcg_seller_signin.dart';
 
 import '../../../../core/error/failures.dart';
 import '../../../../core/error/user_failure.dart';

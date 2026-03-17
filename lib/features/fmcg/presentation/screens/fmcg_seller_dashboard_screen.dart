@@ -134,12 +134,22 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen>
                                     padding: const EdgeInsets.all(18),
                                     decoration: BoxDecoration(
                                       color: Colors.white,
-                                      borderRadius: BorderRadius.circular(18),
+                                      gradient: LinearGradient(
+                                          begin: AlignmentGeometry.centerLeft,
+                                          end: AlignmentGeometry.centerRight,
+                                          colors: [
+                                            Colors.white,
+                                            const Color.fromARGB(
+                                                255, 228, 238, 247),
+                                            const Color.fromARGB(
+                                                255, 239, 231, 249)
+                                          ]),
+                                      borderRadius: BorderRadius.circular(8),
                                       boxShadow: [
                                         BoxShadow(
                                           blurRadius: 20,
                                           color: Colors.black
-                                              .withValues(alpha: 0.08),
+                                              .withValues(alpha: 0.05),
                                           offset: const Offset(0, 10),
                                         )
                                       ],

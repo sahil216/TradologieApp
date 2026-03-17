@@ -1,314 +1,367 @@
-import 'package:dropdown_search/dropdown_search.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tradologie_app/config/routes/navigation_service.dart';
-import 'package:tradologie_app/core/usecases/usecase.dart';
+import 'dart:io';
+import 'dart:ui';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tradologie_app/config/routes/app_router.dart';
+import 'package:tradologie_app/config/routes/navigation_service.dart';
+import 'package:tradologie_app/core/error/network_failure.dart';
+import 'package:tradologie_app/core/error/user_failure.dart';
+import 'package:tradologie_app/core/usecases/usecase.dart';
+import 'package:tradologie_app/core/utils/analytics_services.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_appbar.dart';
-import 'package:tradologie_app/core/widgets/common_drop_down.dart';
+import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
-import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
-import 'package:tradologie_app/features/authentication/domain/entities/fmcg_brands_list.dart';
-import 'package:tradologie_app/features/authentication/domain/entities/fmcg_country_code_list.dart';
-import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_register_seller_usecase.dart';
-import 'package:tradologie_app/features/authentication/presentation/cubit/authentication_cubit.dart';
+import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
+import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
+import 'package:tradologie_app/features/fmcg/presentation/screens/stepper_screens/fmcg_documents_screen.dart';
+import 'package:tradologie_app/features/fmcg/presentation/screens/stepper_screens/fmcg_profile_screen.dart';
+import 'package:tradologie_app/features/my_account/domain/entities/company_details.dart';
+import 'package:tradologie_app/features/my_account/presentation/cubit/my_account_cubit.dart';
+import 'package:tradologie_app/features/webview/presentation/screens/in_app_webview_screen.dart';
+import 'package:tradologie_app/features/webview/presentation/screens/viewmodel/webview_params.dart';
+import 'package:tradologie_app/features/webview/presentation/screens/webview_screen.dart';
 
-import '../../../../core/utils/app_colors.dart';
-import '../../../../core/widgets/custom_button.dart';
-import '../../../../core/widgets/custom_text_field.dart';
+import '../../../../core/api/end_points.dart';
+import '../../../../core/utils/app_strings.dart';
 import '../../../../injection_container.dart';
 
+class _FmcgMyAccountTabBarDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+
+  _FmcgMyAccountTabBarDelegate(this.child);
+
+  @override
+  double get minExtent => 64;
+
+  @override
+  double get maxExtent => 64;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlaps) {
+    return Container(
+      color: Colors.transparent,
+      alignment: Alignment.center,
+      child: child,
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant _FmcgMyAccountTabBarDelegate oldDelegate) {
+    return false;
+  }
+}
+
 class FmcgMyAccountScreen extends StatefulWidget {
-  const FmcgMyAccountScreen({
-    super.key,
-  });
+  const FmcgMyAccountScreen({super.key});
 
   @override
   State<FmcgMyAccountScreen> createState() => _FmcgMyAccountScreenState();
 }
 
 class _FmcgMyAccountScreenState extends State<FmcgMyAccountScreen>
-    with SingleTickerProviderStateMixin {
-  final emailController = TextEditingController();
-  final mobileController = TextEditingController();
-  final nameController = TextEditingController();
-  final brandNameController = TextEditingController();
+    with TickerProviderStateMixin {
+  final SecureStorageService _secureStorage = SecureStorageService();
+  String? token;
+  CompanyDetails? companyDetails;
+  late TabController _tabController;
+  int _previousIndex = 0;
 
-  final distributionLocationController = TextEditingController();
-  final companyNameController = TextEditingController();
+  MyAccountCubit get cubit => BlocProvider.of<MyAccountCubit>(context);
 
-  List<FmcgCountryCodeList> countryCodeList = [];
-  FmcgCountryCodeList? selectedCountryCode;
-  Key countryCodeKey = UniqueKey();
-  List<FmcgBrandsList> brandsList = [];
-  FmcgBrandsList? selectedBrand;
-  Key brandKey = UniqueKey();
-
-  void clearForm() {
-    emailController.clear();
-    mobileController.clear();
-    nameController.clear();
-    brandNameController.clear();
-    distributionLocationController.clear();
-    companyNameController.clear();
-    selectedBrand = null;
-    selectedCountryCode = null;
-    countryCodeKey = UniqueKey();
-    brandKey = UniqueKey();
-    setState(() {});
-  }
-
-  List<FmcgCountryCodeList> fetchCountryCode(
-      String filter, LoadProps? loadProps) {
-    final allItems = countryCodeList;
-    if (filter.isEmpty) return allItems;
-    return allItems
-        .where(
-            (e) => (e.name ?? "").toLowerCase().contains(filter.toLowerCase()))
-        .toList();
-  }
-
-  List<FmcgBrandsList> fetchBrands(String filter, LoadProps? loadProps) {
-    final allItems = brandsList;
-    if (filter.isEmpty) return allItems;
-    return allItems
-        .where((e) =>
-            (e.brandName ?? "").toLowerCase().contains(filter.toLowerCase()))
-        .toList();
-  }
-
-  SecureStorageService secureStorageService = SecureStorageService();
-
-  bool isSubmitted = false;
-
-  AuthenticationCubit get authenticationCubit =>
-      BlocProvider.of<AuthenticationCubit>(context);
+  // Future<void> getCompanyDetails() async {
+  //   await cubit.companyDetails(NoParams());
+  // }
 
   @override
   void initState() {
     super.initState();
+    _loadToken();
+    // getCompanyDetails();
 
-    authenticationCubit.fmcgGetCountryCodeList(NoParams());
-    authenticationCubit.fmcgBrandsList(NoParams());
+    _tabController = TabController(length: 2, vsync: this);
+
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) {
+        _handleTabChange(_tabController.index);
+      }
+    });
   }
 
-  final showPassword = ValueNotifier(false);
-  final formKey = GlobalKey<FormState>();
+  void _handleTabChange(int newIndex) {
+    bool canOpen = _canOpenTab(newIndex);
+
+    if (!canOpen) {
+      Future.microtask(() {
+        _tabController.index = _previousIndex;
+      });
+    } else {
+      _previousIndex = newIndex;
+    }
+  }
+
+  bool _canOpenTab(int index) {
+    return true;
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+
+    super.dispose();
+  }
+
+  Future<void> _loadToken() async {
+    final _token = await _secureStorage.read(AppStrings.apiVerificationCode);
+    setState(() {
+      token = _token;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: AdaptiveScaffold(
-        body: BlocListener<AuthenticationCubit, AuthenticationState>(
-          listenWhen: (previous, current) => previous != current,
-          listener: (context, state) async {
-            if (state is FmcgRegisterSellerSuccess) {
-              clearForm();
-              sl<NavigationService>().pop();
-              CommonToast.success(
-                  "Thank You for Your Enquiry!Your enquiry has been successfully submitted. Our team will contact you shortly.");
-            }
-            if (state is FmcgRegisterSellerError) {
-              CommonToast.showFailureToast(state.failure);
-            }
-            if (state is FmcgRegisterDistributorSuccess) {
-              clearForm();
-              sl<NavigationService>().pop();
-              CommonToast.success(
-                  "Thank You for Your Interest in Becoming a Distributor! Your enquiry has been successfully submitted. Our team will review your details and contact you shortly.");
-            }
-            if (state is FmcgRegisterDistributorError) {
-              CommonToast.showFailureToast(state.failure);
-            }
-            if (state is FmcgCountryCodeListSuccess) {
-              countryCodeList = state.data;
+    if (token == null) {
+      return const AdaptiveScaffold(
+        body: CommonLoader(),
+      );
+    }
 
-              setState(() {});
-            }
-            if (state is FmcgCountryCodeListError) {
-              CommonToast.showFailureToast(state.failure);
-            }
-            if (state is FmcgBrandsListSuccess) {
-              brandsList = state.data;
-
-              setState(() {});
-            }
-            if (state is FmcgBrandsListError) {
-              CommonToast.showFailureToast(state.failure);
-            }
-          },
-          child: Stack(
-            children: [
-              CustomScrollView(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                physics: const BouncingScrollPhysics(
-                  parent: AlwaysScrollableScrollPhysics(),
-                ),
-                slivers: [
-                  CommonAppbar(
-                    title: "My Account",
-                    showBackButton: true,
-                    showNotification: false,
-                  ),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Form(
-                            key: formKey,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                CommonTextField(
-                                  titleText: "Brand Name",
-                                  hintText: "Enter Brand Name",
-                                  controller: brandNameController,
-                                  textInputType: TextInputType.emailAddress,
-                                  autovalidateMode:
-                                      AutovalidateMode.onUserInteraction,
-                                  validator: (String? value) {
-                                    if (value == null || value.trim().isEmpty) {
-                                      return "Required";
-                                    }
-
-                                    return null;
-                                  },
-                                ),
-                                SizedBox(height: 12),
-                                CommonTextField(
-                                  titleText: "Name/Firm name",
-                                  hintText: "Enter Name/Firm name",
-                                  controller: nameController,
-                                  autovalidateMode:
-                                      AutovalidateMode.onUserInteraction,
-                                  validator: (String? val) {
-                                    if (val == null || val.isEmpty) {
-                                      return "Required";
-                                    }
-
-                                    return null;
-                                  },
-                                ),
-                                SizedBox(height: 12),
-                                CommonTextField(
-                                  titleText: "Email",
-                                  hintText: "Enter Email",
-                                  controller: emailController,
-                                  autovalidateMode:
-                                      AutovalidateMode.onUserInteraction,
-                                  validator: (String? val) {
-                                    if (val == null || val.isEmpty) {
-                                      return "Required";
-                                    }
-
-                                    return null;
-                                  },
-                                ),
-                                SizedBox(height: 12),
-                                CommonDropdown<FmcgCountryCodeList>(
-                                  label: 'Country Code',
-                                  hint: 'Select Country Code',
-                                  dropdownKey: countryCodeKey,
-                                  asyncItems: (filter, loadProps) {
-                                    return fetchCountryCode(filter, loadProps);
-                                  },
-                                  selectedItem: null,
-                                  itemAsString: (item) =>
-                                      item.countryText ?? "",
-                                  onChanged: (item) {
-                                    selectedCountryCode = item;
-                                  },
-                                  compareFn: (a, b) =>
-                                      a.countryText == b.countryText,
-                                ),
-                                SizedBox(height: 12),
-                                CommonTextField(
-                                  titleText: "Mobile",
-                                  hintText: "Enter Mobile",
-                                  controller: mobileController,
-                                  autovalidateMode:
-                                      AutovalidateMode.onUserInteraction,
-                                  textInputType: TextInputType.phone,
-                                  inputFormatters: [
-                                    FilteringTextInputFormatter.digitsOnly
-                                  ],
-                                  validator: (String? val) {
-                                    if (val == null || val.isEmpty) {
-                                      return "Required";
-                                    }
-
-                                    return null;
-                                  },
-                                ),
-                                SizedBox(height: 20),
-                                CommonButton(
-                                  onPressed: () async {
-                                    late FmcgRegisterSellerParams params;
-                                    if (formKey.currentState!.validate()) {
-                                      params = FmcgRegisterSellerParams(
-                                          token: Constants.token,
-                                          brandName: brandNameController.text,
-                                          contactName: nameController.text,
-                                          countryCode: selectedCountryCode
-                                                  ?.countryCode ??
-                                              '',
-                                          emailId: emailController.text,
-                                          mobileNo: mobileController.text);
-                                      if (!context.mounted) {
-                                        return;
-                                      }
-                                      FocusManager.instance.primaryFocus
-                                          ?.unfocus();
-
-                                      BlocProvider.of<AuthenticationCubit>(
-                                              context)
-                                          .fmcgRegisterSeller(params);
-                                    }
-                                  },
-                                  text: "Register",
-                                  textStyle: TextStyleConstants.medium(
-                                    context,
-                                    fontSize: 16,
-                                    color: AppColors.white,
-                                  ),
-                                ),
-                                SizedBox(height: 20),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+    return DefaultTabController(
+      length: 2,
+      child: MultiBlocListener(
+        listeners: [
+          BlocListener<MyAccountCubit, MyAccountState>(
+            listenWhen: (previous, current) => previous != current,
+            listener: (context, state) {
+              if (state is CompanyDetailsSuccess) {
+                companyDetails = state.data;
+              }
+              if (state is CompanyDetailsError) {
+                CommonToast.showFailureToast(state.failure);
+              }
+            },
+          ),
+        ],
+        child: AdaptiveScaffold(
+          body: CustomScrollView(
+            physics: NeverScrollableScrollPhysics(),
+            slivers: [
+              /// ⭐ ULTRA COMMON APPBAR
+              CommonAppbar(
+                title: "My Account",
+                showNotification: true,
+                onNotificationTap: () {
+                  sl<NavigationService>().pushNamed(
+                    Routes.notificationScreen,
+                  );
+                },
               ),
-              // BlocBuilder<AuthenticationCubit, AuthenticationState>(
-              //   builder: (context, state) {
-              //     if (state is FmcgRegisterSellerIsLoading ||
-              //         state is FmcgRegisterDistributorIsLoading ||
-              //         state is FmcgBrandsListIsLoading ||
-              //         state is FmcgCountryCodeListIsLoading) {
-              //       return Positioned.fill(child: const CommonLoader());
-              //     }
-              //     return SizedBox.shrink();
-              //   },
-              // ),
+
+              /// ⭐ PINNED TABBAR (EXACT SAME UI)
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _FmcgMyAccountTabBarDelegate(
+                  CommonTabBarWidget(
+                    controller: _tabController,
+                    tabs: const [
+                      "Information",
+                      "Documents",
+                    ],
+                    isEnabled: (index) {
+                      return true;
+                    },
+                  ),
+                ),
+              ),
+              SliverFillRemaining(
+                child: BlocBuilder<MyAccountCubit, MyAccountState>(
+                  buildWhen: (previous, current) {
+                    bool result = previous != current;
+                    result = result &&
+                        (current is CompanyDetailsSuccess ||
+                            current is CompanyDetailsError ||
+                            current is CompanyDetailsIsLoading);
+                    return result;
+                  },
+                  builder: (context, state) {
+                    // if (state is CompanyDetailsError) {
+                    //   if (state.failure is NetworkFailure) {
+                    //     return CustomErrorNetworkWidget(
+                    //       onPress: () {
+                    //         getCompanyDetails();
+                    //       },
+                    //     );
+                    //   } else if (state.failure is UserFailure) {
+                    //     return CustomErrorWidget(
+                    //       onPress: () {
+                    //         getCompanyDetails();
+                    //       },
+                    //       errorText: state.failure.msg,
+                    //     );
+                    //   }
+                    // }
+
+                    /// 👇 KEEP YOUR ORIGINAL TABBARVIEW EXACTLY SAME
+                    return TabBarView(
+                      controller: _tabController,
+                      physics: NeverScrollableScrollPhysics(),
+                      children: [FmcgProfileScreen(), FmcgDocumentsScreen()],
+                    );
+                  },
+                ),
+              ),
             ],
+          ),
+          bottomNavigationBar: SizedBox(
+            height: 70,
           ),
         ),
       ),
+    );
+  }
+}
+
+class CommonTabBarWidget extends StatefulWidget {
+  final TabController controller;
+  final List<String> tabs;
+  final bool Function(int index)? isEnabled;
+
+  const CommonTabBarWidget({
+    super.key,
+    required this.controller,
+    required this.tabs,
+    this.isEnabled,
+  });
+
+  @override
+  State<CommonTabBarWidget> createState() => _CommonTabBarWidgetState();
+}
+
+class _CommonTabBarWidgetState extends State<CommonTabBarWidget> {
+  final ScrollController _scrollController = ScrollController();
+  final List<GlobalKey> _keys = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _keys.addAll(List.generate(widget.tabs.length, (_) => GlobalKey()));
+    widget.controller.addListener(_centerSelectedTab);
+  }
+
+  void _centerSelectedTab() {
+    if (!_scrollController.hasClients) return;
+
+    final index = widget.controller.index;
+    final ctx = _keys[index].currentContext;
+    if (ctx == null) return;
+
+    final box = ctx.findRenderObject() as RenderBox;
+    final pos = box.localToGlobal(Offset.zero);
+
+    final screenWidth = MediaQuery.of(context).size.width;
+    final target = _scrollController.offset +
+        pos.dx -
+        screenWidth / 2 +
+        box.size.width / 2;
+
+    _scrollController.animateTo(
+      target.clamp(
+        _scrollController.position.minScrollExtent,
+        _scrollController.position.maxScrollExtent,
+      ),
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_centerSelectedTab);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: widget.controller.animation!,
+      builder: (context, _) {
+        final progress = widget.controller.animation!.value;
+
+        return ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Container(
+              height: 56,
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: .45),
+                borderRadius: BorderRadius.circular(34),
+                border: Border.all(color: Colors.white.withValues(alpha: .5)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: .08),
+                    blurRadius: 25,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+
+              /// ⭐ SHADER EDGE FADE (NO OVERLAY BLOCKS)
+              child: ListView.builder(
+                controller: _scrollController,
+                scrollDirection: Axis.horizontal,
+                itemCount: widget.tabs.length,
+                itemBuilder: (context, index) {
+                  final selected = widget.controller.index == index;
+                  final enabled = widget.isEnabled?.call(index) ?? true;
+
+                  final stretch =
+                      (1 - (progress - index).abs()).clamp(0.9, 1.0);
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: GestureDetector(
+                      onTap: enabled
+                          ? () => widget.controller.animateTo(index)
+                          : null,
+                      child: Transform.scale(
+                        scale: stretch,
+                        child: AnimatedContainer(
+                          key: _keys[index],
+                          duration: const Duration(milliseconds: 260),
+                          curve: Curves.easeOutCubic,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: selected ? Colors.black : Colors.transparent,
+                            borderRadius: BorderRadius.circular(26),
+                          ),
+                          child: Opacity(
+                            opacity: enabled ? 1 : .3,
+                            child: Text(
+                              widget.tabs[index],
+                              style: TextStyle(
+                                color: selected ? Colors.white : Colors.black54,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

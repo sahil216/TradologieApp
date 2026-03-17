@@ -2,8 +2,10 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
+import 'package:tradologie_app/features/contact_us/more_options_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/chat_list_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_account_screen.dart';
+import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_my_account_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_seller_dashboard_screen.dart';
 
 class CommonFMCGFloatingNavBar extends StatelessWidget {
@@ -47,7 +49,8 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
                 _item(0, Icons.dashboard_outlined, "Dashboard"),
                 _item(1, Icons.chat_outlined, "Chats"),
                 _item(2, Icons.account_circle_outlined, "My Account"),
-                _item(3, Icons.payment_outlined, "Membership"),
+                _item(3, Icons.menu_rounded, "More"),
+                _item(4, Icons.payment_outlined, "Membership"),
               ],
             ),
           ),
@@ -109,13 +112,14 @@ class _FMCGMainScreenState extends State<FMCGMainScreen> {
   final List<Widget> screens = [
     FmcgSellerDashboardScreen(),
     ChatListScreen(),
-    RegistrationScreen(),
+    FmcgMyAccountScreen(),
+    MoreOptionsScreen(),
     SizedBox(),
   ];
 
   void onTabChanged(int index) {
     setState(() {
-      if (index == 3) {
+      if (index == 4) {
         Constants.launch("https://www.tradologie.com/brand-membership/");
       } else {
         setState(() {
