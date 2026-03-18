@@ -9,6 +9,7 @@ import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tradologie_app/core/utils/get_device_id.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/notifications_service.dart';
 import 'app_lifecycle_observer.dart';
@@ -130,4 +131,5 @@ Future<void> init(Future<void> Function(RemoteMessage) handler) async {
       await secureStorage.read(AppStrings.sellerTimeZone) ?? "";
   Constants.token =
       await secureStorage.read(AppStrings.apiVerificationCode) ?? "";
+  Constants.deviceID = await DeviceIdService.getDeviceId();
 }

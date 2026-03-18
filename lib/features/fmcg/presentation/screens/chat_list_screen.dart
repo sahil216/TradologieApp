@@ -35,6 +35,7 @@ class _ChatListScreenState extends State<ChatListScreen>
     ChatListParams params = ChatListParams(
       sellerID: await secureStorage.read(AppStrings.loginId) ?? "",
       token: await secureStorage.read(AppStrings.apiVerificationCode) ?? "",
+      deviceID: Constants.deviceID,
     );
 
     await chatCubit.getChatList(params);

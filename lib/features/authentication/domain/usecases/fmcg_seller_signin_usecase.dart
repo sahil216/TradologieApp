@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:tradologie_app/core/error/failures.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
+import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_signin_response.dart';
 import 'package:tradologie_app/features/authentication/domain/repositories/authentication_repository.dart';
 
@@ -47,12 +48,12 @@ class FmcgSellerSigninParams extends Equatable {
         "UserID": userId,
         "Password": password,
         "Token": token,
-        "Manufacturer": "Samsung",
-        "Model": "S23",
-        "OSVersionRelease": "13",
-        "AppVersion": "1.0.5",
-        "FcmToken": "2018APR031848",
-        "OSType": "Android",
-        "DeviceID": "device-001"
+        "Manufacturer": manufacturer,
+        "Model": model,
+        "OSVersionRelease": osVersionRelease,
+        "AppVersion": appVersion,
+        "FcmToken": fcmToken,
+        "OSType": osType,
+        "DeviceID": Constants.deviceID
       };
 }

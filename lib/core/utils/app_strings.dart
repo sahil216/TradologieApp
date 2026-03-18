@@ -6,6 +6,7 @@ class AppStrings {
   static const String locale = 'locale';
   static const String isBuyer = 'is_buyer';
   static const String isFmcg = 'is_fmcg';
+  static const String deviceId = 'device_id';
 
   static const String userId = 'user_id';
   static const String vendorId = 'vendor_id';

@@ -128,32 +128,54 @@ class _PremiumDocumentPickerState extends State<PremiumDocumentPicker>
                 child: Column(
                   children: [
                     /// Dropdown
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: Colors.white.withOpacity(0.25),
-                      ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          value: selectedAction,
-                          isExpanded: true,
-                          dropdownColor: Colors.white,
-                          items: const [
-                            DropdownMenuItem(
-                                value: "Choose", child: Text("Choose Source")),
-                            DropdownMenuItem(
-                                value: "Camera", child: Text("Camera")),
-                            DropdownMenuItem(
-                                value: "Gallery", child: Text("Gallery")),
-                            DropdownMenuItem(
-                                value: "File", child: Text("File")),
+                    // Container(
+                    //   padding: const EdgeInsets.symmetric(horizontal: 12),
+                    //   decoration: BoxDecoration(
+                    //     borderRadius: BorderRadius.circular(12),
+                    //     color: Colors.white.withOpacity(0.25),
+                    //   ),
+                    //   child: DropdownButtonHideUnderline(
+                    //     child: DropdownButton<String>(
+                    //       value: selectedAction,
+                    //       isExpanded: true,
+                    //       dropdownColor: Colors.white,
+                    //       items: const [
+                    //         DropdownMenuItem(
+                    //             value: "Choose", child: Text("Choose Source")),
+                    //         DropdownMenuItem(
+                    //             value: "Camera", child: Text("Camera")),
+                    //         DropdownMenuItem(
+                    //             value: "Gallery", child: Text("Gallery")),
+                    //         DropdownMenuItem(
+                    //             value: "File", child: Text("File")),
+                    //       ],
+                    //       onChanged: (value) {
+                    //         if (value != null && value != "Choose") {
+                    //           handleSelection(value);
+                    //         }
+                    //       },
+                    //     ),
+                    //   ),
+                    // ),
+
+                    GestureDetector(
+                      onTap: _openPicker,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 16),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.white.withOpacity(0.25),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              file == null ? "Select File" : "Change File",
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                            const Icon(Icons.upload_file),
                           ],
-                          onChanged: (value) {
-                            if (value != null && value != "Choose") {
-                              handleSelection(value);
-                            }
-                          },
                         ),
                       ),
                     ),
@@ -232,6 +254,54 @@ class _PremiumDocumentPickerState extends State<PremiumDocumentPicker>
           ),
         ],
       ),
+    );
+  }
+
+  void _openPicker() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _optionTile(Icons.camera_alt, "Camera", () async {
+                Navigator.pop(context);
+                final picked =
+                    await _picker.pickImage(source: ImageSource.camera);
+                if (picked != null) _setFile(File(picked.path));
+              }),
+              _optionTile(Icons.photo, "Gallery", () async {
+                Navigator.pop(context);
+                final picked =
+                    await _picker.pickImage(source: ImageSource.gallery);
+                if (picked != null) _setFile(File(picked.path));
+              }),
+              _optionTile(Icons.insert_drive_file, "Files", () async {
+                Navigator.pop(context);
+                final result = await FilePicker.platform.pickFiles(
+                  type: FileType.custom,
+                  allowedExtensions: widget.allowedExtensions,
+                );
+                if (result != null && result.files.single.path != null) {
+                  _setFile(File(result.files.single.path!));
+                }
+              }),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _optionTile(IconData icon, String title, VoidCallback onTap) {
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(title),
+      onTap: onTap,
     );
   }
 }

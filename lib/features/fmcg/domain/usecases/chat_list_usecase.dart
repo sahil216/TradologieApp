@@ -7,16 +7,16 @@ import 'package:tradologie_app/features/fmcg/domain/repositories/chat_repositori
 class ChatListParams {
   final String sellerID;
   final String token;
+  final String deviceID;
 
   ChatListParams({
     required this.sellerID,
     required this.token,
+    required this.deviceID,
   });
 
-  Map<String, dynamic> toJson() => {
-        "SellerID": sellerID,
-        "Token": token,
-      };
+  Map<String, dynamic> toJson() =>
+      {"SellerID": sellerID, "Token": token, "DeviceID": deviceID};
 }
 
 class ChatListUsecase implements UseCase<List<ChatList>, ChatListParams> {

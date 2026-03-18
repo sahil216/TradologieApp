@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
+import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/hex_color.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
@@ -72,6 +73,7 @@ class _ChatScreenState extends State<ChatScreen>
       chatID: chatId ?? "0",
       buyerID: widget.chat.quotationUserId ?? "",
       sellerID: loginId,
+      deviceID: Constants.deviceID,
     );
 
     chatCubit.chatData(params);

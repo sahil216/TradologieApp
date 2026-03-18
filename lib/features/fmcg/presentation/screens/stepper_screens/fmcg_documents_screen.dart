@@ -29,34 +29,8 @@ class _FmcgDocumentsScreenState extends State<FmcgDocumentsScreen>
   ChatCubit get chatCubit => BlocProvider.of(context);
   SecureStorageService secureStorage = SecureStorageService();
 
-  final emailController = TextEditingController();
-  final mobileController = TextEditingController();
-  final nameController = TextEditingController();
-  final brandNameController = TextEditingController();
-
-  final distributionLocationController = TextEditingController();
-  final companyNameController = TextEditingController();
-
-  List<FmcgCountryCodeList> countryCodeList = [];
-  FmcgCountryCodeList? selectedCountryCode;
-  Key countryCodeKey = UniqueKey();
-  Key brandKey = UniqueKey();
-
   final showPassword = ValueNotifier(false);
   final formKey = GlobalKey<FormState>();
-
-  void clearForm() {
-    emailController.clear();
-    mobileController.clear();
-    nameController.clear();
-    brandNameController.clear();
-    distributionLocationController.clear();
-    companyNameController.clear();
-    selectedCountryCode = null;
-    countryCodeKey = UniqueKey();
-    brandKey = UniqueKey();
-    setState(() {});
-  }
 
   final fields = [
     {
@@ -77,16 +51,6 @@ class _FmcgDocumentsScreenState extends State<FmcgDocumentsScreen>
     },
   ];
 
-  List<FmcgCountryCodeList> fetchCountryCode(
-      String filter, LoadProps? loadProps) {
-    final allItems = countryCodeList;
-    if (filter.isEmpty) return allItems;
-    return allItems
-        .where(
-            (e) => (e.name ?? "").toLowerCase().contains(filter.toLowerCase()))
-        .toList();
-  }
-
   bool isSubmitted = false;
 
   void getDistributorList() async {
@@ -97,10 +61,6 @@ class _FmcgDocumentsScreenState extends State<FmcgDocumentsScreen>
   void initState() {
     super.initState();
     getDistributorList();
-  }
-
-  Future<void> _refreshChats() async {
-    getDistributorList(); // your API call
   }
 
   void toggle(int index) {

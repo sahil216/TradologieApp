@@ -7,6 +7,7 @@ import 'package:tradologie_app/core/utils/app_strings.dart';
 
 import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
+import 'package:tradologie_app/core/utils/get_device_id.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
@@ -30,8 +31,11 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       Constants().checkAndroidVersion();
+      if (Constants.deviceID == "") {
+        Constants.deviceID = await DeviceIdService.getDeviceId();
+      }
     });
 
     startDelay(context);

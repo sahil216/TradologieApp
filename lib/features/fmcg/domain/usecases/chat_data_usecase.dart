@@ -10,20 +10,23 @@ class ChatDataParams {
   final String chatID;
   final String sellerID;
   final String token;
+  final String deviceID;
 
   ChatDataParams(
       {required this.contents,
       required this.buyerID,
       required this.chatID,
       required this.sellerID,
-      required this.token});
+      required this.token,
+      required this.deviceID});
 
   Map<String, dynamic> toJson() => {
         "BuyerID": buyerID,
         "ChatID": chatID,
         "SellerID": sellerID,
         "Contents": contents,
-        "Token": token
+        "Token": token,
+        "DeviceID": deviceID,
       };
 }
 

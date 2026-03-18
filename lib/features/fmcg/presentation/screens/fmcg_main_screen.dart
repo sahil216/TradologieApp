@@ -5,6 +5,7 @@ import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/features/contact_us/more_options_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/chat_list_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_account_screen.dart';
+import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_distributor_enq.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_my_account_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_seller_dashboard_screen.dart';
 
@@ -87,8 +88,8 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
                 label,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ]
