@@ -14,13 +14,10 @@ import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 import 'package:tradologie_app/features/app/injection_container_app.dart';
 import 'package:tradologie_app/features/app/presentation/screens/main_screen.dart';
-import 'package:tradologie_app/features/chat/domain/entities/chat_list.dart';
-import 'package:tradologie_app/features/chat/domain/entities/distributor_enquiry_list.dart';
-import 'package:tradologie_app/features/chat/domain/usecases/chat_list_usecase.dart';
-import 'package:tradologie_app/features/chat/presentation/cubit/chat_cubit.dart';
-import 'package:tradologie_app/features/chat/presentation/screens/chat_screen.dart';
-import 'package:tradologie_app/features/chat/presentation/screens/fmcg_main_screen.dart';
 import 'package:tradologie_app/features/contact_us/coming_soon_screen.dart';
+import 'package:tradologie_app/features/fmcg/domain/entities/distributor_enquiry_list.dart';
+import 'package:tradologie_app/features/fmcg/presentation/cubit/chat_cubit.dart';
+import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_main_screen.dart';
 
 class FmcgSellerDashboardScreen extends StatefulWidget {
   const FmcgSellerDashboardScreen({super.key});
