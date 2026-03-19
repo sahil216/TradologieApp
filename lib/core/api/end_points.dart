@@ -63,6 +63,12 @@ class EndPoints {
     return '$baseUrl/${userType.name}/Logout';
   }
 
+  static String fmcgSignout(UserType userType) {
+    return userType.name == 'buyer'
+        ? '$baseUrl/FMCG/FMCGBuyerLogout'
+        : '$baseUrl/FMCG/FMCGLogout';
+  }
+
   static String deleteAccount(UserType userType) {
     return userType == UserType.buyer
         ? '$baseUrl/${userType.name}/DeleteCustomerActive'

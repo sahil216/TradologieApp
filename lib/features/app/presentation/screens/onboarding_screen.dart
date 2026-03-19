@@ -68,9 +68,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
   Future<void> nameUpdate() async {
     SecureStorageService secureStorage = SecureStorageService();
-    Constants.name = Constants.isBuyer == true
-        ? await secureStorage.read(AppStrings.customerName) ?? ""
-        : await secureStorage.read(AppStrings.vendorName) ?? "";
+    Constants.name = Constants.isFmcg == true
+        ? await secureStorage.read(AppStrings.fmcgName) ?? ""
+        : Constants.isBuyer == true
+            ? await secureStorage.read(AppStrings.customerName) ?? ""
+            : await secureStorage.read(AppStrings.vendorName) ?? "";
   }
 
   @override
@@ -160,6 +162,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                     SecureStorageService secureStorage =
                                         SecureStorageService();
                                     Constants.isBuyer = false;
+                                    Constants.isFmcg = false;
                                     await secureStorage.write(
                                         AppStrings.isBuyer, "false");
                                     await secureStorage.write(
@@ -173,12 +176,14 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                     SecureStorageService secureStorage =
                                         SecureStorageService();
                                     Constants.isBuyer = false;
+                                    Constants.isFmcg = true;
                                     await secureStorage.write(
                                         AppStrings.isFmcg, "true");
                                     await secureStorage.write(
                                         AppStrings.isBuyer, "false");
-                                    sl<NavigationService>()
-                                        .pushNamed(Routes.fmcgSignIn);
+                                    sl<NavigationService>().pushNamed(
+                                        Routes.fmcgSignIn,
+                                        arguments: false);
                                   },
                             text: selectedProduct == "Agro Commodity"
                                 ? CommonStrings.sellerText
@@ -205,6 +210,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                     SecureStorageService secureStorage =
                                         SecureStorageService();
                                     Constants.isBuyer = true;
+                                    Constants.isFmcg = false;
                                     await secureStorage.write(
                                         AppStrings.isBuyer, "true");
                                     await secureStorage.write(
@@ -215,9 +221,16 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                         "buyer_button_clicked");
                                   }
                                 : () async {
+                                    SecureStorageService secureStorage =
+                                        SecureStorageService();
+                                    Constants.isBuyer = true;
+                                    Constants.isFmcg = true;
+                                    await secureStorage.write(
+                                        AppStrings.isFmcg, "true");
+                                    await secureStorage.write(
+                                        AppStrings.isBuyer, "true");
                                     sl<NavigationService>().pushNamed(
-                                        Routes
-                                            .fmcgRegisterSellerDistributorForm,
+                                        Routes.fmcgSignIn,
                                         arguments: true);
                                   },
                             text: selectedProduct == "Agro Commodity"

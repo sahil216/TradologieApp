@@ -1,3 +1,5 @@
+import 'package:tradologie_app/core/utils/constants.dart';
+
 class UpdateSellerDocumentsParams {
   final String token;
   final String loginID;
@@ -18,6 +20,7 @@ class UpdateSellerDocumentsParams {
         "LoginID": loginID,
         "Document": document,
         "DocumentTypeID": documentTypeId,
-        "Description": description
+        "Description": description,
+        "DeviceID": Constants.deviceID,
       };
 }

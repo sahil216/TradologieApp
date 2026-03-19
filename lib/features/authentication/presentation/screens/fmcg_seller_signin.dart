@@ -29,7 +29,8 @@ import '../../../../core/widgets/custom_text_field.dart';
 import '../cubit/authentication_cubit.dart';
 
 class FmcgSellerSignin extends StatefulWidget {
-  const FmcgSellerSignin({super.key});
+  final bool isBuyer;
+  const FmcgSellerSignin({super.key, required this.isBuyer});
 
   @override
   State<FmcgSellerSignin> createState() => _FmcgSellerSigninState();
@@ -145,6 +146,19 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
               );
             }
             if (state is FmcgSellerSigninError) {
+              CommonToast.showFailureToast(state.failure);
+            }
+            if (state is FmcgBuyerSigninSuccess) {
+              Constants.isFmcg = true;
+              secureStorageService.write(AppStrings.isFmcg, "true");
+
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                Routes.fmcgMainScreen,
+                (route) => false,
+              );
+            }
+            if (state is FmcgBuyerSigninError) {
               CommonToast.showFailureToast(state.failure);
             }
           },
@@ -264,10 +278,15 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
                                             FocusManager.instance.primaryFocus
                                                 ?.unfocus();
 
-                                            BlocProvider.of<
-                                                        AuthenticationCubit>(
-                                                    context)
-                                                .fmcgSellerSignin(params);
+                                            Constants.isBuyer == true
+                                                ? BlocProvider.of<
+                                                            AuthenticationCubit>(
+                                                        context)
+                                                    .fmcgBuyerSignin(params)
+                                                : BlocProvider.of<
+                                                            AuthenticationCubit>(
+                                                        context)
+                                                    .fmcgSellerSignin(params);
                                           }
                                         },
                                         text: CommonStrings.login,
@@ -280,15 +299,24 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
                                       SizedBox(height: 20),
 
                                       InkWell(
-                                        onTap: () {
-                                          sl<NavigationService>().pushNamed(
-                                              Routes
-                                                  .fmcgRegisterSellerDistributorForm,
-                                              arguments: false);
-                                        },
+                                        onTap: widget.isBuyer == true
+                                            ? () {
+                                                sl<NavigationService>().pushNamed(
+                                                    Routes
+                                                        .fmcgRegisterSellerDistributorForm,
+                                                    arguments: true);
+                                              }
+                                            : () {
+                                                sl<NavigationService>().pushNamed(
+                                                    Routes
+                                                        .fmcgRegisterSellerDistributorForm,
+                                                    arguments: false);
+                                              },
                                         child: Center(
                                           child: CommonText(
-                                            "Register New Brand",
+                                            Constants.isBuyer == true
+                                                ? "Don't have an account? Register Now"
+                                                : "Register New Brand",
                                             style: TextStyleConstants.regular(
                                               context,
                                               fontSize: 16,
@@ -297,7 +325,7 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
                                           ),
                                         ),
                                       ),
-                                      // SizedBox(height: 20),
+                                      SizedBox(height: 20),
                                       // SizedBox(
                                       //   width: r.isTablet
                                       //       ? 420
@@ -339,7 +367,8 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
                   }),
               BlocBuilder<AuthenticationCubit, AuthenticationState>(
                 builder: (context, state) {
-                  if (state is FmcgSellerSigninIsLoading) {
+                  if (state is FmcgSellerSigninIsLoading ||
+                      state is FmcgBuyerSigninIsLoading) {
                     return Positioned.fill(child: const CommonLoader());
                   }
                   return SizedBox.shrink();

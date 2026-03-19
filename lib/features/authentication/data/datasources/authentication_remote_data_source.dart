@@ -1,4 +1,5 @@
 import 'package:tradologie_app/core/usecases/usecase.dart';
+import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/delete_account_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_register_distributor_usecase.dart';
@@ -26,6 +27,8 @@ abstract class AuthenticationRemoteDataSource {
   Future<ResponseWrapper<dynamic>?> deleteAccount(DeleteAccountParams params);
   Future<ResponseWrapper<dynamic>?> getCountryCodeList(NoParams params);
   Future<ResponseWrapper<dynamic>?> fmcgSellerSignIn(
+      FmcgSellerSigninParams params);
+  Future<ResponseWrapper<dynamic>?> fmcgBuyerSignIn(
       FmcgSellerSigninParams params);
   Future<ResponseWrapper<dynamic>?> fmcgRegisterSeller(
       FmcgRegisterSellerParams params);
@@ -102,11 +105,19 @@ class AuthenticationRemoteDataSourceImpl
   Future<ResponseWrapper<dynamic>?> signOut(NoParams params) async {
     SecureStorageService storage = SecureStorageService();
     var dparams = await DefaultParams.fromStorage(storage);
+    var params = {
+      "Token": await storage.read(AppStrings.apiVerificationCode),
+      "DeviceID": await storage.read(AppStrings.deviceId)
+    };
     return await apiConsumer.post(
-      Constants.isBuyer == true
-          ? EndPoints.signOut(UserType.buyer)
-          : EndPoints.signOut(UserType.supplier),
-      body: dparams.toJson(),
+      Constants.isFmcg == true
+          ? Constants.isBuyer == true
+              ? EndPoints.fmcgSignout(UserType.buyer)
+              : EndPoints.fmcgSignout(UserType.supplier)
+          : Constants.isBuyer == true
+              ? EndPoints.signOut(UserType.buyer)
+              : EndPoints.signOut(UserType.supplier),
+      body: Constants.isFmcg == true ? params : dparams.toJson(),
     );
   }
 
@@ -134,6 +145,15 @@ class AuthenticationRemoteDataSourceImpl
       FmcgSellerSigninParams params) async {
     return await apiConsumer.post(
       EndPoints.fmcgSellerSignin,
+      body: await params.toJson(),
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> fmcgBuyerSignIn(
+      FmcgSellerSigninParams params) async {
+    return await apiConsumer.post(
+      EndPoints.fmcgBuyerSignin,
       body: await params.toJson(),
     );
   }

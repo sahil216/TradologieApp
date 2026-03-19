@@ -179,6 +179,26 @@ class FmcgSellerSigninError extends AuthenticationState {
   List<Object> get props => [failure];
 }
 
+class FmcgBuyerSigninIsLoading extends AuthenticationState {}
+
+class FmcgBuyerSigninSuccess extends AuthenticationState {
+  final FmcgBuyerLoginSuccess data;
+
+  const FmcgBuyerSigninSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class FmcgBuyerSigninError extends AuthenticationState {
+  final Failure failure;
+
+  const FmcgBuyerSigninError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
 class FmcgRegisterSellerIsLoading extends AuthenticationState {}
 
 class FmcgRegisterSellerSuccess extends AuthenticationState {
@@ -202,7 +222,7 @@ class FmcgRegisterSellerError extends AuthenticationState {
 class FmcgRegisterDistributorIsLoading extends AuthenticationState {}
 
 class FmcgRegisterDistributorSuccess extends AuthenticationState {
-  final bool data;
+  final FmcgBuyerLoginSuccess data;
 
   const FmcgRegisterDistributorSuccess({required this.data});
 

@@ -123,7 +123,10 @@ class AppRoutes {
         });
       case Routes.fmcgSignIn:
         return CupertinoPageRoute(builder: (context) {
-          return const FmcgSellerSignin();
+          final data = routeSettings.arguments as bool;
+          return FmcgSellerSignin(
+            isBuyer: data,
+          );
         });
       case Routes.signupRoute:
         return CupertinoPageRoute(builder: (context) {

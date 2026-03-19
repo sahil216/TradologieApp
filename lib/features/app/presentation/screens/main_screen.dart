@@ -217,9 +217,11 @@ class _MainScreenState extends State<MainScreen>
   }
 
   Future<void> nameUpdate() async {
-    Constants.name = Constants.isBuyer == true
-        ? await secureStorage.read(AppStrings.customerName) ?? ""
-        : await secureStorage.read(AppStrings.vendorName) ?? "";
+    Constants.name = Constants.isFmcg == true
+        ? await secureStorage.read(AppStrings.fmcgName) ?? ""
+        : Constants.isBuyer == true
+            ? await secureStorage.read(AppStrings.customerName) ?? ""
+            : await secureStorage.read(AppStrings.vendorName) ?? "";
   }
 
   @override

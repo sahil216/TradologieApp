@@ -124,9 +124,11 @@ Future<void> init(Future<void> Function(RemoteMessage) handler) async {
       bool.tryParse(await secureStorage.read(AppStrings.isFmcg) ?? "false") ??
           false;
 
-  Constants.name = Constants.isBuyer == true
-      ? await secureStorage.read(AppStrings.customerName) ?? ""
-      : await secureStorage.read(AppStrings.vendorName) ?? "";
+  Constants.name = Constants.isFmcg == true
+      ? await secureStorage.read(AppStrings.fmcgName) ?? ""
+      : Constants.isBuyer == true
+          ? await secureStorage.read(AppStrings.customerName) ?? ""
+          : await secureStorage.read(AppStrings.vendorName) ?? "";
   Constants.timeZone =
       await secureStorage.read(AppStrings.sellerTimeZone) ?? "";
   Constants.token =

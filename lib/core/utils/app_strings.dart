@@ -21,6 +21,7 @@ class AppStrings {
   static const String fcmToken = 'fcm_token';
   static const String customerId = 'customer_id';
   static const String customerName = 'customer_name';
+  static const String fmcgName = 'fmcg_name';
   static const String loginId = 'login_id';
   static const String brandId = 'brand_id';
 

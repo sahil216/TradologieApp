@@ -32,11 +32,6 @@ class FmcgSellerDashboardScreen extends StatefulWidget {
 
 class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen>
     with SingleTickerProviderStateMixin {
-  late AnimationController _screenController;
-  late Animation<double> _screenFade;
-  late Animation<double> _screenScale;
-  late Animation<Offset> _screenSlide;
-
   List<DistributorEnquiryList>? distributorList;
 
   int? open;
@@ -52,46 +47,10 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen>
   void initState() {
     super.initState();
     getDistributorList();
-
-    _screenController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-
-    _screenFade = CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    );
-
-    _screenScale = Tween<double>(
-      begin: 0.97,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _screenSlide = Tween<Offset>(
-      begin: const Offset(0, .04),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _screenController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    Future.delayed(const Duration(milliseconds: 150), () {
-      if (mounted) _screenController.forward();
-    });
   }
 
   Future<void> _refreshChats() async {
     getDistributorList(); // your API call
-  }
-
-  @override
-  void dispose() {
-    _screenController.dispose();
-    super.dispose();
   }
 
   void toggle(int index) {
@@ -124,232 +83,189 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen>
           children: [
             BlocBuilder<ChatCubit, ChatState>(
               builder: (context, state) {
-                return FadeTransition(
-                  opacity: _screenFade,
-                  child: SlideTransition(
-                    position: _screenSlide,
-                    child: ScaleTransition(
-                      scale: _screenScale,
-                      child: RefreshIndicator(
-                        onRefresh: _refreshChats,
-                        child: CustomScrollView(
-                          physics: AlwaysScrollableScrollPhysics(),
-                          slivers: [
-                            /// App Bar
-                            CommonAppbar(
-                              title: "Distributorship Enquiries",
-                              showBackButton: false,
-                              showNotification: false,
-                              showSuffixIcon: true,
-                              suffixIcon: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  IconButton(
-                                      onPressed: () {
-                                        CommonToast.success(
-                                            "Signed Out Successfully");
-                                        Constants.isLogin = false;
-                                        Constants.isBuyer = false;
-                                        Constants.isFmcg = false;
-
-                                        SecureStorageService secureStorage =
-                                            SecureStorageService();
-                                        secureStorage
-                                            .delete(AppStrings.isBuyer);
-                                        Constants.token = "";
-
-                                        secureStorage.delete(
-                                            AppStrings.apiVerificationCode);
-                                        secureStorage.write(
-                                            AppStrings.appSession,
-                                            false.toString());
-
-                                        sl<NavigationService>()
-                                            .pushNamedAndRemoveUntil(
-                                          Routes.onboardingRoute,
-                                        );
-                                      },
-                                      icon: Icon(Icons.logout,
-                                          color: Colors.red)),
-                                ],
-                              ),
-                            ),
-                            // EnquiryTabsSliver(
-                            //   selected: tab,
-                            //   onSelect: (i) {
-                            //     setState(() {
-                            //       tab = i;
-                            //       open = null;
-                            //     });
-                            //   },
-                            // ),
-
-                            // List
-                            EnquiryListSliver(
-                              items: distributorList ?? [],
-                              openIndex: open,
-                              onToggle: (i) {
-                                setState(() {
-                                  open = open == i ? null : i;
-                                });
-                              },
-                            ),
-
-                            /// Chat List
-                            // SliverPadding(
-                            //   padding: const EdgeInsets.all(16),
-                            //   sliver: SliverList(
-                            //     delegate: SliverChildBuilderDelegate(
-                            //       (context, index) {
-                            //         final item = distributorList?[index];
-                            //         final expanded = expandedIndex == index;
-
-                            //         return Padding(
-                            //           padding:
-                            //               const EdgeInsets.only(bottom: 16),
-                            //           child: GestureDetector(
-                            //             onTap: () => toggle(index),
-                            //             child: AnimatedContainer(
-                            //               duration:
-                            //                   const Duration(milliseconds: 250),
-                            //               padding: const EdgeInsets.all(18),
-                            //               decoration: BoxDecoration(
-                            //                 color: Colors.white,
-                            //                 borderRadius:
-                            //                     BorderRadius.circular(18),
-                            //                 boxShadow: [
-                            //                   BoxShadow(
-                            //                     blurRadius: 20,
-                            //                     color: Colors.black
-                            //                         .withOpacity(0.08),
-                            //                     offset: const Offset(0, 10),
-                            //                   )
-                            //                 ],
-                            //               ),
-                            //               child: Column(
-                            //                 children: [
-                            //                   /// HEADER
-                            //                   Row(
-                            //                     children: [
-                            //                       Expanded(
-                            //                         child: Text(
-                            //                           "${(Constants().hideSensitiveData ?? true) ? Constants().maskName(item?.companyName ?? "") : (item?.companyName ?? "")} | ${item?.perferredLocation ?? ""} | ${item?.interestedBrandName ?? ""}",
-                            //                           style: const TextStyle(
-                            //                             fontSize: 16,
-                            //                             fontWeight:
-                            //                                 FontWeight.w600,
-                            //                           ),
-                            //                         ),
-                            //                       ),
-                            //                       AnimatedRotation(
-                            //                         turns: expanded ? 0.5 : 0,
-                            //                         duration: const Duration(
-                            //                             milliseconds: 250),
-                            //                         child: const Icon(Icons
-                            //                             .keyboard_arrow_down),
-                            //                       )
-                            //                     ],
-                            //                   ),
-
-                            //                   /// EXPANDABLE AREA
-                            //                   AnimatedSize(
-                            //                     duration: const Duration(
-                            //                         milliseconds: 250),
-                            //                     child: expanded
-                            //                         ? Padding(
-                            //                             padding:
-                            //                                 const EdgeInsets
-                            //                                     .only(top: 18),
-                            //                             child: Column(
-                            //                               crossAxisAlignment:
-                            //                                   CrossAxisAlignment
-                            //                                       .start,
-                            //                               children: [
-                            //                                 Row(
-                            //                                   children: [
-                            //                                     Text(
-                            //                                       (Constants().hideSensitiveData ??
-                            //                                               true)
-                            //                                           ? Constants().maskName(
-                            //                                               item?.name ??
-                            //                                                   "")
-                            //                                           : (item?.name ??
-                            //                                               ""),
-                            //                                       style:
-                            //                                           const TextStyle(
-                            //                                         fontSize:
-                            //                                             16,
-                            //                                         fontWeight:
-                            //                                             FontWeight
-                            //                                                 .w500,
-                            //                                       ),
-                            //                                     ),
-                            //                                     const Spacer(),
-                            //                                     Text(
-                            //                                       "${item?.countryCode ?? ""} - ${(Constants().hideSensitiveData ?? true) ? Constants().maskPhone(item?.mobile ?? "") : (item?.mobile ?? "")}",
-                            //                                       style:
-                            //                                           const TextStyle(
-                            //                                         fontSize:
-                            //                                             16,
-                            //                                         fontWeight:
-                            //                                             FontWeight
-                            //                                                 .w500,
-                            //                                       ),
-                            //                                     ),
-                            //                                   ],
-                            //                                 ),
-                            //                                 const SizedBox(
-                            //                                     height: 10),
-                            //                                 Text(
-                            //                                   (Constants().hideSensitiveData ??
-                            //                                           true)
-                            //                                       ? Constants()
-                            //                                           .maskEmail(
-                            //                                               item?.email ??
-                            //                                                   "")
-                            //                                       : (item?.email ??
-                            //                                           ""),
-                            //                                   style:
-                            //                                       const TextStyle(
-                            //                                     fontSize: 16,
-                            //                                     fontWeight:
-                            //                                         FontWeight
-                            //                                             .w500,
-                            //                                   ),
-                            //                                 ),
-                            //                                 const SizedBox(
-                            //                                     height: 10),
-                            //                                 Text(
-                            //                                   (item?.interestedBrandName)
-                            //                                       .toString(),
-                            //                                   style:
-                            //                                       const TextStyle(
-                            //                                     fontSize: 16,
-                            //                                     fontWeight:
-                            //                                         FontWeight
-                            //                                             .w500,
-                            //                                   ),
-                            //                                 )
-                            //                               ],
-                            //                             ),
-                            //                           )
-                            //                         : const SizedBox(),
-                            //                   )
-                            //                 ],
-                            //               ),
-                            //             ),
-                            //           ),
-                            //         );
-                            //       },
-                            //       childCount: distributorList?.length ?? 0,
-                            //     ),
-                            //   ),
-                            // ),
-                          ],
-                        ),
+                return RefreshIndicator(
+                  onRefresh: _refreshChats,
+                  child: CustomScrollView(
+                    physics: AlwaysScrollableScrollPhysics(),
+                    slivers: [
+                      /// App Bar
+                      CommonAppbar(
+                        title: "Distributorship Enquiries",
+                        showBackButton: false,
+                        showNotification: false,
                       ),
-                    ),
+                      // EnquiryTabsSliver(
+                      //   selected: tab,
+                      //   onSelect: (i) {
+                      //     setState(() {
+                      //       tab = i;
+                      //       open = null;
+                      //     });
+                      //   },
+                      // ),
+
+                      // List
+                      EnquiryListSliver(
+                        items: distributorList ?? [],
+                        openIndex: open,
+                        onToggle: (i) {
+                          setState(() {
+                            open = open == i ? null : i;
+                          });
+                        },
+                      ),
+
+                      /// Chat List
+                      // SliverPadding(
+                      //   padding: const EdgeInsets.all(16),
+                      //   sliver: SliverList(
+                      //     delegate: SliverChildBuilderDelegate(
+                      //       (context, index) {
+                      //         final item = distributorList?[index];
+                      //         final expanded = expandedIndex == index;
+
+                      //         return Padding(
+                      //           padding:
+                      //               const EdgeInsets.only(bottom: 16),
+                      //           child: GestureDetector(
+                      //             onTap: () => toggle(index),
+                      //             child: AnimatedContainer(
+                      //               duration:
+                      //                   const Duration(milliseconds: 250),
+                      //               padding: const EdgeInsets.all(18),
+                      //               decoration: BoxDecoration(
+                      //                 color: Colors.white,
+                      //                 borderRadius:
+                      //                     BorderRadius.circular(18),
+                      //                 boxShadow: [
+                      //                   BoxShadow(
+                      //                     blurRadius: 20,
+                      //                     color: Colors.black
+                      //                         .withOpacity(0.08),
+                      //                     offset: const Offset(0, 10),
+                      //                   )
+                      //                 ],
+                      //               ),
+                      //               child: Column(
+                      //                 children: [
+                      //                   /// HEADER
+                      //                   Row(
+                      //                     children: [
+                      //                       Expanded(
+                      //                         child: Text(
+                      //                           "${(Constants().hideSensitiveData ?? true) ? Constants().maskName(item?.companyName ?? "") : (item?.companyName ?? "")} | ${item?.perferredLocation ?? ""} | ${item?.interestedBrandName ?? ""}",
+                      //                           style: const TextStyle(
+                      //                             fontSize: 16,
+                      //                             fontWeight:
+                      //                                 FontWeight.w600,
+                      //                           ),
+                      //                         ),
+                      //                       ),
+                      //                       AnimatedRotation(
+                      //                         turns: expanded ? 0.5 : 0,
+                      //                         duration: const Duration(
+                      //                             milliseconds: 250),
+                      //                         child: const Icon(Icons
+                      //                             .keyboard_arrow_down),
+                      //                       )
+                      //                     ],
+                      //                   ),
+
+                      //                   /// EXPANDABLE AREA
+                      //                   AnimatedSize(
+                      //                     duration: const Duration(
+                      //                         milliseconds: 250),
+                      //                     child: expanded
+                      //                         ? Padding(
+                      //                             padding:
+                      //                                 const EdgeInsets
+                      //                                     .only(top: 18),
+                      //                             child: Column(
+                      //                               crossAxisAlignment:
+                      //                                   CrossAxisAlignment
+                      //                                       .start,
+                      //                               children: [
+                      //                                 Row(
+                      //                                   children: [
+                      //                                     Text(
+                      //                                       (Constants().hideSensitiveData ??
+                      //                                               true)
+                      //                                           ? Constants().maskName(
+                      //                                               item?.name ??
+                      //                                                   "")
+                      //                                           : (item?.name ??
+                      //                                               ""),
+                      //                                       style:
+                      //                                           const TextStyle(
+                      //                                         fontSize:
+                      //                                             16,
+                      //                                         fontWeight:
+                      //                                             FontWeight
+                      //                                                 .w500,
+                      //                                       ),
+                      //                                     ),
+                      //                                     const Spacer(),
+                      //                                     Text(
+                      //                                       "${item?.countryCode ?? ""} - ${(Constants().hideSensitiveData ?? true) ? Constants().maskPhone(item?.mobile ?? "") : (item?.mobile ?? "")}",
+                      //                                       style:
+                      //                                           const TextStyle(
+                      //                                         fontSize:
+                      //                                             16,
+                      //                                         fontWeight:
+                      //                                             FontWeight
+                      //                                                 .w500,
+                      //                                       ),
+                      //                                     ),
+                      //                                   ],
+                      //                                 ),
+                      //                                 const SizedBox(
+                      //                                     height: 10),
+                      //                                 Text(
+                      //                                   (Constants().hideSensitiveData ??
+                      //                                           true)
+                      //                                       ? Constants()
+                      //                                           .maskEmail(
+                      //                                               item?.email ??
+                      //                                                   "")
+                      //                                       : (item?.email ??
+                      //                                           ""),
+                      //                                   style:
+                      //                                       const TextStyle(
+                      //                                     fontSize: 16,
+                      //                                     fontWeight:
+                      //                                         FontWeight
+                      //                                             .w500,
+                      //                                   ),
+                      //                                 ),
+                      //                                 const SizedBox(
+                      //                                     height: 10),
+                      //                                 Text(
+                      //                                   (item?.interestedBrandName)
+                      //                                       .toString(),
+                      //                                   style:
+                      //                                       const TextStyle(
+                      //                                     fontSize: 16,
+                      //                                     fontWeight:
+                      //                                         FontWeight
+                      //                                             .w500,
+                      //                                   ),
+                      //                                 )
+                      //                               ],
+                      //                             ),
+                      //                           )
+                      //                         : const SizedBox(),
+                      //                   )
+                      //                 ],
+                      //               ),
+                      //             ),
+                      //           ),
+                      //         );
+                      //       },
+                      //       childCount: distributorList?.length ?? 0,
+                      //     ),
+                      //   ),
+                      // ),
+                    ],
                   ),
                 );
               },
@@ -524,7 +440,7 @@ class _Row extends StatelessWidget {
                     child: Text(
                       getInitial(enquiry.interestedBrandName),
                       style: const TextStyle(
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: T.ink,
                         letterSpacing: 0.5,
@@ -602,9 +518,9 @@ class _Detail extends StatelessWidget {
           // ── Contact fields ──────────────────────────────────────────────
           if (enquiry.mobile != null) ...[
             _Field(
-              label: 'Contact',
+              label: 'Name',
               value: (Constants().hideSensitiveData ?? true)
-                  ? Constants().maskName(enquiry?.name ?? "")
+                  ? Constants().maskName(enquiry.name ?? "")
                   : (enquiry.name ?? ""),
             ),
             const SizedBox(height: 12),
@@ -613,7 +529,7 @@ class _Detail extends StatelessWidget {
             _Field(
               label: 'Phone',
               value:
-                  "${enquiry?.countryCode ?? ""} - ${(Constants().hideSensitiveData ?? true) ? Constants().maskPhone(enquiry?.mobile ?? "") : (enquiry?.mobile ?? "")}",
+                  "${enquiry.countryCode ?? ""} - ${(Constants().hideSensitiveData ?? true) ? Constants().maskPhone(enquiry.mobile ?? "") : (enquiry.mobile ?? "")}",
               valueStyle: T.mono,
             ),
             const SizedBox(height: 12),
@@ -622,14 +538,14 @@ class _Detail extends StatelessWidget {
             _Field(
               label: 'Email',
               value: (Constants().hideSensitiveData ?? true)
-                  ? Constants().maskEmail(enquiry?.email ?? "")
-                  : (enquiry?.email ?? ""),
+                  ? Constants().maskEmail(enquiry.email ?? "")
+                  : (enquiry.email ?? ""),
               valueStyle: T.mono,
             ),
             const SizedBox(height: 12),
           ],
           _Field(label: 'Location', value: enquiry.perferredLocation ?? ""),
-          const SizedBox(height: 20),
+          const SizedBox(height: 5),
         ],
       ),
     );

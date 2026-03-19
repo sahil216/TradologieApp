@@ -5,6 +5,7 @@ import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/buyer_login_success.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/country_code_list.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_brands_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_buyer_login_success.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_country_code_list.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_signin_response.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/login_success.dart';
@@ -14,6 +15,7 @@ import 'package:tradologie_app/features/authentication/domain/usecases/buyer_sig
 import 'package:tradologie_app/features/authentication/domain/usecases/buyer_verify_otp_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/delete_account_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_brands_list_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_buyer_login_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_country_code_list_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_register_distributor_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_register_seller_usecase.dart';
@@ -42,6 +44,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   final DeleteAccountUsecase deleteAccountUsecase;
   final GetCountryCodeListUsecase getCountryCodeListUsecase;
   final FmcgSellerSigninUsecase fmcgSellerSigninUsecase;
+  final FmcgBuyerLoginUsecase fmcgBuyerLoginUsecase;
   final FmcgRegisterDistributorUsecase fmcgRegisterDistributorUsecase;
   final FmcgRegisterSellerUsecase fmcgRegisterSellerUsecase;
   final FmcgCountryCodeListUsecase fmcgCountryCodeListUsecase;
@@ -63,6 +66,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     required this.fmcgRegisterSellerUsecase,
     required this.fmcgCountryCodeListUsecase,
     required this.fmcgBrandsListUsecase,
+    required this.fmcgBuyerLoginUsecase,
   }) : super(AuthenticationInitial());
 
   Future<void> sendOtp(SendOtpParams params, bool isResend) async {
@@ -81,6 +85,18 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     emit(response.fold(
       (failure) => FmcgSellerSigninError(failure: failure),
       (res) => FmcgSellerSigninSuccess(
+        data: res,
+      ),
+    ));
+  }
+
+  Future<void> fmcgBuyerSignin(FmcgSellerSigninParams params) async {
+    emit(FmcgBuyerSigninIsLoading());
+    Either<Failure, FmcgBuyerLoginSuccess> response =
+        await fmcgBuyerLoginUsecase(params);
+    emit(response.fold(
+      (failure) => FmcgBuyerSigninError(failure: failure),
+      (res) => FmcgBuyerSigninSuccess(
         data: res,
       ),
     ));
@@ -209,7 +225,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   Future<void> fmcgRegisterDistributor(
       FmcgRegisterDistributorParams params) async {
     emit(FmcgRegisterDistributorIsLoading());
-    Either<Failure, bool> response =
+    Either<Failure, FmcgBuyerLoginSuccess> response =
         await fmcgRegisterDistributorUsecase(params);
     emit(response.fold(
       (failure) => FmcgRegisterDistributorError(failure: failure),

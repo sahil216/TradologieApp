@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:tradologie_app/core/utils/app_strings.dart';
 
 // ─── Tokens ───────────────────────────────────────────────────────────────────
 //
@@ -27,31 +28,35 @@ class T {
     color: ink,
     letterSpacing: -1.0,
     height: 1.05,
+    fontFamily: AppStrings.fontFamily,
   );
   static const TextStyle title = TextStyle(
-    fontSize: 15,
+    fontSize: 17,
     fontWeight: FontWeight.w500,
     color: ink,
     letterSpacing: -0.2,
+    fontFamily: AppStrings.fontFamily,
   );
   static const TextStyle body = TextStyle(
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: FontWeight.w400,
     color: muted,
     letterSpacing: -0.1,
+    fontFamily: AppStrings.fontFamily,
   );
   static const TextStyle caption = TextStyle(
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: FontWeight.w400,
     color: muted,
     letterSpacing: 0.1,
+    fontFamily: AppStrings.fontFamily,
   );
   static const TextStyle mono = TextStyle(
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: FontWeight.w400,
     color: blue,
     letterSpacing: -0.2,
-    fontFamily: 'Courier',
+    fontFamily: AppStrings.fontFamily,
   );
 }
 

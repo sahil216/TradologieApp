@@ -48,9 +48,11 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<void> nameUpdate() async {
     SecureStorageService secureStorage = SecureStorageService();
-    Constants.name = Constants.isBuyer == true
-        ? await secureStorage.read(AppStrings.customerName) ?? ""
-        : await secureStorage.read(AppStrings.vendorName) ?? "";
+    Constants.name = Constants.isFmcg == true
+        ? await secureStorage.read(AppStrings.fmcgName) ?? ""
+        : Constants.isBuyer == true
+            ? await secureStorage.read(AppStrings.customerName) ?? ""
+            : await secureStorage.read(AppStrings.vendorName) ?? "";
   }
 
   Future<void> _goNext(BuildContext context) async {
@@ -58,6 +60,8 @@ class _SplashScreenState extends State<SplashScreen>
     if (Constants.isLogin) {
       if (Constants.isFmcg == true) {
         if (Constants.isBuyer == true) {
+          sl<NavigationService>()
+              .pushNamedAndRemoveUntil(Routes.fmcgMainScreen);
         } else {
           sl<NavigationService>()
               .pushNamedAndRemoveUntil(Routes.fmcgMainScreen);

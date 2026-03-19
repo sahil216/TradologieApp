@@ -1,3 +1,5 @@
+import 'package:tradologie_app/core/utils/constants.dart';
+
 class UpdateSellerProfileParams {
   final String token;
   final String loginID;
@@ -36,6 +38,7 @@ class UpdateSellerProfileParams {
         "Email": email,
         "DOB": dob,
         "isimage": isImage,
-        "Name": name
+        "Name": name,
+        "DeviceID": Constants.deviceID,
       };
 }

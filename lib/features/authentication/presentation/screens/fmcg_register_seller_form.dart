@@ -1,7 +1,12 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:tradologie_app/config/routes/app_router.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
@@ -54,6 +59,12 @@ class _FmcgRegisterSellerDistributorFormState
   FmcgBrandsList? selectedBrand;
   Key brandKey = UniqueKey();
 
+  String model = '';
+  String osVersionRelease = '';
+  String deviceId = '';
+  String manufacturer = '';
+  String appVersion = '';
+
   void clearForm() {
     emailController.clear();
     mobileController.clear();
@@ -97,9 +108,61 @@ class _FmcgRegisterSellerDistributorFormState
   @override
   void initState() {
     super.initState();
-
+    initPlatformState();
+    initPackageInfo();
     authenticationCubit.fmcgGetCountryCodeList(NoParams());
     authenticationCubit.fmcgBrandsList(NoParams());
+  }
+
+  Future<void> initPackageInfo() async {
+    final info = await PackageInfo.fromPlatform();
+    setState(() {
+      appVersion = info.version;
+    });
+  }
+
+  final deviceInfoPlugin = DeviceInfoPlugin();
+
+  Future<void> initPlatformState() async {
+    try {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          _readAndroidBuildData(
+            await deviceInfoPlugin.androidInfo,
+          );
+          break;
+
+        case TargetPlatform.iOS:
+          _readIosDeviceInfo(
+            await deviceInfoPlugin.iosInfo,
+          );
+          break;
+
+        default:
+          throw UnimplementedError(
+            'Platform not supported',
+          );
+      }
+    } on PlatformException catch (e) {
+      debugPrint('Failed to get device info: $e');
+    }
+
+    if (!mounted) return;
+    setState(() {});
+  }
+
+  void _readAndroidBuildData(AndroidDeviceInfo build) {
+    manufacturer = build.manufacturer;
+    model = build.model;
+    osVersionRelease = build.version.release;
+    deviceId = build.id;
+  }
+
+  void _readIosDeviceInfo(IosDeviceInfo data) {
+    manufacturer = "Apple";
+    model = data.modelName;
+    osVersionRelease = data.systemVersion;
+    deviceId = data.identifierForVendor ?? "";
   }
 
   final showPassword = ValueNotifier(false);
@@ -124,10 +187,6 @@ class _FmcgRegisterSellerDistributorFormState
               } else {
                 Constants().hideSensitiveData = true;
               }
-              clearForm();
-
-              CommonToast.success(
-                  "Thank You for Your Enquiry!Your enquiry has been successfully submitted. Our team will contact you shortly.");
 
               Navigator.pushNamedAndRemoveUntil(
                 context,
@@ -143,8 +202,15 @@ class _FmcgRegisterSellerDistributorFormState
               CommonToast.showFailureToast(state.failure);
             }
             if (state is FmcgRegisterDistributorSuccess) {
+              Constants.isFmcg = true;
+              secureStorageService.write(AppStrings.isFmcg, "true");
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                Routes.fmcgMainScreen,
+                (route) => false,
+              );
               clearForm();
-              sl<NavigationService>().pop();
+
               CommonToast.success(
                   "Thank You for Your Interest in Becoming a Distributor! Your enquiry has been successfully submitted. Our team will review your details and contact you shortly.");
             }
@@ -346,26 +412,41 @@ class _FmcgRegisterSellerDistributorFormState
                                               params;
                                           if (formKey.currentState!
                                               .validate()) {
-                                            params = FmcgRegisterDistributorParams(
-                                                name: nameController.text,
-                                                mobile: mobileController.text,
-                                                email: emailController.text,
-                                                companyName:
-                                                    companyNameController.text,
-                                                interestedBrandName:
-                                                    (selectedBrand?.brandName ==
-                                                            "Other")
-                                                        ? brandNameController
-                                                            .text
-                                                        : selectedBrand
-                                                                ?.brandName ??
-                                                            "",
-                                                perferredLocation:
-                                                    distributionLocationController
-                                                        .text,
-                                                countryCode: selectedCountryCode
-                                                        ?.countryCode ??
-                                                    '');
+                                            params =
+                                                FmcgRegisterDistributorParams(
+                                              name: nameController.text,
+                                              mobile: mobileController.text,
+                                              email: emailController.text,
+                                              companyName:
+                                                  companyNameController.text,
+                                              interestedBrandName:
+                                                  (selectedBrand?.brandName ==
+                                                          "Other")
+                                                      ? brandNameController.text
+                                                      : selectedBrand
+                                                              ?.brandName ??
+                                                          "",
+                                              perferredLocation:
+                                                  distributionLocationController
+                                                      .text,
+                                              countryCode: selectedCountryCode
+                                                      ?.countryCode ??
+                                                  '',
+                                              osType: Platform.isAndroid
+                                                  ? "Android"
+                                                  : "iOS",
+                                              fcmToken:
+                                                  await secureStorageService
+                                                          .read(AppStrings
+                                                              .fcmToken) ??
+                                                      "",
+                                              manufacturer: manufacturer,
+                                              model: model,
+                                              osVersionRelease:
+                                                  osVersionRelease,
+                                              appVersion: appVersion,
+                                              deviceId: deviceId,
+                                            );
                                             if (!context.mounted) {
                                               return;
                                             }
@@ -490,17 +571,30 @@ class _FmcgRegisterSellerDistributorFormState
                                           if (formKey.currentState!
                                               .validate()) {
                                             params = FmcgRegisterSellerParams(
-                                                token: "2018APR031848",
-                                                brandName:
-                                                    brandNameController.text,
-                                                contactName:
-                                                    nameController.text,
-                                                countryCode: selectedCountryCode
-                                                        ?.countryCode ??
-                                                    '',
-                                                emailId: emailController.text,
-                                                mobileNo:
-                                                    mobileController.text);
+                                              token: "2018APR031848",
+                                              brandName:
+                                                  brandNameController.text,
+                                              contactName: nameController.text,
+                                              countryCode: selectedCountryCode
+                                                      ?.countryCode ??
+                                                  '',
+                                              emailId: emailController.text,
+                                              mobileNo: mobileController.text,
+                                              osType: Platform.isAndroid
+                                                  ? "Android"
+                                                  : "iOS",
+                                              fcmToken:
+                                                  await secureStorageService
+                                                          .read(AppStrings
+                                                              .fcmToken) ??
+                                                      "",
+                                              manufacturer: manufacturer,
+                                              model: model,
+                                              osVersionRelease:
+                                                  osVersionRelease,
+                                              appVersion: appVersion,
+                                              deviceId: deviceId,
+                                            );
                                             if (!context.mounted) {
                                               return;
                                             }

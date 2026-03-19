@@ -70,9 +70,11 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
   }
 
   Future<String> getName() async {
-    return name = Constants.isBuyer == true
-        ? await secureStorage.read(AppStrings.customerName) ?? ""
-        : await secureStorage.read(AppStrings.vendorName) ?? "";
+    return name = Constants.isFmcg == true
+        ? await secureStorage.read(AppStrings.fmcgName) ?? ""
+        : Constants.isBuyer == true
+            ? await secureStorage.read(AppStrings.customerName) ?? ""
+            : await secureStorage.read(AppStrings.vendorName) ?? "";
   }
 
   @override
@@ -88,9 +90,11 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
               if (state is SignOutSuccess) {
                 CommonToast.success("Signed Out Successfully");
                 Constants.isLogin = false;
+                Constants.isFmcg = false;
                 SecureStorageService secureStorage = SecureStorageService();
                 secureStorage.delete(AppStrings.apiVerificationCode);
                 Constants.token = "";
+                secureStorage.write(AppStrings.isFmcg, false.toString());
 
                 secureStorage.write(AppStrings.appSession, false.toString());
 
@@ -129,9 +133,9 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
             CustomScrollView(
               slivers: [
                 /// ⭐ COMMON APPBAR
-                const CommonAppbar(
+                CommonAppbar(
                   title: "More",
-                  showNotification: true,
+                  showNotification: Constants.isFmcg == true ? false : true,
                 ),
 
                 /// ⭐ BODY
@@ -346,7 +350,7 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
             ),
           ),
           IconButton(
-            onPressed: () => _appCubit.changeTab(2),
+            onPressed: Constants.isFmcg ? null : () => _appCubit.changeTab(2),
             icon: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
           ),
         ],

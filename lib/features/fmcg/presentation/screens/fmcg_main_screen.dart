@@ -1,13 +1,19 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
+import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/features/contact_us/more_options_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/chat_list_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_account_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_distributor_enq.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_my_account_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_seller_dashboard_screen.dart';
+import 'package:tradologie_app/features/webview/presentation/screens/in_app_webview_screen.dart';
+import 'package:tradologie_app/features/webview/presentation/screens/viewmodel/webview_params.dart';
+import 'package:tradologie_app/features/webview/presentation/screens/webview_screen.dart';
 
 class CommonFMCGFloatingNavBar extends StatelessWidget {
   final int index;
@@ -47,11 +53,16 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _item(0, Icons.dashboard_outlined, "Dashboard"),
-                _item(1, Icons.chat_outlined, "Chats"),
-                _item(2, Icons.account_circle_outlined, "My Account"),
-                _item(3, Icons.menu_rounded, "More"),
-                _item(4, Icons.payment_outlined, "Membership"),
+                if (Constants.isBuyer == true) ...[
+                  _item(0, Icons.dashboard_outlined, "Dashboard"),
+                  _item(1, Icons.menu_rounded, "More"),
+                ] else ...[
+                  _item(0, Icons.dashboard_outlined, "Dashboard"),
+                  _item(1, Icons.chat_outlined, "Chats"),
+                  // _item(2, Icons.account_circle_outlined, "My Account"),
+                  _item(2, Icons.menu_rounded, "More"),
+                  _item(3, Icons.payment_outlined, "Membership"),
+                ]
               ],
             ),
           ),
@@ -110,17 +121,48 @@ class FMCGMainScreen extends StatefulWidget {
 class _FMCGMainScreenState extends State<FMCGMainScreen> {
   int currentIndex = 0;
 
+  SecureStorageService secureStorage = SecureStorageService();
+
+  Future<void> nameUpdate() async {
+    Constants.name = Constants.isFmcg == true
+        ? await secureStorage.read(AppStrings.fmcgName) ?? ""
+        : Constants.isBuyer == true
+            ? await secureStorage.read(AppStrings.customerName) ?? ""
+            : await secureStorage.read(AppStrings.vendorName) ?? "";
+  }
+
+  @override
+  initState() {
+    super.initState();
+    nameUpdate();
+  }
+
   final List<Widget> screens = [
     FmcgSellerDashboardScreen(),
     ChatListScreen(),
-    FmcgMyAccountScreen(),
+    // FmcgMyAccountScreen(),
     MoreOptionsScreen(),
     SizedBox(),
+  ];
+  final List<Widget> buyerScreens = [
+    Constants.isAndroid14OrBelow && Platform.isAndroid
+        ? InAppWebViewScreen(
+            params: WebviewParams(
+                url: "https://www.tradologie.com/fmcg-view",
+                canPop: false,
+                isAppBar: true))
+        : WebViewScreen(
+            params: WebviewParams(
+            url: "https://www.tradologie.com/fmcg-view",
+            canPop: false,
+            isAppBar: true,
+          )),
+    MoreOptionsScreen(),
   ];
 
   void onTabChanged(int index) {
     setState(() {
-      if (index == 4) {
+      if (index == 3) {
         Constants.launch("https://www.tradologie.com/brand-membership/");
       } else {
         setState(() {
@@ -136,7 +178,9 @@ class _FMCGMainScreenState extends State<FMCGMainScreen> {
       body: SafeArea(
         child: Stack(
           children: [
-            screens[currentIndex],
+            Constants.isBuyer == true
+                ? buyerScreens[currentIndex]
+                : screens[currentIndex],
             CommonFMCGFloatingNavBar(
               index: currentIndex,
               onTap: onTabChanged,
