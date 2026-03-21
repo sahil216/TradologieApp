@@ -4,14 +4,22 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/app_colors.dart';
+import 'package:tradologie_app/core/utils/app_strings.dart';
+import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
+import 'package:tradologie_app/core/widgets/common_date_picker.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_button.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 import 'package:tradologie_app/core/widgets/custom_text_field.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_country_code_list.dart';
+import 'package:tradologie_app/features/fmcg/domain/entities/fmcg_get_seller_profile.dart';
+import 'package:tradologie_app/features/fmcg/domain/entities/fmcg_seller_gender.dart';
+import 'package:tradologie_app/features/fmcg/domain/entities/fmcg_seller_title.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_profile_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/update_seller_profile_usecase.dart';
 import 'package:tradologie_app/features/fmcg/presentation/cubit/chat_cubit.dart';
 
 import '../../../../../core/widgets/common_drop_down.dart';
@@ -28,34 +36,38 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
   ChatCubit get chatCubit => BlocProvider.of(context);
   SecureStorageService secureStorage = SecureStorageService();
 
+  FmcgGetSellerProfile? fmcgGetSellerProfile;
+
   final emailController = TextEditingController();
   final mobileController = TextEditingController();
   final nameController = TextEditingController();
   final brandNameController = TextEditingController();
 
-  final distributionLocationController = TextEditingController();
-  final companyNameController = TextEditingController();
-
   List<FmcgCountryCodeList> countryCodeList = [];
   FmcgCountryCodeList? selectedCountryCode;
+  FmcgSellerTitle? selectedTitle;
+  FmcgSellerGender? selectedGender;
   Key countryCodeKey = UniqueKey();
+  Key titleKey = UniqueKey();
+  Key genderKey = UniqueKey();
   Key brandKey = UniqueKey();
 
   final showPassword = ValueNotifier(false);
   final formKey = GlobalKey<FormState>();
 
-  void clearForm() {
-    emailController.clear();
-    mobileController.clear();
-    nameController.clear();
-    brandNameController.clear();
-    distributionLocationController.clear();
-    companyNameController.clear();
-    selectedCountryCode = null;
-    countryCodeKey = UniqueKey();
-    brandKey = UniqueKey();
-    setState(() {});
-  }
+  DateTime? dateOfBirth;
+
+  // void clearForm() {
+  //   emailController.clear();
+  //   mobileController.clear();
+  //   nameController.clear();
+  //   brandNameController.clear();
+
+  //   selectedCountryCode = null;
+  //   countryCodeKey = UniqueKey();
+  //   brandKey = UniqueKey();
+  //   setState(() {});
+  // }
 
   List<FmcgCountryCodeList> fetchCountryCode(
       String filter, LoadProps? loadProps) {
@@ -67,20 +79,40 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
         .toList();
   }
 
+  List<FmcgSellerTitle> fetchSalutation(String filter, LoadProps? loadProps) {
+    final allItems = fmcgGetSellerProfile?.fmcgSellerTitle ?? [];
+    if (filter.isEmpty) return allItems;
+    return allItems
+        .where((e) =>
+            (e.titleName ?? "").toLowerCase().contains(filter.toLowerCase()))
+        .toList();
+  }
+
+  List<FmcgSellerGender> fetchGender(String filter, LoadProps? loadProps) {
+    final allItems = fmcgGetSellerProfile?.fmcgSellerGender ?? [];
+    if (filter.isEmpty) return allItems;
+    return allItems
+        .where((e) =>
+            (e.genderName ?? "").toLowerCase().contains(filter.toLowerCase()))
+        .toList();
+  }
+
   bool isSubmitted = false;
 
-  void getDistributorList() async {
-    await chatCubit.getDistributorList(NoParams());
+  void getProfileData() async {
+    GetSellerProfileParams params = GetSellerProfileParams(
+      token: await secureStorage.read(AppStrings.apiVerificationCode) ?? "",
+      loginID: await secureStorage.read(AppStrings.userId) ?? "",
+      deviceID: Constants.deviceID,
+    );
+
+    await chatCubit.getSellerProfile(params);
   }
 
   @override
   void initState() {
     super.initState();
-    getDistributorList();
-  }
-
-  Future<void> _refreshChats() async {
-    getDistributorList(); // your API call
+    getProfileData();
   }
 
   void toggle(int index) {
@@ -102,10 +134,10 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
       body: BlocListener<ChatCubit, ChatState>(
         listenWhen: (previous, current) => previous != current,
         listener: (context, state) async {
-          if (state is DistributorListSuccess) {
-            // distributorList = state.data;
+          if (state is GetSellerProfileSuccess) {
+            fmcgGetSellerProfile = state.data;
           }
-          if (state is DistributorListError) {
+          if (state is GetSellerProfileError) {
             CommonToast.showFailureToast(state.failure);
           }
         },
@@ -146,6 +178,23 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
 
                                       return null;
                                     },
+                                  ),
+                                  SizedBox(height: 12),
+                                  CommonDropdown<FmcgSellerTitle>(
+                                    label: 'Title',
+                                    hint: 'Select Title',
+                                    dropdownKey: titleKey,
+                                    asyncItems: (filter, loadProps) {
+                                      return fetchSalutation(filter, loadProps);
+                                    },
+                                    selectedItem: null,
+                                    itemAsString: (item) =>
+                                        item.titleName ?? "",
+                                    onChanged: (item) {
+                                      selectedTitle = item;
+                                    },
+                                    compareFn: (a, b) =>
+                                        a.titleName == b.titleName,
                                   ),
                                   SizedBox(height: 12),
                                   CommonTextField(
@@ -214,33 +263,70 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
                                       return null;
                                     },
                                   ),
+                                  SizedBox(height: 12),
+                                  CommonDropdown<FmcgSellerGender>(
+                                    label: 'Gender',
+                                    hint: 'Select Gender',
+                                    dropdownKey: genderKey,
+                                    asyncItems: (filter, loadProps) {
+                                      return fetchGender(filter, loadProps);
+                                    },
+                                    selectedItem: null,
+                                    itemAsString: (item) =>
+                                        item.genderName ?? "",
+                                    onChanged: (item) {
+                                      selectedGender = item;
+                                    },
+                                    compareFn: (a, b) =>
+                                        a.genderName == b.genderName,
+                                  ),
+                                  SizedBox(height: 12),
+                                  CommonDatePicker(
+                                    label: "Date of Birth",
+                                    hint: "(yyyy/mm/dd)",
+                                    type: PickerType.dateTime,
+                                    firstDate: DateTime(1900),
+                                    lastDate: DateTime.now(),
+                                    onChanged: (value) {
+                                      dateOfBirth = value;
+                                    },
+                                    validator: (value) {
+                                      if (value == null) return "Required";
+                                      return null;
+                                    },
+                                  ),
                                   SizedBox(height: 20),
                                   CommonButton(
                                     onPressed: () async {
-                                      // late FmcgRegisterSellerParams params;
-                                      // if (formKey.currentState!.validate()) {
-                                      //   params = FmcgRegisterSellerParams(
-                                      //       token: "2018APR031848",
-                                      //       brandName:
-                                      //           brandNameController.text,
-                                      //       contactName: nameController.text,
-                                      //       countryCode: selectedCountryCode
-                                      //               ?.countryCode ??
-                                      //           '',
-                                      //       emailId: emailController.text,
-                                      //       mobileNo: mobileController.text);
-                                      //   if (!context.mounted) {
-                                      //     return;
-                                      //   }
-                                      //   FocusManager.instance.primaryFocus
-                                      //       ?.unfocus();
+                                      late UpdateSellerProfileParams params;
+                                      if (formKey.currentState!.validate()) {
+                                        params = UpdateSellerProfileParams(
+                                            token: await secureStorage.read(
+                                                    AppStrings
+                                                        .apiVerificationCode) ??
+                                                "",
+                                            loginID: '',
+                                            titleID: '',
+                                            genderID: '',
+                                            profileImage: '',
+                                            password: '',
+                                            mobile: '',
+                                            email: '',
+                                            dob: '',
+                                            name: '',
+                                            isImage: null);
+                                        if (!context.mounted) {
+                                          return;
+                                        }
+                                        FocusManager.instance.primaryFocus
+                                            ?.unfocus();
 
-                                      //   BlocProvider.of<AuthenticationCubit>(
-                                      //           context)
-                                      //       .fmcgRegisterSeller(params);
-                                      // }
+                                        BlocProvider.of<AuthenticationCubit>(
+                                                context)
+                                            .fmcgRegisterSeller(params);
+                                      }
                                     },
-                                    text: "Submits",
+                                    text: "Submit",
                                     textStyle: TextStyleConstants.medium(
                                       context,
                                       fontSize: 16,

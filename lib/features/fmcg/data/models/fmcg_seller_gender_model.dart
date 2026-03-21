@@ -1,7 +1,7 @@
 import 'package:tradologie_app/features/fmcg/domain/entities/fmcg_seller_gender.dart';
 
 class FmcgSellerGenderModel extends FmcgSellerGender {
-  FmcgSellerGenderModel({
+  const FmcgSellerGenderModel({
     super.genderId,
     super.genderName,
   });

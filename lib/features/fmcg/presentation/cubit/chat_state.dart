@@ -74,3 +74,91 @@ class DistributorListError extends ChatState {
   @override
   List<Object> get props => [failure];
 }
+
+class UpdateSellerDocumentsIsLoading extends ChatState {}
+
+class UpdateSellerDocumentsSuccess extends ChatState {
+  final bool data;
+
+  const UpdateSellerDocumentsSuccess({
+    required this.data,
+  });
+
+  @override
+  List<Object> get props => [data];
+}
+
+class UpdateSellerDocumentsError extends ChatState {
+  final Failure failure;
+
+  const UpdateSellerDocumentsError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class UpdateSellerProfileIsLoading extends ChatState {}
+
+class UpdateSellerProfileSuccess extends ChatState {
+  final bool data;
+
+  const UpdateSellerProfileSuccess({
+    required this.data,
+  });
+
+  @override
+  List<Object> get props => [data];
+}
+
+class UpdateSellerProfileError extends ChatState {
+  final Failure failure;
+
+  const UpdateSellerProfileError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class GetSellerProfileIsLoading extends ChatState {}
+
+class GetSellerProfileSuccess extends ChatState {
+  final FmcgGetSellerProfile data;
+
+  const GetSellerProfileSuccess({
+    required this.data,
+  });
+
+  @override
+  List<Object> get props => [data];
+}
+
+class GetSellerProfileError extends ChatState {
+  final Failure failure;
+
+  const GetSellerProfileError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class GetSellerDocumentsIsLoading extends ChatState {}
+
+class GetSellerDocumentsSuccess extends ChatState {
+  final FmcgSellerDocumentDetail data;
+
+  const GetSellerDocumentsSuccess({
+    required this.data,
+  });
+
+  @override
+  List<Object> get props => [data];
+}
+
+class GetSellerDocumentsError extends ChatState {
+  final Failure failure;
+
+  const GetSellerDocumentsError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}

@@ -1,7 +1,7 @@
 import 'package:tradologie_app/features/fmcg/domain/entities/fmcg_seller_title.dart';
 
 class FmcgSellerTitleModel extends FmcgSellerTitle {
-  FmcgSellerTitleModel({
+  const FmcgSellerTitleModel({
     super.titleId,
     super.titleName,
   });

@@ -5,6 +5,10 @@ import 'package:tradologie_app/features/fmcg/domain/repositories/chat_repositori
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_data_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_distributor_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_documents_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_profile_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/update_seller_documents_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/update_seller_profile_usecase.dart';
 import 'package:tradologie_app/features/fmcg/presentation/cubit/chat_cubit.dart';
 
 final sl = GetIt.instance;
@@ -15,6 +19,10 @@ Future<void> init() async {
         chatListUsecase: sl(),
         chatDataUsecase: sl(),
         getDistributorListUsecase: sl(),
+        getSellerDocumentsUsecase: sl(),
+        getSellerProfileUsecase: sl(),
+        updateSellerProfileUsecase: sl(),
+        updateSellerDocumentsUsecase: sl(),
       ));
 
   //! Use cases
@@ -24,6 +32,15 @@ Future<void> init() async {
       () => ChatDataUsecase(chatRepository: sl()));
   sl.registerLazySingleton<GetDistributorListUsecase>(
       () => GetDistributorListUsecase(chatRepository: sl()));
+
+  sl.registerLazySingleton<GetSellerDocumentsUsecase>(
+      () => GetSellerDocumentsUsecase(chatRepository: sl()));
+  sl.registerLazySingleton<GetSellerProfileUsecase>(
+      () => GetSellerProfileUsecase(chatRepository: sl()));
+  sl.registerLazySingleton<UpdateSellerProfileUsecase>(
+      () => UpdateSellerProfileUsecase(chatRepository: sl()));
+  sl.registerLazySingleton<UpdateSellerDocumentsUsecase>(
+      () => UpdateSellerDocumentsUsecase(chatRepository: sl()));
 
   //! Repository
   sl.registerLazySingleton<ChatRepository>(() => ChatRepositoryImpl(

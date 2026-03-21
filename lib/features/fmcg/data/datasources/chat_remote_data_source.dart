@@ -5,16 +5,23 @@ import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_data_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_documents_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_profile_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/update_seller_documents_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/update_seller_profile_usecase.dart';
 
 abstract class ChatRemoteDataSource {
   Future<ResponseWrapper<dynamic>?> getChatList(ChatListParams params);
   Future<ResponseWrapper<dynamic>?> chatData(ChatDataParams params);
   Future<ResponseWrapper<dynamic>?> getDistributorList(NoParams params);
-  Future<ResponseWrapper<dynamic>?> fmcgGetSellerProfile(NoParams params);
-  Future<ResponseWrapper<dynamic>?> fmcgUpdateSellerProfile(NoParams params);
-  Future<ResponseWrapper<dynamic>?> fmcgGetSellerDocuments(NoParams params);
-  Future<ResponseWrapper<dynamic>?> fmcgUpdateSellerDocuments(NoParams params);
-  Future<ResponseWrapper<dynamic>?> fmcgLogout(NoParams params);
+  Future<ResponseWrapper<dynamic>?> fmcgGetSellerProfile(
+      GetSellerProfileParams params);
+  Future<ResponseWrapper<dynamic>?> fmcgUpdateSellerProfile(
+      UpdateSellerProfileParams params);
+  Future<ResponseWrapper<dynamic>?> fmcgGetSellerDocuments(
+      GetSellerDocumentsParams params);
+  Future<ResponseWrapper<dynamic>?> fmcgUpdateSellerDocuments(
+      UpdateSellerDocumentsParams params);
 }
 
 class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
@@ -48,45 +55,36 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
 
   @override
   Future<ResponseWrapper<dynamic>?> fmcgGetSellerProfile(
-      NoParams params) async {
+      GetSellerProfileParams params) async {
     return await apiConsumer.post(
       EndPoints.fmcgGetSellerProfile,
-      body: {"Token": Constants.token},
+      body: params.toJson(),
     );
   }
 
   @override
   Future<ResponseWrapper<dynamic>?> fmcgUpdateSellerProfile(
-      NoParams params) async {
-    return await apiConsumer.post(
-      EndPoints.fmcgUpdateSellerProfile,
-      body: {"Token": Constants.token},
-    );
+      UpdateSellerProfileParams params) async {
+    return await apiConsumer.post(EndPoints.fmcgUpdateSellerProfile,
+        body: params.toJson(), formDataIsEnabled: true);
   }
 
   @override
   Future<ResponseWrapper<dynamic>?> fmcgGetSellerDocuments(
-      NoParams params) async {
+      GetSellerDocumentsParams params) async {
     return await apiConsumer.post(
       EndPoints.fmcgGetSellerDocuments,
-      body: {"Token": Constants.token},
+      body: params.toJson(),
     );
   }
 
   @override
   Future<ResponseWrapper<dynamic>?> fmcgUpdateSellerDocuments(
-      NoParams params) async {
+      UpdateSellerDocumentsParams params) async {
     return await apiConsumer.post(
       EndPoints.fmcgUpdateSellerDocuments,
-      body: {"Token": Constants.token},
-    );
-  }
-
-  @override
-  Future<ResponseWrapper<dynamic>?> fmcgLogout(NoParams params) async {
-    return await apiConsumer.post(
-      EndPoints.fmcgLogout,
-      body: {"Token": Constants.token},
+      body: params.toJson(),
+      formDataIsEnabled: true,
     );
   }
 }

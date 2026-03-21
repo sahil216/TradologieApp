@@ -59,9 +59,9 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
                 ] else ...[
                   _item(0, Icons.dashboard_outlined, "Dashboard"),
                   _item(1, Icons.chat_outlined, "Chats"),
-                  // _item(2, Icons.account_circle_outlined, "My Account"),
-                  _item(2, Icons.menu_rounded, "More"),
-                  _item(3, Icons.payment_outlined, "Membership"),
+                  _item(2, Icons.account_circle_outlined, "My Account"),
+                  _item(3, Icons.menu_rounded, "More"),
+                  _item(4, Icons.payment_outlined, "Membership"),
                 ]
               ],
             ),
@@ -140,7 +140,7 @@ class _FMCGMainScreenState extends State<FMCGMainScreen> {
   final List<Widget> screens = [
     FmcgSellerDashboardScreen(),
     ChatListScreen(),
-    // FmcgMyAccountScreen(),
+    FmcgMyAccountScreen(),
     MoreOptionsScreen(),
     SizedBox(),
   ];
@@ -162,7 +162,7 @@ class _FMCGMainScreenState extends State<FMCGMainScreen> {
 
   void onTabChanged(int index) {
     setState(() {
-      if (index == 3) {
+      if (index == 4) {
         Constants.launch("https://www.tradologie.com/brand-membership/");
       } else {
         setState(() {

@@ -1,4 +1,8 @@
+import 'package:dartz/dartz.dart';
+import 'package:tradologie_app/core/error/failures.dart';
+import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
+import 'package:tradologie_app/features/fmcg/domain/repositories/chat_repositories.dart';
 
 class UpdateSellerDocumentsParams {
   final String token;
@@ -23,4 +27,14 @@ class UpdateSellerDocumentsParams {
         "Description": description,
         "DeviceID": Constants.deviceID,
       };
+}
+
+class UpdateSellerDocumentsUsecase
+    implements UseCase<bool, UpdateSellerDocumentsParams> {
+  final ChatRepository chatRepository;
+
+  UpdateSellerDocumentsUsecase({required this.chatRepository});
+  @override
+  Future<Either<Failure, bool>> call(UpdateSellerDocumentsParams params) =>
+      chatRepository.updateFmcgSellerDocuments(params);
 }
