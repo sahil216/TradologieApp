@@ -1,10 +1,15 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/app_colors.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
+import 'package:tradologie_app/core/utils/common_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
@@ -42,6 +47,8 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
   final mobileController = TextEditingController();
   final nameController = TextEditingController();
   final brandNameController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
 
   List<FmcgCountryCodeList> countryCodeList = [];
   FmcgCountryCodeList? selectedCountryCode;
@@ -55,7 +62,7 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
   final showPassword = ValueNotifier(false);
   final formKey = GlobalKey<FormState>();
 
-  DateTime? dateOfBirth;
+  String? dateOfBirth;
 
   // void clearForm() {
   //   emailController.clear();
@@ -68,6 +75,56 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
   //   brandKey = UniqueKey();
   //   setState(() {});
   // }
+
+  File? _selectedImage;
+  final ImagePicker _picker = ImagePicker();
+  bool isImage = false;
+
+  Future<void> _pickImage(ImageSource source) async {
+    final picked = await _picker.pickImage(
+      source: source,
+      imageQuality: 70,
+    );
+
+    if (picked != null) {
+      final file = File(picked.path);
+      isImage = true;
+      setState(() => _selectedImage = file);
+    }
+  }
+
+  void _showPickerOptions() {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: Icon(Icons.camera_alt),
+                title: Text("Camera"),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_library),
+                title: Text("Gallery"),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.gallery);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   List<FmcgCountryCodeList> fetchCountryCode(
       String filter, LoadProps? loadProps) {
@@ -102,11 +159,28 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
   void getProfileData() async {
     GetSellerProfileParams params = GetSellerProfileParams(
       token: await secureStorage.read(AppStrings.apiVerificationCode) ?? "",
-      loginID: await secureStorage.read(AppStrings.userId) ?? "",
+      loginID: await secureStorage.read(AppStrings.loginId) ?? "",
       deviceID: Constants.deviceID,
     );
 
     await chatCubit.getSellerProfile(params);
+  }
+
+  void fillData() {
+    emailController.text = fmcgGetSellerProfile?.email ?? "";
+    mobileController.text = fmcgGetSellerProfile?.mobile ?? "";
+    nameController.text = fmcgGetSellerProfile?.fullName ?? "";
+    brandNameController.text = fmcgGetSellerProfile?.fullName ?? "";
+    dateOfBirth = fmcgGetSellerProfile?.dob ?? "";
+
+    selectedTitle = fmcgGetSellerProfile?.fmcgSellerTitle
+        ?.where((e) => e.titleId == fmcgGetSellerProfile?.titleId)
+        .toList()
+        .firstOrNull;
+    selectedGender = fmcgGetSellerProfile?.fmcgSellerGender
+        ?.where((e) => e.genderId == fmcgGetSellerProfile?.genderId)
+        .toList()
+        .firstOrNull;
   }
 
   @override
@@ -136,6 +210,8 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
         listener: (context, state) async {
           if (state is GetSellerProfileSuccess) {
             fmcgGetSellerProfile = state.data;
+            fillData();
+            setState(() {});
           }
           if (state is GetSellerProfileError) {
             CommonToast.showFailureToast(state.failure);
@@ -163,6 +239,53 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
                                   SizedBox(
                                     height: 20,
                                   ),
+                                  GestureDetector(
+                                    onTap: _showPickerOptions,
+                                    child: Container(
+                                      height: 90,
+                                      width: 90,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color:
+                                                Colors.black.withOpacity(0.1),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 4),
+                                          )
+                                        ],
+                                      ),
+                                      child: _selectedImage != null
+                                          ? CircleAvatar(
+                                              radius: 40,
+                                              backgroundColor:
+                                                  Colors.grey.shade200,
+                                              backgroundImage:
+                                                  FileImage(_selectedImage!))
+                                          : CircleAvatar(
+                                              radius: 40,
+                                              backgroundColor:
+                                                  Colors.grey.shade200,
+                                              backgroundImage:
+                                                  (fmcgGetSellerProfile
+                                                                  ?.profileImage ??
+                                                              "")
+                                                          .isNotEmpty
+                                                      ? NetworkImage(
+                                                          fmcgGetSellerProfile!
+                                                              .profileImage!)
+                                                      : null,
+                                              child: (fmcgGetSellerProfile
+                                                              ?.profileImage ??
+                                                          "")
+                                                      .isEmpty
+                                                  ? const Icon(
+                                                      Icons.account_circle,
+                                                      size: 40)
+                                                  : null,
+                                            ),
+                                    ),
+                                  ),
                                   CommonTextField(
                                     titleText: "Brand Name",
                                     hintText: "Enter Brand Name",
@@ -187,7 +310,7 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
                                     asyncItems: (filter, loadProps) {
                                       return fetchSalutation(filter, loadProps);
                                     },
-                                    selectedItem: null,
+                                    selectedItem: selectedTitle,
                                     itemAsString: (item) =>
                                         item.titleName ?? "",
                                     onChanged: (item) {
@@ -219,10 +342,6 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
                                     autovalidateMode:
                                         AutovalidateMode.onUserInteraction,
                                     validator: (String? val) {
-                                      if (val == null || val.isEmpty) {
-                                        return "Required";
-                                      }
-
                                       return null;
                                     },
                                   ),
@@ -256,10 +375,6 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
                                       FilteringTextInputFormatter.digitsOnly
                                     ],
                                     validator: (String? val) {
-                                      if (val == null || val.isEmpty) {
-                                        return "Required";
-                                      }
-
                                       return null;
                                     },
                                   ),
@@ -271,7 +386,7 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
                                     asyncItems: (filter, loadProps) {
                                       return fetchGender(filter, loadProps);
                                     },
-                                    selectedItem: null,
+                                    selectedItem: selectedGender,
                                     itemAsString: (item) =>
                                         item.genderName ?? "",
                                     onChanged: (item) {
@@ -283,18 +398,76 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
                                   SizedBox(height: 12),
                                   CommonDatePicker(
                                     label: "Date of Birth",
-                                    hint: "(yyyy/mm/dd)",
-                                    type: PickerType.dateTime,
+                                    hint: dateOfBirth ?? "(yyyy/mm/dd)",
+                                    type: PickerType.date,
                                     firstDate: DateTime(1900),
                                     lastDate: DateTime.now(),
                                     onChanged: (value) {
-                                      dateOfBirth = value;
+                                      dateOfBirth = value.toString();
                                     },
                                     validator: (value) {
-                                      if (value == null) return "Required";
                                       return null;
                                     },
                                   ),
+                                  CommonTextField(
+                                    titleText: CommonStrings.password,
+                                    hintText: CommonStrings.enterPassword,
+                                    controller: passwordController,
+                                    isObsecureText: showPassword.value == true
+                                        ? false
+                                        : true,
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        showPassword.value == true
+                                            ? Icons.visibility_outlined
+                                            : Icons.visibility_off_outlined,
+                                        color: AppColors.grayText,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          showPassword.value =
+                                              !showPassword.value;
+                                        });
+                                      },
+                                    ),
+                                    autovalidateMode:
+                                        AutovalidateMode.onUserInteraction,
+                                  ),
+                                  SizedBox(height: 12),
+                                  CommonTextField(
+                                    titleText: CommonStrings.confirmPassword,
+                                    hintText:
+                                        CommonStrings.enterConfirmPassword,
+                                    controller: confirmPasswordController,
+                                    textRequired: "Passwords do not match",
+                                    isObsecureText: showPassword.value == true
+                                        ? false
+                                        : true,
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        showPassword.value == true
+                                            ? Icons.visibility_outlined
+                                            : Icons.visibility_off_outlined,
+                                        color: AppColors.grayText,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          showPassword.value =
+                                              !showPassword.value;
+                                        });
+                                      },
+                                    ),
+                                    validator: (String? val) {
+                                      if (val != passwordController.text &&
+                                          passwordController.text.isNotEmpty) {
+                                        return "Passwords do not match";
+                                      }
+                                      return null;
+                                    },
+                                    autovalidateMode:
+                                        AutovalidateMode.onUserInteraction,
+                                  ),
+                                  SizedBox(height: 12),
                                   SizedBox(height: 20),
                                   CommonButton(
                                     onPressed: () async {
@@ -305,25 +478,30 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
                                                     AppStrings
                                                         .apiVerificationCode) ??
                                                 "",
-                                            loginID: '',
-                                            titleID: '',
-                                            genderID: '',
-                                            profileImage: '',
-                                            password: '',
-                                            mobile: '',
-                                            email: '',
-                                            dob: '',
-                                            name: '',
-                                            isImage: null);
+                                            loginID: await secureStorage
+                                                    .read(AppStrings.loginId) ??
+                                                "",
+                                            titleID: selectedTitle?.titleId
+                                                    .toString() ??
+                                                "",
+                                            genderID: selectedGender?.genderId
+                                                    .toString() ??
+                                                "",
+                                            profileImage: _selectedImage,
+                                            password: passwordController.text,
+                                            mobile: mobileController.text,
+                                            email: emailController.text,
+                                            dob: dateOfBirth.toString(),
+                                            name: nameController.text,
+                                            isImage: isImage);
                                         if (!context.mounted) {
                                           return;
                                         }
                                         FocusManager.instance.primaryFocus
                                             ?.unfocus();
 
-                                        BlocProvider.of<AuthenticationCubit>(
-                                                context)
-                                            .fmcgRegisterSeller(params);
+                                        BlocProvider.of<ChatCubit>(context)
+                                            .updateSellerProfile(params);
                                       }
                                     },
                                     text: "Submit",
@@ -347,13 +525,62 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
             ),
             BlocBuilder<ChatCubit, ChatState>(
               builder: (context, state) {
-                if (state is DistributorListIsLoading) {
+                if (state is GetSellerProfileIsLoading ||
+                    state is UpdateSellerProfileIsLoading) {
                   return Positioned.fill(child: const CommonLoader());
                 }
                 return SizedBox.shrink();
               },
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class ProfileWidget extends StatelessWidget {
+  final String imageUrl;
+
+  final double size;
+  final VoidCallback? onTap;
+
+  const ProfileWidget({
+    super.key,
+    required this.imageUrl,
+    this.size = 60,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: size,
+        width: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            )
+          ],
+        ),
+        child: ClipOval(
+          child: Image.network(
+            imageUrl,
+            loadingBuilder: (context, child, progress) {
+              if (progress == null) return child;
+              return Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                ),
+              );
+            },
+          ),
         ),
       ),
     );

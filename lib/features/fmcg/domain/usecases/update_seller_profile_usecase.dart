@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import 'package:tradologie_app/core/error/failures.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
@@ -19,7 +22,7 @@ class UpdateSellerProfileParams {
   final String loginID;
   final String titleID;
   final String genderID;
-  final String profileImage;
+  final File? profileImage;
   final bool isImage;
   final String password;
   final String mobile;
@@ -41,12 +44,11 @@ class UpdateSellerProfileParams {
     required this.isImage,
   });
 
-  Map<String, dynamic> toJson() => {
+  Future<Map<String, dynamic>> toJson() async => {
         "Token": token,
         "LoginID": loginID,
         "TitleID": titleID,
         "GenderID": genderID,
-        "ProfileImage": profileImage,
         "Password": password,
         "Mobile": mobile,
         "Email": email,
@@ -54,5 +56,12 @@ class UpdateSellerProfileParams {
         "isimage": isImage,
         "Name": name,
         "DeviceID": Constants.deviceID,
+        if (profileImage != null)
+          "ProfileImage": await MultipartFile.fromFile(
+            profileImage!.path,
+            filename: profileImage!.path.split('/').last,
+          )
+        else
+          "ProfileImage": "",
       };
 }

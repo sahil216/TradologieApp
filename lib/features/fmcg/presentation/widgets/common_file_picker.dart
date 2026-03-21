@@ -1,260 +1,88 @@
 import 'dart:io';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 
 class PremiumDocumentPicker extends StatefulWidget {
   final String title;
   final List<String> allowedExtensions;
   final Function(File?) onFileSelected;
+  final String? initialFileUrl;
+  final Widget? upload;
 
   const PremiumDocumentPicker({
     super.key,
     required this.title,
     required this.allowedExtensions,
     required this.onFileSelected,
+    this.initialFileUrl,
+    this.upload,
   });
 
   @override
   State<PremiumDocumentPicker> createState() => _PremiumDocumentPickerState();
 }
 
-class _PremiumDocumentPickerState extends State<PremiumDocumentPicker>
-    with SingleTickerProviderStateMixin {
+class _PremiumDocumentPickerState extends State<PremiumDocumentPicker> {
   File? file;
+  String? networkFile;
   final ImagePicker _picker = ImagePicker();
-
-  late AnimationController _controller;
-  late Animation<double> _scale;
-
-  String selectedAction = "Choose";
 
   @override
   void initState() {
     super.initState();
-
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-
-    _scale = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOutBack,
-    );
+    networkFile = widget.initialFileUrl;
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  bool isImage(String path) {
+    return path.toLowerCase().endsWith(".jpg") ||
+        path.toLowerCase().endsWith(".jpeg") ||
+        path.toLowerCase().endsWith(".png");
   }
 
-  Future<void> handleSelection(String value) async {
-    setState(() => selectedAction = value);
+  bool isPdf(String path) {
+    return path.toLowerCase().endsWith(".pdf");
+  }
 
-    if (value == "Camera") {
-      final picked = await _picker.pickImage(source: ImageSource.camera);
-      if (picked != null) _setFile(File(picked.path));
-    } else if (value == "Gallery") {
-      final picked = await _picker.pickImage(source: ImageSource.gallery);
-      if (picked != null) _setFile(File(picked.path));
-    } else if (value == "File") {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: widget.allowedExtensions,
-      );
-      if (result != null) {
-        _setFile(File(result.files.single.path!));
-      }
+  Future<void> _pickFromCamera() async {
+    final picked = await _picker.pickImage(source: ImageSource.camera);
+    if (picked != null) _setFile(File(picked.path));
+  }
+
+  Future<void> _pickFromGallery() async {
+    final picked = await _picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) _setFile(File(picked.path));
+  }
+
+  Future<void> _pickFromFiles() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: widget.allowedExtensions,
+    );
+
+    if (result != null && result.files.single.path != null) {
+      _setFile(File(result.files.single.path!));
     }
   }
 
   void _setFile(File newFile) {
-    setState(() => file = newFile);
+    setState(() {
+      file = newFile;
+      networkFile = null;
+    });
     widget.onFileSelected(file);
-    _controller.forward(from: 0);
   }
 
-  void removeFile() {
+  void _removeFile() {
     setState(() {
       file = null;
-      selectedAction = "Choose";
+      networkFile = null;
     });
     widget.onFileSelected(null);
-  }
-
-  bool isImage(String path) {
-    return path.endsWith(".jpg") ||
-        path.endsWith(".jpeg") ||
-        path.endsWith(".png");
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isSelected = file != null;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// Title
-          Text(
-            widget.title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-
-          const SizedBox(height: 10),
-
-          /// Glass Container
-          ClipRRect(
-            borderRadius: BorderRadius.circular(18),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(18),
-                  color: Colors.white.withOpacity(0.15),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.3),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    /// Dropdown
-                    // Container(
-                    //   padding: const EdgeInsets.symmetric(horizontal: 12),
-                    //   decoration: BoxDecoration(
-                    //     borderRadius: BorderRadius.circular(12),
-                    //     color: Colors.white.withOpacity(0.25),
-                    //   ),
-                    //   child: DropdownButtonHideUnderline(
-                    //     child: DropdownButton<String>(
-                    //       value: selectedAction,
-                    //       isExpanded: true,
-                    //       dropdownColor: Colors.white,
-                    //       items: const [
-                    //         DropdownMenuItem(
-                    //             value: "Choose", child: Text("Choose Source")),
-                    //         DropdownMenuItem(
-                    //             value: "Camera", child: Text("Camera")),
-                    //         DropdownMenuItem(
-                    //             value: "Gallery", child: Text("Gallery")),
-                    //         DropdownMenuItem(
-                    //             value: "File", child: Text("File")),
-                    //       ],
-                    //       onChanged: (value) {
-                    //         if (value != null && value != "Choose") {
-                    //           handleSelection(value);
-                    //         }
-                    //       },
-                    //     ),
-                    //   ),
-                    // ),
-
-                    GestureDetector(
-                      onTap: _openPicker,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 12, horizontal: 16),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.white.withOpacity(0.25),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              file == null ? "Select File" : "Change File",
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                            const Icon(Icons.upload_file),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    /// Animated Preview
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      child: isSelected
-                          ? ScaleTransition(
-                              scale: _scale,
-                              child: Container(
-                                key: const ValueKey("file"),
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: Colors.white.withOpacity(0.3),
-                                ),
-                                child: Row(
-                                  children: [
-                                    /// Preview
-                                    if (isImage(file!.path))
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: Image.file(
-                                          file!,
-                                          width: 50,
-                                          height: 50,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      )
-                                    else
-                                      const Icon(Icons.description, size: 40),
-
-                                    const SizedBox(width: 12),
-
-                                    /// File Name
-                                    Expanded(
-                                      child: Text(
-                                        file!.path.split('/').last,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-
-                                    const Icon(Icons.check_circle,
-                                        color: Colors.green),
-
-                                    const SizedBox(width: 8),
-
-                                    GestureDetector(
-                                      onTap: removeFile,
-                                      child: const Icon(Icons.close,
-                                          color: Colors.red),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          : Container(
-                              key: const ValueKey("empty"),
-                              padding: const EdgeInsets.all(20),
-                              alignment: Alignment.center,
-                              child: Text(
-                                "No file selected",
-                                style: TextStyle(
-                                  color: Colors.black.withOpacity(0.8),
-                                ),
-                              ),
-                            ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   void _openPicker() {
@@ -268,28 +96,30 @@ class _PremiumDocumentPickerState extends State<PremiumDocumentPicker>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _optionTile(Icons.camera_alt, "Camera", () async {
-                Navigator.pop(context);
-                final picked =
-                    await _picker.pickImage(source: ImageSource.camera);
-                if (picked != null) _setFile(File(picked.path));
-              }),
-              _optionTile(Icons.photo, "Gallery", () async {
-                Navigator.pop(context);
-                final picked =
-                    await _picker.pickImage(source: ImageSource.gallery);
-                if (picked != null) _setFile(File(picked.path));
-              }),
-              _optionTile(Icons.insert_drive_file, "Files", () async {
-                Navigator.pop(context);
-                final result = await FilePicker.platform.pickFiles(
-                  type: FileType.custom,
-                  allowedExtensions: widget.allowedExtensions,
-                );
-                if (result != null && result.files.single.path != null) {
-                  _setFile(File(result.files.single.path!));
-                }
-              }),
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text("Camera"),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickFromCamera();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo),
+                title: const Text("Gallery"),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickFromGallery();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.insert_drive_file),
+                title: const Text("Files"),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickFromFiles();
+                },
+              ),
             ],
           ),
         );
@@ -297,11 +127,181 @@ class _PremiumDocumentPickerState extends State<PremiumDocumentPicker>
     );
   }
 
-  Widget _optionTile(IconData icon, String title, VoidCallback onTap) {
-    return ListTile(
-      leading: Icon(icon),
-      title: Text(title),
-      onTap: onTap,
+  /// 🔥 Open Preview
+  Future<void> _openPreview() async {
+    final path = file?.path ?? networkFile;
+
+    if (path == null) return;
+
+    if (isImage(path)) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => FullScreenImageView(
+            file: file,
+            url: networkFile,
+          ),
+        ),
+      );
+    } else if (isPdf(path)) {
+      if (file != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => PDFViewerScreen(path: file!.path),
+          ),
+        );
+      } else {
+        final downloadedPath = await downloadFile(networkFile!);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => PDFViewerScreen(path: downloadedPath),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<String> downloadFile(String url) async {
+    final dir = await getTemporaryDirectory();
+    final path = "${dir.path}/temp.pdf";
+    await Dio().download(url, path);
+    return path;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hasFile = file != null || networkFile != null;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            widget.title,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          /// Upload Box
+          GestureDetector(
+            onTap: _openPicker,
+            child: Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade400),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey),
+                    ),
+                    child: Text(
+                      "Browse",
+                      style: TextStyleConstants.medium(context, fontSize: 16),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      hasFile
+                          ? (file != null
+                              ? file!.path.split('/').last
+                              : networkFile!.split('/').last)
+                          : widget.initialFileUrl ?? "Click to upload file",
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyleConstants.medium(context, fontSize: 16),
+                    ),
+                  ),
+                  if (hasFile)
+                    GestureDetector(
+                      onTap: _removeFile,
+                      child: const Icon(Icons.close, color: Colors.red),
+                    )
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          /// Preview
+          // if (hasFile)
+          //   GestureDetector(
+          //     onTap: _openPreview,
+          //     child: Container(
+          //       padding: const EdgeInsets.all(10),
+          //       decoration: BoxDecoration(
+          //         borderRadius: BorderRadius.circular(10),
+          //         color: Colors.grey.shade100,
+          //       ),
+          //       child: Row(
+          //         children: [
+          //           if (file != null && isImage(file!.path))
+          //             Image.file(file!, width: 50, height: 50)
+          //           else if (networkFile != null && isImage(networkFile!))
+          //             Image.network(networkFile!, width: 50, height: 50)
+          //           else if ((file != null && isPdf(file!.path)) ||
+          //               (networkFile != null && isPdf(networkFile!)))
+          //             const Icon(Icons.picture_as_pdf, size: 40)
+          //           else
+          //             const Icon(Icons.description, size: 40),
+          //           const SizedBox(width: 10),
+          //           const Text("Tap to preview"),
+          //           const Spacer(),
+          //           const Icon(Icons.check_circle, color: Colors.green),
+          //         ],
+          //       ),
+          //     ),
+          //   ),
+          file != null ? widget.upload ?? Container() : Container(),
+        ],
+      ),
+    );
+  }
+}
+
+/// 🔥 Full Screen Image Viewer
+class FullScreenImageView extends StatelessWidget {
+  final File? file;
+  final String? url;
+
+  const FullScreenImageView({super.key, this.file, this.url});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(backgroundColor: Colors.transparent),
+      body: Center(
+        child: file != null ? Image.file(file!) : Image.network(url!),
+      ),
+    );
+  }
+}
+
+/// 🔥 PDF Viewer
+class PDFViewerScreen extends StatelessWidget {
+  final String path;
+
+  const PDFViewerScreen({super.key, required this.path});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("PDF Preview")),
+      body: PDFView(filePath: path),
     );
   }
 }

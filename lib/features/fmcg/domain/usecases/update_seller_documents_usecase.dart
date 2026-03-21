@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import 'package:tradologie_app/core/error/failures.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
@@ -7,7 +10,7 @@ import 'package:tradologie_app/features/fmcg/domain/repositories/chat_repositori
 class UpdateSellerDocumentsParams {
   final String token;
   final String loginID;
-  final String document;
+  final File? document;
   final String documentTypeId;
   final String description;
 
@@ -19,13 +22,19 @@ class UpdateSellerDocumentsParams {
     required this.description,
   });
 
-  Map<String, dynamic> toJson() => {
+  Future<Map<String, dynamic>> toJson() async => {
         "Token": token,
         "LoginID": loginID,
-        "Document": document,
         "DocumentTypeID": documentTypeId,
         "Description": description,
         "DeviceID": Constants.deviceID,
+        if (document != null)
+          "Document": await MultipartFile.fromFile(
+            document?.path ?? "",
+            filename: document?.path.split('/').last ?? "",
+          )
+        else
+          "Document": "",
       };
 }
 

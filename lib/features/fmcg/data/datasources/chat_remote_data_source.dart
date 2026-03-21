@@ -66,7 +66,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   Future<ResponseWrapper<dynamic>?> fmcgUpdateSellerProfile(
       UpdateSellerProfileParams params) async {
     return await apiConsumer.post(EndPoints.fmcgUpdateSellerProfile,
-        body: params.toJson(), formDataIsEnabled: true);
+        body: await params.toJson(), formDataIsEnabled: true);
   }
 
   @override
@@ -83,7 +83,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       UpdateSellerDocumentsParams params) async {
     return await apiConsumer.post(
       EndPoints.fmcgUpdateSellerDocuments,
-      body: params.toJson(),
+      body: await params.toJson(),
       formDataIsEnabled: true,
     );
   }

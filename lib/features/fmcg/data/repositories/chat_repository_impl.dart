@@ -98,7 +98,7 @@ class ChatRepositoryImpl implements ChatRepository {
       final response =
           await chatRemoteDataSource.fmcgUpdateSellerProfile(params);
       if (response != null && response.success) {
-        return response.data;
+        return Right(response.data);
       }
 
       return Left(UserFailure(response?.message, response?.code));
