@@ -29,17 +29,42 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
+  // Pre-load the composition so it's ready before the widget builds
+  LottieComposition? _composition;
+  bool _compositionLoaded = false;
+
   @override
   void initState() {
     super.initState();
+    _preloadLottie();
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       Constants().checkAndroidVersion();
       if (Constants.deviceID == "") {
         Constants.deviceID = await DeviceIdService.getDeviceId();
       }
     });
+  }
 
-    startDelay(context);
+  /// Loads the Lottie JSON into memory before the widget renders,
+  /// so there is no white-flash while the file is being parsed.
+  Future<void> _preloadLottie() async {
+    final composition = await AssetLottie(
+      "assets/images/splash_screen.json",
+    ).load();
+
+    if (!mounted) return;
+
+    setState(() {
+      _composition = composition;
+      _compositionLoaded = true;
+    });
+
+    // Start navigation timer only after composition is ready
+    Future.delayed(composition.duration, () {
+      if (!mounted) return;
+      _goNext(context);
+    });
   }
 
   Future<String> getAppVersion() async {
@@ -79,23 +104,12 @@ class _SplashScreenState extends State<SplashScreen>
     }
   }
 
-  void startDelay(BuildContext context) {
-    Future.delayed(const Duration(seconds: 10), () {
-      if (!context.mounted) return;
-      _goNext(context);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    // startDelay(context);
     return AdaptiveScaffold(
-      // appBar: Constants.appBar(context, height: 0, boxShadow: []),
       body: SafeArea(
         child: BlocListener<AppCubit, AppState>(
-          listener: (context, state) {
-            // _goNext(context); // ✅ Navigate only if app is allowed
-          },
+          listener: (context, state) {},
           child: Stack(
             clipBehavior: Clip.none,
             alignment: Alignment.center,
@@ -103,12 +117,10 @@ class _SplashScreenState extends State<SplashScreen>
               BlocBuilder<AppCubit, AppState>(
                 buildWhen: (previous, current) {
                   bool result = current != previous;
-
                   result = result &&
                       (current is CheckForceUpdateError ||
                           current is CheckForceUpdateIsLoading ||
                           current is CheckForceUpdateSuccess);
-
                   return result;
                 },
                 builder: (context, state) {
@@ -120,17 +132,20 @@ class _SplashScreenState extends State<SplashScreen>
                 slivers: [
                   SliverToBoxAdapter(
                     child: Center(
-                      child: Lottie.asset(
-                        "assets/images/splash_screen.json",
-                        fit: BoxFit.contain,
-                        frameRate: FrameRate.max,
-                        repeat: false,
-                        onLoaded: (composition) {
-                          Future.delayed(composition.duration, () {
-                            _goNext(context);
-                          });
-                        },
-                      ),
+                      child: _compositionLoaded && _composition != null
+                          // ✅ Composition is ready — render instantly, no flash
+                          ? Lottie(
+                              composition: _composition!,
+                              fit: BoxFit.contain,
+                              frameRate: FrameRate.max,
+                              repeat: false,
+                            )
+                          // ✅ Placeholder matches the splash background exactly
+                          // so the transition is seamless
+                          : const SizedBox(
+                              height: double.infinity,
+                              width: double.infinity,
+                            ),
                     ),
                   ),
                 ],
