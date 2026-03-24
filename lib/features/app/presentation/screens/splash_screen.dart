@@ -61,7 +61,7 @@ class _SplashScreenState extends State<SplashScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await Future.wait([
         _initDevice(),
-        _preloadGif(),
+        // _preloadGif(),
       ]);
     });
   }
@@ -76,10 +76,15 @@ class _SplashScreenState extends State<SplashScreen>
   /// Decodes the GIF into Flutter's image cache so that
   /// Image.asset renders on the very first frame — no white flash.
   Future<void> _preloadGif() async {
-    await precacheImage(
-      const AssetImage("assets/images/splash.gif"),
-      context,
-    );
+    final image = const AssetImage("assets/images/splash.gif");
+
+    await precacheImage(image, context);
+
+    image.resolve(const ImageConfiguration());
+    // await precacheImage(
+    //   const AssetImage("assets/images/splash.gif"),
+    //   context,
+    // );
 
     if (!mounted) return;
     setState(() => _gifReady = true);
@@ -93,8 +98,14 @@ class _SplashScreenState extends State<SplashScreen>
     // Navigate after GIF finishes — adjust to match your GIF duration
     Future.delayed(const Duration(seconds: 4), () {
       if (!mounted) return;
-      _goNext(context);
+      // _goNext(context);
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    _preloadGif();
+    super.didChangeDependencies();
   }
 
   @override
@@ -136,85 +147,93 @@ class _SplashScreenState extends State<SplashScreen>
     final screenWidth = MediaQuery.of(context).size.width;
 
     return AdaptiveScaffold(
-      body: SafeArea(
-        child: BlocListener<AppCubit, AppState>(
-          listener: (context, state) {},
-          child: Stack(
-            clipBehavior: Clip.none,
-            alignment: Alignment.center,
-            children: [
-              BlocBuilder<AppCubit, AppState>(
-                buildWhen: (previous, current) {
-                  bool result = current != previous;
-                  result = result &&
-                      (current is CheckForceUpdateError ||
-                          current is CheckForceUpdateIsLoading ||
-                          current is CheckForceUpdateSuccess);
-                  return result;
-                },
-                builder: (context, state) => const SizedBox.shrink(),
-              ),
+      body: BlocListener<AppCubit, AppState>(
+        listener: (context, state) {},
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
+          children: [
+            BlocBuilder<AppCubit, AppState>(
+              buildWhen: (previous, current) {
+                bool result = current != previous;
+                result = result &&
+                    (current is CheckForceUpdateError ||
+                        current is CheckForceUpdateIsLoading ||
+                        current is CheckForceUpdateSuccess);
+                return result;
+              },
+              builder: (context, state) => const SizedBox.shrink(),
+            ),
 
-              // ── Main content column ──────────────────────────────────────
-              SizedBox(
-                height: screenHeight,
-                width: screenWidth,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // GIF animation
-                    SizedBox(
-                      height: screenHeight * 0.55,
-                      width: screenWidth,
-                      child: _gifReady
-                          // ✅ GIF fully cached — renders instantly, no flash
-                          ? Image.asset(
-                              "assets/images/splash.gif",
+            // ── Main content column ──────────────────────────────────────
+            SizedBox(
+              height: screenHeight,
+              width: screenWidth,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // GIF animation
+                  SizedBox(
+                    height: screenHeight * 0.4,
+                    width: screenWidth,
+                    child: _gifReady
+                        ? Image.asset(
+                            "assets/images/splash.gif",
+                            fit: BoxFit.contain,
+                            gaplessPlayback: true,
+                            frameBuilder: (context, child, frame,
+                                wasSynchronouslyLoaded) {
+                              return AnimatedOpacity(
+                                opacity: frame == null ? 0 : 1,
+                                duration: const Duration(milliseconds: 300),
+                                child: child,
+                              );
+                            },
+                          )
+                        : Image.asset(
+                            "assets/images/splash.gif",
+                            fit: BoxFit.contain,
+                            gaplessPlayback: true,
+                          ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Logo — fades + slides up into view
+                  SlideTransition(
+                    position: _logoSlide,
+                    child: FadeTransition(
+                      opacity: _logoOpacity,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: Image.asset(
+                              ImgAssets.companyLogo, // your logo asset path
+                              height: screenHeight * 0.07,
                               fit: BoxFit.contain,
-                              gaplessPlayback: true,
-                            )
-                          // ✅ Fixed-height placeholder — no infinite constraint
-                          : const SizedBox.shrink(),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Logo — fades + slides up into view
-                    SlideTransition(
-                      position: _logoSlide,
-                      child: FadeTransition(
-                        opacity: _logoOpacity,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20.0),
-                              child: Image.asset(
-                                ImgAssets.companyLogo, // your logo asset path
-                                height: screenHeight * 0.1,
-                                fit: BoxFit.contain,
-                              ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
+            ),
 
-              // ── Bottom URL text ──────────────────────────────────────────
-              Positioned(
-                bottom: 1,
-                child: CommonText(
-                  CommonStrings.tradologieWebsitewithouthttp,
-                  textAlign: TextAlign.center,
-                  style: TextStyleConstants.regular(context),
-                ),
+            // ── Bottom URL text ──────────────────────────────────────────
+            Positioned(
+              bottom: 1,
+              child: CommonText(
+                CommonStrings.tradologieWebsitewithouthttp,
+                textAlign: TextAlign.center,
+                style: TextStyleConstants.regular(context),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

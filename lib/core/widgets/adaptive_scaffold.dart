@@ -44,7 +44,7 @@ class AdaptiveScaffold extends StatelessWidget {
       extendBody: true,
       body: SizedBox.expand(
         child: DecoratedBox(
-          decoration: BoxDecoration(),
+          decoration: BoxDecoration(gradient: _defaultGradient),
           child: _buildContent(context, r),
         ),
       ),
@@ -71,10 +71,11 @@ class AdaptiveScaffold extends StatelessWidget {
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
     colors: [
-      Color(0xFFFFFFFF),
-      Color(0xFFF7FAFF),
-      Color(0xFFEFF5FF),
-      Color(0xFFE6F0FF),
+      Color(0xFF0079D3), // 600 — deep blue top
+      Color(0xFF2CB3FF), // 400 — mid blue
+      Color(0xFFEFF8FF), // 200 — soft light blue
+      Color(0xFFEFF8FF), // 50  — near-white pale blue bottom
     ],
+    stops: [0.0, 0.10, 0.38, 1.0],
   );
 }
