@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 
@@ -79,7 +80,7 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   void startDelay(BuildContext context) {
-    Future.delayed(const Duration(milliseconds: 3000), () {
+    Future.delayed(const Duration(seconds: 10), () {
       if (!context.mounted) return;
       _goNext(context);
     });
@@ -119,10 +120,16 @@ class _SplashScreenState extends State<SplashScreen>
                 slivers: [
                   SliverToBoxAdapter(
                     child: Center(
-                      child: Image.asset(
-                        ImgAssets.companyLogo,
-                        height: 386,
-                        width: 391,
+                      child: Lottie.asset(
+                        "assets/images/splash_screen.json",
+                        fit: BoxFit.contain,
+                        frameRate: FrameRate.max,
+                        repeat: false,
+                        onLoaded: (composition) {
+                          Future.delayed(composition.duration, () {
+                            _goNext(context);
+                          });
+                        },
                       ),
                     ),
                   ),
