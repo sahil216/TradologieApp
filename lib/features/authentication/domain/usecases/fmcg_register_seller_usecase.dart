@@ -10,6 +10,7 @@ class FmcgRegisterSellerParams {
   final String brandName;
   final String contactName;
   final String countryCode;
+  final String countryId;
   final String emailId;
   final String mobileNo;
   final String manufacturer;
@@ -25,6 +26,7 @@ class FmcgRegisterSellerParams {
     required this.brandName,
     required this.contactName,
     required this.countryCode,
+    required this.countryId,
     required this.emailId,
     required this.mobileNo,
     required this.manufacturer,
@@ -40,6 +42,7 @@ class FmcgRegisterSellerParams {
         "BrandName": brandName,
         "ContactName": contactName,
         "CountryCode": countryCode,
+        "CountryID": countryId,
         "EmailId": emailId,
         "MobileNo": mobileNo,
         "Manufacturer": manufacturer,

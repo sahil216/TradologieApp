@@ -29,6 +29,8 @@ class UpdateSellerProfileParams {
   final String email;
   final String dob;
   final String name;
+  final String countryCode;
+  final String countryId;
 
   UpdateSellerProfileParams({
     required this.token,
@@ -42,6 +44,8 @@ class UpdateSellerProfileParams {
     required this.dob,
     required this.name,
     required this.isImage,
+    required this.countryCode,
+    required this.countryId,
   });
 
   Future<Map<String, dynamic>> toJson() async => {
@@ -53,6 +57,8 @@ class UpdateSellerProfileParams {
         "Mobile": mobile,
         "Email": email,
         "DOB": dob,
+        "CountryCode": countryCode,
+        "CountryID": countryId,
         "isimage": isImage,
         "Name": name,
         "DeviceID": Constants.deviceID,

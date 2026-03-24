@@ -594,6 +594,10 @@ class _FmcgRegisterSellerDistributorFormState
                                                   osVersionRelease,
                                               appVersion: appVersion,
                                               deviceId: deviceId,
+                                              countryId:
+                                                  (selectedCountryCode?.id ??
+                                                          "")
+                                                      .toString(),
                                             );
                                             if (!context.mounted) {
                                               return;

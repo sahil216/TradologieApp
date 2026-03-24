@@ -22,6 +22,8 @@ class FmcgGetSellerProfileModel extends FmcgGetSellerProfile {
     super.fmcgSellerGender,
     super.analyticsUrl,
     super.brandName,
+    super.countryCode,
+    super.countryId,
   });
 
   factory FmcgGetSellerProfileModel.fromJson(Map<String, dynamic> json) =>
@@ -40,6 +42,8 @@ class FmcgGetSellerProfileModel extends FmcgGetSellerProfile {
         toDate: json["ToDate"],
         brandName: json["BrandName"],
         analyticsUrl: json["Analytics_URL"],
+        countryCode: json["CountryCode"],
+        countryId: json["CountryID"],
         fmcgSellerTitle: json["FMCGSellerTitle"] == null
             ? []
             : List<FmcgSellerTitle>.from(json["FMCGSellerTitle"]!

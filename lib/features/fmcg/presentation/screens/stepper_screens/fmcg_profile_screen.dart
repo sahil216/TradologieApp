@@ -182,6 +182,10 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
         ?.where((e) => e.genderId == fmcgGetSellerProfile?.genderId)
         .toList()
         .firstOrNull;
+    selectedCountryCode = countryCodeList
+        .where((e) => e.countryCode == fmcgGetSellerProfile?.countryCode)
+        .toList()
+        .firstOrNull;
   }
 
   @override
@@ -302,6 +306,7 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
                                     titleText: "Brand Name",
                                     hintText: "Enter Brand Name",
                                     controller: brandNameController,
+                                    isEnable: false,
                                     textInputType: TextInputType.emailAddress,
                                     autovalidateMode:
                                         AutovalidateMode.onUserInteraction,
@@ -366,7 +371,7 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
                                       return fetchCountryCode(
                                           filter, loadProps);
                                     },
-                                    selectedItem: null,
+                                    selectedItem: selectedCountryCode,
                                     itemAsString: (item) =>
                                         item.countryText ?? "",
                                     onChanged: (item) {
@@ -506,7 +511,13 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
                                             email: emailController.text,
                                             dob: dateOfBirth.toString(),
                                             name: nameController.text,
-                                            isImage: isImage);
+                                            isImage: isImage,
+                                            countryCode: selectedCountryCode
+                                                    ?.countryCode ??
+                                                "",
+                                            countryId:
+                                                (selectedCountryCode?.id ?? "")
+                                                    .toString());
                                         if (!context.mounted) {
                                           return;
                                         }

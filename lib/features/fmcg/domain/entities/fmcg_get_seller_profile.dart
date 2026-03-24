@@ -19,6 +19,8 @@ class FmcgGetSellerProfile extends Equatable {
   final List<FmcgSellerGender>? fmcgSellerGender;
   final String? analyticsUrl;
   final String? brandName;
+  final String? countryCode;
+  final String? countryId;
 
   const FmcgGetSellerProfile(
       {this.loginId,
@@ -36,7 +38,9 @@ class FmcgGetSellerProfile extends Equatable {
       this.fmcgSellerTitle,
       this.fmcgSellerGender,
       this.analyticsUrl,
-      this.brandName});
+      this.brandName,
+      this.countryCode,
+      this.countryId});
 
   @override
   List<Object?> get props => [
@@ -55,6 +59,8 @@ class FmcgGetSellerProfile extends Equatable {
         fmcgSellerTitle,
         fmcgSellerGender,
         analyticsUrl,
-        brandName
+        brandName,
+        countryCode,
+        countryId
       ];
 }
