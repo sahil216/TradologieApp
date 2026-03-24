@@ -17,6 +17,7 @@ import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
+import 'package:tradologie_app/features/contact_us/more_options_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/stepper_screens/fmcg_documents_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/stepper_screens/fmcg_profile_screen.dart';
 import 'package:tradologie_app/features/my_account/domain/entities/company_details.dart';
@@ -82,7 +83,7 @@ class _FmcgMyAccountScreenState extends State<FmcgMyAccountScreen>
     _loadToken();
     // getCompanyDetails();
 
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
 
     _tabController.addListener(() {
       if (_tabController.indexIsChanging) {
@@ -152,7 +153,7 @@ class _FmcgMyAccountScreenState extends State<FmcgMyAccountScreen>
               /// ⭐ ULTRA COMMON APPBAR
               CommonAppbar(
                 title: "My Account",
-                showNotification: true,
+                showNotification: false,
                 onNotificationTap: () {
                   sl<NavigationService>().pushNamed(
                     Routes.notificationScreen,
@@ -169,6 +170,7 @@ class _FmcgMyAccountScreenState extends State<FmcgMyAccountScreen>
                     tabs: const [
                       "Information",
                       "Documents",
+                      "More Options",
                     ],
                     isEnabled: (index) {
                       return true;
@@ -208,15 +210,16 @@ class _FmcgMyAccountScreenState extends State<FmcgMyAccountScreen>
                     return TabBarView(
                       controller: _tabController,
                       physics: NeverScrollableScrollPhysics(),
-                      children: [FmcgProfileScreen(), FmcgDocumentsScreen()],
+                      children: [
+                        FmcgProfileScreen(),
+                        FmcgDocumentsScreen(),
+                        MoreOptionsScreen()
+                      ],
                     );
                   },
                 ),
               ),
             ],
-          ),
-          bottomNavigationBar: SizedBox(
-            height: 70,
           ),
         ),
       ),

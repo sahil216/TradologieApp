@@ -27,84 +27,76 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      left: 20,
-      right: 20,
-      bottom: 5,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(40),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 6,
-              vertical: 10,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: .75),
-              borderRadius: BorderRadius.circular(40),
-              boxShadow: [
-                BoxShadow(
-                  blurRadius: 20,
-                  color: Colors.black.withValues(alpha: .08),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                if (Constants.isBuyer == true) ...[
-                  _item(0, Icons.dashboard_outlined, "Dashboard"),
-                  _item(1, Icons.menu_rounded, "More"),
-                ] else ...[
-                  _item(0, Icons.dashboard_outlined, "Dashboard"),
-                  _item(1, Icons.chat_outlined, "Chats"),
-                  _item(2, Icons.account_circle_outlined, "Account"),
-                  _item(3, Icons.menu_rounded, "More"),
-                  _item(4, Icons.payment_outlined, "Membership"),
-                  _item(5, Icons.analytics, "Analytics"),
-                ]
-              ],
-            ),
-          ),
+    return Container(
+      height: 70,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
         ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          if (Constants.isBuyer == true) ...[
+            _item(0, Icons.dashboard_outlined, "Dashboard"),
+            _item(1, Icons.menu_rounded, "More"),
+          ] else ...[
+            _item(0, Icons.dashboard_outlined, "Dashboard"),
+            _item(1, Icons.chat_outlined, "Chats"),
+            _item(2, Icons.account_circle_outlined, "Account"),
+            // _item(3, Icons.menu_rounded, "More"),
+            _item(3, Icons.payment_outlined, "Membership"),
+            _item(4, Icons.analytics, "Analytics"),
+          ]
+        ],
       ),
     );
   }
 
   Widget _item(int i, IconData icon, String label) {
-    final bool active = i == index;
+    final bool selected = i == index;
 
-    return GestureDetector(
-      onTap: () => onTap(i),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        padding: EdgeInsets.symmetric(
-          horizontal: active ? 16 : 12,
-          vertical: 8,
-        ),
-        decoration: BoxDecoration(
-          color: active ? Colors.black : Colors.transparent,
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: Row(
+    const activeColor = Colors.black; // pink
+    const inactiveColor = Colors.grey;
+
+    return Expanded(
+      child: InkWell(
+        onTap: () => onTap(i),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            /// 🔴 Top Indicator
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              height: 3,
+              width: selected ? 20 : 0,
+              margin: const EdgeInsets.only(bottom: 6),
+              decoration: BoxDecoration(
+                color: activeColor,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+
+            /// Icon
             Icon(
               icon,
               size: 20,
-              color: active ? Colors.white : Colors.black54,
+              color: selected ? activeColor : inactiveColor,
             ),
-            if (active) ...[
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
+
+            const SizedBox(height: 4),
+
+            /// Label
+            Text(
+              label,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                color: selected ? activeColor : inactiveColor,
               ),
-            ]
+            ),
           ],
         ),
       ),
@@ -173,7 +165,7 @@ class _FMCGMainScreenState extends State<FMCGMainScreen> {
 
   void onTabChanged(int index) {
     setState(() {
-      if (index == 4) {
+      if (index == 3) {
         Constants.launch("https://www.tradologie.com/brand-membership/");
       } else {
         setState(() {
@@ -192,11 +184,13 @@ class _FMCGMainScreenState extends State<FMCGMainScreen> {
             Constants.isBuyer == true
                 ? buyerScreens[currentIndex]
                 : screens[currentIndex],
-            CommonFMCGFloatingNavBar(
-              index: currentIndex,
-              onTap: onTabChanged,
-            ),
           ],
+        ),
+      ),
+      bottomNavigationBar: SafeArea(
+        child: CommonFMCGFloatingNavBar(
+          index: currentIndex,
+          onTap: onTabChanged,
         ),
       ),
     );

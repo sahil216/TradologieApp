@@ -249,7 +249,6 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
                     alignment: Alignment.bottomCenter,
                     child: Padding(
                       padding: const EdgeInsets.only(
-                        bottom: 70,
                         left: 16,
                         right: 16,
                       ),

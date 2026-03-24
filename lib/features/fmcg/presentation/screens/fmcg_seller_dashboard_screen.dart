@@ -278,14 +278,14 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen>
                 return SizedBox.shrink();
               },
             ),
-            CommonFMCGFloatingNavBar(
-              index: navIndex,
-              onTap: (i) {
-                setState(() {
-                  navIndex = i;
-                });
-              },
-            ),
+            // CommonFMCGFloatingNavBar(
+            //   index: navIndex,
+            //   onTap: (i) {
+            //     setState(() {
+            //       navIndex = i;
+            //     });
+            //   },
+            // ),
           ],
         ),
       ),
