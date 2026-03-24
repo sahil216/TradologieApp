@@ -28,7 +28,7 @@ class AdaptiveScaffold extends StatelessWidget {
     this.resizeToAvoidBottomInset = true,
     this.maxContentWidth,
     this.backgroundGradient,
-    this.scaffoldBackgroundColor = Colors.white,
+    this.scaffoldBackgroundColor = Colors.transparent,
   });
 
   @override
@@ -71,10 +71,10 @@ class AdaptiveScaffold extends StatelessWidget {
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
     colors: [
-      Color(0xFF0079D3), // 600 — deep blue top
-      Color(0xFF2CB3FF), // 400 — mid blue
-      Color(0xFFEFF8FF), // 200 — soft light blue
-      Color(0xFFEFF8FF), // 50  — near-white pale blue bottom
+      Color(0xFF0199F6), // 600 — deep blue top
+      Color(0xFF2CB3FF),
+      Color(0xFFDEF0FF),
+      Color(0xFFDEF0FF), // 50  — near-white pale blue bottom
     ],
     stops: [0.0, 0.10, 0.38, 1.0],
   );

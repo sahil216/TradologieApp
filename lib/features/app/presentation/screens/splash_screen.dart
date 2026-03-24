@@ -98,7 +98,7 @@ class _SplashScreenState extends State<SplashScreen>
     // Navigate after GIF finishes — adjust to match your GIF duration
     Future.delayed(const Duration(seconds: 4), () {
       if (!mounted) return;
-      // _goNext(context);
+      _goNext(context);
     });
   }
 
