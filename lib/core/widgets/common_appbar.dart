@@ -47,7 +47,7 @@ class CommonAppbar extends StatelessWidget {
       elevation: 0,
       expandedHeight: expandedHeight,
       automaticallyImplyLeading: false,
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.transparent,
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         statusBarBrightness: statusBarBrightness,
@@ -72,7 +72,7 @@ class CommonAppbar extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               /// 🤍 PURE WHITE NOTCH BACKGROUND
-              Container(color: Colors.white),
+              Container(color: Colors.transparent),
 
               /// 💎 LIQUID GLASS (NO BASELINE CUT)
               Positioned(
