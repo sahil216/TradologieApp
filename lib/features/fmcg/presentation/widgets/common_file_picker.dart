@@ -4,7 +4,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 
 class PremiumDocumentPicker extends StatefulWidget {
@@ -143,23 +142,6 @@ class _PremiumDocumentPickerState extends State<PremiumDocumentPicker> {
           ),
         ),
       );
-    } else if (isPdf(path)) {
-      if (file != null) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => PDFViewerScreen(path: file!.path),
-          ),
-        );
-      } else {
-        final downloadedPath = await downloadFile(networkFile!);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => PDFViewerScreen(path: downloadedPath),
-          ),
-        );
-      }
     }
   }
 
@@ -292,16 +274,3 @@ class FullScreenImageView extends StatelessWidget {
 }
 
 /// 🔥 PDF Viewer
-class PDFViewerScreen extends StatelessWidget {
-  final String path;
-
-  const PDFViewerScreen({super.key, required this.path});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("PDF Preview")),
-      body: PDFView(filePath: path),
-    );
-  }
-}

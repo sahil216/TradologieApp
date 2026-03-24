@@ -240,6 +240,9 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
 
         await secureStorage.write(
             AppStrings.brandId, data.fmcgUserDetail?.brandId ?? "");
+        await secureStorage.write(
+            AppStrings.analyticsUrl, data.fmcgUserDetail?.analyticsUrl ?? "");
+        Constants.analyticsUrl = data.fmcgUserDetail?.analyticsUrl ?? "";
 
         return Right(data);
       }

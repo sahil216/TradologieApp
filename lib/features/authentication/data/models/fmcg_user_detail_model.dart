@@ -17,6 +17,7 @@ class FmcgUserDetailModel extends FmcgUserDetail {
     super.brandId,
     super.fromDate,
     super.toDate,
+    super.analyticsUrl,
   });
 
   factory FmcgUserDetailModel.fromJson(Map<String, dynamic> json) =>
@@ -36,5 +37,6 @@ class FmcgUserDetailModel extends FmcgUserDetail {
         brandId: json["BrandID"].toString(),
         fromDate: json["FromDate"].toString(),
         toDate: json["ToDate"].toString(),
+        analyticsUrl: json["Analytics_URL"].toString(),
       );
 }

@@ -22,6 +22,7 @@ class Constants {
   static bool isFmcg = false;
   static String token = "";
   static String deviceID = "";
+  static String analyticsUrl = "";
 
   bool? hideSensitiveData;
 

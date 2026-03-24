@@ -61,82 +61,99 @@ class _FmcgDocumentsScreenState extends State<FmcgDocumentsScreen>
           if (state is GetSellerDocumentsError) {
             CommonToast.showFailureToast(state.failure);
           }
+
+          if (state is UpdateSellerDocumentsSuccess) {
+            getDocuments();
+            setState(() {});
+          }
+          if (state is UpdateSellerDocumentsError) {
+            CommonToast.showFailureToast(state.failure);
+          }
         },
         child: Stack(
           children: [
             BlocBuilder<ChatCubit, ChatState>(
               builder: (context, state) {
-                return CustomScrollView(
-                  physics: AlwaysScrollableScrollPhysics(),
-                  slivers: [
-                    SliverPadding(
-                      padding: const EdgeInsets.all(16),
-                      sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            var field = data?.fmcgSellerDocumentType?[index] ??
-                                FmcgSellerDocumentType();
-                            FmcgSellerDocumentList? doc;
+                return state is GetSellerDocumentsIsLoading ||
+                        state is UpdateSellerDocumentsIsLoading
+                    ? CommonLoader()
+                    : CustomScrollView(
+                        physics: AlwaysScrollableScrollPhysics(),
+                        slivers: [
+                          SliverPadding(
+                            padding: const EdgeInsets.all(16),
+                            sliver: SliverList(
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) {
+                                  var field =
+                                      data?.fmcgSellerDocumentType?[index] ??
+                                          FmcgSellerDocumentType();
+                                  FmcgSellerDocumentList? doc;
 
-                            try {
-                              doc = data?.fmcgSellerDocument?.firstWhere((d) =>
-                                  d.documentTypeId == field.documentTypeId);
-                            } catch (e) {
-                              doc = null;
-                            }
+                                  try {
+                                    doc = data?.fmcgSellerDocument?.firstWhere(
+                                        (d) =>
+                                            d.documentTypeId ==
+                                            field.documentTypeId);
+                                  } catch (e) {
+                                    doc = null;
+                                  }
 
-                            return PremiumDocumentPicker(
-                              title: field.documentName ?? "",
-                              allowedExtensions: ["pdf", "jpg", "png"],
-                              initialFileUrl: doc?.document,
-                              onFileSelected: (file) async {
-                                params = UpdateSellerDocumentsParams(
-                                    token: await secureStorage.read(
-                                            AppStrings.apiVerificationCode) ??
-                                        "",
-                                    loginID: await secureStorage
-                                            .read(AppStrings.loginId) ??
-                                        "",
-                                    document: file,
-                                    documentTypeId:
-                                        field.documentTypeId.toString(),
-                                    description: '');
-                              },
-                              upload: Padding(
-                                padding: const EdgeInsets.only(top: 10),
-                                child: SizedBox(
-                                  width: double.infinity,
-                                  child: ElevatedButton(
-                                    onPressed: () async {
-                                      chatCubit.updateSellerDocuments(params);
+                                  return PremiumDocumentPicker(
+                                    title: field.documentName ?? "",
+                                    allowedExtensions: ["pdf", "jpg", "png"],
+                                    initialFileUrl: doc?.document,
+                                    onFileSelected: (file) async {
+                                      params = UpdateSellerDocumentsParams(
+                                          token: await secureStorage.read(
+                                                  AppStrings
+                                                      .apiVerificationCode) ??
+                                              "",
+                                          loginID: await secureStorage
+                                                  .read(AppStrings.loginId) ??
+                                              "",
+                                          document: file,
+                                          documentTypeId:
+                                              field.documentTypeId.toString(),
+                                          description: '');
                                     },
-                                    style: ElevatedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 14),
+                                    upload: Padding(
+                                      padding: const EdgeInsets.only(top: 10),
+                                      child: SizedBox(
+                                        width: double.infinity,
+                                        child: ElevatedButton(
+                                          onPressed: () async {
+                                            chatCubit
+                                                .updateSellerDocuments(params);
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 14),
+                                          ),
+                                          child: const Text("Upload"),
+                                        ),
+                                      ),
                                     ),
-                                    child: const Text("Upload"),
-                                  ),
-                                ),
+                                  );
+                                },
+                                childCount:
+                                    data?.fmcgSellerDocumentType?.length,
                               ),
-                            );
-                          },
-                          childCount: data?.fmcgSellerDocumentType?.length,
-                        ),
-                      ),
-                    ),
-                  ],
-                );
+                            ),
+                          ),
+                        ],
+                      );
               },
             ),
-            BlocBuilder<ChatCubit, ChatState>(
-              builder: (context, state) {
-                if (state is GetSellerDocumentsIsLoading ||
-                    state is UpdateSellerDocumentsIsLoading) {
-                  return Positioned.fill(child: const CommonLoader());
-                }
-                return SizedBox.shrink();
-              },
-            ),
+            // BlocBuilder<ChatCubit, ChatState>(
+            //   builder: (context, state) {
+            //     if (state is GetSellerDocumentsIsLoading ||
+            //         state is UpdateSellerDocumentsIsLoading) {
+            //       return Positioned.fill(child: const CommonLoader());
+            //     }
+            //     return SizedBox.shrink();
+            //   },
+            // ),
           ],
         ),
       ),

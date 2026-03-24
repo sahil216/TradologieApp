@@ -63,7 +63,7 @@ class _ChatListScreenState extends State<ChatListScreen>
             chatList = state.data;
           }
           if (state is GetChatListError) {
-            CommonToast.showFailureToast(state.failure);
+            // CommonToast.showFailureToast(state.failure);
           }
         },
         child: Stack(

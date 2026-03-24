@@ -24,6 +24,7 @@ class AppStrings {
   static const String fmcgName = 'fmcg_name';
   static const String loginId = 'login_id';
   static const String brandId = 'brand_id';
+  static const String analyticsUrl = 'analytics_url';
 
   static const String sessionExpired =
       'Your Session is Expired, Please Login Again';

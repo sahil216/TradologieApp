@@ -2,6 +2,9 @@ import 'package:dartz/dartz.dart';
 import 'package:tradologie_app/core/error/failures.dart';
 import 'package:tradologie_app/core/error/user_failure.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
+import 'package:tradologie_app/core/utils/app_strings.dart';
+import 'package:tradologie_app/core/utils/constants.dart';
+import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/features/fmcg/data/datasources/chat_remote_data_source.dart';
 import 'package:tradologie_app/features/fmcg/data/models/chat_data_model.dart';
 import 'package:tradologie_app/features/fmcg/data/models/chat_list_model.dart';
@@ -83,7 +86,12 @@ class ChatRepositoryImpl implements ChatRepository {
     try {
       final response = await chatRemoteDataSource.fmcgGetSellerProfile(params);
       if (response != null && response.success) {
-        return Right(FmcgGetSellerProfileModel.fromJson(response.data));
+        SecureStorageService secureStorage = SecureStorageService();
+        var data = FmcgGetSellerProfileModel.fromJson(response.data);
+        await secureStorage.write(
+            AppStrings.analyticsUrl, data.analyticsUrl ?? "");
+        Constants.analyticsUrl = data.analyticsUrl ?? "";
+        return Right(data);
       }
       return Left(UserFailure(response?.message, response?.code));
     } on Failure catch (e) {

@@ -133,5 +133,7 @@ Future<void> init(Future<void> Function(RemoteMessage) handler) async {
       await secureStorage.read(AppStrings.sellerTimeZone) ?? "";
   Constants.token =
       await secureStorage.read(AppStrings.apiVerificationCode) ?? "";
+  Constants.analyticsUrl =
+      await secureStorage.read(AppStrings.analyticsUrl) ?? "";
   Constants.deviceID = await DeviceIdService.getDeviceId();
 }

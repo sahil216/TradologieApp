@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/app_colors.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
@@ -170,7 +171,7 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
     emailController.text = fmcgGetSellerProfile?.email ?? "";
     mobileController.text = fmcgGetSellerProfile?.mobile ?? "";
     nameController.text = fmcgGetSellerProfile?.fullName ?? "";
-    brandNameController.text = fmcgGetSellerProfile?.fullName ?? "";
+    brandNameController.text = fmcgGetSellerProfile?.brandName ?? "";
     dateOfBirth = fmcgGetSellerProfile?.dob ?? "";
 
     selectedTitle = fmcgGetSellerProfile?.fmcgSellerTitle
@@ -211,9 +212,20 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
           if (state is GetSellerProfileSuccess) {
             fmcgGetSellerProfile = state.data;
             fillData();
+            await secureStorage.write(AppStrings.analyticsUrl,
+                fmcgGetSellerProfile?.analyticsUrl ?? "");
+            Constants.analyticsUrl = fmcgGetSellerProfile?.analyticsUrl ?? "";
             setState(() {});
           }
           if (state is GetSellerProfileError) {
+            CommonToast.showFailureToast(state.failure);
+          }
+
+          if (state is UpdateSellerProfileSuccess) {
+            getProfileData();
+            setState(() {});
+          }
+          if (state is UpdateSellerProfileError) {
             CommonToast.showFailureToast(state.failure);
           }
         },
@@ -294,10 +306,10 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
                                     autovalidateMode:
                                         AutovalidateMode.onUserInteraction,
                                     validator: (String? value) {
-                                      if (value == null ||
-                                          value.trim().isEmpty) {
-                                        return "Required";
-                                      }
+                                      // if (value == null ||
+                                      //     value.trim().isEmpty) {
+                                      //   return "Required";
+                                      // }
 
                                       return null;
                                     },
@@ -327,9 +339,9 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
                                     autovalidateMode:
                                         AutovalidateMode.onUserInteraction,
                                     validator: (String? val) {
-                                      if (val == null || val.isEmpty) {
-                                        return "Required";
-                                      }
+                                      // if (val == null || val.isEmpty) {
+                                      //   return "Required";
+                                      // }
 
                                       return null;
                                     },
@@ -403,7 +415,8 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
                                     firstDate: DateTime(1900),
                                     lastDate: DateTime.now(),
                                     onChanged: (value) {
-                                      dateOfBirth = value.toString();
+                                      dateOfBirth = DateFormat('yyyy/MM/dd')
+                                          .format(value ?? DateTime.now());
                                     },
                                     validator: (value) {
                                       return null;

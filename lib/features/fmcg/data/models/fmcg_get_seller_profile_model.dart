@@ -20,6 +20,8 @@ class FmcgGetSellerProfileModel extends FmcgGetSellerProfile {
     super.toDate,
     super.fmcgSellerTitle,
     super.fmcgSellerGender,
+    super.analyticsUrl,
+    super.brandName,
   });
 
   factory FmcgGetSellerProfileModel.fromJson(Map<String, dynamic> json) =>
@@ -36,6 +38,8 @@ class FmcgGetSellerProfileModel extends FmcgGetSellerProfile {
         dob: json["DOB"],
         fromDate: json["FromDate"],
         toDate: json["ToDate"],
+        brandName: json["BrandName"],
+        analyticsUrl: json["Analytics_URL"],
         fmcgSellerTitle: json["FMCGSellerTitle"] == null
             ? []
             : List<FmcgSellerTitle>.from(json["FMCGSellerTitle"]!

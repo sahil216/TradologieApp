@@ -37,7 +37,7 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
           filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
           child: Container(
             padding: const EdgeInsets.symmetric(
-              horizontal: 12,
+              horizontal: 6,
               vertical: 10,
             ),
             decoration: BoxDecoration(
@@ -59,9 +59,10 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
                 ] else ...[
                   _item(0, Icons.dashboard_outlined, "Dashboard"),
                   _item(1, Icons.chat_outlined, "Chats"),
-                  _item(2, Icons.account_circle_outlined, "My Account"),
+                  _item(2, Icons.account_circle_outlined, "Account"),
                   _item(3, Icons.menu_rounded, "More"),
                   _item(4, Icons.payment_outlined, "Membership"),
+                  _item(5, Icons.analytics, "Analytics"),
                 ]
               ],
             ),
@@ -90,7 +91,7 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
           children: [
             Icon(
               icon,
-              size: 22,
+              size: 20,
               color: active ? Colors.white : Colors.black54,
             ),
             if (active) ...[
@@ -99,7 +100,7 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
                 label,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 12,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -143,6 +144,16 @@ class _FMCGMainScreenState extends State<FMCGMainScreen> {
     FmcgMyAccountScreen(),
     MoreOptionsScreen(),
     SizedBox(),
+    Constants.isAndroid14OrBelow && Platform.isAndroid
+        ? InAppWebViewScreen(
+            params: WebviewParams(
+                url: Constants.analyticsUrl, canPop: false, isAppBar: true))
+        : WebViewScreen(
+            params: WebviewParams(
+            url: Constants.analyticsUrl,
+            canPop: false,
+            isAppBar: true,
+          )),
   ];
   final List<Widget> buyerScreens = [
     Constants.isAndroid14OrBelow && Platform.isAndroid

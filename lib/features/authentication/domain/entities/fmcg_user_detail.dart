@@ -16,24 +16,25 @@ class FmcgUserDetail extends Equatable {
   final String? brandId;
   final String? fromDate;
   final String? toDate;
+  final String? analyticsUrl;
 
-  const FmcgUserDetail({
-    this.loginId,
-    this.userId,
-    this.accountType,
-    this.titleId,
-    this.titleName,
-    this.fullName,
-    this.genderId,
-    this.genderName,
-    this.mobile,
-    this.email,
-    this.dob,
-    this.apiVerificationCode,
-    this.brandId,
-    this.fromDate,
-    this.toDate,
-  });
+  const FmcgUserDetail(
+      {this.loginId,
+      this.userId,
+      this.accountType,
+      this.titleId,
+      this.titleName,
+      this.fullName,
+      this.genderId,
+      this.genderName,
+      this.mobile,
+      this.email,
+      this.dob,
+      this.apiVerificationCode,
+      this.brandId,
+      this.fromDate,
+      this.toDate,
+      this.analyticsUrl});
 
   @override
   List<Object?> get props => [
@@ -51,6 +52,7 @@ class FmcgUserDetail extends Equatable {
         apiVerificationCode,
         brandId,
         fromDate,
-        toDate
+        toDate,
+        analyticsUrl,
       ];
 }
