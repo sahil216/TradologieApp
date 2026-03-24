@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lottie/lottie.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 
@@ -29,42 +28,79 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
-  // Pre-load the composition so it's ready before the widget builds
-  LottieComposition? _composition;
-  bool _compositionLoaded = false;
+  bool _gifReady = false;
+
+  // Animation controller for the logo fade + slide in
+  late final AnimationController _logoController;
+  late final Animation<double> _logoOpacity;
+  late final Animation<Offset> _logoSlide;
 
   @override
   void initState() {
     super.initState();
-    _preloadLottie();
+
+    // Logo animates in: fades + slides up from slightly below
+    _logoController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+
+    _logoOpacity = CurvedAnimation(
+      parent: _logoController,
+      curve: Curves.easeIn,
+    );
+
+    _logoSlide = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _logoController,
+      curve: Curves.easeOut,
+    ));
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      Constants().checkAndroidVersion();
-      if (Constants.deviceID == "") {
-        Constants.deviceID = await DeviceIdService.getDeviceId();
-      }
+      await Future.wait([
+        _initDevice(),
+        _preloadGif(),
+      ]);
     });
   }
 
-  /// Loads the Lottie JSON into memory before the widget renders,
-  /// so there is no white-flash while the file is being parsed.
-  Future<void> _preloadLottie() async {
-    final composition = await AssetLottie(
-      "assets/images/splash_screen.json",
-    ).load();
+  Future<void> _initDevice() async {
+    Constants().checkAndroidVersion();
+    if (Constants.deviceID == "") {
+      Constants.deviceID = await DeviceIdService.getDeviceId();
+    }
+  }
+
+  /// Decodes the GIF into Flutter's image cache so that
+  /// Image.asset renders on the very first frame — no white flash.
+  Future<void> _preloadGif() async {
+    await precacheImage(
+      const AssetImage("assets/images/splash.gif"),
+      context,
+    );
 
     if (!mounted) return;
+    setState(() => _gifReady = true);
 
-    setState(() {
-      _composition = composition;
-      _compositionLoaded = true;
+    // Start logo animation shortly after GIF appears
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (!mounted) return;
+      _logoController.forward();
     });
 
-    // Start navigation timer only after composition is ready
-    Future.delayed(composition.duration, () {
+    // Navigate after GIF finishes — adjust to match your GIF duration
+    Future.delayed(const Duration(seconds: 4), () {
       if (!mounted) return;
       _goNext(context);
     });
+  }
+
+  @override
+  void dispose() {
+    _logoController.dispose();
+    super.dispose();
   }
 
   Future<String> getAppVersion() async {
@@ -73,7 +109,7 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> nameUpdate() async {
-    SecureStorageService secureStorage = SecureStorageService();
+    final SecureStorageService secureStorage = SecureStorageService();
     Constants.name = Constants.isFmcg == true
         ? await secureStorage.read(AppStrings.fmcgName) ?? ""
         : Constants.isBuyer == true
@@ -85,19 +121,9 @@ class _SplashScreenState extends State<SplashScreen>
     nameUpdate();
     if (Constants.isLogin) {
       if (Constants.isFmcg == true) {
-        if (Constants.isBuyer == true) {
-          sl<NavigationService>()
-              .pushNamedAndRemoveUntil(Routes.fmcgMainScreen);
-        } else {
-          sl<NavigationService>()
-              .pushNamedAndRemoveUntil(Routes.fmcgMainScreen);
-        }
+        sl<NavigationService>().pushNamedAndRemoveUntil(Routes.fmcgMainScreen);
       } else {
-        if (Constants.isBuyer == true) {
-          sl<NavigationService>().pushNamedAndRemoveUntil(Routes.mainRoute);
-        } else {
-          sl<NavigationService>().pushNamedAndRemoveUntil(Routes.mainRoute);
-        }
+        sl<NavigationService>().pushNamedAndRemoveUntil(Routes.mainRoute);
       }
     } else {
       sl<NavigationService>().pushNamedAndRemoveUntil(Routes.onboardingRoute);
@@ -106,6 +132,9 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return AdaptiveScaffold(
       body: SafeArea(
         child: BlocListener<AppCubit, AppState>(
@@ -123,27 +152,65 @@ class _SplashScreenState extends State<SplashScreen>
                           current is CheckForceUpdateSuccess);
                   return result;
                 },
-                builder: (context, state) {
-                  return const SizedBox.shrink();
-                },
+                builder: (context, state) => const SizedBox.shrink(),
               ),
-              CustomScrollView(
-                physics: const BouncingScrollPhysics(),
-                slivers: [
-                  SliverToBoxAdapter(
-                    child:
-                        Center(child: Image.asset("assets/images/splash.gif")),
-                  ),
-                ],
+
+              // ── Main content column ──────────────────────────────────────
+              SizedBox(
+                height: screenHeight,
+                width: screenWidth,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // GIF animation
+                    SizedBox(
+                      height: screenHeight * 0.55,
+                      width: screenWidth,
+                      child: _gifReady
+                          // ✅ GIF fully cached — renders instantly, no flash
+                          ? Image.asset(
+                              "assets/images/splash.gif",
+                              fit: BoxFit.contain,
+                              gaplessPlayback: true,
+                            )
+                          // ✅ Fixed-height placeholder — no infinite constraint
+                          : const SizedBox.shrink(),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Logo — fades + slides up into view
+                    SlideTransition(
+                      position: _logoSlide,
+                      child: FadeTransition(
+                        opacity: _logoOpacity,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20.0),
+                              child: Image.asset(
+                                ImgAssets.companyLogo, // your logo asset path
+                                height: screenHeight * 0.1,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
+
+              // ── Bottom URL text ──────────────────────────────────────────
               Positioned(
                 bottom: 1,
                 child: CommonText(
                   CommonStrings.tradologieWebsitewithouthttp,
                   textAlign: TextAlign.center,
-                  style: TextStyleConstants.regular(
-                    context,
-                  ),
+                  style: TextStyleConstants.regular(context),
                 ),
               ),
             ],
