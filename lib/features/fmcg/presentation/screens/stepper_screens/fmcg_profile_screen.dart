@@ -415,7 +415,7 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
                                     firstDate: DateTime(1900),
                                     lastDate: DateTime.now(),
                                     onChanged: (value) {
-                                      dateOfBirth = DateFormat('yyyy/MM/dd')
+                                      dateOfBirth = DateFormat('yyyy-MM-dd')
                                           .format(value ?? DateTime.now());
                                     },
                                     validator: (value) {

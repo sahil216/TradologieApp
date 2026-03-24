@@ -145,15 +145,15 @@ class _FmcgDocumentsScreenState extends State<FmcgDocumentsScreen>
                       );
               },
             ),
-            // BlocBuilder<ChatCubit, ChatState>(
-            //   builder: (context, state) {
-            //     if (state is GetSellerDocumentsIsLoading ||
-            //         state is UpdateSellerDocumentsIsLoading) {
-            //       return Positioned.fill(child: const CommonLoader());
-            //     }
-            //     return SizedBox.shrink();
-            //   },
-            // ),
+            BlocBuilder<ChatCubit, ChatState>(
+              builder: (context, state) {
+                if (state is GetSellerDocumentsIsLoading ||
+                    state is UpdateSellerDocumentsIsLoading) {
+                  return Positioned.fill(child: const CommonLoader());
+                }
+                return SizedBox.shrink();
+              },
+            ),
           ],
         ),
       ),
