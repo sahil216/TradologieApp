@@ -131,22 +131,8 @@ class _SplashScreenState extends State<SplashScreen>
                 physics: const BouncingScrollPhysics(),
                 slivers: [
                   SliverToBoxAdapter(
-                    child: Center(
-                      child: _compositionLoaded && _composition != null
-                          // ✅ Composition is ready — render instantly, no flash
-                          ? Lottie(
-                              composition: _composition!,
-                              fit: BoxFit.contain,
-                              frameRate: FrameRate.max,
-                              repeat: false,
-                            )
-                          // ✅ Placeholder matches the splash background exactly
-                          // so the transition is seamless
-                          : const SizedBox(
-                              height: double.infinity,
-                              width: double.infinity,
-                            ),
-                    ),
+                    child:
+                        Center(child: Image.asset("assets/images/splash.gif")),
                   ),
                 ],
               ),
