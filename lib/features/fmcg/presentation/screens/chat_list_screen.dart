@@ -8,6 +8,7 @@ import 'package:tradologie_app/core/utils/extensions.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_appbar.dart';
+import 'package:tradologie_app/core/widgets/common_fmcg_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
@@ -76,26 +77,30 @@ class _ChatListScreenState extends State<ChatListScreen>
                     physics: AlwaysScrollableScrollPhysics(),
                     slivers: [
                       /// App Bar
-                      CommonAppbar(
+                      CommonSliverAppBar(
                         title: "Chats",
-                        showBackButton: false,
-                        showNotification: false,
-                        showSuffixIcon: true,
-                        suffixIcon: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            IconButton(
-                                onPressed: () async {
-                                  await _refreshChats();
-                                },
-                                icon: Icon(
-                                  Icons.refresh,
-                                  color: Colors.green,
-                                )),
-                          ],
-                        ),
+                        showSearch: false,
                       ),
+                      // CommonAppbar(
+                      //   title: "Chats",
+                      //   showBackButton: false,
+                      //   showNotification: false,
+                      //   showSuffixIcon: true,
+                      //   suffixIcon: Row(
+                      //     mainAxisAlignment: MainAxisAlignment.end,
+                      //     crossAxisAlignment: CrossAxisAlignment.end,
+                      //     children: [
+                      //       IconButton(
+                      //           onPressed: () async {
+                      //             await _refreshChats();
+                      //           },
+                      //           icon: Icon(
+                      //             Icons.refresh,
+                      //             color: Colors.green,
+                      //           )),
+                      //     ],
+                      //   ),
+                      // ),
                       ChatListSliver(
                         items: chatList ?? [],
                         onToggle: (i) async {

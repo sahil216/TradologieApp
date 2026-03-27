@@ -15,6 +15,16 @@ class DistributorEnquiryList extends Equatable {
   final DateTime? insertedDate;
   final int? updatedId;
   final DateTime? updatedDate;
+  final bool? isInterest;
+  final String? fMCGCategory;
+  final String? brandPartnershipType;
+  final String? distributionCoverage;
+  final String? fMCGDistributor;
+  final String? partnerBrand;
+  final String? specifyRequirement;
+  final String? distributionExperience;
+  final String? salesTeam;
+  final String? warehousingFacility;
 
   const DistributorEnquiryList({
     this.quotationUserId,
@@ -31,6 +41,16 @@ class DistributorEnquiryList extends Equatable {
     this.insertedDate,
     this.updatedId,
     this.updatedDate,
+    this.isInterest,
+    this.fMCGCategory,
+    this.brandPartnershipType,
+    this.distributionCoverage,
+    this.fMCGDistributor,
+    this.partnerBrand,
+    this.specifyRequirement,
+    this.distributionExperience,
+    this.salesTeam,
+    this.warehousingFacility,
   });
 
   @override
@@ -49,5 +69,15 @@ class DistributorEnquiryList extends Equatable {
         insertedDate,
         updatedId,
         updatedDate,
+        isInterest,
+        fMCGCategory,
+        brandPartnershipType,
+        distributionCoverage,
+        fMCGDistributor,
+        partnerBrand,
+        specifyRequirement,
+        distributionExperience,
+        salesTeam,
+        warehousingFacility
       ];
 }

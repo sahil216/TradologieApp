@@ -1,34 +1,18 @@
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tradologie_app/config/routes/app_router.dart';
-import 'package:tradologie_app/config/routes/navigation_service.dart';
-import 'package:tradologie_app/core/error/network_failure.dart';
-import 'package:tradologie_app/core/error/user_failure.dart';
-import 'package:tradologie_app/core/usecases/usecase.dart';
-import 'package:tradologie_app/core/utils/analytics_services.dart';
-import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
-import 'package:tradologie_app/core/widgets/common_appbar.dart';
-import 'package:tradologie_app/core/widgets/common_loader.dart';
+import 'package:tradologie_app/core/widgets/common_fmcg_appbar.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
-import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
-import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
 import 'package:tradologie_app/features/contact_us/more_options_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/stepper_screens/fmcg_documents_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/stepper_screens/fmcg_profile_screen.dart';
 import 'package:tradologie_app/features/my_account/domain/entities/company_details.dart';
 import 'package:tradologie_app/features/my_account/presentation/cubit/my_account_cubit.dart';
-import 'package:tradologie_app/features/webview/presentation/screens/in_app_webview_screen.dart';
-import 'package:tradologie_app/features/webview/presentation/screens/viewmodel/webview_params.dart';
-import 'package:tradologie_app/features/webview/presentation/screens/webview_screen.dart';
 
-import '../../../../core/api/end_points.dart';
 import '../../../../core/utils/app_strings.dart';
-import '../../../../injection_container.dart';
 
 class _FmcgMyAccountTabBarDelegate extends SliverPersistentHeaderDelegate {
   final Widget child;
@@ -124,12 +108,6 @@ class _FmcgMyAccountScreenState extends State<FmcgMyAccountScreen>
 
   @override
   Widget build(BuildContext context) {
-    if (token == null) {
-      return const AdaptiveScaffold(
-        body: CommonLoader(),
-      );
-    }
-
     return DefaultTabController(
       length: 2,
       child: MultiBlocListener(
@@ -151,14 +129,9 @@ class _FmcgMyAccountScreenState extends State<FmcgMyAccountScreen>
             physics: NeverScrollableScrollPhysics(),
             slivers: [
               /// ⭐ ULTRA COMMON APPBAR
-              CommonAppbar(
+              CommonSliverAppBar(
                 title: "My Account",
-                showNotification: false,
-                onNotificationTap: () {
-                  sl<NavigationService>().pushNamed(
-                    Routes.notificationScreen,
-                  );
-                },
+                showBackButton: false,
               ),
 
               /// ⭐ PINNED TABBAR (EXACT SAME UI)

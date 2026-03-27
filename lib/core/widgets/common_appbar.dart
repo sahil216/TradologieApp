@@ -47,9 +47,9 @@ class CommonAppbar extends StatelessWidget {
       elevation: 0,
       expandedHeight: expandedHeight,
       automaticallyImplyLeading: false,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
       systemOverlayStyle: SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
+        statusBarColor: Colors.white,
         statusBarBrightness: statusBarBrightness,
         statusBarIconBrightness: statusBarIconBrightness,
       ),

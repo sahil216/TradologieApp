@@ -243,19 +243,19 @@ class Constants {
   }
 
   String maskPhone(String phone) {
-    if (phone.length <= 4) return "xxxx";
-    return "${phone.substring(0, 2)}xxxxxxxx";
+    if (phone.length <= 4) return "****";
+    return "${phone.substring(0, 2)}********";
   }
 
   String maskEmail(String email) {
     final parts = email.split("@");
-    if (parts.length != 2) return "xxxx@xxxx.com";
+    if (parts.length != 2) return "****@****.com";
 
     String name = parts[0];
     String domain = parts[1];
 
-    String maskedName = name.length <= 2 ? "xx" : "${name.substring(0, 2)}xxxx";
-    String maskedDomain = domain.length <= 2 ? "xx" : "xxxx";
+    String maskedName = name.length <= 2 ? "**" : "${name.substring(0, 2)}****";
+    String maskedDomain = domain.length <= 2 ? "**" : "****";
 
     return "$maskedName@$maskedDomain";
   }

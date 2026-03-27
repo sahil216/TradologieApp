@@ -6,6 +6,7 @@ import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
+import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/common_social_icons.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
@@ -101,28 +102,32 @@ class _SendOtpScreenState extends State<SendOtpScreen>
                         ScrollViewKeyboardDismissBehavior.onDrag,
                     physics: const BouncingScrollPhysics(),
                     slivers: [
-                      SliverToBoxAdapter(
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: r.value(
-                            mobile: r.screenHeight * 0.35,
-                            tablet: r.screenHeight * 0.4,
-                          ),
-                          child: Constants.isBuyer == true
-                              ? Image.asset(
-                                  ImgAssets.buyerLoginImage,
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                )
-                              : Image.asset(
-                                  ImgAssets.sellerLoginImage,
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                ),
-                        ),
+                      CommonAppbar(
+                        title: "Send OTP",
+                        showBackButton: true,
                       ),
+                      // SliverToBoxAdapter(
+                      //   child: SizedBox(
+                      //     width: double.infinity,
+                      //     height: r.value(
+                      //       mobile: r.screenHeight * 0.35,
+                      //       tablet: r.screenHeight * 0.4,
+                      //     ),
+                      //     child: Constants.isBuyer == true
+                      //         ? Image.asset(
+                      //             ImgAssets.buyerLoginImage,
+                      //             fit: BoxFit.cover,
+                      //             width: double.infinity,
+                      //             height: double.infinity,
+                      //           )
+                      //         : Image.asset(
+                      //             ImgAssets.sellerLoginImage,
+                      //             fit: BoxFit.cover,
+                      //             width: double.infinity,
+                      //             height: double.infinity,
+                      //           ),
+                      //   ),
+                      // ),
                       SliverToBoxAdapter(
                         child: Center(
                           child: ConstrainedBox(
@@ -412,8 +417,9 @@ class _SendOtpScreenState extends State<SendOtpScreen>
                                             TextSpan(
                                               recognizer: TapGestureRecognizer()
                                                 ..onTap = () {
-                                                  Navigator.pushNamed(context,
-                                                      Routes.signinRoute);
+                                                  // Navigator.pushNamed(context,
+                                                  //     Routes.signinRoute);
+                                                  sl<NavigationService>().pop();
                                                 },
                                               text: CommonStrings.login,
                                               style:
@@ -445,25 +451,25 @@ class _SendOtpScreenState extends State<SendOtpScreen>
                   );
                 },
               ),
-              if (Navigator.canPop(context)) ...[
-                Positioned(
-                  top: Responsive(context).screenHeight * 0.01,
-                  left: 16,
-                  child: GestureDetector(
-                    onTap: () {
-                      sl<NavigationService>().pop();
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      child: const Icon(
-                        Icons.arrow_back_ios_new,
-                        color: Colors.black,
-                        size: 24,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              // if (Navigator.canPop(context)) ...[
+              //   Positioned(
+              //     top: Responsive(context).screenHeight * 0.01,
+              //     left: 16,
+              //     child: GestureDetector(
+              //       onTap: () {
+              //         sl<NavigationService>().pop();
+              //       },
+              //       child: Container(
+              //         padding: const EdgeInsets.all(8),
+              //         child: const Icon(
+              //           Icons.arrow_back_ios_new,
+              //           color: Colors.black,
+              //           size: 24,
+              //         ),
+              //       ),
+              //   ),
+              // ),
+              // ],
               BlocBuilder<AuthenticationCubit, AuthenticationState>(
                 buildWhen: (previous, current) {
                   bool result = current != previous;

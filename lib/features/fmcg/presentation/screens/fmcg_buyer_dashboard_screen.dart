@@ -1,0 +1,328 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tradologie_app/core/utils/app_strings.dart';
+import 'package:tradologie_app/core/utils/constants.dart';
+import 'package:tradologie_app/core/utils/secure_storage_service.dart';
+import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
+import 'package:tradologie_app/core/widgets/common_fmcg_appbar.dart';
+import 'package:tradologie_app/core/widgets/common_loader.dart';
+import 'package:tradologie_app/features/fmcg/domain/entities/fmcg_buyer_brands_list.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/add_buyer_brand_interest_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_brands_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/presentation/cubit/chat_cubit.dart';
+
+class FmcgBuyerDashboardScreen extends StatefulWidget {
+  const FmcgBuyerDashboardScreen({super.key});
+
+  @override
+  State<FmcgBuyerDashboardScreen> createState() =>
+      _FmcgBuyerDashboardScreenState();
+}
+
+class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
+  List<FmcgBuyerBrandsList>? distributorList;
+
+  // Search & Filter state
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  String? _selectedLocation;
+  String? _selectedBrand;
+  bool _showFilters = false;
+  SecureStorageService secureStorage = SecureStorageService();
+
+  ChatCubit get chatCubit => BlocProvider.of(context);
+
+  void getBuyerBrandsList() async {
+    GetBuyerBrandsListParams params = GetBuyerBrandsListParams(
+      token: await secureStorage.read(AppStrings.apiVerificationCode) ?? "",
+      deviceID: Constants.deviceID,
+      distributorID: await secureStorage.read(AppStrings.loginId) ?? "",
+    );
+    await chatCubit.getBuyerBrandsList(params);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getBuyerBrandsList();
+    _searchController.addListener(() {
+      setState(() => _searchQuery = _searchController.text.toLowerCase());
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _refreshChats() async => getBuyerBrandsList();
+
+  List<FmcgBuyerBrandsList> get _filteredList {
+    final source = distributorList ?? [];
+    return source.where((e) {
+      final matchSearch = _searchQuery.isEmpty ||
+          (e.brandName?.toLowerCase().contains(_searchQuery) ?? false);
+
+      final matchBrand =
+          _selectedBrand == null || e.brandName == _selectedBrand;
+
+      return matchSearch && matchBrand;
+    }).toList();
+  }
+
+  // List<String> get _uniqueLocations {
+  //   return (distributorList ?? [])
+  //       .map((e) => e.perferredLocation ?? '')
+  //       .where((s) => s.isNotEmpty)
+  //       .toSet()
+  //       .toList()
+  //     ..sort();
+  // }
+
+  // List<String> get _uniqueBrands {
+  //   return (distributorList ?? [])
+  //       .map((e) => e.interestedBrandName ?? '')
+  //       .where((s) => s.isNotEmpty)
+  //       .toSet()
+  //       .toList()
+  //     ..sort();
+  // }
+
+  void _clearFilters() {
+    setState(() {
+      _selectedLocation = null;
+      _selectedBrand = null;
+      _searchController.clear();
+    });
+  }
+
+  bool get _hasActiveFilters =>
+      _selectedLocation != null ||
+      _selectedBrand != null ||
+      _searchQuery.isNotEmpty;
+
+  @override
+  Widget build(BuildContext context) {
+    return AdaptiveScaffold(
+      body: BlocListener<ChatCubit, ChatState>(
+        listenWhen: (previous, current) => previous != current,
+        listener: (context, state) async {
+          if (state is GetBuyerBrandsListSuccess) {
+            setState(() => distributorList = state.data);
+          }
+          if (state is GetBuyerBrandsListError) {
+            // CommonToast.showFailureToast(state.failure);
+          }
+          if (state is AddBuyerBrandInterestSuccess) {
+            distributorList?.clear();
+            getBuyerBrandsList();
+          }
+          if (state is AddBuyerBrandInterestError) {
+            // CommonToast.showFailureToast(state.failure);
+          }
+        },
+        child: Stack(
+          children: [
+            BlocBuilder<ChatCubit, ChatState>(
+              builder: (context, state) {
+                return RefreshIndicator(
+                  onRefresh: _refreshChats,
+                  child: CustomScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    slivers: [
+                      // ── App Bar ─────────────────────────────────────────
+                      CommonSliverAppBar(
+                        title: 'BrandHub',
+                        showSearch: true,
+                        showFilter: true,
+                        showBackButton: false,
+                        onFilterPressed: () {},
+                        onSearchChanged: (q) {},
+                      ),
+                      SliverToBoxAdapter(
+                        child: const SizedBox(height: 16),
+                      ),
+
+                      // ── Grid ─────────────────────────────────────────────
+                      // _filteredList.isEmpty
+                      //     ? SliverFillRemaining(
+                      //         child: _EmptyState(
+                      //           hasFilters: _hasActiveFilters,
+                      //           onClear: _clearFilters,
+                      //         ),
+                      //       )
+                      //     :
+                      SliverPadding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
+                        sliver: SliverGrid(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                            childAspectRatio: 0.9,
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (context, i) => enquiryCard(
+                              distributorList?[i] ?? FmcgBuyerBrandsList(),
+                            ),
+                            childCount: distributorList?.length ?? 0,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+
+            // ── Loading overlay ─────────────────────────────────────────
+            BlocBuilder<ChatCubit, ChatState>(
+              builder: (context, state) {
+                if (state is GetBuyerBrandsListIsLoading ||
+                    state is AddBuyerBrandInterestIsLoading) {
+                  return const Positioned.fill(child: CommonLoader());
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget enquiryCard(FmcgBuyerBrandsList enquiry) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F7FA),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFF0A9FED).withValues(alpha: 0.4),
+        ),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          /// 🔴 BRAND NAME (AMUL STYLE)
+          CachedNetworkImage(
+            imageUrl: enquiry.localInternalPath ?? "",
+            height: 50,
+            placeholder: (context, url) => CommonLoader(),
+            errorWidget: (context, url, error) {
+              debugPrint("Image load failed: $error");
+              return const Icon(Icons.broken_image);
+            },
+            httpHeaders: const {
+              "Connection": "keep-alive",
+            },
+          ),
+
+          const SizedBox(height: 6),
+
+          /// 👤 NAME
+          Text(
+            enquiry.brandName ?? "—",
+            maxLines: 2,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF2B2B2B),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          /// 🔹 DIVIDER
+          Container(
+            height: 1,
+            color: const Color(0xFF0A9FED),
+          ),
+
+          const SizedBox(height: 16),
+
+          /// 🔻 ACTION ROW
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              /// 👍 INTERESTED BUTTON
+              GestureDetector(
+                onTap: enquiry.isInterested == true
+                    ? () {}
+                    : () async {
+                        final params = AddBuyerBrandInterestParams(
+                          token: await secureStorage
+                                  .read(AppStrings.apiVerificationCode) ??
+                              "",
+                          deviceID: Constants.deviceID,
+                          brandID: enquiry.brandId.toString(),
+                          distributorID:
+                              await secureStorage.read(AppStrings.loginId) ??
+                                  "",
+                        );
+                        chatCubit.addBuyerBrandInterest(params);
+                      },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: enquiry.isInterested == true
+                        ? const Color(0xFF0A9FED).withValues(alpha: 0.15)
+                        : Colors.transparent,
+                    border: Border.all(
+                      color: enquiry.isInterested == true
+                          ? const Color(0xFF0A9FED)
+                          : Colors.grey.shade400,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.thumb_up,
+                        size: 18,
+                        color: enquiry.isInterested == true
+                            ? const Color(0xFF0A9FED)
+                            : Colors.grey,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        enquiry.isInterested == true
+                            ? "Interested - ${enquiry.totalInterestedDistributors == 0 ? "" : enquiry.totalInterestedDistributors}"
+                            : "Interested - ${enquiry.totalInterestedDistributors == 0 ? "" : enquiry.totalInterestedDistributors}",
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: enquiry.isInterested == true
+                              ? const Color(0xFF0A9FED)
+                              : Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              /// ℹ️ TOOLTIP ICON
+              Tooltip(
+                message: enquiry.isInterested == true
+                    ? "You have already shown interest"
+                    : "Tap to show interest",
+                child: const Icon(
+                  Icons.info_outline,
+                  color: Colors.black,
+                  size: 18,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -3,21 +3,17 @@ import 'dart:ui';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:lottie/lottie.dart';
 
 import 'package:tradologie_app/config/routes/app_router.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/utils/analytics_services.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
-import 'package:tradologie_app/core/utils/common_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/responsive.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
-import 'package:tradologie_app/core/widgets/common_drop_down.dart';
-import 'package:tradologie_app/core/widgets/custom_button.dart';
 import 'package:tradologie_app/features/app/injection_container_app.dart';
-import 'package:tradologie_app/features/app/presentation/widgets/animated_rotating_image.dart';
 
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/assets_manager.dart';
@@ -91,17 +87,23 @@ class _OnboardingScreenState extends State<OnboardingScreen>
           slivers: [
             SliverToBoxAdapter(
               child: SizedBox(
+                height: 60,
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Image.asset(ImgAssets.companyLogo, height: 60),
+            ),
+            SliverToBoxAdapter(
+              child: SizedBox(
                 height: Responsive(context).screenHeight * 0.2,
-                child: Image.asset(
-                  "assets/images/splash.gif",
-                ),
+                child: Lottie.asset("assets/images/splash_screen.json"),
               ),
             ),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10.0),
                 child: Text(
-                  "Choose Business Type & Continue",
+                  "Choose Business Category",
                   textAlign: TextAlign.center,
                   style: TextStyleConstants.semiBold(
                     context,
@@ -127,7 +129,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         Constants.isFmcg = false;
                         await secureStorage.write(AppStrings.isBuyer, "false");
                         await secureStorage.write(AppStrings.isFmcg, "false");
-                        sl<NavigationService>().pushNamed(Routes.sendOtpScreen);
+                        sl<NavigationService>().pushNamed(Routes.signinRoute);
                         AnalyticsService.logEvent("seller_button_clicked");
                       },
                     ),
@@ -142,7 +144,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         Constants.isFmcg = false;
                         await secureStorage.write(AppStrings.isBuyer, "true");
                         await secureStorage.write(AppStrings.isFmcg, "false");
-                        sl<NavigationService>().pushNamed(Routes.sendOtpScreen);
+                        sl<NavigationService>().pushNamed(Routes.signinRoute);
                         AnalyticsService.logEvent("buyer_button_clicked");
                       },
                     ),
@@ -392,92 +394,134 @@ class _BusinessCardState extends State<BusinessCard> {
       onTapCancel: () => setState(() => isPressed = false),
       child: AnimatedScale(
         duration: const Duration(milliseconds: 120),
-        scale: isPressed ? 0.97 : 1,
+        scale: isPressed ? 0.96 : 1,
         child: Container(
           margin: const EdgeInsets.only(bottom: 14),
 
-          /// 🌈 Gradient Border Glow
+          /// 🌈 Outer subtle glow border
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-          ),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 12,
+                ),
+              ]
+              // gradient: LinearGradient(
+              //   colors: [
+              //     Colors.white.withValues(alpha: 0.6),
+              //     Colors.white.withValues(alpha: 0.1),
+              //   ],
+              //   begin: Alignment.topLeft,
+              //   end: Alignment.bottomRight,
+              // ),
+              ),
 
           child: Padding(
-            padding: const EdgeInsets.all(1.5), // border thickness
-
+            padding: const EdgeInsets.all(1.2),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(18),
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Material(
-                  color: Colors.white.withOpacity(0.6),
+                filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(18),
 
-                  /// 💥 Ripple Effect
-                  child: InkWell(
-                    onTap: widget.onTap,
-                    splashColor: Colors.blue.withOpacity(0.2),
-                    highlightColor: Colors.transparent,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 14),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
+                    /// ✨ Main glass surface
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.white.withValues(alpha: 0.55),
+                        Colors.white.withValues(alpha: 0.25),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
 
-                        /// 🌫 Shadow
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
-                            blurRadius: 12,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            height: 52,
-                            width: 52,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                image: AssetImage(widget.image),
-                                fit: BoxFit.cover,
+                    /// 💡 Light edge + soft shadow
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.4),
+                      width: 1,
+                    ),
+
+                    // boxShadow: [
+                    //   /// outer soft shadow
+                    //   BoxShadow(
+                    //     color: Colors.black.withValues(alpha: 0.08),
+                    //     blurRadius: 20,
+                    //     offset: const Offset(0, 10),
+                    //   ),
+
+                    //   /// inner light glow illusion
+                    //   BoxShadow(
+                    //     color: Colors.white.withValues(alpha: 0.6),
+                    //     blurRadius: 10,
+                    //     spreadRadius: -4,
+                    //     offset: const Offset(-2, -2),
+                    //   ),
+                    // ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: widget.onTap,
+                      splashColor: Colors.white.withValues(alpha: 0.2),
+                      highlightColor: Colors.transparent,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 14),
+                        child: Row(
+                          children: [
+                            /// 🔵 Avatar (glass circle)
+                            Container(
+                              height: 52,
+                              width: 52,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.5),
+                                ),
+                                image: DecorationImage(
+                                  image: AssetImage(widget.image),
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
-                          ),
 
-                          const SizedBox(width: 14),
+                            const SizedBox(width: 14),
 
-                          /// 🔹 Text
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  widget.title,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 14,
-                                    color: Color(0xFF1B3C59),
+                            /// 🔹 Text
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    widget.title,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                      color: Color(0xFF1B3C59),
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  widget.subtitle,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey.shade600,
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    widget.subtitle,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.grey.shade700,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
 
-                          const Icon(
-                            Icons.arrow_forward_ios,
-                            size: 16,
-                            color: Colors.grey,
-                          ),
-                        ],
+                            /// ➡ Arrow
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              size: 16,
+                              color: Colors.grey.shade600,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

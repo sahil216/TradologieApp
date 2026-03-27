@@ -3,8 +3,12 @@ import 'package:tradologie_app/core/api/end_points.dart';
 import 'package:tradologie_app/core/response_wrapper/response_wrapper.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
+import 'package:tradologie_app/features/fmcg/domain/entities/fmcg_buyer_brands_list.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/add_buyer_brand_interest_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/add_distributor_interest_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_data_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_brands_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_documents_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_profile_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/update_seller_documents_usecase.dart';
@@ -22,6 +26,12 @@ abstract class ChatRemoteDataSource {
       GetSellerDocumentsParams params);
   Future<ResponseWrapper<dynamic>?> fmcgUpdateSellerDocuments(
       UpdateSellerDocumentsParams params);
+  Future<ResponseWrapper<dynamic>?> getBuyerBrandsList(
+      GetBuyerBrandsListParams params);
+  Future<ResponseWrapper<dynamic>?> addBuyerBrandInterest(
+      AddBuyerBrandInterestParams params);
+  Future<ResponseWrapper<dynamic>?> addDistributorInterest(
+      AddDistributorInterestParams params);
 }
 
 class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
@@ -85,6 +95,33 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       EndPoints.fmcgUpdateSellerDocuments,
       body: await params.toJson(),
       formDataIsEnabled: true,
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> getBuyerBrandsList(
+      GetBuyerBrandsListParams params) async {
+    return await apiConsumer.post(
+      EndPoints.getBuyerBrandsList,
+      body: params.toJson(),
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> addDistributorInterest(
+      AddDistributorInterestParams params) async {
+    return await apiConsumer.post(
+      EndPoints.addDistributorInterest,
+      body: params.toJson(),
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> addBuyerBrandInterest(
+      AddBuyerBrandInterestParams params) async {
+    return await apiConsumer.post(
+      EndPoints.addBrandInterest,
+      body: params.toJson(),
     );
   }
 }

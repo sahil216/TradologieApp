@@ -28,7 +28,7 @@ class AdaptiveScaffold extends StatelessWidget {
     this.resizeToAvoidBottomInset = true,
     this.maxContentWidth,
     this.backgroundGradient,
-    this.scaffoldBackgroundColor = Colors.transparent,
+    this.scaffoldBackgroundColor = Colors.white,
   });
 
   @override
@@ -44,7 +44,7 @@ class AdaptiveScaffold extends StatelessWidget {
       extendBody: true,
       body: SizedBox.expand(
         child: DecoratedBox(
-          decoration: BoxDecoration(gradient: _defaultGradient),
+          decoration: BoxDecoration(color: Color(0xFFF4F4F4)),
           child: _buildContent(context, r),
         ),
       ),
@@ -64,18 +64,19 @@ class AdaptiveScaffold extends StatelessWidget {
       ),
     );
 
-    return useSafeArea ? SafeArea(child: content) : content;
+    return useSafeArea ? content : content;
   }
 
-  static const _defaultGradient = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [
-      Color(0xFF0199F6), // 600 — deep blue top
-      Color(0xFF2CB3FF),
-      Color(0xFFDEF0FF),
-      Color(0xFFDEF0FF), // 50  — near-white pale blue bottom
-    ],
-    stops: [0.0, 0.10, 0.38, 1.0],
-  );
+  // static const _defaultGradient = LinearGradient(
+  //   begin: Alignment.topCenter,
+  //   end: Alignment.bottomCenter,
+  //   colors: [
+  //     // Colors.black,
+  //     Color.fromARGB(255, 215, 239, 248),
+  //     Color.fromARGB(255, 229, 246, 252),
+  //     Color.fromARGB(255, 255, 255, 255),
+  //     // Colors.white,
+  //   ],
+  //   stops: [0.1, 0.5, 1.0],
+  // );
 }

@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 
@@ -173,30 +174,30 @@ class _SplashScreenState extends State<SplashScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // GIF animation
-                  SizedBox(
-                    height: screenHeight * 0.4,
-                    width: screenWidth,
-                    child: _gifReady
-                        ? Image.asset(
-                            "assets/images/splash.gif",
-                            fit: BoxFit.contain,
-                            gaplessPlayback: true,
-                            frameBuilder: (context, child, frame,
-                                wasSynchronouslyLoaded) {
-                              return AnimatedOpacity(
-                                opacity: frame == null ? 0 : 1,
-                                duration: const Duration(milliseconds: 300),
-                                child: child,
-                              );
-                            },
-                          )
-                        : Image.asset(
-                            "assets/images/splash.gif",
-                            fit: BoxFit.contain,
-                            gaplessPlayback: true,
-                          ),
-                  ),
-
+                  // SizedBox(
+                  //   height: screenHeight * 0.4,
+                  //   width: screenWidth,
+                  //   child: _gifReady
+                  //       ? Image.asset(
+                  //           "assets/images/splash.gif",
+                  //           fit: BoxFit.contain,
+                  //           gaplessPlayback: true,
+                  //           frameBuilder: (context, child, frame,
+                  //               wasSynchronouslyLoaded) {
+                  //             return AnimatedOpacity(
+                  //               opacity: frame == null ? 0 : 1,
+                  //               duration: const Duration(milliseconds: 300),
+                  //               child: child,
+                  //             );
+                  //           },
+                  //         )
+                  //       : Image.asset(
+                  //           "assets/images/splash.gif",
+                  //           fit: BoxFit.contain,
+                  //           gaplessPlayback: true,
+                  //         ),
+                  // ),
+                  Lottie.asset("assets/images/splash_screen.json"),
                   const SizedBox(height: 24),
 
                   // Logo — fades + slides up into view

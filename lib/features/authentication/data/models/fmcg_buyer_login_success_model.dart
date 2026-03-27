@@ -19,6 +19,16 @@ class FmcgBuyerLoginSuccessModel extends FmcgBuyerLoginSuccess {
     super.perferredLocation,
     super.brandId,
     super.apiVerificationCode,
+    super.brandPartnershipType,
+    super.distributionCoverage,
+    super.fMCGCategory,
+    super.fMCGDistributor,
+    super.partnerBrand,
+    super.salesTeam,
+    super.warehousingFacility,
+    super.specifyRequirement,
+    super.webType,
+    super.distributionExperience,
   });
 
   factory FmcgBuyerLoginSuccessModel.fromJson(Map<String, dynamic> json) =>
@@ -40,5 +50,15 @@ class FmcgBuyerLoginSuccessModel extends FmcgBuyerLoginSuccess {
         perferredLocation: json["PerferredLocation"],
         brandId: json["BrandID"],
         apiVerificationCode: json["ApiVerificationCode"],
+        brandPartnershipType: json["BrandPartnershipType"],
+        distributionCoverage: json["DistributionCoverage"],
+        fMCGCategory: json["FMCGCategory"],
+        fMCGDistributor: json["FMCGDistributor"],
+        partnerBrand: json["PartnerBrand"],
+        salesTeam: json["SalesTeam"],
+        warehousingFacility: json["WarehousingFacility"],
+        specifyRequirement: json["SpecifyRequirement"],
+        webType: json["WebType"],
+        distributionExperience: json["DistributionExperience"],
       );
 }

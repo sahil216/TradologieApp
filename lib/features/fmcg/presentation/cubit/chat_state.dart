@@ -162,3 +162,69 @@ class GetSellerDocumentsError extends ChatState {
   @override
   List<Object> get props => [failure];
 }
+
+class GetBuyerBrandsListIsLoading extends ChatState {}
+
+class GetBuyerBrandsListSuccess extends ChatState {
+  final List<FmcgBuyerBrandsList> data;
+
+  const GetBuyerBrandsListSuccess({
+    required this.data,
+  });
+
+  @override
+  List<Object> get props => [data];
+}
+
+class GetBuyerBrandsListError extends ChatState {
+  final Failure failure;
+
+  const GetBuyerBrandsListError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class AddBuyerBrandInterestIsLoading extends ChatState {}
+
+class AddBuyerBrandInterestSuccess extends ChatState {
+  final bool data;
+
+  const AddBuyerBrandInterestSuccess({
+    required this.data,
+  });
+
+  @override
+  List<Object> get props => [data];
+}
+
+class AddBuyerBrandInterestError extends ChatState {
+  final Failure failure;
+
+  const AddBuyerBrandInterestError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class AddDistributorInterestIsLoading extends ChatState {}
+
+class AddDistributorInterestSuccess extends ChatState {
+  final bool data;
+
+  const AddDistributorInterestSuccess({
+    required this.data,
+  });
+
+  @override
+  List<Object> get props => [data];
+}
+
+class AddDistributorInterestError extends ChatState {
+  final Failure failure;
+
+  const AddDistributorInterestError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}

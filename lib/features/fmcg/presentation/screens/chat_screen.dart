@@ -130,293 +130,302 @@ class _ChatScreenState extends State<ChatScreen>
             CommonToast.showFailureToast(state.failure);
           }
         },
-        child: Stack(
-          children: [
-            BlocBuilder<ChatCubit, ChatState>(builder: (context, state) {
-              return Column(
-                children: [
-                  ChatTopBar(
-                    name: widget.chat.name ?? "",
-                    imageUrl: "",
-                    notificationCount: 2,
-                    isOnline: widget.chat.loginStatus?.toLowerCase() == "online"
-                        ? true
-                        : false,
-                    onBackTap: () {
-                      Navigator.pop(context);
-                    },
-                    onNotificationTap: () {},
-                  ),
-                  Expanded(
-                    child: CustomScrollView(
-                      controller: _scrollController,
-                      physics: const BouncingScrollPhysics(),
-                      slivers: [
-                        SliverPadding(
-                          padding: const EdgeInsets.fromLTRB(14, 10, 14, 90),
-                          sliver: SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                                final msg = chatData?[index];
-                                final isMe =
-                                    msg?.msgType?.toLowerCase() == "seller"
-                                        ? true
-                                        : false;
+        child: SafeArea(
+          child: Stack(
+            children: [
+              BlocBuilder<ChatCubit, ChatState>(builder: (context, state) {
+                return Column(
+                  children: [
+                    ChatTopBar(
+                      name: widget.chat.name ?? "",
+                      imageUrl: "",
+                      notificationCount: 2,
+                      isOnline:
+                          widget.chat.loginStatus?.toLowerCase() == "online"
+                              ? true
+                              : false,
+                      onBackTap: () {
+                        Navigator.pop(context);
+                      },
+                      onNotificationTap: () {},
+                    ),
+                    Expanded(
+                      child: CustomScrollView(
+                        controller: _scrollController,
+                        physics: const BouncingScrollPhysics(),
+                        slivers: [
+                          SliverPadding(
+                            padding: const EdgeInsets.fromLTRB(14, 10, 14, 90),
+                            sliver: SliverList(
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) {
+                                  final msg = chatData?[index];
+                                  final isMe =
+                                      msg?.msgType?.toLowerCase() == "seller"
+                                          ? true
+                                          : false;
 
-                                Map<String, dynamic>? data;
+                                  Map<String, dynamic>? data;
 
-                                try {
-                                  if (msg?.msgContent != null &&
-                                      (msg?.msgContent ?? "").isNotEmpty) {
-                                    data = jsonDecode(msg!.msgContent!);
+                                  try {
+                                    if (msg?.msgContent != null &&
+                                        (msg?.msgContent ?? "").isNotEmpty) {
+                                      data = jsonDecode(msg!.msgContent!);
+                                    }
+                                  } catch (e) {
+                                    data = null;
                                   }
-                                } catch (e) {
-                                  data = null;
-                                }
 
-                                return Column(
-                                  children: [
-                                    if ((msg?.displayDate ?? "").isNotEmpty)
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 14,
-                                        ),
-                                        child: Center(
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 14,
-                                              vertical: 7,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(30),
-                                              border: Border.all(
-                                                color: Colors.black12,
+                                  return Column(
+                                    children: [
+                                      if ((msg?.displayDate ?? "").isNotEmpty)
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 14,
+                                          ),
+                                          child: Center(
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 14,
+                                                vertical: 7,
                                               ),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black
-                                                      .withOpacity(0.04),
-                                                  blurRadius: 8,
-                                                  offset: const Offset(0, 2),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(30),
+                                                border: Border.all(
+                                                  color: Colors.black12,
                                                 ),
-                                              ],
-                                            ),
-                                            child: Text(
-                                              msg?.displayDate ?? "",
-                                              style: TextStyleConstants.medium(
-                                                context,
-                                                fontSize: 11,
-                                                color: Colors.grey.shade700,
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withValues(
+                                                            alpha: 0.04),
+                                                    blurRadius: 8,
+                                                    offset: const Offset(0, 2),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Text(
+                                                msg?.displayDate ?? "",
+                                                style:
+                                                    TextStyleConstants.medium(
+                                                  context,
+                                                  fontSize: 11,
+                                                  color: Colors.grey.shade700,
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    Align(
-                                      alignment: isMe
-                                          ? Alignment.centerRight
-                                          : Alignment.centerLeft,
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 4,
-                                        ),
-                                        child: ConstrainedBox(
-                                          constraints: BoxConstraints(
-                                            maxWidth: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.74,
+                                      Align(
+                                        alignment: isMe
+                                            ? Alignment.centerRight
+                                            : Alignment.centerLeft,
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 4,
                                           ),
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 14,
-                                              vertical: 12,
+                                          child: ConstrainedBox(
+                                            constraints: BoxConstraints(
+                                              maxWidth: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.74,
                                             ),
-                                            decoration: BoxDecoration(
-                                              color: isMe
-                                                  ? sentBubbleColor
-                                                  : receivedBubbleColor,
-                                              borderRadius: BorderRadius.only(
-                                                topLeft:
-                                                    const Radius.circular(18),
-                                                topRight:
-                                                    const Radius.circular(18),
-                                                bottomLeft: Radius.circular(
-                                                    isMe ? 18 : 4),
-                                                bottomRight: Radius.circular(
-                                                    isMe ? 4 : 18),
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 14,
+                                                vertical: 12,
                                               ),
-                                              boxShadow: [
-                                                // BoxShadow(
-                                                //   color: Colors.black
-                                                //       .withOpacity(0.06),
-                                                //   blurRadius: 10,
-                                                //   offset: const Offset(0, 3),
-                                                // ),
-                                              ],
-                                              border: isMe
-                                                  ? null
-                                                  : Border.all(
-                                                      color: Colors.black12,
+                                              decoration: BoxDecoration(
+                                                color: isMe
+                                                    ? sentBubbleColor
+                                                    : receivedBubbleColor,
+                                                borderRadius: BorderRadius.only(
+                                                  topLeft:
+                                                      const Radius.circular(18),
+                                                  topRight:
+                                                      const Radius.circular(18),
+                                                  bottomLeft: Radius.circular(
+                                                      isMe ? 18 : 4),
+                                                  bottomRight: Radius.circular(
+                                                      isMe ? 4 : 18),
+                                                ),
+                                                boxShadow: [
+                                                  // BoxShadow(
+                                                  //   color: Colors.black
+                                                  //       .withValues(alpha: 0.06),
+                                                  //   blurRadius: 10,
+                                                  //   offset: const Offset(0, 3),
+                                                  // ),
+                                                ],
+                                                border: isMe
+                                                    ? null
+                                                    : Border.all(
+                                                        color: Colors.black12,
+                                                      ),
+                                              ),
+                                              child: Column(
+                                                crossAxisAlignment: isMe
+                                                    ? CrossAxisAlignment.end
+                                                    : CrossAxisAlignment.start,
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    data?["Message"] ?? "",
+                                                    style: TextStyleConstants
+                                                        .medium(
+                                                      context,
+                                                      color: isMe
+                                                          ? Colors.white
+                                                          : const Color(
+                                                              0xff1F2937),
+                                                      fontSize: 15,
                                                     ),
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment: isMe
-                                                  ? CrossAxisAlignment.end
-                                                  : CrossAxisAlignment.start,
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Text(
-                                                  data?["Message"] ?? "",
-                                                  style:
-                                                      TextStyleConstants.medium(
-                                                    context,
-                                                    color: isMe
-                                                        ? Colors.white
-                                                        : const Color(
-                                                            0xff1F2937),
-                                                    fontSize: 15,
                                                   ),
-                                                ),
-                                                const SizedBox(height: 6),
-                                                Text(
-                                                  msg?.displayTime ?? "",
-                                                  style:
-                                                      TextStyleConstants.medium(
-                                                    context,
-                                                    color: isMe
-                                                        ? Colors.white70
-                                                        : Colors.grey.shade600,
-                                                    fontSize: 11,
+                                                  const SizedBox(height: 6),
+                                                  Text(
+                                                    msg?.displayTime ?? "",
+                                                    style: TextStyleConstants
+                                                        .medium(
+                                                      context,
+                                                      color: isMe
+                                                          ? Colors.white70
+                                                          : Colors
+                                                              .grey.shade600,
+                                                      fontSize: 11,
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
                                       ),
+                                    ],
+                                  );
+                                },
+                                childCount: chatData?.length ?? 0,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    /// Message Input Bar
+                    SafeArea(
+                      top: false,
+                      child: Container(
+                        padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.05),
+                              blurRadius: 14,
+                              offset: const Offset(0, -2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: const Color(0xffF3F5F7),
+                                  borderRadius: BorderRadius.circular(28),
+                                  border: Border.all(
+                                    color: Colors.black12,
+                                  ),
+                                ),
+                                child: TextField(
+                                  controller: controller,
+                                  minLines: 1,
+                                  maxLines: 4,
+                                  textInputAction: TextInputAction.send,
+                                  decoration: InputDecoration(
+                                    hintText: "Type your message...",
+                                    hintStyle: TextStyle(
+                                      color: Colors.grey.shade500,
+                                      fontSize: 15,
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 18,
+                                      vertical: 14,
+                                    ),
+                                    border: InputBorder.none,
+                                  ),
+                                  onSubmitted: (_) {
+                                    setState(() {
+                                      getData(
+                                        controller.text.isEmpty
+                                            ? null
+                                            : controller.text,
+                                        chatData?.last.chatId.toString(),
+                                      );
+                                      controller.clear();
+                                      WidgetsBinding.instance
+                                          .addPostFrameCallback((_) {
+                                        _scrollToBottom();
+                                      });
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  getData(
+                                    controller.text.isEmpty
+                                        ? null
+                                        : controller.text,
+                                    chatData?.last.chatId.toString(),
+                                  );
+                                  controller.clear();
+                                  WidgetsBinding.instance
+                                      .addPostFrameCallback((_) {
+                                    _scrollToBottom();
+                                  });
+                                });
+                              },
+                              child: Container(
+                                height: 52,
+                                width: 52,
+                                decoration: BoxDecoration(
+                                  color: primaryColor,
+                                  borderRadius: BorderRadius.circular(18),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color:
+                                          primaryColor.withValues(alpha: 0.28),
+                                      blurRadius: 12,
+                                      offset: const Offset(0, 6),
                                     ),
                                   ],
-                                );
-                              },
-                              childCount: chatData?.length ?? 0,
+                                ),
+                                child: const Icon(
+                                  Icons.send_rounded,
+                                  color: Colors.white,
+                                  size: 22,
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-
-                  /// Message Input Bar
-                  SafeArea(
-                    top: false,
-                    child: Container(
-                      padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 14,
-                            offset: const Offset(0, -2),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xffF3F5F7),
-                                borderRadius: BorderRadius.circular(28),
-                                border: Border.all(
-                                  color: Colors.black12,
-                                ),
-                              ),
-                              child: TextField(
-                                controller: controller,
-                                minLines: 1,
-                                maxLines: 4,
-                                textInputAction: TextInputAction.send,
-                                decoration: InputDecoration(
-                                  hintText: "Type your message...",
-                                  hintStyle: TextStyle(
-                                    color: Colors.grey.shade500,
-                                    fontSize: 15,
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 18,
-                                    vertical: 14,
-                                  ),
-                                  border: InputBorder.none,
-                                ),
-                                onSubmitted: (_) {
-                                  setState(() {
-                                    getData(
-                                      controller.text.isEmpty
-                                          ? null
-                                          : controller.text,
-                                      chatData?.last.chatId.toString(),
-                                    );
-                                    controller.clear();
-                                    WidgetsBinding.instance
-                                        .addPostFrameCallback((_) {
-                                      _scrollToBottom();
-                                    });
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                getData(
-                                  controller.text.isEmpty
-                                      ? null
-                                      : controller.text,
-                                  chatData?.last.chatId.toString(),
-                                );
-                                controller.clear();
-                                WidgetsBinding.instance
-                                    .addPostFrameCallback((_) {
-                                  _scrollToBottom();
-                                });
-                              });
-                            },
-                            child: Container(
-                              height: 52,
-                              width: 52,
-                              decoration: BoxDecoration(
-                                color: primaryColor,
-                                borderRadius: BorderRadius.circular(18),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: primaryColor.withOpacity(0.28),
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 6),
-                                  ),
-                                ],
-                              ),
-                              child: const Icon(
-                                Icons.send_rounded,
-                                color: Colors.white,
-                                size: 22,
-                              ),
-                            ),
-                          ),
-                        ],
                       ),
                     ),
-                  ),
-                ],
-              );
-            }),
-          ],
+                  ],
+                );
+              }),
+            ],
+          ),
         ),
       ),
     );
