@@ -77,11 +77,6 @@ class _SplashScreenState extends State<SplashScreen>
   /// Decodes the GIF into Flutter's image cache so that
   /// Image.asset renders on the very first frame — no white flash.
   Future<void> _preloadGif() async {
-    final image = const AssetImage("assets/images/splash.gif");
-
-    await precacheImage(image, context);
-
-    image.resolve(const ImageConfiguration());
     // await precacheImage(
     //   const AssetImage("assets/images/splash.gif"),
     //   context,
@@ -97,7 +92,7 @@ class _SplashScreenState extends State<SplashScreen>
     });
 
     // Navigate after GIF finishes — adjust to match your GIF duration
-    Future.delayed(const Duration(seconds: 4), () {
+    Future.delayed(const Duration(seconds: 3), () {
       if (!mounted) return;
       _goNext(context);
     });

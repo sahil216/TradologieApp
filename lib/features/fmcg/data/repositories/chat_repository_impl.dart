@@ -24,6 +24,7 @@ import 'package:tradologie_app/features/fmcg/domain/usecases/add_distributor_int
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_data_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_brands_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_distributor_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_documents_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_profile_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/update_seller_documents_usecase.dart';
@@ -70,10 +71,9 @@ class ChatRepositoryImpl implements ChatRepository {
 
   @override
   Future<Either<Failure, List<DistributorEnquiryList>>> getDistributorList(
-      NoParams params) async {
+      GetDistributorListParams params) async {
     try {
-      final response =
-          await chatRemoteDataSource.getDistributorList(NoParams());
+      final response = await chatRemoteDataSource.getDistributorList(params);
       if (response != null && response.success) {
         return Right((response.data as List)
             .map((e) => DistributorEnquiryListModel.fromJson(e))

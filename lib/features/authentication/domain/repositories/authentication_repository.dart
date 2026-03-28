@@ -3,8 +3,16 @@ import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/buyer_login_success.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/country_code_list.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_brands_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_buyer_brand_partnership_type_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_buyer_category_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_buyer_distribution_coverage_list.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_buyer_login_success.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_country_code_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_business_type_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_exporting_products_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_partnership_type_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_product_category_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_service_label_list.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_signin_response.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/login_success.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/send_otp_result.dart';
@@ -44,4 +52,21 @@ abstract class AuthenticationRepository {
   Future<Either<Failure, List<FmcgCountryCodeList>>> fmcgGetCountryCodeList(
       NoParams params);
   Future<Either<Failure, List<FmcgBrandsList>>> fmcgBrandsList(NoParams params);
+
+  Future<Either<Failure, List<FmcgBuyerCategoryList>>> fmcgBuyerCategoryList(
+      NoParams params);
+  Future<Either<Failure, List<FmcgBuyerBrandPartnershipTypeList>>>
+      fmcgBuyerBrandPartnershipList(NoParams params);
+  Future<Either<Failure, List<FmcgBuyerDistributionCoverageList>>>
+      fmcgBuyerDistributionCoverageList(NoParams params);
+  Future<Either<Failure, List<FmcgSellerBusinessTypeList>>>
+      fmcgSellerBusinessTypeList(NoParams params);
+  Future<Either<Failure, List<FmcgSellerProductCategoryList>>>
+      fmcgSellerProductCategoryList(NoParams params);
+  Future<Either<Failure, List<FmcgSellerPartnershipTypeList>>>
+      fmcgSellerPartnershipTypeList(NoParams params);
+  Future<Either<Failure, List<FmcgSellerServiceLabelList>>>
+      fmcgSellerServiceLabelList(NoParams params);
+  Future<Either<Failure, List<FmcgSellerExportingProductsList>>>
+      fmcgSellerExportingProductsList(NoParams params);
 }

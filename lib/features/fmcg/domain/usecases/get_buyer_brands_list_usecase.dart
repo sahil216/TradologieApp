@@ -8,17 +8,20 @@ class GetBuyerBrandsListParams {
   final String token;
   final String deviceID;
   final String distributorID;
+  final String searchText;
 
   GetBuyerBrandsListParams({
     required this.token,
     required this.deviceID,
     required this.distributorID,
+    required this.searchText,
   });
 
   Map<String, dynamic> toJson() => {
         "Token": token,
         "DeviceID": deviceID,
         "DistributorID": distributorID,
+        "SearchText": searchText,
       };
 }
 

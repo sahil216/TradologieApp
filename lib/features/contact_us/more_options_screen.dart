@@ -13,6 +13,7 @@ import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_appbar.dart';
+import 'package:tradologie_app/core/widgets/common_fmcg_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/common_social_icons.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
@@ -133,10 +134,17 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
             CustomScrollView(
               slivers: [
                 /// ⭐ COMMON APPBAR
-                CommonAppbar(
-                  title: "More",
-                  showNotification: Constants.isFmcg == true ? false : true,
-                ),
+                Constants.isFmcg
+                    ? CommonAppbar(
+                        title: "More",
+                        showBackButton: false,
+                        showNotification: false,
+                      )
+                    : CommonAppbar(
+                        title: "More",
+                        showNotification:
+                            Constants.isFmcg == true ? false : true,
+                      ),
 
                 /// ⭐ BODY
                 SliverToBoxAdapter(

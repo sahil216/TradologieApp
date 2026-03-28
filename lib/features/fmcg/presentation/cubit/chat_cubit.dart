@@ -65,7 +65,7 @@ class ChatCubit extends Cubit<ChatState> {
     ));
   }
 
-  Future<void> getDistributorList(NoParams params) async {
+  Future<void> getDistributorList(GetDistributorListParams params) async {
     emit(DistributorListIsLoading());
     Either<Failure, List<DistributorEnquiryList>> response =
         await getDistributorListUsecase(params);

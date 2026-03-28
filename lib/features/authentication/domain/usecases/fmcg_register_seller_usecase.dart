@@ -19,22 +19,31 @@ class FmcgRegisterSellerParams {
   final String fcmToken;
   final String osType;
   final String deviceId;
+  final String businessType;
+  final String productCategory;
+  final String partnershipType;
+  final String serviceLabel;
+  final String exportingProducts;
 
-  FmcgRegisterSellerParams({
-    required this.token,
-    required this.brandName,
-    required this.contactName,
-    required this.countryCode,
-    required this.emailId,
-    required this.mobileNo,
-    required this.manufacturer,
-    required this.model,
-    required this.osVersionRelease,
-    required this.appVersion,
-    required this.fcmToken,
-    required this.osType,
-    required this.deviceId,
-  });
+  FmcgRegisterSellerParams(
+      {required this.token,
+      required this.brandName,
+      required this.contactName,
+      required this.countryCode,
+      required this.emailId,
+      required this.mobileNo,
+      required this.manufacturer,
+      required this.model,
+      required this.osVersionRelease,
+      required this.appVersion,
+      required this.fcmToken,
+      required this.osType,
+      required this.deviceId,
+      required this.businessType,
+      required this.productCategory,
+      required this.partnershipType,
+      required this.serviceLabel,
+      required this.exportingProducts});
   Map<String, dynamic> toJson() => {
         "Token": token,
         "BrandName": brandName,
@@ -48,7 +57,12 @@ class FmcgRegisterSellerParams {
         "AppVersion": appVersion,
         "FcmToken": fcmToken,
         "OSType": osType,
-        "DeviceID": Constants.deviceID
+        "DeviceID": Constants.deviceID,
+        "BusinessType": businessType,
+        "ProductCategory": productCategory,
+        "PartnershipType": partnershipType,
+        "ServiceLabel": serviceLabel,
+        "ExportingProducts": exportingProducts,
       };
 }
 

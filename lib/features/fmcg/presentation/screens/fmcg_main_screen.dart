@@ -48,8 +48,7 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
             _item(0, Icons.dashboard_outlined, "Dashboard"),
             _item(1, Icons.chat_outlined, "Chats"),
             _item(2, Icons.account_circle_outlined, "Account"),
-            // _item(3, Icons.menu_rounded, "More"),
-            _item(3, Icons.payment_outlined, "Membership"),
+            _item(3, Icons.menu_rounded, "More"),
             _item(4, Icons.analytics, "Analytics"),
           ]
         ],
@@ -143,7 +142,7 @@ class _FMCGMainScreenState extends State<FMCGMainScreen> {
     FmcgSellerDashboardScreen(),
     ChatListScreen(),
     FmcgMyAccountScreen(),
-    SizedBox(),
+    MoreOptionsScreen(),
     Constants.isAndroid14OrBelow && Platform.isAndroid
         ? InAppWebViewScreen(
             params: WebviewParams(
@@ -174,29 +173,16 @@ class _FMCGMainScreenState extends State<FMCGMainScreen> {
 
   void onTabChanged(int index) {
     setState(() {
-      if (index == 3) {
-        Constants.launch("https://www.tradologie.com/brand-membership/");
-      } else {
-        setState(() {
-          currentIndex = index;
-        });
-      }
+      currentIndex = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return AdaptiveScaffold(
-      body: SafeArea(
-        top: false,
-        child: Stack(
-          children: [
-            Constants.isBuyer == true
-                ? buyerScreens[currentIndex]
-                : screens[currentIndex],
-          ],
-        ),
-      ),
+      body: Constants.isBuyer == true
+          ? buyerScreens[currentIndex]
+          : screens[currentIndex],
       bottomNavigationBar: CommonFMCGFloatingNavBar(
         index: currentIndex,
         onTap: onTabChanged,

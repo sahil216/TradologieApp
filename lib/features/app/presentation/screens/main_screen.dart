@@ -311,33 +311,36 @@ class CommonFloatingNavBar extends StatelessWidget {
       left: 20,
       right: 20,
       bottom: 5,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(40),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 10,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: .75),
-              borderRadius: BorderRadius.circular(40),
-              boxShadow: [
-                BoxShadow(
-                  blurRadius: 20,
-                  color: Colors.black.withValues(alpha: .08),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _item(0, Icons.dashboard_outlined, "Dashboard"),
-                _item(1, Icons.description_outlined, "Negotiation"),
-                _item(2, Icons.person_outline, "Account"),
-                _item(3, Icons.menu, "More"),
-              ],
+      child: SafeArea(
+        top: false,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(40),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 10,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: .75),
+                borderRadius: BorderRadius.circular(40),
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 20,
+                    color: Colors.black.withValues(alpha: .08),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _item(0, Icons.dashboard_outlined, "Dashboard"),
+                  _item(1, Icons.description_outlined, "Negotiation"),
+                  _item(2, Icons.person_outline, "Account"),
+                  _item(3, Icons.menu, "More"),
+                ],
+              ),
             ),
           ),
         ),

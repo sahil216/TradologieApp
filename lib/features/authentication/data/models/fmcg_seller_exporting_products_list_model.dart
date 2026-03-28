@@ -1,12 +1,11 @@
-class FmcgSellerExportingProductsListModel {
-  final int? exportingId;
-  final String? name;
-  final String? insertedDate;
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_exporting_products_list.dart';
 
-  FmcgSellerExportingProductsListModel({
-    this.exportingId,
-    this.name,
-    this.insertedDate,
+class FmcgSellerExportingProductsListModel
+    extends FmcgSellerExportingProductsList {
+  const FmcgSellerExportingProductsListModel({
+    super.exportingId,
+    super.name,
+    super.insertedDate,
   });
 
   factory FmcgSellerExportingProductsListModel.fromJson(
@@ -16,10 +15,4 @@ class FmcgSellerExportingProductsListModel {
         name: json["Name"],
         insertedDate: json["InsertedDate"],
       );
-
-  Map<String, dynamic> toJson() => {
-        "ExportingID": exportingId,
-        "Name": name,
-        "InsertedDate": insertedDate,
-      };
 }

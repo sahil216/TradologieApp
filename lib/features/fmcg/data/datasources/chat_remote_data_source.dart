@@ -3,12 +3,12 @@ import 'package:tradologie_app/core/api/end_points.dart';
 import 'package:tradologie_app/core/response_wrapper/response_wrapper.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
-import 'package:tradologie_app/features/fmcg/domain/entities/fmcg_buyer_brands_list.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_buyer_brand_interest_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_distributor_interest_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_data_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_brands_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_distributor_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_documents_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_profile_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/update_seller_documents_usecase.dart';
@@ -17,7 +17,8 @@ import 'package:tradologie_app/features/fmcg/domain/usecases/update_seller_profi
 abstract class ChatRemoteDataSource {
   Future<ResponseWrapper<dynamic>?> getChatList(ChatListParams params);
   Future<ResponseWrapper<dynamic>?> chatData(ChatDataParams params);
-  Future<ResponseWrapper<dynamic>?> getDistributorList(NoParams params);
+  Future<ResponseWrapper<dynamic>?> getDistributorList(
+      GetDistributorListParams params);
   Future<ResponseWrapper<dynamic>?> fmcgGetSellerProfile(
       GetSellerProfileParams params);
   Future<ResponseWrapper<dynamic>?> fmcgUpdateSellerProfile(
@@ -56,10 +57,11 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   }
 
   @override
-  Future<ResponseWrapper<dynamic>?> getDistributorList(NoParams params) async {
+  Future<ResponseWrapper<dynamic>?> getDistributorList(
+      GetDistributorListParams params) async {
     return await apiConsumer.post(
       EndPoints.getDistributorList,
-      body: {"Token": Constants.token},
+      body: params.toJson(),
     );
   }
 

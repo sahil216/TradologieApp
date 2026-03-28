@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,10 +14,14 @@ import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 import 'package:tradologie_app/features/app/injection_container_app.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_buyer_category_list.dart';
+import 'package:tradologie_app/features/authentication/presentation/cubit/authentication_cubit.dart';
 import 'package:tradologie_app/features/fmcg/domain/entities/distributor_enquiry_list.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_distributor_interest_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_distributor_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/presentation/cubit/chat_cubit.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_distributor_enq.dart';
+import 'package:tradologie_app/features/fmcg/presentation/widgets/category_filter_sheet.dart';
 
 class FmcgSellerDashboardScreen extends StatefulWidget {
   const FmcgSellerDashboardScreen({super.key});
@@ -35,22 +39,51 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen> {
   String _searchQuery = '';
   String? _selectedLocation;
   String? _selectedBrand;
-  bool _showFilters = false;
+  Set<String> _selectedCategories = {};
 
   ChatCubit get chatCubit => BlocProvider.of(context);
 
+  AuthenticationCubit get authenticationCubit => BlocProvider.of(context);
+
   SecureStorageService secureStorage = SecureStorageService();
 
-  void getDistributorList() async {
-    await chatCubit.getDistributorList(NoParams());
+  Future<void> getDistributorList({
+    String search = "",
+    Set<String>? categories,
+  }) async {
+    GetDistributorListParams params = GetDistributorListParams(
+      token: await secureStorage.read(AppStrings.apiVerificationCode) ?? "",
+      deviceID: Constants.deviceID,
+      searchText: search,
+      category: categories == null || categories.isEmpty
+          ? ""
+          : categories.join(","), // 🔥 important
+    );
+
+    await chatCubit.getDistributorList(params);
   }
+
+  Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
     getDistributorList();
+    authenticationCubit.fmcgBuyerCategoryList(NoParams());
     _searchController.addListener(() {
       setState(() => _searchQuery = _searchController.text.toLowerCase());
+    });
+  }
+
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      distributorList?.clear();
+      getDistributorList(
+        search: query,
+        categories: _selectedCategories,
+      );
     });
   }
 
@@ -60,45 +93,9 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen> {
     super.dispose();
   }
 
+  List<FmcgBuyerCategoryList>? fmcgBuyerCategoryList;
+
   Future<void> _refreshChats() async => getDistributorList();
-
-  List<DistributorEnquiryList> get _filteredList {
-    final source = distributorList ?? [];
-    return source.where((e) {
-      final matchSearch = _searchQuery.isEmpty ||
-          (e.interestedBrandName?.toLowerCase().contains(_searchQuery) ??
-              false) ||
-          (e.perferredLocation?.toLowerCase().contains(_searchQuery) ??
-              false) ||
-          (e.name?.toLowerCase().contains(_searchQuery) ?? false);
-
-      final matchLocation =
-          _selectedLocation == null || e.perferredLocation == _selectedLocation;
-
-      final matchBrand =
-          _selectedBrand == null || e.interestedBrandName == _selectedBrand;
-
-      return matchSearch && matchLocation && matchBrand;
-    }).toList();
-  }
-
-  List<String> get _uniqueLocations {
-    return (distributorList ?? [])
-        .map((e) => e.perferredLocation ?? '')
-        .where((s) => s.isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort();
-  }
-
-  List<String> get _uniqueBrands {
-    return (distributorList ?? [])
-        .map((e) => e.interestedBrandName ?? '')
-        .where((s) => s.isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort();
-  }
 
   void _clearFilters() {
     setState(() {
@@ -116,88 +113,110 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return AdaptiveScaffold(
-      body: BlocListener<ChatCubit, ChatState>(
-        listenWhen: (previous, current) => previous != current,
-        listener: (context, state) async {
-          if (state is DistributorListSuccess) {
-            setState(() => distributorList = state.data);
-          }
-          if (state is DistributorListError) {
-            CommonToast.showFailureToast(state.failure);
-          }
-          if (state is AddDistributorInterestSuccess) {
-            CommonToast.success(
-                "Thank you for your interest! Our sales team will connect with you shortly to explain how the platform works.");
-          }
-          if (state is AddDistributorInterestError) {
-            CommonToast.showFailureToast(state.failure);
-          }
-        },
-        child: Stack(
-          children: [
-            BlocBuilder<ChatCubit, ChatState>(
-              builder: (context, state) {
-                return RefreshIndicator(
-                  onRefresh: _refreshChats,
-                  child: CustomScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    slivers: [
-                      // ── App Bar ─────────────────────────────────────────
-                      CommonSliverAppBar(
-                        title: 'Distributor Enquiry',
-                        showSearch: true,
-                        showFilter: true,
-                        showBackButton: false,
-                        onFilterPressed: () {},
-                        onSearchChanged: (q) {},
-                      ),
-                      SliverToBoxAdapter(
-                        child: const SizedBox(height: 16),
-                      ),
+      body: MultiBlocListener(
+        listeners: [
+          BlocListener<ChatCubit, ChatState>(
+            listenWhen: (previous, current) => previous != current,
+            listener: (context, state) async {
+              if (state is DistributorListSuccess) {
+                distributorList = state.data;
+              }
+              if (state is DistributorListError) {
+                CommonToast.showFailureToast(state.failure);
+              }
+              if (state is AddDistributorInterestSuccess) {
+                CommonToast.success(
+                    "Thank you for your interest! Our sales team will connect with you shortly to explain how the platform works.");
+              }
+              if (state is AddDistributorInterestError) {
+                CommonToast.showFailureToast(state.failure);
+              }
+            },
+          ),
+          BlocListener<AuthenticationCubit, AuthenticationState>(
+              listenWhen: (previous, current) => previous != current,
+              listener: (context, state) async {
+                if (state is FmcgBuyerCategoryListSuccess) {
+                  fmcgBuyerCategoryList = state.data;
 
-                      // ── Grid ─────────────────────────────────────────────
-                      _filteredList.isEmpty
-                          ? SliverFillRemaining(
-                              child: _EmptyState(
-                                hasFilters: _hasActiveFilters,
-                                onClear: _clearFilters,
-                              ),
-                            )
-                          : SliverPadding(
-                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
-                              sliver: SliverGrid(
-                                gridDelegate:
-                                    const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  crossAxisSpacing: 12,
-                                  mainAxisSpacing: 12,
-                                  childAspectRatio: 0.62,
-                                ),
-                                delegate: SliverChildBuilderDelegate(
-                                  (context, i) => enquiryCard(
-                                    _filteredList[i],
-                                  ),
-                                  childCount: _filteredList.length,
-                                ),
-                              ),
-                            ),
-                    ],
-                  ),
-                );
-              },
-            ),
-
-            // ── Loading overlay ─────────────────────────────────────────
-            BlocBuilder<ChatCubit, ChatState>(
-              builder: (context, state) {
-                if (state is DistributorListIsLoading ||
-                    state is AddDistributorInterestIsLoading) {
-                  return const Positioned.fill(child: CommonLoader());
+                  setState(() {});
                 }
-                return const SizedBox.shrink();
-              },
-            ),
-          ],
+              }),
+        ],
+        child: SafeArea(
+          top: false,
+          child: Stack(
+            children: [
+              BlocBuilder<ChatCubit, ChatState>(
+                builder: (context, state) {
+                  return RefreshIndicator(
+                    onRefresh: _refreshChats,
+                    child: CustomScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      slivers: [
+                        // ── App Bar ─────────────────────────────────────────
+                        CommonAppbar(
+                          title: "Distributor Enquiry",
+                          showBackButton: false,
+                        ),
+                        SliverPersistentHeader(
+                          pinned: true,
+                          delegate: SearchBarDelegate(
+                            showFilter: true,
+                            onFilterPressed: () {
+                              _openCategoryFilter();
+                            },
+                            onSearchChanged: _onSearchChanged,
+                          ),
+                        ),
+                        SliverToBoxAdapter(
+                          child: const SizedBox(height: 16),
+                        ),
+
+                        // ── Grid ─────────────────────────────────────────────
+                        (distributorList?.isEmpty ?? true)
+                            ? SliverFillRemaining(
+                                child: _EmptyState(
+                                  hasFilters: _hasActiveFilters,
+                                  onClear: _clearFilters,
+                                ),
+                              )
+                            : SliverPadding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(12, 0, 12, 32),
+                                sliver: SliverGrid(
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 12,
+                                    mainAxisSpacing: 12,
+                                    childAspectRatio: 0.62,
+                                  ),
+                                  delegate: SliverChildBuilderDelegate(
+                                    (context, i) =>
+                                        enquiryCard(distributorList![i]),
+                                    childCount: distributorList?.length ?? 0,
+                                  ),
+                                ),
+                              ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+
+              // ── Loading overlay ─────────────────────────────────────────
+              BlocBuilder<ChatCubit, ChatState>(
+                builder: (context, state) {
+                  if (state is DistributorListIsLoading ||
+                      state is AddDistributorInterestIsLoading) {
+                    return const Positioned.fill(child: CommonLoader());
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -208,6 +227,29 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen> {
     return name.trim()[0].toUpperCase();
   }
 
+  void _openCategoryFilter() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) {
+        return CategoryFilterSheet(
+          selectedCategories: _selectedCategories,
+          categories: fmcgBuyerCategoryList ?? [],
+          onApply: (values) {
+            distributorList?.clear();
+            setState(() => _selectedCategories = values);
+
+            getDistributorList(
+              search: _searchController.text,
+              categories: values,
+            );
+          },
+        );
+      },
+    );
+  }
+
   void _showConfirmation(BuildContext context, String distributorID) {
     showDialog(
       context: context,
@@ -216,7 +258,7 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen> {
           borderRadius: BorderRadius.circular(14),
         ),
         content: Text(
-          "Are you sure you want to connect with a distributor?",
+          "Are you sure want to connect with distributor?",
           style: TextStyleConstants.semiBold(context, fontSize: 16),
         ),
         actions: [
@@ -291,7 +333,7 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen> {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -309,7 +351,7 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen> {
                     child: Text(
                       _initial(enquiry.name),
                       style: const TextStyle(
-                        fontSize: 20,
+                        fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF0A9FED),
                       ),
@@ -322,7 +364,7 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen> {
                     enquiry.name ?? "—",
                     maxLines: 2,
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 13,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF2B2B2B),
                     ),
@@ -331,7 +373,7 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen> {
               ],
             ),
 
-            const SizedBox(height: 14),
+            const SizedBox(height: 10),
 
             /// 🔹 DIVIDER
             Container(
@@ -339,7 +381,7 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen> {
               color: const Color(0xFF0A9FED).withValues(alpha: 0.3),
             ),
 
-            const SizedBox(height: 14),
+            const SizedBox(height: 10),
 
             /// 🔹 DETAILS
             _RowItem(
@@ -371,36 +413,38 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen> {
             _RowItem(
               icon: Icons.category,
               color: Colors.deepPurple,
-              text: enquiry.interestedBrandName ?? "—",
+              text: enquiry.fMCGCategory ?? "—",
             ),
 
-            const SizedBox(height: 18),
+            const SizedBox(height: 12),
 
             /// 🔹 BUTTON
-            Center(
-              child: GestureDetector(
-                onTap: () => _showConfirmation(
-                    context, enquiry.quotationUserId.toString()),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 28,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(25),
-                    gradient: const LinearGradient(
-                      colors: [
-                        Color(0xFF2DAAE1),
-                        Color(0xFF1B8ED1),
-                      ],
+            Expanded(
+              child: Center(
+                child: GestureDetector(
+                  onTap: () => _showConfirmation(
+                      context, enquiry.quotationUserId.toString()),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 28,
+                      vertical: 12,
                     ),
-                  ),
-                  child: const Text(
-                    "Contact",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25),
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFF2DAAE1),
+                          Color(0xFF1B8ED1),
+                        ],
+                      ),
+                    ),
+                    child: const Text(
+                      "Connect",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
@@ -428,13 +472,14 @@ class _RowItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: color),
+        Icon(icon, size: 14, color: color),
         const SizedBox(width: 10),
         Expanded(
           child: Text(
             text,
+            maxLines: 2,
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               color: Color(0xFF3A3A3A),
             ),
           ),

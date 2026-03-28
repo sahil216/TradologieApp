@@ -14,6 +14,7 @@ class CommonAppbar extends StatelessWidget {
   final bool showBackButton;
   final bool showNotification;
   final bool? showLogo;
+  final bool showWebview;
 
   final VoidCallback? onBackTap;
   final VoidCallback? onNotificationTap;
@@ -38,6 +39,7 @@ class CommonAppbar extends StatelessWidget {
     this.showLogo = false,
     this.showSuffixIcon,
     this.suffixIcon,
+    this.showWebview = false,
   });
 
   @override
@@ -72,7 +74,17 @@ class CommonAppbar extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               /// 🤍 PURE WHITE NOTCH BACKGROUND
-              Container(color: Colors.transparent),
+              showWebview == true
+                  ? Container(
+                      color: Colors.white,
+                    )
+                  : Container(
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Color(0xFF042B4D), Color(0xFF064474)],
+                        ),
+                      ),
+                    ),
 
               /// 💎 LIQUID GLASS (NO BASELINE CUT)
               Positioned(
@@ -81,25 +93,14 @@ class CommonAppbar extends StatelessWidget {
                 right: 0,
                 bottom: 0,
                 child: ClipRect(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(
-                      sigmaX: blur,
-                      sigmaY: blur,
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                          // gradient: LinearGradient(
-                          //   begin: Alignment.topLeft,
-                          //   end: Alignment.bottomRight,
-                          //   colors: [
-                          //     Color(0xFFE3F2FD), // very light blue
-                          //     Color(0xFFE3F2FD), // very light blue
-                          //     // light sky blue
-                          //     Color(0xFFE1F5FE), // light blue
-                          //   ],
-                          // ),
+                  child: Container(
+                    decoration: showWebview == true
+                        ? BoxDecoration(color: Colors.white)
+                        : BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF042B4D), Color(0xFF064474)],
+                            ),
                           ),
-                    ),
                   ),
                 ),
               ),
@@ -114,36 +115,41 @@ class CommonAppbar extends StatelessWidget {
                       Positioned(
                         left: 12,
                         bottom: baseline,
-                        child: _glassActionWrapper(
-                          GestureDetector(
-                            onTap:
-                                onBackTap ?? () => Navigator.maybePop(context),
-                            child: const Icon(
+                        child: GestureDetector(
+                          onTap: onBackTap ?? () => Navigator.maybePop(context),
+                          child: _glassActionWrapper(
+                            const Icon(
                               Icons.arrow_back_ios_new,
                               size: 18,
+                              color: Colors.white,
                             ),
                           ),
                         ),
                       ),
 
                     /// 🍏 TITLE
-                    Positioned(
-                      left: showBackButton ? 52 : 20,
-                      right: (showNotification || addAction != null) ? 150 : 20,
-                      bottom: baseline,
+                    Align(
+                      alignment: AlignmentGeometry.bottomCenter,
                       child: Transform.scale(
                         scale: scale,
                         alignment: Alignment.bottomLeft,
                         child: showLogo == true
-                            ? Image.asset(
-                                ImgAssets.companyLogo,
-                                height: 40,
+                            ? Padding(
+                                padding: const EdgeInsets.only(bottom: 10.0),
+                                child: Image.asset(
+                                  ImgAssets.companyLogo,
+                                  height: 40,
+                                ),
                               )
-                            : Text(
-                                title,
-                                style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w500,
+                            : Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: Text(
+                                  title,
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ),
                       ),
@@ -162,13 +168,16 @@ class CommonAppbar extends StatelessWidget {
                       Positioned(
                         right: 12,
                         bottom: baseline,
-                        child: _glassActionWrapper(
-                          GestureDetector(
-                            onTap: () {
-                              sl<NavigationService>()
-                                  .pushNamed(Routes.notificationScreen);
-                            },
-                            child: const Icon(Icons.notifications_none),
+                        child: GestureDetector(
+                          onTap: () {
+                            sl<NavigationService>()
+                                .pushNamed(Routes.notificationScreen);
+                          },
+                          child: _glassActionWrapper(
+                            const Icon(
+                              Icons.notifications_none,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
@@ -193,16 +202,12 @@ class CommonAppbar extends StatelessWidget {
   Widget _glassActionWrapper(Widget child) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(14),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: .8),
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: child,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
         ),
+        child: child,
       ),
     );
   }

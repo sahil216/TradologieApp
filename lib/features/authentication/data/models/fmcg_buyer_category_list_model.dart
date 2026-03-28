@@ -1,12 +1,10 @@
-class FmcgBuyerCategoryListModel {
-  final int? categoryId;
-  final String? name;
-  final String? insertedDate;
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_buyer_category_list.dart';
 
-  FmcgBuyerCategoryListModel({
-    this.categoryId,
-    this.name,
-    this.insertedDate,
+class FmcgBuyerCategoryListModel extends FmcgBuyerCategoryList {
+  const FmcgBuyerCategoryListModel({
+    super.categoryId,
+    super.name,
+    super.insertedDate,
   });
 
   factory FmcgBuyerCategoryListModel.fromJson(Map<String, dynamic> json) =>
@@ -15,10 +13,4 @@ class FmcgBuyerCategoryListModel {
         name: json["Name"],
         insertedDate: json["InsertedDate"],
       );
-
-  Map<String, dynamic> toJson() => {
-        "CategoryID": categoryId,
-        "Name": name,
-        "InsertedDate": insertedDate,
-      };
 }

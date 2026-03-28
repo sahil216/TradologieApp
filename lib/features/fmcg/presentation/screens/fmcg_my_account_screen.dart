@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
+import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_fmcg_appbar.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
-import 'package:tradologie_app/features/contact_us/more_options_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/stepper_screens/fmcg_documents_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/stepper_screens/fmcg_profile_screen.dart';
 import 'package:tradologie_app/features/my_account/domain/entities/company_details.dart';
@@ -67,7 +67,7 @@ class _FmcgMyAccountScreenState extends State<FmcgMyAccountScreen>
     _loadToken();
     // getCompanyDetails();
 
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
 
     _tabController.addListener(() {
       if (_tabController.indexIsChanging) {
@@ -125,74 +125,76 @@ class _FmcgMyAccountScreenState extends State<FmcgMyAccountScreen>
           ),
         ],
         child: AdaptiveScaffold(
-          body: CustomScrollView(
-            physics: NeverScrollableScrollPhysics(),
-            slivers: [
-              /// ⭐ ULTRA COMMON APPBAR
-              CommonSliverAppBar(
-                title: "My Account",
-                showBackButton: false,
-              ),
+          body: SafeArea(
+            top: false,
+            child: CustomScrollView(
+              physics: NeverScrollableScrollPhysics(),
+              slivers: [
+                /// ⭐ ULTRA COMMON APPBAR
+                CommonAppbar(
+                  title: "My Account",
+                  showBackButton: false,
+                  showNotification: false,
+                ),
 
-              /// ⭐ PINNED TABBAR (EXACT SAME UI)
-              SliverPersistentHeader(
-                pinned: true,
-                delegate: _FmcgMyAccountTabBarDelegate(
-                  CommonTabBarWidget(
-                    controller: _tabController,
-                    tabs: const [
-                      "Information",
-                      "Documents",
-                      "More Options",
-                    ],
-                    isEnabled: (index) {
-                      return true;
+                /// ⭐ PINNED TABBAR (EXACT SAME UI)
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: _FmcgMyAccountTabBarDelegate(
+                    CommonTabBarWidget(
+                      controller: _tabController,
+                      tabs: const [
+                        "Information",
+                        "Documents",
+                      ],
+                      isEnabled: (index) {
+                        return true;
+                      },
+                    ),
+                  ),
+                ),
+                SliverFillRemaining(
+                  child: BlocBuilder<MyAccountCubit, MyAccountState>(
+                    buildWhen: (previous, current) {
+                      bool result = previous != current;
+                      result = result &&
+                          (current is CompanyDetailsSuccess ||
+                              current is CompanyDetailsError ||
+                              current is CompanyDetailsIsLoading);
+                      return result;
+                    },
+                    builder: (context, state) {
+                      // if (state is CompanyDetailsError) {
+                      //   if (state.failure is NetworkFailure) {
+                      //     return CustomErrorNetworkWidget(
+                      //       onPress: () {
+                      //         getCompanyDetails();
+                      //       },
+                      //     );
+                      //   } else if (state.failure is UserFailure) {
+                      //     return CustomErrorWidget(
+                      //       onPress: () {
+                      //         getCompanyDetails();
+                      //       },
+                      //       errorText: state.failure.msg,
+                      //     );
+                      //   }
+                      // }
+
+                      /// 👇 KEEP YOUR ORIGINAL TABBARVIEW EXACTLY SAME
+                      return TabBarView(
+                        controller: _tabController,
+                        physics: NeverScrollableScrollPhysics(),
+                        children: [
+                          FmcgProfileScreen(),
+                          FmcgDocumentsScreen(),
+                        ],
+                      );
                     },
                   ),
                 ),
-              ),
-              SliverFillRemaining(
-                child: BlocBuilder<MyAccountCubit, MyAccountState>(
-                  buildWhen: (previous, current) {
-                    bool result = previous != current;
-                    result = result &&
-                        (current is CompanyDetailsSuccess ||
-                            current is CompanyDetailsError ||
-                            current is CompanyDetailsIsLoading);
-                    return result;
-                  },
-                  builder: (context, state) {
-                    // if (state is CompanyDetailsError) {
-                    //   if (state.failure is NetworkFailure) {
-                    //     return CustomErrorNetworkWidget(
-                    //       onPress: () {
-                    //         getCompanyDetails();
-                    //       },
-                    //     );
-                    //   } else if (state.failure is UserFailure) {
-                    //     return CustomErrorWidget(
-                    //       onPress: () {
-                    //         getCompanyDetails();
-                    //       },
-                    //       errorText: state.failure.msg,
-                    //     );
-                    //   }
-                    // }
-
-                    /// 👇 KEEP YOUR ORIGINAL TABBARVIEW EXACTLY SAME
-                    return TabBarView(
-                      controller: _tabController,
-                      physics: NeverScrollableScrollPhysics(),
-                      children: [
-                        FmcgProfileScreen(),
-                        FmcgDocumentsScreen(),
-                        MoreOptionsScreen()
-                      ],
-                    );
-                  },
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

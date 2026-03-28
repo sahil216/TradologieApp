@@ -1,12 +1,10 @@
-class FmcgSellerServiceLabelListModel {
-  final int? labelId;
-  final String? name;
-  final String? insertedDate;
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_service_label_list.dart';
 
-  FmcgSellerServiceLabelListModel({
-    this.labelId,
-    this.name,
-    this.insertedDate,
+class FmcgSellerServiceLabelListModel extends FmcgSellerServiceLabelList {
+  const FmcgSellerServiceLabelListModel({
+    super.labelId,
+    super.name,
+    super.insertedDate,
   });
 
   factory FmcgSellerServiceLabelListModel.fromJson(Map<String, dynamic> json) =>
@@ -15,10 +13,4 @@ class FmcgSellerServiceLabelListModel {
         name: json["Name"],
         insertedDate: json["InsertedDate"],
       );
-
-  Map<String, dynamic> toJson() => {
-        "LabelID": labelId,
-        "Name": name,
-        "InsertedDate": insertedDate,
-      };
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -5,6 +7,7 @@ import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
+import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_fmcg_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/features/fmcg/domain/entities/fmcg_buyer_brands_list.dart';
@@ -26,20 +29,33 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
   // Search & Filter state
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  String? _selectedLocation;
-  String? _selectedBrand;
-  bool _showFilters = false;
   SecureStorageService secureStorage = SecureStorageService();
 
   ChatCubit get chatCubit => BlocProvider.of(context);
 
-  void getBuyerBrandsList() async {
+  void getBuyerBrandsList({
+    String search = "",
+  }) async {
     GetBuyerBrandsListParams params = GetBuyerBrandsListParams(
       token: await secureStorage.read(AppStrings.apiVerificationCode) ?? "",
       deviceID: Constants.deviceID,
       distributorID: await secureStorage.read(AppStrings.loginId) ?? "",
+      searchText: search,
     );
     await chatCubit.getBuyerBrandsList(params);
+  }
+
+  Timer? _debounce;
+
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      distributorList?.clear();
+      getBuyerBrandsList(
+        search: query,
+      );
+    });
   }
 
   @override
@@ -59,50 +75,6 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
 
   Future<void> _refreshChats() async => getBuyerBrandsList();
 
-  List<FmcgBuyerBrandsList> get _filteredList {
-    final source = distributorList ?? [];
-    return source.where((e) {
-      final matchSearch = _searchQuery.isEmpty ||
-          (e.brandName?.toLowerCase().contains(_searchQuery) ?? false);
-
-      final matchBrand =
-          _selectedBrand == null || e.brandName == _selectedBrand;
-
-      return matchSearch && matchBrand;
-    }).toList();
-  }
-
-  // List<String> get _uniqueLocations {
-  //   return (distributorList ?? [])
-  //       .map((e) => e.perferredLocation ?? '')
-  //       .where((s) => s.isNotEmpty)
-  //       .toSet()
-  //       .toList()
-  //     ..sort();
-  // }
-
-  // List<String> get _uniqueBrands {
-  //   return (distributorList ?? [])
-  //       .map((e) => e.interestedBrandName ?? '')
-  //       .where((s) => s.isNotEmpty)
-  //       .toSet()
-  //       .toList()
-  //     ..sort();
-  // }
-
-  void _clearFilters() {
-    setState(() {
-      _selectedLocation = null;
-      _selectedBrand = null;
-      _searchController.clear();
-    });
-  }
-
-  bool get _hasActiveFilters =>
-      _selectedLocation != null ||
-      _selectedBrand != null ||
-      _searchQuery.isNotEmpty;
-
   @override
   Widget build(BuildContext context) {
     return AdaptiveScaffold(
@@ -116,79 +88,91 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
             // CommonToast.showFailureToast(state.failure);
           }
           if (state is AddBuyerBrandInterestSuccess) {
-            distributorList?.clear();
+            // distributorList?.clear();
             getBuyerBrandsList();
           }
           if (state is AddBuyerBrandInterestError) {
             // CommonToast.showFailureToast(state.failure);
           }
         },
-        child: Stack(
-          children: [
-            BlocBuilder<ChatCubit, ChatState>(
-              builder: (context, state) {
-                return RefreshIndicator(
-                  onRefresh: _refreshChats,
-                  child: CustomScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    slivers: [
-                      // ── App Bar ─────────────────────────────────────────
-                      CommonSliverAppBar(
-                        title: 'BrandHub',
-                        showSearch: true,
-                        showFilter: true,
-                        showBackButton: false,
-                        onFilterPressed: () {},
-                        onSearchChanged: (q) {},
-                      ),
-                      SliverToBoxAdapter(
-                        child: const SizedBox(height: 16),
-                      ),
-
-                      // ── Grid ─────────────────────────────────────────────
-                      // _filteredList.isEmpty
-                      //     ? SliverFillRemaining(
-                      //         child: _EmptyState(
-                      //           hasFilters: _hasActiveFilters,
-                      //           onClear: _clearFilters,
-                      //         ),
-                      //       )
-                      //     :
-                      SliverPadding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
-                        sliver: SliverGrid(
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                            childAspectRatio: 0.9,
-                          ),
-                          delegate: SliverChildBuilderDelegate(
-                            (context, i) => enquiryCard(
-                              distributorList?[i] ?? FmcgBuyerBrandsList(),
-                            ),
-                            childCount: distributorList?.length ?? 0,
+        child: SafeArea(
+          top: false,
+          child: Stack(
+            children: [
+              BlocBuilder<ChatCubit, ChatState>(
+                builder: (context, state) {
+                  return RefreshIndicator(
+                    onRefresh: _refreshChats,
+                    child: CustomScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      slivers: [
+                        // ── App Bar ─────────────────────────────────────────
+                        CommonAppbar(
+                          title: 'Brand Hub',
+                          showBackButton: false,
+                          showNotification: false,
+                          // showSearch: true,
+                          // showFilter: false,
+                          // showBackButton: false,
+                          // onFilterPressed: () {},
+                          // onSearchChanged: _onSearchChanged,
+                        ),
+                        SliverPersistentHeader(
+                          pinned: true,
+                          delegate: SearchBarDelegate(
+                            showFilter: false,
+                            onSearchChanged: _onSearchChanged,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+                        SliverToBoxAdapter(
+                          child: const SizedBox(height: 16),
+                        ),
 
-            // ── Loading overlay ─────────────────────────────────────────
-            BlocBuilder<ChatCubit, ChatState>(
-              builder: (context, state) {
-                if (state is GetBuyerBrandsListIsLoading ||
-                    state is AddBuyerBrandInterestIsLoading) {
-                  return const Positioned.fill(child: CommonLoader());
-                }
-                return const SizedBox.shrink();
-              },
-            ),
-          ],
+                        // ── Grid ─────────────────────────────────────────────
+                        // _filteredList.isEmpty
+                        //     ? SliverFillRemaining(
+                        //         child: _EmptyState(
+                        //           hasFilters: _hasActiveFilters,
+                        //           onClear: _clearFilters,
+                        //         ),
+                        //       )
+                        //     :
+                        SliverPadding(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
+                          sliver: SliverGrid(
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
+                              childAspectRatio: 0.9,
+                            ),
+                            delegate: SliverChildBuilderDelegate(
+                              (context, i) => enquiryCard(
+                                distributorList?[i] ?? FmcgBuyerBrandsList(),
+                              ),
+                              childCount: distributorList?.length ?? 0,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+
+              // ── Loading overlay ─────────────────────────────────────────
+              BlocBuilder<ChatCubit, ChatState>(
+                builder: (context, state) {
+                  if (state is GetBuyerBrandsListIsLoading ||
+                      state is AddBuyerBrandInterestIsLoading) {
+                    return const Positioned.fill(child: CommonLoader());
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

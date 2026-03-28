@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tradologie_app/config/routes/app_router.dart';
-import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/extensions.dart';
@@ -10,9 +8,6 @@ import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_fmcg_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
-import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
-import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
-import 'package:tradologie_app/features/app/injection_container_app.dart';
 import 'package:tradologie_app/features/fmcg/domain/entities/chat_list.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/presentation/cubit/chat_cubit.dart';
@@ -67,174 +62,178 @@ class _ChatListScreenState extends State<ChatListScreen>
             // CommonToast.showFailureToast(state.failure);
           }
         },
-        child: Stack(
-          children: [
-            BlocBuilder<ChatCubit, ChatState>(
-              builder: (context, state) {
-                return RefreshIndicator(
-                  onRefresh: _refreshChats,
-                  child: CustomScrollView(
-                    physics: AlwaysScrollableScrollPhysics(),
-                    slivers: [
-                      /// App Bar
-                      CommonSliverAppBar(
-                        title: "Chats",
-                        showSearch: false,
-                      ),
-                      // CommonAppbar(
-                      //   title: "Chats",
-                      //   showBackButton: false,
-                      //   showNotification: false,
-                      //   showSuffixIcon: true,
-                      //   suffixIcon: Row(
-                      //     mainAxisAlignment: MainAxisAlignment.end,
-                      //     crossAxisAlignment: CrossAxisAlignment.end,
-                      //     children: [
-                      //       IconButton(
-                      //           onPressed: () async {
-                      //             await _refreshChats();
-                      //           },
-                      //           icon: Icon(
-                      //             Icons.refresh,
-                      //             color: Colors.green,
-                      //           )),
-                      //     ],
-                      //   ),
-                      // ),
-                      ChatListSliver(
-                        items: chatList ?? [],
-                        onToggle: (i) async {
-                          final shouldRefresh = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => ChatScreen(
-                                chat: chatList?[i] ?? ChatList(),
+        child: SafeArea(
+          top: false,
+          child: Stack(
+            children: [
+              BlocBuilder<ChatCubit, ChatState>(
+                builder: (context, state) {
+                  return RefreshIndicator(
+                    onRefresh: _refreshChats,
+                    child: CustomScrollView(
+                      physics: AlwaysScrollableScrollPhysics(),
+                      slivers: [
+                        /// App Bar
+                        CommonAppbar(
+                          title: "Chats",
+                          showBackButton: false,
+                          showNotification: false,
+                        ),
+                        // CommonAppbar(
+                        //   title: "Chats",
+                        //   showBackButton: false,
+                        //   showNotification: false,
+                        //   showSuffixIcon: true,
+                        //   suffixIcon: Row(
+                        //     mainAxisAlignment: MainAxisAlignment.end,
+                        //     crossAxisAlignment: CrossAxisAlignment.end,
+                        //     children: [
+                        //       IconButton(
+                        //           onPressed: () async {
+                        //             await _refreshChats();
+                        //           },
+                        //           icon: Icon(
+                        //             Icons.refresh,
+                        //             color: Colors.green,
+                        //           )),
+                        //     ],
+                        //   ),
+                        // ),
+                        ChatListSliver(
+                          items: chatList ?? [],
+                          onToggle: (i) async {
+                            final shouldRefresh = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ChatScreen(
+                                  chat: chatList?[i] ?? ChatList(),
+                                ),
                               ),
-                            ),
-                          );
+                            );
 
-                          if (shouldRefresh == true) {
-                            await _refreshChats();
-                          }
-                        },
-                      ),
+                            if (shouldRefresh == true) {
+                              await _refreshChats();
+                            }
+                          },
+                        ),
 
-                      /// Chat List
-                      // SliverPadding(
-                      //   padding: const EdgeInsets.symmetric(
-                      //       horizontal: 12, vertical: 8),
-                      //   sliver: SliverList(
-                      //     delegate: SliverChildBuilderDelegate(
-                      //       (context, index) {
-                      //         final chat = chatList?[index];
+                        /// Chat List
+                        // SliverPadding(
+                        //   padding: const EdgeInsets.symmetric(
+                        //       horizontal: 12, vertical: 8),
+                        //   sliver: SliverList(
+                        //     delegate: SliverChildBuilderDelegate(
+                        //       (context, index) {
+                        //         final chat = chatList?[index];
 
-                      //         return Padding(
-                      //           padding: const EdgeInsets.only(bottom: 10),
-                      //           child: Material(
-                      //             color: Colors.white,
-                      //             borderRadius: BorderRadius.circular(16),
-                      //             elevation: 1,
-                      //             child: InkWell(
-                      //               borderRadius: BorderRadius.circular(16),
-                      //               onTap: () async {
-                      //                 final shouldRefresh =
-                      //                     await Navigator.push(
-                      //                   context,
-                      //                   MaterialPageRoute(
-                      //                     builder: (_) => ChatScreen(
-                      //                       chat: chat ?? ChatList(),
-                      //                     ),
-                      //                   ),
-                      //                 );
+                        //         return Padding(
+                        //           padding: const EdgeInsets.only(bottom: 10),
+                        //           child: Material(
+                        //             color: Colors.white,
+                        //             borderRadius: BorderRadius.circular(16),
+                        //             elevation: 1,
+                        //             child: InkWell(
+                        //               borderRadius: BorderRadius.circular(16),
+                        //               onTap: () async {
+                        //                 final shouldRefresh =
+                        //                     await Navigator.push(
+                        //                   context,
+                        //                   MaterialPageRoute(
+                        //                     builder: (_) => ChatScreen(
+                        //                       chat: chat ?? ChatList(),
+                        //                     ),
+                        //                   ),
+                        //                 );
 
-                      //                 if (shouldRefresh == true) {
-                      //                   await _refreshChats();
-                      //                 }
-                      //               },
-                      //               child: Padding(
-                      //                 padding: const EdgeInsets.symmetric(
-                      //                   horizontal: 14,
-                      //                   vertical: 12,
-                      //                 ),
-                      //                 child: Row(
-                      //                   children: [
-                      //                     const SizedBox(width: 12),
+                        //                 if (shouldRefresh == true) {
+                        //                   await _refreshChats();
+                        //                 }
+                        //               },
+                        //               child: Padding(
+                        //                 padding: const EdgeInsets.symmetric(
+                        //                   horizontal: 14,
+                        //                   vertical: 12,
+                        //                 ),
+                        //                 child: Row(
+                        //                   children: [
+                        //                     const SizedBox(width: 12),
 
-                      //                     /// Name + Message
-                      //                     Expanded(
-                      //                       child: Column(
-                      //                         crossAxisAlignment:
-                      //                             CrossAxisAlignment.start,
-                      //                         children: [
-                      //                           Row(
-                      //                             children: [
-                      //                               Text(
-                      //                                 chat?.name ?? "",
-                      //                                 style: TextStyleConstants
-                      //                                     .semiBold(context),
-                      //                               ),
-                      //                               Text(
-                      //                                 " - ${chat?.mobile}",
-                      //                                 style: TextStyleConstants
-                      //                                     .semiBold(context),
-                      //                               ),
-                      //                             ],
-                      //                           ),
-                      //                           const SizedBox(height: 4),
-                      //                           Text(
-                      //                             DateTime.parse(
-                      //                                     chat?.chatInsertedDate ??
-                      //                                         "")
-                      //                                 .dateTimeFormat,
-                      //                             maxLines: 1,
-                      //                             overflow:
-                      //                                 TextOverflow.ellipsis,
-                      //                             style: TextStyleConstants
-                      //                                     .medium(context)
-                      //                                 .copyWith(
-                      //                                     color:
-                      //                                         Colors.grey[600]),
-                      //                           ),
-                      //                         ],
-                      //                       ),
-                      //                     ),
+                        //                     /// Name + Message
+                        //                     Expanded(
+                        //                       child: Column(
+                        //                         crossAxisAlignment:
+                        //                             CrossAxisAlignment.start,
+                        //                         children: [
+                        //                           Row(
+                        //                             children: [
+                        //                               Text(
+                        //                                 chat?.name ?? "",
+                        //                                 style: TextStyleConstants
+                        //                                     .semiBold(context),
+                        //                               ),
+                        //                               Text(
+                        //                                 " - ${chat?.mobile}",
+                        //                                 style: TextStyleConstants
+                        //                                     .semiBold(context),
+                        //                               ),
+                        //                             ],
+                        //                           ),
+                        //                           const SizedBox(height: 4),
+                        //                           Text(
+                        //                             DateTime.parse(
+                        //                                     chat?.chatInsertedDate ??
+                        //                                         "")
+                        //                                 .dateTimeFormat,
+                        //                             maxLines: 1,
+                        //                             overflow:
+                        //                                 TextOverflow.ellipsis,
+                        //                             style: TextStyleConstants
+                        //                                     .medium(context)
+                        //                                 .copyWith(
+                        //                                     color:
+                        //                                         Colors.grey[600]),
+                        //                           ),
+                        //                         ],
+                        //                       ),
+                        //                     ),
 
-                      //                     /// Time + unread
-                      //                     Column(
-                      //                       crossAxisAlignment:
-                      //                           CrossAxisAlignment.end,
-                      //                       children: [
-                      //                         Icon(
-                      //                           Icons.keyboard_arrow_right,
-                      //                         ),
-                      //                         const SizedBox(height: 6),
-                      //                       ],
-                      //                     ),
-                      //                   ],
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //           ),
-                      //         );
-                      //       },
-                      //       childCount: chatList?.length ?? 0,
-                      //     ),
-                      //   ),
-                      // )
-                    ],
-                  ),
-                );
-              },
-            ),
-            BlocBuilder<ChatCubit, ChatState>(
-              builder: (context, state) {
-                if (state is GetChatListIsLoading) {
-                  return Positioned.fill(child: const CommonLoader());
-                }
-                return SizedBox.shrink();
-              },
-            ),
-          ],
+                        //                     /// Time + unread
+                        //                     Column(
+                        //                       crossAxisAlignment:
+                        //                           CrossAxisAlignment.end,
+                        //                       children: [
+                        //                         Icon(
+                        //                           Icons.keyboard_arrow_right,
+                        //                         ),
+                        //                         const SizedBox(height: 6),
+                        //                       ],
+                        //                     ),
+                        //                   ],
+                        //                 ),
+                        //               ),
+                        //             ),
+                        //           ),
+                        //         );
+                        //       },
+                        //       childCount: chatList?.length ?? 0,
+                        //     ),
+                        //   ),
+                        // )
+                      ],
+                    ),
+                  );
+                },
+              ),
+              BlocBuilder<ChatCubit, ChatState>(
+                builder: (context, state) {
+                  if (state is GetChatListIsLoading) {
+                    return Positioned.fill(child: const CommonLoader());
+                  }
+                  return SizedBox.shrink();
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

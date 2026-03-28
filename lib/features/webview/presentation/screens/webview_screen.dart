@@ -139,6 +139,7 @@ class _WebViewScreenState extends State<WebViewScreen>
                         showBackButton: widget.params.canPop ?? false,
                         showNotification: widget.params.isShowNotification,
                         showLogo: true,
+                        showWebview: true,
                         onNotificationTap: () {
                           sl<NavigationService>().pushNamed(
                             Routes.notificationScreen,

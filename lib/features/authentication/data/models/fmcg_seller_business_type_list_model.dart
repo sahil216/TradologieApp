@@ -1,12 +1,10 @@
-class FmcgSellerBusinessTypeListModel {
-  final int? typeId;
-  final String? name;
-  final String? insertedDate;
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_business_type_list.dart';
 
-  FmcgSellerBusinessTypeListModel({
-    this.typeId,
-    this.name,
-    this.insertedDate,
+class FmcgSellerBusinessTypeListModel extends FmcgSellerBusinessTypeList {
+  const FmcgSellerBusinessTypeListModel({
+    super.typeId,
+    super.name,
+    super.insertedDate,
   });
 
   factory FmcgSellerBusinessTypeListModel.fromJson(Map<String, dynamic> json) =>
@@ -15,10 +13,4 @@ class FmcgSellerBusinessTypeListModel {
         name: json["Name"],
         insertedDate: json["InsertedDate"],
       );
-
-  Map<String, dynamic> toJson() => {
-        "TypeID": typeId,
-        "Name": name,
-        "InsertedDate": insertedDate,
-      };
 }

@@ -119,8 +119,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 delegate: SliverChildListDelegate(
                   [
                     BusinessCard(
-                      title: "Seller-Agro Commodity",
-                      subtitle: "List & Sell Agro Commodities",
+                      title: "Agro Commodity",
+                      subtitle: "Register/Login as Seller.",
                       image: "assets/images/agro_image.png",
                       onTap: () async {
                         SecureStorageService secureStorage =
@@ -134,8 +134,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       },
                     ),
                     BusinessCard(
-                      title: "Buyer-Agro Commodity",
-                      subtitle: "Negotiate and Purchase Agro Commodities",
+                      title: "Agro Commodity",
+                      subtitle: "Register/Login as Buyer.",
                       image: "assets/images/agro_image.png",
                       onTap: () async {
                         SecureStorageService secureStorage =
@@ -149,8 +149,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       },
                     ),
                     BusinessCard(
-                      title: "Seller- FMCG & Packaged Food",
-                      subtitle: "List & Sell Agro Commodities",
+                      title: "FMCG & Packaged Food",
+                      subtitle: "Register/Login as Brand.",
                       image: "assets/images/fmcg_image.jpg",
                       onTap: () async {
                         SecureStorageService secureStorage =
@@ -165,8 +165,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       },
                     ),
                     BusinessCard(
-                      title: "Buyer- FMCG & Packaged Food",
-                      subtitle: "Negotiate and Purchase Agro Commodities",
+                      title: "FMCG & Packaged Food",
+                      subtitle: "Register/Login as Distributor.",
                       image: "assets/images/fmcg_image.jpg",
                       onTap: () async {
                         SecureStorageService secureStorage =

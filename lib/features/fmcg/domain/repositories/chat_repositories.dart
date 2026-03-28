@@ -12,6 +12,7 @@ import 'package:tradologie_app/features/fmcg/domain/usecases/add_distributor_int
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_data_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_brands_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_distributor_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_documents_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_profile_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/update_seller_documents_usecase.dart';
@@ -21,7 +22,7 @@ abstract class ChatRepository {
   Future<Either<Failure, List<ChatList>>> getChatList(ChatListParams params);
   Future<Either<Failure, List<ChatData>>> chatData(ChatDataParams params);
   Future<Either<Failure, List<DistributorEnquiryList>>> getDistributorList(
-      NoParams params);
+      GetDistributorListParams params);
   Future<Either<Failure, FmcgGetSellerProfile>> getFmcgSellerProfile(
       GetSellerProfileParams params);
   Future<Either<Failure, bool>> updateFmcgSellerProfile(

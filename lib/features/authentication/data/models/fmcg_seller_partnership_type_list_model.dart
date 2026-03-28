@@ -1,12 +1,10 @@
-class FmcgSellerPartnershipTypeListModel {
-  final int? typeId;
-  final String? name;
-  final String? insertedDate;
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_partnership_type_list.dart';
 
-  FmcgSellerPartnershipTypeListModel({
-    this.typeId,
-    this.name,
-    this.insertedDate,
+class FmcgSellerPartnershipTypeListModel extends FmcgSellerPartnershipTypeList {
+  const FmcgSellerPartnershipTypeListModel({
+    super.typeId,
+    super.name,
+    super.insertedDate,
   });
 
   factory FmcgSellerPartnershipTypeListModel.fromJson(
@@ -16,10 +14,4 @@ class FmcgSellerPartnershipTypeListModel {
         name: json["Name"],
         insertedDate: json["InsertedDate"],
       );
-
-  Map<String, dynamic> toJson() => {
-        "TypeID": typeId,
-        "Name": name,
-        "InsertedDate": insertedDate,
-      };
 }

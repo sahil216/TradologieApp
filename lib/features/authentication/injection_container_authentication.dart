@@ -2,10 +2,18 @@ import 'package:get_it/get_it.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/buyer_signin_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/delete_account_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_brands_list_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_buyer_brand_partnership_type_list_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_buyer_category_list_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_buyer_distribution_coverage_list_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_buyer_login_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_country_code_list_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_register_distributor_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_register_seller_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_business_type_list_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_exporting_products_list_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_partnership_type_list_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_product_category_list_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_service_label_list_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_signin_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/get_country_code_list_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/sign_out_usecase.dart';
@@ -42,6 +50,14 @@ Future<void> init() async {
         fmcgCountryCodeListUsecase: sl(),
         fmcgBrandsListUsecase: sl(),
         fmcgBuyerLoginUsecase: sl(),
+        fmcgBuyerBrandPartnershipTypeListUsecase: sl(),
+        fmcgBuyerCategoryListUsecase: sl(),
+        fmcgBuyerDistributionCoverageListUsecase: sl(),
+        fmcgSellerBusinessTypeListUsecase: sl(),
+        fmcgSellerExportingProductsListUsecase: sl(),
+        fmcgSellerPartnershipTypeListUsecase: sl(),
+        fmcgSellerProductCategoryListUsecase: sl(),
+        fmcgSellerServiceLabelListUsecase: sl(),
       ));
 
   //! Use cases
@@ -77,6 +93,23 @@ Future<void> init() async {
       () => FmcgCountryCodeListUsecase(authenticationRepository: sl()));
   sl.registerLazySingleton<FmcgBrandsListUsecase>(
       () => FmcgBrandsListUsecase(authenticationRepository: sl()));
+
+  sl.registerLazySingleton<FmcgBuyerBrandPartnershipTypeListUsecase>(() =>
+      FmcgBuyerBrandPartnershipTypeListUsecase(authenticationRepository: sl()));
+  sl.registerLazySingleton<FmcgBuyerCategoryListUsecase>(
+      () => FmcgBuyerCategoryListUsecase(authenticationRepository: sl()));
+  sl.registerLazySingleton<FmcgBuyerDistributionCoverageListUsecase>(() =>
+      FmcgBuyerDistributionCoverageListUsecase(authenticationRepository: sl()));
+  sl.registerLazySingleton<FmcgSellerBusinessTypeListUsecase>(
+      () => FmcgSellerBusinessTypeListUsecase(authenticationRepository: sl()));
+  sl.registerLazySingleton<FmcgSellerExportingProductsListUsecase>(() =>
+      FmcgSellerExportingProductsListUsecase(authenticationRepository: sl()));
+  sl.registerLazySingleton<FmcgSellerPartnershipTypeListUsecase>(() =>
+      FmcgSellerPartnershipTypeListUsecase(authenticationRepository: sl()));
+  sl.registerLazySingleton<FmcgSellerProductCategoryListUsecase>(() =>
+      FmcgSellerProductCategoryListUsecase(authenticationRepository: sl()));
+  sl.registerLazySingleton<FmcgSellerServiceLabelListUsecase>(
+      () => FmcgSellerServiceLabelListUsecase(authenticationRepository: sl()));
 
   //! Repository
   sl.registerLazySingleton<AuthenticationRepository>(
