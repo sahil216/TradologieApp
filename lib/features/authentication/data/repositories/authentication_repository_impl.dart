@@ -3,8 +3,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/features/authentication/data/models/country_code_list_model.dart';
 import 'package:tradologie_app/features/authentication/data/models/fmcg_brand_list_model.dart';
+import 'package:tradologie_app/features/authentication/data/models/fmcg_buyer_brand_partnership_type_list_model.dart';
+import 'package:tradologie_app/features/authentication/data/models/fmcg_buyer_category_list_model.dart';
+import 'package:tradologie_app/features/authentication/data/models/fmcg_buyer_distribution_coverage_list_model.dart';
 import 'package:tradologie_app/features/authentication/data/models/fmcg_buyer_login_success_model.dart';
 import 'package:tradologie_app/features/authentication/data/models/fmcg_country_code_list_model.dart';
+import 'package:tradologie_app/features/authentication/data/models/fmcg_seller_business_type_list_model.dart';
+import 'package:tradologie_app/features/authentication/data/models/fmcg_seller_exporting_products_list_model.dart';
+import 'package:tradologie_app/features/authentication/data/models/fmcg_seller_partnership_type_list_model.dart';
+import 'package:tradologie_app/features/authentication/data/models/fmcg_seller_product_category_list_model.dart';
+import 'package:tradologie_app/features/authentication/data/models/fmcg_seller_service_label_list_model.dart';
 import 'package:tradologie_app/features/authentication/data/models/fmcg_seller_signin_response_model.dart';
 import 'package:tradologie_app/features/authentication/data/models/login_success_model.dart';
 import 'package:tradologie_app/features/authentication/data/models/send_otp_result_model.dart';
@@ -12,8 +20,16 @@ import 'package:tradologie_app/features/authentication/data/models/verify_otp_re
 import 'package:tradologie_app/features/authentication/domain/entities/buyer_login_success.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/country_code_list.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_brands_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_buyer_brand_partnership_type_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_buyer_category_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_buyer_distribution_coverage_list.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_buyer_login_success.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_country_code_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_business_type_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_exporting_products_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_partnership_type_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_product_category_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_service_label_list.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_signin_response.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/send_otp_result.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/delete_account_usecase.dart';
@@ -490,12 +506,147 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
         await secureStorage.write(AppStrings.fmcgName, data.name ?? "");
 
         await secureStorage.write(
-            AppStrings.loginId, data.quotationUserId.toString() ?? "");
+            AppStrings.loginId, data.quotationUserId.toString());
 
-        await secureStorage.write(
-            AppStrings.brandId, data.brandId.toString() ?? "");
+        await secureStorage.write(AppStrings.brandId, data.brandId.toString());
 
         return Right(data);
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<FmcgBuyerCategoryList>>> fmcgBuyerCategoryList(
+      NoParams params) async {
+    try {
+      final response =
+          await authenticationRemoteDataSource.fmcgBuyerCategoryList(params);
+      if (response != null && response.success) {
+        return Right((response.data as List)
+            .map((e) => FmcgBuyerCategoryListModel.fromJson(e))
+            .toList());
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<FmcgBuyerBrandPartnershipTypeList>>>
+      fmcgBuyerBrandPartnershipList(NoParams params) async {
+    try {
+      final response = await authenticationRemoteDataSource
+          .fmcgBuyerBrandPartnershipList(params);
+      if (response != null && response.success) {
+        return Right((response.data as List)
+            .map((e) => FmcgBuyerBrandPartnershipTypeListModel.fromJson(e))
+            .toList());
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<FmcgBuyerDistributionCoverageList>>>
+      fmcgBuyerDistributionCoverageList(NoParams params) async {
+    try {
+      final response = await authenticationRemoteDataSource
+          .fmcgBuyerDistributionCoverageList(params);
+      if (response != null && response.success) {
+        return Right((response.data as List)
+            .map((e) => FmcgBuyerDistributionCoverageListModel.fromJson(e))
+            .toList());
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<FmcgSellerBusinessTypeList>>>
+      fmcgSellerBusinessTypeList(NoParams params) async {
+    try {
+      final response = await authenticationRemoteDataSource
+          .fmcgSellerBusinessTypeList(params);
+      if (response != null && response.success) {
+        return Right((response.data as List)
+            .map((e) => FmcgSellerBusinessTypeListModel.fromJson(e))
+            .toList());
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<FmcgSellerProductCategoryList>>>
+      fmcgSellerProductCategoryList(NoParams params) async {
+    try {
+      final response = await authenticationRemoteDataSource
+          .fmcgSellerProductCategoryList(params);
+      if (response != null && response.success) {
+        return Right((response.data as List)
+            .map((e) => FmcgSellerProductCategoryListModel.fromJson(e))
+            .toList());
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<FmcgSellerPartnershipTypeList>>>
+      fmcgSellerPartnershipTypeList(NoParams params) async {
+    try {
+      final response = await authenticationRemoteDataSource
+          .fmcgSellerPartnershipTypeList(params);
+      if (response != null && response.success) {
+        return Right((response.data as List)
+            .map((e) => FmcgSellerPartnershipTypeListModel.fromJson(e))
+            .toList());
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<FmcgSellerServiceLabelList>>>
+      fmcgSellerServiceLabelList(NoParams params) async {
+    try {
+      final response = await authenticationRemoteDataSource
+          .fmcgSellerServiceLabelList(params);
+      if (response != null && response.success) {
+        return Right((response.data as List)
+            .map((e) => FmcgSellerServiceLabelListModel.fromJson(e))
+            .toList());
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<FmcgSellerExportingProductsList>>>
+      fmcgSellerExportingProductsList(NoParams params) async {
+    try {
+      final response = await authenticationRemoteDataSource
+          .fmcgSellerExportingProductsList(params);
+      if (response != null && response.success) {
+        return Right((response.data as List)
+            .map((e) => FmcgSellerExportingProductsListModel.fromJson(e))
+            .toList());
       }
       return Left(UserFailure(response?.message, response?.code));
     } on Failure catch (e) {

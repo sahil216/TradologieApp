@@ -18,6 +18,16 @@ class FmcgBuyerLoginSuccess extends Equatable {
   final String? perferredLocation;
   final int? brandId;
   final String? apiVerificationCode;
+  final String? webType;
+  final String? fMCGCategory;
+  final String? brandPartnershipType;
+  final String? distributionCoverage;
+  final String? fMCGDistributor;
+  final String? partnerBrand;
+  final String? specifyRequirement;
+  final String? distributionExperience;
+  final String? salesTeam;
+  final String? warehousingFacility;
 
   const FmcgBuyerLoginSuccess({
     this.rowNum,
@@ -37,6 +47,16 @@ class FmcgBuyerLoginSuccess extends Equatable {
     this.perferredLocation,
     this.brandId,
     this.apiVerificationCode,
+    this.webType,
+    this.fMCGCategory,
+    this.brandPartnershipType,
+    this.distributionCoverage,
+    this.fMCGDistributor,
+    this.partnerBrand,
+    this.specifyRequirement,
+    this.distributionExperience,
+    this.salesTeam,
+    this.warehousingFacility,
   });
 
   @override
@@ -58,5 +78,15 @@ class FmcgBuyerLoginSuccess extends Equatable {
         perferredLocation,
         brandId,
         apiVerificationCode,
+        webType,
+        fMCGCategory,
+        brandPartnershipType,
+        distributionCoverage,
+        fMCGDistributor,
+        partnerBrand,
+        specifyRequirement,
+        distributionExperience,
+        salesTeam,
+        warehousingFacility,
       ];
 }

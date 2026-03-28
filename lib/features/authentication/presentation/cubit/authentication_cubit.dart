@@ -5,8 +5,16 @@ import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/buyer_login_success.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/country_code_list.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_brands_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_buyer_brand_partnership_type_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_buyer_category_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_buyer_distribution_coverage_list.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_buyer_login_success.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_country_code_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_business_type_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_exporting_products_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_partnership_type_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_product_category_list.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_service_label_list.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_signin_response.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/login_success.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/send_otp_result.dart';
@@ -15,10 +23,18 @@ import 'package:tradologie_app/features/authentication/domain/usecases/buyer_sig
 import 'package:tradologie_app/features/authentication/domain/usecases/buyer_verify_otp_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/delete_account_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_brands_list_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_buyer_brand_partnership_type_list_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_buyer_category_list_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_buyer_distribution_coverage_list_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_buyer_login_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_country_code_list_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_register_distributor_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_register_seller_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_business_type_list_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_exporting_products_list_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_partnership_type_list_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_product_category_list_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_service_label_list_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_signin_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/get_country_code_list_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/sign_out_usecase.dart';
@@ -49,6 +65,19 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   final FmcgRegisterSellerUsecase fmcgRegisterSellerUsecase;
   final FmcgCountryCodeListUsecase fmcgCountryCodeListUsecase;
   final FmcgBrandsListUsecase fmcgBrandsListUsecase;
+  final FmcgBuyerBrandPartnershipTypeListUsecase
+      fmcgBuyerBrandPartnershipTypeListUsecase;
+  final FmcgBuyerCategoryListUsecase fmcgBuyerCategoryListUsecase;
+  final FmcgBuyerDistributionCoverageListUsecase
+      fmcgBuyerDistributionCoverageListUsecase;
+  final FmcgSellerBusinessTypeListUsecase fmcgSellerBusinessTypeListUsecase;
+  final FmcgSellerExportingProductsListUsecase
+      fmcgSellerExportingProductsListUsecase;
+  final FmcgSellerPartnershipTypeListUsecase
+      fmcgSellerPartnershipTypeListUsecase;
+  final FmcgSellerProductCategoryListUsecase
+      fmcgSellerProductCategoryListUsecase;
+  final FmcgSellerServiceLabelListUsecase fmcgSellerServiceLabelListUsecase;
 
   AuthenticationCubit({
     required this.sendOtpUsecase,
@@ -67,6 +96,14 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     required this.fmcgCountryCodeListUsecase,
     required this.fmcgBrandsListUsecase,
     required this.fmcgBuyerLoginUsecase,
+    required this.fmcgBuyerBrandPartnershipTypeListUsecase,
+    required this.fmcgBuyerCategoryListUsecase,
+    required this.fmcgBuyerDistributionCoverageListUsecase,
+    required this.fmcgSellerBusinessTypeListUsecase,
+    required this.fmcgSellerExportingProductsListUsecase,
+    required this.fmcgSellerPartnershipTypeListUsecase,
+    required this.fmcgSellerProductCategoryListUsecase,
+    required this.fmcgSellerServiceLabelListUsecase,
   }) : super(AuthenticationInitial());
 
   Future<void> sendOtp(SendOtpParams params, bool isResend) async {
@@ -230,6 +267,86 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     emit(response.fold(
       (failure) => FmcgRegisterDistributorError(failure: failure),
       (res) => FmcgRegisterDistributorSuccess(data: res),
+    ));
+  }
+
+  Future<void> fmcgBuyerCategoryList(NoParams params) async {
+    emit(FmcgBuyerCategoryListIsLoading());
+    Either<Failure, List<FmcgBuyerCategoryList>> response =
+        await fmcgBuyerCategoryListUsecase(params);
+    emit(response.fold(
+      (failure) => FmcgBuyerCategoryListError(failure: failure),
+      (res) => FmcgBuyerCategoryListSuccess(data: res),
+    ));
+  }
+
+  Future<void> fmcgBuyerBrandPartnershipList(NoParams params) async {
+    emit(FmcgBuyerBrandPartnershipTypeListIsLoading());
+    Either<Failure, List<FmcgBuyerBrandPartnershipTypeList>> response =
+        await fmcgBuyerBrandPartnershipTypeListUsecase(params);
+    emit(response.fold(
+      (failure) => FmcgBuyerBrandPartnershipTypeListError(failure: failure),
+      (res) => FmcgBuyerBrandPartnershipTypeListSuccess(data: res),
+    ));
+  }
+
+  Future<void> fmcgBuyerDistributionCoverageList(NoParams params) async {
+    emit(FmcgBuyerDistributionCoverageListIsLoading());
+    Either<Failure, List<FmcgBuyerDistributionCoverageList>> response =
+        await fmcgBuyerDistributionCoverageListUsecase(params);
+    emit(response.fold(
+      (failure) => FmcgBuyerDistributionCoverageListError(failure: failure),
+      (res) => FmcgBuyerDistributionCoverageListSuccess(data: res),
+    ));
+  }
+
+  Future<void> fmcgSellerBusinessTypeList(NoParams params) async {
+    emit(FmcgSellerBusinessTypeListIsLoading());
+    Either<Failure, List<FmcgSellerBusinessTypeList>> response =
+        await fmcgSellerBusinessTypeListUsecase(params);
+    emit(response.fold(
+      (failure) => FmcgSellerBusinessTypeListError(failure: failure),
+      (res) => FmcgSellerBusinessTypeListSuccess(data: res),
+    ));
+  }
+
+  Future<void> fmcgSellerProductCategoryList(NoParams params) async {
+    emit(FmcgSellerProductCategoryListIsLoading());
+    Either<Failure, List<FmcgSellerProductCategoryList>> response =
+        await fmcgSellerProductCategoryListUsecase(params);
+    emit(response.fold(
+      (failure) => FmcgSellerProductCategoryListError(failure: failure),
+      (res) => FmcgSellerProductCategoryListSuccess(data: res),
+    ));
+  }
+
+  Future<void> fmcgSellerPartnershipTypeList(NoParams params) async {
+    emit(FmcgSellerPartnershipTypeListIsLoading());
+    Either<Failure, List<FmcgSellerPartnershipTypeList>> response =
+        await fmcgSellerPartnershipTypeListUsecase(params);
+    emit(response.fold(
+      (failure) => FmcgSellerPartnershipTypeListError(failure: failure),
+      (res) => FmcgSellerPartnershipTypeListSuccess(data: res),
+    ));
+  }
+
+  Future<void> fmcgSellerServiceLabelList(NoParams params) async {
+    emit(FmcgSellerServiceLabelListIsLoading());
+    Either<Failure, List<FmcgSellerServiceLabelList>> response =
+        await fmcgSellerServiceLabelListUsecase(params);
+    emit(response.fold(
+      (failure) => FmcgSellerServiceLabelListError(failure: failure),
+      (res) => FmcgSellerServiceLabelListSuccess(data: res),
+    ));
+  }
+
+  Future<void> fmcgSellerExportingProductsList(NoParams params) async {
+    emit(FmcgSellerExportingProductsListIsLoading());
+    Either<Failure, List<FmcgSellerExportingProductsList>> response =
+        await fmcgSellerExportingProductsListUsecase(params);
+    emit(response.fold(
+      (failure) => FmcgSellerExportingProductsListError(failure: failure),
+      (res) => FmcgSellerExportingProductsListSuccess(data: res),
     ));
   }
 }

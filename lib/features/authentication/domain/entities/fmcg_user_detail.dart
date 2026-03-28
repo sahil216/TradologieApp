@@ -17,6 +17,14 @@ class FmcgUserDetail extends Equatable {
   final String? fromDate;
   final String? toDate;
   final String? analyticsUrl;
+  final String? countryCode;
+  final String? businessType;
+  final String? productCategory;
+  final String? partnershipType;
+  final String? serviceLabel;
+  final String? exportingProducts;
+  final String? countryID;
+  final String? brandName;
 
   const FmcgUserDetail(
       {this.loginId,
@@ -34,7 +42,15 @@ class FmcgUserDetail extends Equatable {
       this.brandId,
       this.fromDate,
       this.toDate,
-      this.analyticsUrl});
+      this.analyticsUrl,
+      this.countryCode,
+      this.businessType,
+      this.productCategory,
+      this.partnershipType,
+      this.serviceLabel,
+      this.exportingProducts,
+      this.countryID,
+      this.brandName});
 
   @override
   List<Object?> get props => [
@@ -54,5 +70,13 @@ class FmcgUserDetail extends Equatable {
         fromDate,
         toDate,
         analyticsUrl,
+        countryCode,
+        businessType,
+        productCategory,
+        partnershipType,
+        serviceLabel,
+        exportingProducts,
+        countryID,
+        brandName
       ];
 }

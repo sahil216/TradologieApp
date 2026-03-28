@@ -71,6 +71,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen>
                         Routes.notificationScreen,
                       );
                     },
+                    showWebview: true,
                   ),
 
                 /// 🌐 WEBVIEW BODY

@@ -16,6 +16,16 @@ class DistributorEnquiryListModel extends DistributorEnquiryList {
     super.insertedDate,
     super.updatedId,
     super.updatedDate,
+    super.isInterest,
+    super.fMCGCategory,
+    super.brandPartnershipType,
+    super.distributionCoverage,
+    super.fMCGDistributor,
+    super.partnerBrand,
+    super.specifyRequirement,
+    super.distributionExperience,
+    super.salesTeam,
+    super.warehousingFacility,
   });
 
   factory DistributorEnquiryListModel.fromJson(Map<String, dynamic> json) =>
@@ -38,5 +48,15 @@ class DistributorEnquiryListModel extends DistributorEnquiryList {
         updatedDate: json["UpdatedDate"] == null
             ? null
             : DateTime.parse(json["UpdatedDate"]),
+        isInterest: json["IsInterest"],
+        fMCGCategory: json["FMCGCategory"],
+        brandPartnershipType: json["BrandPartnershipType"],
+        distributionCoverage: json["DistributionCoverage"],
+        fMCGDistributor: json["FMCGDistributor"],
+        partnerBrand: json["PartnerBrand"],
+        specifyRequirement: json["SpecifyRequirement"],
+        distributionExperience: json["DistributionExperience"],
+        salesTeam: json["SalesTeam"],
+        warehousingFacility: json["WarehousingFacility"],
       );
 }

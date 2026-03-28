@@ -76,6 +76,7 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen>
           return Stack(
             children: [
               SafeArea(
+                top: false,
                 child: Listener(
                   onPointerMove: (e) {
                     final size = MediaQuery.of(context).size;
@@ -102,6 +103,9 @@ class _BuyerDashboardScreenState extends State<BuyerDashboardScreen>
                           title: "Dashboard",
                           showBackButton: false,
                           showNotification: true,
+                        ),
+                        SliverToBoxAdapter(
+                          child: SizedBox(height: 16),
                         ),
                         const SliverToBoxAdapter(
                           child: BuyerDashboardBannerEngine(

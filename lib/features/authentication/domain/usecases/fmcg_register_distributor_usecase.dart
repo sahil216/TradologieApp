@@ -31,6 +31,11 @@ class FmcgRegisterDistributorParams {
   final String fcmToken;
   final String osType;
   final String deviceId;
+  final String fmcgCategory;
+  final String brandPartnershipType;
+  final String distributionCoverage;
+  final String partnerBrand;
+  final String specifyRequirement;
 
   FmcgRegisterDistributorParams({
     required this.name,
@@ -47,6 +52,11 @@ class FmcgRegisterDistributorParams {
     required this.fcmToken,
     required this.osType,
     required this.deviceId,
+    required this.fmcgCategory,
+    required this.brandPartnershipType,
+    required this.distributionCoverage,
+    required this.partnerBrand,
+    required this.specifyRequirement,
   });
 
   Map<String, dynamic> toJson() => {
@@ -63,6 +73,11 @@ class FmcgRegisterDistributorParams {
         "AppVersion": appVersion,
         "FcmToken": fcmToken,
         "OSType": osType,
-        "DeviceID": Constants.deviceID
+        "DeviceID": Constants.deviceID,
+        "FMCGCategory": fmcgCategory,
+        "BrandPartnershipType": brandPartnershipType,
+        "DistributionCoverage": distributionCoverage,
+        "PartnerBrand": partnerBrand,
+        "SpecifyRequirement": specifyRequirement,
       };
 }

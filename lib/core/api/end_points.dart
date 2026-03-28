@@ -49,7 +49,22 @@ class EndPoints {
   static String fmcgUpdateSellerProfile =
       "$baseUrl/FMCG/FMCGUpdateSellerProfile";
   static String fmcgGetSellerProfile = "$baseUrl/FMCG/FMCGGetSellerProfile";
-
+  static String fmcgBuyerCategoryList =
+      "$baseUrl/FMCG/FMCGDistributorFMCGCategoryList";
+  static String fmcgBuyerBrandPartnershipList =
+      "$baseUrl/FMCG/FMCGDistributorBrandPartnershipTypeList";
+  static String fmcgBuyerDistributionCoverageList =
+      "$baseUrl/FMCG/FMCGDistributionCoverageList";
+  static String fmcgSellerBusinessTypeList =
+      "$baseUrl/FMCG/FMCGBrandBusinessTypeList";
+  static String fmcgSellerProductCategoryList =
+      "$baseUrl/FMCG/FMCGBrandProductCategoryList";
+  static String fmcgSellerPartnershipTypeList =
+      "$baseUrl/FMCG/FMCGBrandPartnershipTypeList";
+  static String fmcgSellerServiceLabelList =
+      "$baseUrl/FMCG/FMCGBrandServiceLabelList";
+  static String fmcgSellerExportingProductsList =
+      "$baseUrl/FMCG/FMCGBrandExportingProductsList";
   // Verify
   static String verifyOtp(UserType userType) {
     return '$baseUrl/${userType.name}/VerifyOTPForLogin';
@@ -109,6 +124,12 @@ class EndPoints {
   static String getChatList = '$baseUrl/FMCG/FMCGBuyersSellerWise';
   static String chatData = '$baseUrl/FMCG/FMCGDirectChatHistory';
   static String getDistributorList = '$baseUrl/FMCG/FMCGBuyersBrandWise';
+  static String getBuyerBrandsList =
+      '$baseUrl/FMCG/FMCGDistributorBrandInterestList';
+  static String addDistributorInterest =
+      '$baseUrl/FMCG/FMCGAddBrandDistributorInterest';
+  static String addBrandInterest =
+      '$baseUrl/FMCG/FMCGAddDistributorBrandInterest';
 
   // Negotiation
   static String getNegotiation(UserType userType) {

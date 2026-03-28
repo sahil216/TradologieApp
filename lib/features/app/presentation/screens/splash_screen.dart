@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 
@@ -28,17 +29,85 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
+  bool _gifReady = false;
+
+  // Animation controller for the logo fade + slide in
+  late final AnimationController _logoController;
+  late final Animation<double> _logoOpacity;
+  late final Animation<Offset> _logoSlide;
+
   @override
   void initState() {
     super.initState();
+
+    // Logo animates in: fades + slides up from slightly below
+    _logoController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+
+    _logoOpacity = CurvedAnimation(
+      parent: _logoController,
+      curve: Curves.easeIn,
+    );
+
+    _logoSlide = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _logoController,
+      curve: Curves.easeOut,
+    ));
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      Constants().checkAndroidVersion();
-      if (Constants.deviceID == "") {
-        Constants.deviceID = await DeviceIdService.getDeviceId();
-      }
+      await Future.wait([
+        _initDevice(),
+        // _preloadGif(),
+      ]);
+    });
+  }
+
+  Future<void> _initDevice() async {
+    Constants().checkAndroidVersion();
+    if (Constants.deviceID == "") {
+      Constants.deviceID = await DeviceIdService.getDeviceId();
+    }
+  }
+
+  /// Decodes the GIF into Flutter's image cache so that
+  /// Image.asset renders on the very first frame — no white flash.
+  Future<void> _preloadGif() async {
+    // await precacheImage(
+    //   const AssetImage("assets/images/splash.gif"),
+    //   context,
+    // );
+
+    if (!mounted) return;
+    setState(() => _gifReady = true);
+
+    // Start logo animation shortly after GIF appears
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (!mounted) return;
+      _logoController.forward();
     });
 
-    startDelay(context);
+    // Navigate after GIF finishes — adjust to match your GIF duration
+    Future.delayed(const Duration(seconds: 3), () {
+      if (!mounted) return;
+      _goNext(context);
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    _preloadGif();
+    super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    _logoController.dispose();
+    super.dispose();
   }
 
   Future<String> getAppVersion() async {
@@ -47,7 +116,7 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> nameUpdate() async {
-    SecureStorageService secureStorage = SecureStorageService();
+    final SecureStorageService secureStorage = SecureStorageService();
     Constants.name = Constants.isFmcg == true
         ? await secureStorage.read(AppStrings.fmcgName) ?? ""
         : Constants.isBuyer == true
@@ -59,87 +128,108 @@ class _SplashScreenState extends State<SplashScreen>
     nameUpdate();
     if (Constants.isLogin) {
       if (Constants.isFmcg == true) {
-        if (Constants.isBuyer == true) {
-          sl<NavigationService>()
-              .pushNamedAndRemoveUntil(Routes.fmcgMainScreen);
-        } else {
-          sl<NavigationService>()
-              .pushNamedAndRemoveUntil(Routes.fmcgMainScreen);
-        }
+        sl<NavigationService>().pushNamedAndRemoveUntil(Routes.fmcgMainScreen);
       } else {
-        if (Constants.isBuyer == true) {
-          sl<NavigationService>().pushNamedAndRemoveUntil(Routes.mainRoute);
-        } else {
-          sl<NavigationService>().pushNamedAndRemoveUntil(Routes.mainRoute);
-        }
+        sl<NavigationService>().pushNamedAndRemoveUntil(Routes.mainRoute);
       }
     } else {
       sl<NavigationService>().pushNamedAndRemoveUntil(Routes.onboardingRoute);
     }
   }
 
-  void startDelay(BuildContext context) {
-    Future.delayed(const Duration(milliseconds: 3000), () {
-      if (!context.mounted) return;
-      _goNext(context);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    // startDelay(context);
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return AdaptiveScaffold(
-      // appBar: Constants.appBar(context, height: 0, boxShadow: []),
-      body: SafeArea(
-        child: BlocListener<AppCubit, AppState>(
-          listener: (context, state) {
-            // _goNext(context); // ✅ Navigate only if app is allowed
-          },
-          child: Stack(
-            clipBehavior: Clip.none,
-            alignment: Alignment.center,
-            children: [
-              BlocBuilder<AppCubit, AppState>(
-                buildWhen: (previous, current) {
-                  bool result = current != previous;
+      body: BlocListener<AppCubit, AppState>(
+        listener: (context, state) {},
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
+          children: [
+            BlocBuilder<AppCubit, AppState>(
+              buildWhen: (previous, current) {
+                bool result = current != previous;
+                result = result &&
+                    (current is CheckForceUpdateError ||
+                        current is CheckForceUpdateIsLoading ||
+                        current is CheckForceUpdateSuccess);
+                return result;
+              },
+              builder: (context, state) => const SizedBox.shrink(),
+            ),
 
-                  result = result &&
-                      (current is CheckForceUpdateError ||
-                          current is CheckForceUpdateIsLoading ||
-                          current is CheckForceUpdateSuccess);
+            // ── Main content column ──────────────────────────────────────
+            SizedBox(
+              height: screenHeight,
+              width: screenWidth,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // GIF animation
+                  // SizedBox(
+                  //   height: screenHeight * 0.4,
+                  //   width: screenWidth,
+                  //   child: _gifReady
+                  //       ? Image.asset(
+                  //           "assets/images/splash.gif",
+                  //           fit: BoxFit.contain,
+                  //           gaplessPlayback: true,
+                  //           frameBuilder: (context, child, frame,
+                  //               wasSynchronouslyLoaded) {
+                  //             return AnimatedOpacity(
+                  //               opacity: frame == null ? 0 : 1,
+                  //               duration: const Duration(milliseconds: 300),
+                  //               child: child,
+                  //             );
+                  //           },
+                  //         )
+                  //       : Image.asset(
+                  //           "assets/images/splash.gif",
+                  //           fit: BoxFit.contain,
+                  //           gaplessPlayback: true,
+                  //         ),
+                  // ),
+                  Lottie.asset("assets/images/splash_screen.json"),
+                  const SizedBox(height: 24),
 
-                  return result;
-                },
-                builder: (context, state) {
-                  return const SizedBox.shrink();
-                },
-              ),
-              CustomScrollView(
-                physics: const BouncingScrollPhysics(),
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: Center(
-                      child: Image.asset(
-                        ImgAssets.companyLogo,
-                        height: 386,
-                        width: 391,
+                  // Logo — fades + slides up into view
+                  SlideTransition(
+                    position: _logoSlide,
+                    child: FadeTransition(
+                      opacity: _logoOpacity,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: Image.asset(
+                              ImgAssets.companyLogo, // your logo asset path
+                              height: screenHeight * 0.07,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ],
               ),
-              Positioned(
-                bottom: 1,
-                child: CommonText(
-                  CommonStrings.tradologieWebsitewithouthttp,
-                  textAlign: TextAlign.center,
-                  style: TextStyleConstants.regular(
-                    context,
-                  ),
-                ),
+            ),
+
+            // ── Bottom URL text ──────────────────────────────────────────
+            Positioned(
+              bottom: 1,
+              child: CommonText(
+                CommonStrings.tradologieWebsitewithouthttp,
+                textAlign: TextAlign.center,
+                style: TextStyleConstants.regular(context),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

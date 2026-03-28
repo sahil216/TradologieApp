@@ -36,6 +36,20 @@ abstract class AuthenticationRemoteDataSource {
       FmcgRegisterDistributorParams params);
   Future<ResponseWrapper<dynamic>?> fmcgGetCountryCodeList(NoParams params);
   Future<ResponseWrapper<dynamic>?> fmcgBrandsList(NoParams params);
+
+  Future<ResponseWrapper<dynamic>?> fmcgBuyerCategoryList(NoParams params);
+  Future<ResponseWrapper<dynamic>?> fmcgBuyerBrandPartnershipList(
+      NoParams params);
+  Future<ResponseWrapper<dynamic>?> fmcgBuyerDistributionCoverageList(
+      NoParams params);
+  Future<ResponseWrapper<dynamic>?> fmcgSellerBusinessTypeList(NoParams params);
+  Future<ResponseWrapper<dynamic>?> fmcgSellerProductCategoryList(
+      NoParams params);
+  Future<ResponseWrapper<dynamic>?> fmcgSellerPartnershipTypeList(
+      NoParams params);
+  Future<ResponseWrapper<dynamic>?> fmcgSellerServiceLabelList(NoParams params);
+  Future<ResponseWrapper<dynamic>?> fmcgSellerExportingProductsList(
+      NoParams params);
 }
 
 class AuthenticationRemoteDataSourceImpl
@@ -190,6 +204,78 @@ class AuthenticationRemoteDataSourceImpl
     return await apiConsumer.post(
       EndPoints.fmcgGetAllBrandList,
       body: {"Token": ""},
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> fmcgBuyerCategoryList(
+      NoParams params) async {
+    return await apiConsumer.post(
+      EndPoints.fmcgBuyerCategoryList,
+      body: null,
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> fmcgBuyerBrandPartnershipList(
+      NoParams params) async {
+    return await apiConsumer.post(
+      EndPoints.fmcgBuyerBrandPartnershipList,
+      body: null,
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> fmcgBuyerDistributionCoverageList(
+      NoParams params) async {
+    return await apiConsumer.post(
+      EndPoints.fmcgBuyerDistributionCoverageList,
+      body: null,
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> fmcgSellerBusinessTypeList(
+      NoParams params) async {
+    return await apiConsumer.post(
+      EndPoints.fmcgSellerBusinessTypeList,
+      body: null,
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> fmcgSellerProductCategoryList(
+      NoParams params) async {
+    return await apiConsumer.post(
+      EndPoints.fmcgSellerProductCategoryList,
+      body: null,
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> fmcgSellerPartnershipTypeList(
+      NoParams params) async {
+    return await apiConsumer.post(
+      EndPoints.fmcgSellerPartnershipTypeList,
+      body: null,
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> fmcgSellerServiceLabelList(
+      NoParams params) async {
+    return await apiConsumer.post(
+      EndPoints.fmcgSellerServiceLabelList,
+      body: null,
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> fmcgSellerExportingProductsList(
+      NoParams params) async {
+    return await apiConsumer.post(
+      EndPoints.fmcgSellerExportingProductsList,
+      body: null,
     );
   }
 }

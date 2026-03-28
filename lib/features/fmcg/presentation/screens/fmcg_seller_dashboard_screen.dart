@@ -1,26 +1,27 @@
-import 'dart:math';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tradologie_app/config/routes/app_router.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
-import 'package:tradologie_app/core/utils/extensions.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_appbar.dart';
+import 'package:tradologie_app/core/widgets/common_fmcg_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 import 'package:tradologie_app/features/app/injection_container_app.dart';
-import 'package:tradologie_app/features/app/presentation/screens/main_screen.dart';
-import 'package:tradologie_app/features/contact_us/coming_soon_screen.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/fmcg_buyer_category_list.dart';
+import 'package:tradologie_app/features/authentication/presentation/cubit/authentication_cubit.dart';
 import 'package:tradologie_app/features/fmcg/domain/entities/distributor_enquiry_list.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/add_distributor_interest_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_distributor_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/presentation/cubit/chat_cubit.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_distributor_enq.dart';
-import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_main_screen.dart';
+import 'package:tradologie_app/features/fmcg/presentation/widgets/category_filter_sheet.dart';
 
 class FmcgSellerDashboardScreen extends StatefulWidget {
   const FmcgSellerDashboardScreen({super.key});
@@ -30,548 +31,504 @@ class FmcgSellerDashboardScreen extends StatefulWidget {
       _FmcgSellerDashboardScreenState();
 }
 
-class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen>
-    with SingleTickerProviderStateMixin {
+class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen> {
   List<DistributorEnquiryList>? distributorList;
 
-  int? open;
+  // Search & Filter state
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  String? _selectedLocation;
+  String? _selectedBrand;
+  Set<String> _selectedCategories = {};
 
   ChatCubit get chatCubit => BlocProvider.of(context);
+
+  AuthenticationCubit get authenticationCubit => BlocProvider.of(context);
+
   SecureStorageService secureStorage = SecureStorageService();
 
-  void getDistributorList() async {
-    await chatCubit.getDistributorList(NoParams());
+  Future<void> getDistributorList({
+    String search = "",
+    Set<String>? categories,
+  }) async {
+    GetDistributorListParams params = GetDistributorListParams(
+      token: await secureStorage.read(AppStrings.apiVerificationCode) ?? "",
+      deviceID: Constants.deviceID,
+      searchText: search,
+      category: categories == null || categories.isEmpty
+          ? ""
+          : categories.join(","), // 🔥 important
+    );
+
+    await chatCubit.getDistributorList(params);
   }
+
+  Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
     getDistributorList();
-  }
-
-  Future<void> _refreshChats() async {
-    getDistributorList(); // your API call
-  }
-
-  void toggle(int index) {
-    setState(() {
-      if (expandedIndex == index) {
-        expandedIndex = null;
-      } else {
-        expandedIndex = index;
-      }
+    authenticationCubit.fmcgBuyerCategoryList(NoParams());
+    _searchController.addListener(() {
+      setState(() => _searchQuery = _searchController.text.toLowerCase());
     });
   }
 
-  int? expandedIndex;
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
 
-  int navIndex = 0;
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      distributorList?.clear();
+      getDistributorList(
+        search: query,
+        categories: _selectedCategories,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  List<FmcgBuyerCategoryList>? fmcgBuyerCategoryList;
+
+  Future<void> _refreshChats() async => getDistributorList();
+
+  void _clearFilters() {
+    setState(() {
+      _selectedLocation = null;
+      _selectedBrand = null;
+      _searchController.clear();
+    });
+  }
+
+  bool get _hasActiveFilters =>
+      _selectedLocation != null ||
+      _selectedBrand != null ||
+      _searchQuery.isNotEmpty;
+
   @override
   Widget build(BuildContext context) {
     return AdaptiveScaffold(
-      body: BlocListener<ChatCubit, ChatState>(
-        listenWhen: (previous, current) => previous != current,
-        listener: (context, state) async {
-          if (state is DistributorListSuccess) {
-            distributorList = state.data;
-          }
-          if (state is DistributorListError) {
-            CommonToast.showFailureToast(state.failure);
-          }
-        },
-        child: Stack(
-          children: [
-            BlocBuilder<ChatCubit, ChatState>(
-              builder: (context, state) {
-                return RefreshIndicator(
-                  onRefresh: _refreshChats,
-                  child: CustomScrollView(
-                    physics: AlwaysScrollableScrollPhysics(),
-                    slivers: [
-                      /// App Bar
-                      CommonAppbar(
-                        title: "Distributorship Enquiries",
-                        showBackButton: false,
-                        showNotification: false,
-                      ),
-                      // EnquiryTabsSliver(
-                      //   selected: tab,
-                      //   onSelect: (i) {
-                      //     setState(() {
-                      //       tab = i;
-                      //       open = null;
-                      //     });
-                      //   },
-                      // ),
+      body: MultiBlocListener(
+        listeners: [
+          BlocListener<ChatCubit, ChatState>(
+            listenWhen: (previous, current) => previous != current,
+            listener: (context, state) async {
+              if (state is DistributorListSuccess) {
+                distributorList = state.data;
+              }
+              if (state is DistributorListError) {
+                CommonToast.showFailureToast(state.failure);
+              }
+              if (state is AddDistributorInterestSuccess) {
+                CommonToast.success(
+                    "Thank you for your interest! Our sales team will connect with you shortly to explain how the platform works.");
+              }
+              if (state is AddDistributorInterestError) {
+                CommonToast.showFailureToast(state.failure);
+              }
+            },
+          ),
+          BlocListener<AuthenticationCubit, AuthenticationState>(
+              listenWhen: (previous, current) => previous != current,
+              listener: (context, state) async {
+                if (state is FmcgBuyerCategoryListSuccess) {
+                  fmcgBuyerCategoryList = state.data;
 
-                      // List
-                      EnquiryListSliver(
-                        items: distributorList ?? [],
-                        openIndex: open,
-                        onToggle: (i) {
-                          setState(() {
-                            open = open == i ? null : i;
-                          });
-                        },
-                      ),
-
-                      /// Chat List
-                      // SliverPadding(
-                      //   padding: const EdgeInsets.all(16),
-                      //   sliver: SliverList(
-                      //     delegate: SliverChildBuilderDelegate(
-                      //       (context, index) {
-                      //         final item = distributorList?[index];
-                      //         final expanded = expandedIndex == index;
-
-                      //         return Padding(
-                      //           padding:
-                      //               const EdgeInsets.only(bottom: 16),
-                      //           child: GestureDetector(
-                      //             onTap: () => toggle(index),
-                      //             child: AnimatedContainer(
-                      //               duration:
-                      //                   const Duration(milliseconds: 250),
-                      //               padding: const EdgeInsets.all(18),
-                      //               decoration: BoxDecoration(
-                      //                 color: Colors.white,
-                      //                 borderRadius:
-                      //                     BorderRadius.circular(18),
-                      //                 boxShadow: [
-                      //                   BoxShadow(
-                      //                     blurRadius: 20,
-                      //                     color: Colors.black
-                      //                         .withOpacity(0.08),
-                      //                     offset: const Offset(0, 10),
-                      //                   )
-                      //                 ],
-                      //               ),
-                      //               child: Column(
-                      //                 children: [
-                      //                   /// HEADER
-                      //                   Row(
-                      //                     children: [
-                      //                       Expanded(
-                      //                         child: Text(
-                      //                           "${(Constants().hideSensitiveData ?? true) ? Constants().maskName(item?.companyName ?? "") : (item?.companyName ?? "")} | ${item?.perferredLocation ?? ""} | ${item?.interestedBrandName ?? ""}",
-                      //                           style: const TextStyle(
-                      //                             fontSize: 16,
-                      //                             fontWeight:
-                      //                                 FontWeight.w600,
-                      //                           ),
-                      //                         ),
-                      //                       ),
-                      //                       AnimatedRotation(
-                      //                         turns: expanded ? 0.5 : 0,
-                      //                         duration: const Duration(
-                      //                             milliseconds: 250),
-                      //                         child: const Icon(Icons
-                      //                             .keyboard_arrow_down),
-                      //                       )
-                      //                     ],
-                      //                   ),
-
-                      //                   /// EXPANDABLE AREA
-                      //                   AnimatedSize(
-                      //                     duration: const Duration(
-                      //                         milliseconds: 250),
-                      //                     child: expanded
-                      //                         ? Padding(
-                      //                             padding:
-                      //                                 const EdgeInsets
-                      //                                     .only(top: 18),
-                      //                             child: Column(
-                      //                               crossAxisAlignment:
-                      //                                   CrossAxisAlignment
-                      //                                       .start,
-                      //                               children: [
-                      //                                 Row(
-                      //                                   children: [
-                      //                                     Text(
-                      //                                       (Constants().hideSensitiveData ??
-                      //                                               true)
-                      //                                           ? Constants().maskName(
-                      //                                               item?.name ??
-                      //                                                   "")
-                      //                                           : (item?.name ??
-                      //                                               ""),
-                      //                                       style:
-                      //                                           const TextStyle(
-                      //                                         fontSize:
-                      //                                             16,
-                      //                                         fontWeight:
-                      //                                             FontWeight
-                      //                                                 .w500,
-                      //                                       ),
-                      //                                     ),
-                      //                                     const Spacer(),
-                      //                                     Text(
-                      //                                       "${item?.countryCode ?? ""} - ${(Constants().hideSensitiveData ?? true) ? Constants().maskPhone(item?.mobile ?? "") : (item?.mobile ?? "")}",
-                      //                                       style:
-                      //                                           const TextStyle(
-                      //                                         fontSize:
-                      //                                             16,
-                      //                                         fontWeight:
-                      //                                             FontWeight
-                      //                                                 .w500,
-                      //                                       ),
-                      //                                     ),
-                      //                                   ],
-                      //                                 ),
-                      //                                 const SizedBox(
-                      //                                     height: 10),
-                      //                                 Text(
-                      //                                   (Constants().hideSensitiveData ??
-                      //                                           true)
-                      //                                       ? Constants()
-                      //                                           .maskEmail(
-                      //                                               item?.email ??
-                      //                                                   "")
-                      //                                       : (item?.email ??
-                      //                                           ""),
-                      //                                   style:
-                      //                                       const TextStyle(
-                      //                                     fontSize: 16,
-                      //                                     fontWeight:
-                      //                                         FontWeight
-                      //                                             .w500,
-                      //                                   ),
-                      //                                 ),
-                      //                                 const SizedBox(
-                      //                                     height: 10),
-                      //                                 Text(
-                      //                                   (item?.interestedBrandName)
-                      //                                       .toString(),
-                      //                                   style:
-                      //                                       const TextStyle(
-                      //                                     fontSize: 16,
-                      //                                     fontWeight:
-                      //                                         FontWeight
-                      //                                             .w500,
-                      //                                   ),
-                      //                                 )
-                      //                               ],
-                      //                             ),
-                      //                           )
-                      //                         : const SizedBox(),
-                      //                   )
-                      //                 ],
-                      //               ),
-                      //             ),
-                      //           ),
-                      //         );
-                      //       },
-                      //       childCount: distributorList?.length ?? 0,
-                      //     ),
-                      //   ),
-                      // ),
-                    ],
-                  ),
-                );
-              },
-            ),
-            BlocBuilder<ChatCubit, ChatState>(
-              builder: (context, state) {
-                if (state is DistributorListIsLoading) {
-                  return Positioned.fill(child: const CommonLoader());
+                  setState(() {});
                 }
-                return SizedBox.shrink();
-              },
-            ),
-            // CommonFMCGFloatingNavBar(
-            //   index: navIndex,
-            //   onTap: (i) {
-            //     setState(() {
-            //       navIndex = i;
-            //     });
-            //   },
-            // ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+              }),
+        ],
+        child: SafeArea(
+          top: false,
+          child: Stack(
+            children: [
+              BlocBuilder<ChatCubit, ChatState>(
+                builder: (context, state) {
+                  return RefreshIndicator(
+                    onRefresh: _refreshChats,
+                    child: CustomScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      slivers: [
+                        // ── App Bar ─────────────────────────────────────────
+                        CommonAppbar(
+                          title: "Distributor Enquiry",
+                          showBackButton: false,
+                        ),
+                        SliverPersistentHeader(
+                          pinned: true,
+                          delegate: SearchBarDelegate(
+                            showFilter: true,
+                            onFilterPressed: () {
+                              _openCategoryFilter();
+                            },
+                            onSearchChanged: _onSearchChanged,
+                          ),
+                        ),
+                        SliverToBoxAdapter(
+                          child: const SizedBox(height: 16),
+                        ),
 
-class EnquiryTabsSliver extends StatelessWidget {
-  final int selected;
-  final ValueChanged<int> onSelect;
-
-  const EnquiryTabsSliver({
-    super.key,
-    required this.selected,
-    required this.onSelect,
-  });
-
-  static const _labels = ['All', 'New', 'In review', 'Contacted'];
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: SizedBox(
-        height: 36,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          itemCount: _labels.length,
-          itemBuilder: (_, i) => GestureDetector(
-            onTap: () => onSelect(i),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
-              margin: const EdgeInsets.only(right: 24),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: i == selected ? T.blue : Colors.transparent,
-                    width: 1.5,
-                  ),
-                ),
+                        // ── Grid ─────────────────────────────────────────────
+                        (distributorList?.isEmpty ?? true)
+                            ? SliverFillRemaining(
+                                child: _EmptyState(
+                                  hasFilters: _hasActiveFilters,
+                                  onClear: _clearFilters,
+                                ),
+                              )
+                            : SliverPadding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(12, 0, 12, 32),
+                                sliver: SliverGrid(
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 12,
+                                    mainAxisSpacing: 12,
+                                    childAspectRatio: 0.62,
+                                  ),
+                                  delegate: SliverChildBuilderDelegate(
+                                    (context, i) =>
+                                        enquiryCard(distributorList![i]),
+                                    childCount: distributorList?.length ?? 0,
+                                  ),
+                                ),
+                              ),
+                      ],
+                    ),
+                  );
+                },
               ),
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: Text(
-                  _labels[i],
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight:
-                        i == selected ? FontWeight.w600 : FontWeight.w400,
-                    color: i == selected ? T.blue : T.muted,
-                  ),
-                ),
+
+              // ── Loading overlay ─────────────────────────────────────────
+              BlocBuilder<ChatCubit, ChatState>(
+                builder: (context, state) {
+                  if (state is DistributorListIsLoading ||
+                      state is AddDistributorInterestIsLoading) {
+                    return const Positioned.fill(child: CommonLoader());
+                  }
+                  return const SizedBox.shrink();
+                },
               ),
-            ),
+            ],
           ),
         ),
       ),
     );
   }
-}
 
-class EnquiryListSliver extends StatelessWidget {
-  final List<DistributorEnquiryList> items;
-  final int? openIndex;
-  final ValueChanged<int> onToggle;
+  String _initial(String? name) {
+    if (name == null || name.trim().isEmpty) return '?';
+    return name.trim()[0].toUpperCase();
+  }
 
-  const EnquiryListSliver({
-    super.key,
-    required this.items,
-    required this.openIndex,
-    required this.onToggle,
-  });
+  void _openCategoryFilter() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) {
+        return CategoryFilterSheet(
+          selectedCategories: _selectedCategories,
+          categories: fmcgBuyerCategoryList ?? [],
+          onApply: (values) {
+            distributorList?.clear();
+            setState(() => _selectedCategories = values);
 
-  @override
-  Widget build(BuildContext context) {
-    if (items.isEmpty) {
-      return const SliverFillRemaining(
-        child: Center(child: Text('Nothing here yet', style: T.body)),
-      );
-    }
+            getDistributorList(
+              search: _searchController.text,
+              categories: values,
+            );
+          },
+        );
+      },
+    );
+  }
 
-    return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (context, i) {
-          return Column(
-            children: [
-              _Row(
-                enquiry: items[i],
-                index: i,
-                isOpen: openIndex == i,
-                onTap: () => onToggle(i),
+  void _showConfirmation(BuildContext context, String distributorID) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+        ),
+        content: Text(
+          "Are you sure want to connect with distributor?",
+          style: TextStyleConstants.semiBold(context, fontSize: 16),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          GestureDetector(
+            onTap: () async {
+              sl<NavigationService>().pop();
+              AddDistributorInterestParams params =
+                  AddDistributorInterestParams(
+                      token: await secureStorage
+                              .read(AppStrings.apiVerificationCode) ??
+                          "",
+                      deviceID: Constants.deviceID,
+                      sellerID:
+                          await secureStorage.read(AppStrings.loginId) ?? "",
+                      distributorID: distributorID);
+              chatCubit.addDistributorInterest(params);
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 28,
+                vertical: 10,
               ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24),
-                child: Divider(
-                  height: 0,
-                  thickness: 0.5,
-                  color: T.faint,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(25),
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFF2DAAE1),
+                    Color(0xFF1B8ED1),
+                  ],
                 ),
               ),
-            ],
-          );
-        },
-        childCount: items.length,
+              child: const Text(
+                "Confirm",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
-}
 
-class _Row extends StatelessWidget {
-  final DistributorEnquiryList enquiry;
-  final int index;
-  final bool isOpen;
-  final VoidCallback onTap;
+  Widget enquiryCard(
+    DistributorEnquiryList enquiry,
+  ) {
+    final hideSensitive = Constants().hideSensitiveData ?? true;
 
-  const _Row({
-    required this.enquiry,
-    required this.index,
-    required this.isOpen,
-    required this.onTap,
-  });
+    final phone = enquiry.mobile != null
+        ? "${enquiry.countryCode ?? ""} ${hideSensitive ? Constants().maskPhone(enquiry.mobile ?? "") : enquiry.mobile!}"
+        : null;
 
-  @override
-  Widget build(BuildContext context) {
-    String getInitial(String? name) {
-      if (name == null || name.trim().isEmpty) {
-        return '?'; // fallback icon letter
-      }
-      return name.trim()[0].toUpperCase();
-    }
+    final email = enquiry.email != null
+        ? (hideSensitive
+            ? Constants().maskEmail(enquiry.email ?? "")
+            : enquiry.email!)
+        : null;
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ── Collapsed row ────────────────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Row(
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F7FA),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFF0A9FED).withValues(alpha: 0.4),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// 🔹 HEADER
+            Row(
               children: [
-                // Monogram — just text on white, framed by a very faint ring
                 Container(
-                  width: 38,
-                  height: 38,
+                  width: 40,
+                  height: 40,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: T.faint, width: 1),
+                    color: const Color(0xFF0A9FED).withValues(alpha: 0.15),
                   ),
                   child: Center(
                     child: Text(
-                      getInitial(enquiry.interestedBrandName),
+                      _initial(enquiry.name),
                       style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: T.ink,
-                        letterSpacing: 0.5,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF0A9FED),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 14),
-                // Content
+                const SizedBox(width: 12),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(enquiry.interestedBrandName ?? "",
-                                style: T.title,
-                                overflow: TextOverflow.ellipsis),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 3),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(enquiry.perferredLocation ?? "",
-                                style: T.body, overflow: TextOverflow.ellipsis),
-                          ),
-                        ],
-                      ),
-                    ],
+                  child: Text(
+                    enquiry.name ?? "—",
+                    maxLines: 2,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF2B2B2B),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                // Chevron
-                AnimatedRotation(
-                  turns: isOpen ? 0.25 : 0,
-                  duration: const Duration(milliseconds: 200),
-                  child:
-                      const Icon(Icons.chevron_right, size: 16, color: T.muted),
                 ),
               ],
             ),
-          ),
 
-          // ── Expanded detail ──────────────────────────────────────────────
-          AnimatedSize(
-            duration: const Duration(milliseconds: 220),
-            curve: Curves.easeInOut,
-            child: isOpen ? _Detail(enquiry: enquiry) : const SizedBox.shrink(),
-          ),
-        ],
+            const SizedBox(height: 10),
+
+            /// 🔹 DIVIDER
+            Container(
+              height: 1,
+              color: const Color(0xFF0A9FED).withValues(alpha: 0.3),
+            ),
+
+            const SizedBox(height: 10),
+
+            /// 🔹 DETAILS
+            _RowItem(
+              icon: Icons.location_on,
+              color: Colors.green,
+              text: enquiry.perferredLocation ?? "—",
+            ),
+
+            const SizedBox(height: 10),
+
+            if (phone != null)
+              _RowItem(
+                icon: Icons.phone,
+                color: Colors.blue,
+                text: phone,
+              ),
+
+            const SizedBox(height: 10),
+
+            if (email != null)
+              _RowItem(
+                icon: Icons.mail,
+                color: Colors.orange,
+                text: email,
+              ),
+
+            const SizedBox(height: 10),
+
+            _RowItem(
+              icon: Icons.category,
+              color: Colors.deepPurple,
+              text: enquiry.fMCGCategory ?? "—",
+            ),
+
+            const SizedBox(height: 12),
+
+            /// 🔹 BUTTON
+            Expanded(
+              child: Center(
+                child: GestureDetector(
+                  onTap: () => _showConfirmation(
+                      context, enquiry.quotationUserId.toString()),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 28,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25),
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFF2DAAE1),
+                          Color(0xFF1B8ED1),
+                        ],
+                      ),
+                    ),
+                    child: const Text(
+                      "Connect",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _Detail extends StatelessWidget {
-  final DistributorEnquiryList enquiry;
-  const _Detail({required this.enquiry});
+class _RowItem extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String text;
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(24, 0, 24, 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF9F9FB),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ── Contact fields ──────────────────────────────────────────────
-          if (enquiry.mobile != null) ...[
-            _Field(
-              label: 'Name',
-              value: (Constants().hideSensitiveData ?? true)
-                  ? Constants().maskName(enquiry.name ?? "")
-                  : (enquiry.name ?? ""),
-            ),
-            const SizedBox(height: 12),
-          ],
-          if (enquiry.mobile != null) ...[
-            _Field(
-              label: 'Phone',
-              value:
-                  "${enquiry.countryCode ?? ""} - ${(Constants().hideSensitiveData ?? true) ? Constants().maskPhone(enquiry.mobile ?? "") : (enquiry.mobile ?? "")}",
-              valueStyle: T.mono,
-            ),
-            const SizedBox(height: 12),
-          ],
-          if (enquiry.email != null) ...[
-            _Field(
-              label: 'Email',
-              value: (Constants().hideSensitiveData ?? true)
-                  ? Constants().maskEmail(enquiry.email ?? "")
-                  : (enquiry.email ?? ""),
-              valueStyle: T.mono,
-            ),
-            const SizedBox(height: 12),
-          ],
-          _Field(label: 'Location', value: enquiry.perferredLocation ?? ""),
-          const SizedBox(height: 5),
-        ],
-      ),
-    );
-  }
-}
-
-class _Field extends StatelessWidget {
-  final String label;
-  final String value;
-  final TextStyle? valueStyle;
-  const _Field({required this.label, required this.value, this.valueStyle});
+  const _RowItem({
+    required this.icon,
+    required this.color,
+    required this.text,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          width: 64,
-          child: Text(label, style: T.caption.copyWith(letterSpacing: 0)),
-        ),
+        Icon(icon, size: 14, color: color),
+        const SizedBox(width: 10),
         Expanded(
-          child:
-              Text(value, style: valueStyle ?? T.body.copyWith(color: T.ink)),
+          child: Text(
+            text,
+            maxLines: 2,
+            style: const TextStyle(
+              fontSize: 13,
+              color: Color(0xFF3A3A3A),
+            ),
+          ),
         ),
       ],
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  final bool hasFilters;
+  final VoidCallback onClear;
+
+  const _EmptyState({required this.hasFilters, required this.onClear});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            hasFilters ? Icons.search_off_rounded : Icons.inbox_outlined,
+            size: 40,
+            color: T.muted,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            hasFilters ? 'No results match your filters' : 'Nothing here yet',
+            style: T.body.copyWith(color: T.muted),
+          ),
+          if (hasFilters) ...[
+            const SizedBox(height: 12),
+            GestureDetector(
+              onTap: onClear,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  border: Border.all(color: T.blue),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text('Clear filters',
+                    style: T.body.copyWith(color: T.blue)),
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/utils/analytics_services.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/assets_manager.dart';
@@ -28,6 +29,7 @@ import '../../../../core/widgets/common_loader.dart';
 import '../../../../core/widgets/common_social_icons.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
+import '../../../../injection_container.dart';
 import '../cubit/authentication_cubit.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -345,7 +347,8 @@ class _SignInScreenState extends State<SignInScreen>
                                             r.isTablet ? 420 : double.infinity,
                                         child: CommonButton(
                                           onPressed: () {
-                                            Navigator.pop(context);
+                                            sl<NavigationService>().pushNamed(
+                                                Routes.sendOtpScreen);
                                           },
                                           text:
                                               CommonStrings.sendOtpViaWhatsapp,

@@ -18,6 +18,14 @@ class FmcgUserDetailModel extends FmcgUserDetail {
     super.fromDate,
     super.toDate,
     super.analyticsUrl,
+    super.brandName,
+    super.countryCode,
+    super.countryID,
+    super.businessType,
+    super.productCategory,
+    super.partnershipType,
+    super.serviceLabel,
+    super.exportingProducts,
   });
 
   factory FmcgUserDetailModel.fromJson(Map<String, dynamic> json) =>
@@ -38,5 +46,13 @@ class FmcgUserDetailModel extends FmcgUserDetail {
         fromDate: json["FromDate"].toString(),
         toDate: json["ToDate"].toString(),
         analyticsUrl: json["Analytics_URL"].toString(),
+        brandName: json["BrandName"].toString(),
+        countryCode: json["CountryCode"].toString(),
+        countryID: json["CountryID"].toString(),
+        businessType: json["BusinessType"].toString(),
+        productCategory: json["ProductCategory"].toString(),
+        partnershipType: json["PartnershipType"].toString(),
+        serviceLabel: json["ServiceLabel"].toString(),
+        exportingProducts: json["ExportingProducts"].toString(),
       );
 }

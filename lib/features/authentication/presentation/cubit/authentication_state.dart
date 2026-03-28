@@ -278,3 +278,163 @@ class FmcgBrandsListError extends AuthenticationState {
   @override
   List<Object> get props => [failure];
 }
+
+class FmcgBuyerCategoryListIsLoading extends AuthenticationState {}
+
+class FmcgBuyerCategoryListSuccess extends AuthenticationState {
+  final List<FmcgBuyerCategoryList> data;
+
+  const FmcgBuyerCategoryListSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class FmcgBuyerCategoryListError extends AuthenticationState {
+  final Failure failure;
+
+  const FmcgBuyerCategoryListError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class FmcgBuyerBrandPartnershipTypeListIsLoading extends AuthenticationState {}
+
+class FmcgBuyerBrandPartnershipTypeListSuccess extends AuthenticationState {
+  final List<FmcgBuyerBrandPartnershipTypeList> data;
+
+  const FmcgBuyerBrandPartnershipTypeListSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class FmcgBuyerBrandPartnershipTypeListError extends AuthenticationState {
+  final Failure failure;
+
+  const FmcgBuyerBrandPartnershipTypeListError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class FmcgBuyerDistributionCoverageListIsLoading extends AuthenticationState {}
+
+class FmcgBuyerDistributionCoverageListSuccess extends AuthenticationState {
+  final List<FmcgBuyerDistributionCoverageList> data;
+
+  const FmcgBuyerDistributionCoverageListSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class FmcgBuyerDistributionCoverageListError extends AuthenticationState {
+  final Failure failure;
+
+  const FmcgBuyerDistributionCoverageListError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class FmcgSellerBusinessTypeListIsLoading extends AuthenticationState {}
+
+class FmcgSellerBusinessTypeListSuccess extends AuthenticationState {
+  final List<FmcgSellerBusinessTypeList> data;
+
+  const FmcgSellerBusinessTypeListSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class FmcgSellerBusinessTypeListError extends AuthenticationState {
+  final Failure failure;
+
+  const FmcgSellerBusinessTypeListError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class FmcgSellerProductCategoryListIsLoading extends AuthenticationState {}
+
+class FmcgSellerProductCategoryListSuccess extends AuthenticationState {
+  final List<FmcgSellerProductCategoryList> data;
+
+  const FmcgSellerProductCategoryListSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class FmcgSellerProductCategoryListError extends AuthenticationState {
+  final Failure failure;
+
+  const FmcgSellerProductCategoryListError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class FmcgSellerPartnershipTypeListIsLoading extends AuthenticationState {}
+
+class FmcgSellerPartnershipTypeListSuccess extends AuthenticationState {
+  final List<FmcgSellerPartnershipTypeList> data;
+
+  const FmcgSellerPartnershipTypeListSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class FmcgSellerPartnershipTypeListError extends AuthenticationState {
+  final Failure failure;
+
+  const FmcgSellerPartnershipTypeListError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class FmcgSellerServiceLabelListIsLoading extends AuthenticationState {}
+
+class FmcgSellerServiceLabelListSuccess extends AuthenticationState {
+  final List<FmcgSellerServiceLabelList> data;
+
+  const FmcgSellerServiceLabelListSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class FmcgSellerServiceLabelListError extends AuthenticationState {
+  final Failure failure;
+
+  const FmcgSellerServiceLabelListError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class FmcgSellerExportingProductsListIsLoading extends AuthenticationState {}
+
+class FmcgSellerExportingProductsListSuccess extends AuthenticationState {
+  final List<FmcgSellerExportingProductsList> data;
+
+  const FmcgSellerExportingProductsListSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class FmcgSellerExportingProductsListError extends AuthenticationState {
+  final Failure failure;
+
+  const FmcgSellerExportingProductsListError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
