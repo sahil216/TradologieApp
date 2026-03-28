@@ -43,7 +43,7 @@ class FmcgGetSellerProfileModel extends FmcgGetSellerProfile {
         brandName: json["BrandName"],
         analyticsUrl: json["Analytics_URL"],
         countryCode: json["CountryCode"],
-        countryId: json["CountryID"],
+        countryId: json["CountryID"].toString(),
         fmcgSellerTitle: json["FMCGSellerTitle"] == null
             ? []
             : List<FmcgSellerTitle>.from(json["FMCGSellerTitle"]!
