@@ -162,14 +162,14 @@ class _CommonTextFieldState extends State<CommonTextField> {
             ? widget.titleWidget!
             : widget.titleText != null
                 ? Container(
-                    margin: EdgeInsetsDirectional.only(start: 10, bottom: 3),
+                    margin: EdgeInsetsDirectional.only(bottom: 3),
                     child: CustomRequiredTextRich(
                       text: widget.titleText!,
                       showRequired: widget.isRequired ?? false,
                       style: widget.titleStyle ??
                           TextStyleConstants.medium(
                             context,
-                            color: widget.titleColor ?? AppColors.blackApp,
+                            color: widget.titleColor ?? AppColors.defaultText,
                             fontSize: 15,
                           ),
                     ),

@@ -313,16 +313,41 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
                                                     arguments: false);
                                               },
                                         child: Center(
-                                          child: CommonText(
-                                            Constants.isBuyer == true
-                                                ? "Don't have an account? Register Now"
-                                                : "Register New Brand",
-                                            style: TextStyleConstants.regular(
-                                              context,
-                                              fontSize: 16,
-                                              color: AppColors.defaultText,
-                                            ),
-                                          ),
+                                          child: Constants.isBuyer == true
+                                              ? RichText(
+                                                  text: TextSpan(
+                                                    text:
+                                                        "Don't have an account? ",
+                                                    style: TextStyleConstants
+                                                        .regular(
+                                                      context,
+                                                      fontSize: 16,
+                                                      color:
+                                                          AppColors.defaultText,
+                                                    ),
+                                                    children: [
+                                                      TextSpan(
+                                                        text: "Register Now",
+                                                        style:
+                                                            TextStyleConstants
+                                                                .semiBold(
+                                                          context,
+                                                          fontSize: 16,
+                                                          color: AppColors.blue,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
+                                              : CommonText(
+                                                  "Register New Brand",
+                                                  style: TextStyleConstants
+                                                      .semiBold(
+                                                    context,
+                                                    fontSize: 16,
+                                                    color: AppColors.blue,
+                                                  ),
+                                                ),
                                         ),
                                       ),
                                       SizedBox(height: 20),

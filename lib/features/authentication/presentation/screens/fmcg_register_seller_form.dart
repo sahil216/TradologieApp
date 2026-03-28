@@ -467,486 +467,497 @@ class _FmcgRegisterSellerDistributorFormState
   }
 
   Widget distributorForm() {
-    return Form(
-      key: formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(
-            height: 20,
-          ),
-          CommonTextField(
-            titleText: "Full Name",
-            hintText: "Enter Full Name",
-            controller: nameController,
-            textInputType: TextInputType.emailAddress,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (String? value) {
-              if (value == null || value.trim().isEmpty) {
-                return "Required";
-              }
-
-              return null;
-            },
-          ),
-          SizedBox(height: 12),
-          CommonTextField(
-            titleText: "Company Name ",
-            hintText: "Enter Company Name ",
-            controller: companyNameController,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (String? val) {
-              if (val == null || val.isEmpty) {
-                return "Required";
-              }
-
-              return null;
-            },
-          ),
-          SizedBox(height: 12),
-          CommonTextField(
-            titleText: "Email",
-            hintText: "Enter Email",
-            controller: emailController,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (String? val) {
-              if (val == null || val.isEmpty) {
-                return "Required";
-              }
-              if (val.isEmailValid == false) {
-                return "Enter valid email";
-              }
-
-              return null;
-            },
-          ),
-          SizedBox(height: 12),
-          CommonDropdown<FmcgCountryCodeList>(
-            label: 'Country Code',
-            hint: 'Select Country Code',
-            dropdownKey: countryCodeKey,
-            asyncItems: (filter, loadProps) {
-              return fetchCountryCode(filter, loadProps);
-            },
-            validator: (value) => value == null ? "Required" : null,
-            selectedItem: null,
-            itemAsString: (item) => item.countryText ?? "",
-            onChanged: (item) {
-              selectedCountryCode = item;
-            },
-            compareFn: (a, b) => a.countryText == b.countryText,
-          ),
-          SizedBox(height: 12),
-          CommonTextField(
-            titleText: "Mobile",
-            hintText: "Enter Mobile",
-            controller: mobileController,
-            textInputType: TextInputType.phone,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (String? val) {
-              if (val == null || val.isEmpty) {
-                return "Required";
-              }
-
-              return null;
-            },
-          ),
-          SizedBox(height: 12),
-          CommonDropdown<FmcgBrandsList>(
-            label: 'Brand Name of Interest',
-            hint: 'Select Brand Name of Interest',
-            dropdownKey: countryCodeKey,
-            asyncItems: (filter, loadProps) {
-              return fetchBrands(filter, loadProps);
-            },
-            validator: (value) => value == null ? "Required" : null,
-            selectedItem: null,
-            itemAsString: (item) => item.brandName ?? "",
-            onChanged: (item) {
-              selectedBrand = item;
-              setState(() {});
-            },
-            compareFn: (a, b) => a.brandName == b.brandName,
-          ),
-          SizedBox(height: 12),
-          selectedBrand?.brandName == "Other"
-              ? CommonTextField(
-                  titleText: "Brand Name",
-                  hintText: "Enter Brand Name",
-                  controller: brandNameController,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (String? val) {
-                    if (val == null || val.isEmpty) {
-                      return "Required";
-                    }
-
-                    return null;
-                  },
-                )
-              : SizedBox.shrink(),
-          SizedBox(height: 12),
-          CommonTextField(
-            titleText: "Preferred Distributorship Location",
-            hintText: "Enter Preferred Distributorship Location",
-            controller: distributionLocationController,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (String? val) {
-              if (val == null || val.isEmpty) {
-                return "Required";
-              }
-
-              return null;
-            },
-          ),
-          SizedBox(height: 12),
-          CommonDropdown<FmcgBuyerCategoryList>(
-            label: 'Which FMCG categories are you interested in Distributing?',
-            hint: 'Select FMCG categories.',
-            dropdownKey: fmcgBuyerCategoryListKey,
-            asyncItems: (filter, loadProps) {
-              return fetchFmcgBuyerCategoryList(filter, loadProps);
-            },
-            validator: (value) => value == null ? "Required" : null,
-            selectedItem: null,
-            itemAsString: (item) => item.name ?? "",
-            onChanged: (item) {
-              selectedFmcgBuyerCategoryList = item;
-              setState(() {});
-            },
-            compareFn: (a, b) => a.name == b.name,
-          ),
-          SizedBox(height: 12),
-          CommonDropdown<FmcgBuyerBrandPartnershipTypeList>(
-            label: 'What type of brand Partnership are you interested in?',
-            hint: 'Select Type of Brand Partnership.',
-            dropdownKey: fmcgBuyerBrandPartnershipTypeListKey,
-            asyncItems: (filter, loadProps) {
-              return fetchFmcgBuyerBrandPartnershipTypeList(filter, loadProps);
-            },
-            selectedItem: null,
-            validator: (value) => value == null ? "Required" : null,
-            itemAsString: (item) => item.name ?? "",
-            onChanged: (item) {
-              selectedFmcgBuyerBrandPartnershipTypeList = item;
-              setState(() {});
-            },
-            compareFn: (a, b) => a.name == b.name,
-          ),
-          SizedBox(height: 12),
-          CommonDropdown<FmcgBuyerDistributionCoverageList>(
-            label: 'What is your distribution coverage?',
-            hint: 'Select distribution coverage',
-            dropdownKey: fmcgBuyerDistributionCoverageListKey,
-            asyncItems: (filter, loadProps) {
-              return fetchFmcgBuyerDistributionCoverageList(filter, loadProps);
-            },
-            validator: (value) => value == null ? "Required" : null,
-            selectedItem: null,
-            itemAsString: (item) => item.name ?? "",
-            onChanged: (item) {
-              selectedFmcgBuyerDistributionCoverageList = item;
-              setState(() {});
-            },
-            compareFn: (a, b) => a.name == b.name,
-          ),
-          SizedBox(height: 12),
-          CommonTextField(
-            titleText: "Which brand(s) are you looking to partner with?",
-            hintText: "Enter brand name looking to partner with?",
-            controller: partnerBrandNameController,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (String? val) {
-              if (val == null || val.isEmpty) {
-                return "Required";
-              }
-
-              return null;
-            },
-          ),
-          SizedBox(height: 12),
-          CommonTextField(
-            titleText: "Want to specify your requirement?",
-            hintText: "MOQ, Margin Expectations, Territory, etc.",
-            controller: specifyRequirementsController,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (String? val) {
-              if (val == null || val.isEmpty) {
-                return "Required";
-              }
-
-              return null;
-            },
-          ),
-          SizedBox(height: 20),
-          CommonButton(
-            onPressed: () async {
-              late FmcgRegisterDistributorParams params;
-              if (formKey.currentState!.validate()) {
-                params = FmcgRegisterDistributorParams(
-                  name: nameController.text,
-                  mobile: mobileController.text,
-                  email: emailController.text,
-                  companyName: companyNameController.text,
-                  interestedBrandName: (selectedBrand?.brandName == "Other")
-                      ? brandNameController.text
-                      : selectedBrand?.brandName ?? "",
-                  perferredLocation: distributionLocationController.text,
-                  countryCode: selectedCountryCode?.countryCode ?? '',
-                  osType: Platform.isAndroid ? "Android" : "iOS",
-                  fcmToken:
-                      await secureStorageService.read(AppStrings.fcmToken) ??
-                          "",
-                  manufacturer: manufacturer,
-                  model: model,
-                  osVersionRelease: osVersionRelease,
-                  appVersion: appVersion,
-                  deviceId: deviceId,
-                  fmcgCategory: selectedFmcgBuyerCategoryList?.name ?? '',
-                  brandPartnershipType:
-                      selectedFmcgBuyerBrandPartnershipTypeList?.name ?? '',
-                  distributionCoverage:
-                      selectedFmcgBuyerDistributionCoverageList?.name ?? '',
-                  partnerBrand: partnerBrandNameController.text,
-                  specifyRequirement: specifyRequirementsController.text,
-                );
-                if (!context.mounted) {
-                  return;
-                }
-                FocusManager.instance.primaryFocus?.unfocus();
-
-                BlocProvider.of<AuthenticationCubit>(context)
-                    .fmcgRegisterDistributor(params);
-              }
-            },
-            text: "Register",
-            textStyle: TextStyleConstants.medium(
-              context,
-              fontSize: 16,
-              color: AppColors.white,
+    return SafeArea(
+      top: false,
+      child: Form(
+        key: formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              height: 20,
             ),
-          ),
-          SizedBox(height: 20),
-        ],
+            CommonTextField(
+              titleText: "Full Name",
+              hintText: "Enter Full Name",
+              controller: nameController,
+              textInputType: TextInputType.emailAddress,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (String? value) {
+                if (value == null || value.trim().isEmpty) {
+                  return "Required";
+                }
+
+                return null;
+              },
+            ),
+            SizedBox(height: 12),
+            CommonTextField(
+              titleText: "Company Name ",
+              hintText: "Enter Company Name ",
+              controller: companyNameController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (String? val) {
+                if (val == null || val.isEmpty) {
+                  return "Required";
+                }
+
+                return null;
+              },
+            ),
+            SizedBox(height: 12),
+            CommonTextField(
+              titleText: "Email",
+              hintText: "Enter Email",
+              controller: emailController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (String? val) {
+                if (val == null || val.isEmpty) {
+                  return "Required";
+                }
+                if (val.isEmailValid == false) {
+                  return "Enter valid email";
+                }
+
+                return null;
+              },
+            ),
+            SizedBox(height: 12),
+            CommonDropdown<FmcgCountryCodeList>(
+              label: 'Country Code',
+              hint: 'Select Country Code',
+              dropdownKey: countryCodeKey,
+              asyncItems: (filter, loadProps) {
+                return fetchCountryCode(filter, loadProps);
+              },
+              validator: (value) => value == null ? "Required" : null,
+              selectedItem: null,
+              itemAsString: (item) => item.countryText ?? "",
+              onChanged: (item) {
+                selectedCountryCode = item;
+              },
+              compareFn: (a, b) => a.countryText == b.countryText,
+            ),
+            SizedBox(height: 12),
+            CommonTextField(
+              titleText: "Mobile",
+              hintText: "Enter Mobile",
+              controller: mobileController,
+              textInputType: TextInputType.phone,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (String? val) {
+                if (val == null || val.isEmpty) {
+                  return "Required";
+                }
+
+                return null;
+              },
+            ),
+            SizedBox(height: 12),
+            CommonDropdown<FmcgBrandsList>(
+              label: 'Brand Name of Interest',
+              hint: 'Select Brand Name of Interest',
+              dropdownKey: countryCodeKey,
+              asyncItems: (filter, loadProps) {
+                return fetchBrands(filter, loadProps);
+              },
+              validator: (value) => value == null ? "Required" : null,
+              selectedItem: null,
+              itemAsString: (item) => item.brandName ?? "",
+              onChanged: (item) {
+                selectedBrand = item;
+                setState(() {});
+              },
+              compareFn: (a, b) => a.brandName == b.brandName,
+            ),
+            SizedBox(height: 12),
+            selectedBrand?.brandName == "Other"
+                ? CommonTextField(
+                    titleText: "Brand Name",
+                    hintText: "Enter Brand Name",
+                    controller: brandNameController,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (String? val) {
+                      if (val == null || val.isEmpty) {
+                        return "Required";
+                      }
+
+                      return null;
+                    },
+                  )
+                : SizedBox.shrink(),
+            SizedBox(height: 12),
+            CommonTextField(
+              titleText: "Preferred Distributorship Location",
+              hintText: "Enter Preferred Distributorship Location",
+              controller: distributionLocationController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (String? val) {
+                if (val == null || val.isEmpty) {
+                  return "Required";
+                }
+
+                return null;
+              },
+            ),
+            SizedBox(height: 12),
+            CommonDropdown<FmcgBuyerCategoryList>(
+              label:
+                  'Which FMCG categories are you interested in Distributing?',
+              hint: 'Select FMCG categories.',
+              dropdownKey: fmcgBuyerCategoryListKey,
+              asyncItems: (filter, loadProps) {
+                return fetchFmcgBuyerCategoryList(filter, loadProps);
+              },
+              validator: (value) => value == null ? "Required" : null,
+              selectedItem: null,
+              itemAsString: (item) => item.name ?? "",
+              onChanged: (item) {
+                selectedFmcgBuyerCategoryList = item;
+                setState(() {});
+              },
+              compareFn: (a, b) => a.name == b.name,
+            ),
+            SizedBox(height: 12),
+            CommonDropdown<FmcgBuyerBrandPartnershipTypeList>(
+              label: 'What type of brand Partnership are you interested in?',
+              hint: 'Select Type of Brand Partnership.',
+              dropdownKey: fmcgBuyerBrandPartnershipTypeListKey,
+              asyncItems: (filter, loadProps) {
+                return fetchFmcgBuyerBrandPartnershipTypeList(
+                    filter, loadProps);
+              },
+              selectedItem: null,
+              validator: (value) => value == null ? "Required" : null,
+              itemAsString: (item) => item.name ?? "",
+              onChanged: (item) {
+                selectedFmcgBuyerBrandPartnershipTypeList = item;
+                setState(() {});
+              },
+              compareFn: (a, b) => a.name == b.name,
+            ),
+            SizedBox(height: 12),
+            CommonDropdown<FmcgBuyerDistributionCoverageList>(
+              label: 'What is your distribution coverage?',
+              hint: 'Select distribution coverage',
+              dropdownKey: fmcgBuyerDistributionCoverageListKey,
+              asyncItems: (filter, loadProps) {
+                return fetchFmcgBuyerDistributionCoverageList(
+                    filter, loadProps);
+              },
+              validator: (value) => value == null ? "Required" : null,
+              selectedItem: null,
+              itemAsString: (item) => item.name ?? "",
+              onChanged: (item) {
+                selectedFmcgBuyerDistributionCoverageList = item;
+                setState(() {});
+              },
+              compareFn: (a, b) => a.name == b.name,
+            ),
+            // SizedBox(height: 12),
+            // CommonTextField(
+            //   titleText: "Which brand(s) are you looking to partner with?",
+            //   hintText: "Enter brand name looking to partner with?",
+            //   controller: partnerBrandNameController,
+            //   autovalidateMode: AutovalidateMode.onUserInteraction,
+            //   validator: (String? val) {
+            //     if (val == null || val.isEmpty) {
+            //       return "Required";
+            //     }
+
+            //     return null;
+            //   },
+            // ),
+            SizedBox(height: 12),
+            CommonTextField(
+              titleText: "Want to specify your requirement?",
+              hintText: "MOQ, Margin Expectations, Territory, etc.",
+              controller: specifyRequirementsController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (String? val) {
+                if (val == null || val.isEmpty) {
+                  return "Required";
+                }
+
+                return null;
+              },
+            ),
+            SizedBox(height: 20),
+            CommonButton(
+              onPressed: () async {
+                late FmcgRegisterDistributorParams params;
+                if (formKey.currentState!.validate()) {
+                  params = FmcgRegisterDistributorParams(
+                    name: nameController.text,
+                    mobile: mobileController.text,
+                    email: emailController.text,
+                    companyName: companyNameController.text,
+                    interestedBrandName: (selectedBrand?.brandName == "Other")
+                        ? brandNameController.text
+                        : selectedBrand?.brandName ?? "",
+                    perferredLocation: distributionLocationController.text,
+                    countryCode: selectedCountryCode?.countryCode ?? '',
+                    osType: Platform.isAndroid ? "Android" : "iOS",
+                    fcmToken:
+                        await secureStorageService.read(AppStrings.fcmToken) ??
+                            "",
+                    manufacturer: manufacturer,
+                    model: model,
+                    osVersionRelease: osVersionRelease,
+                    appVersion: appVersion,
+                    deviceId: deviceId,
+                    fmcgCategory: selectedFmcgBuyerCategoryList?.name ?? '',
+                    brandPartnershipType:
+                        selectedFmcgBuyerBrandPartnershipTypeList?.name ?? '',
+                    distributionCoverage:
+                        selectedFmcgBuyerDistributionCoverageList?.name ?? '',
+                    partnerBrand: "",
+                    specifyRequirement: specifyRequirementsController.text,
+                  );
+                  if (!context.mounted) {
+                    return;
+                  }
+                  FocusManager.instance.primaryFocus?.unfocus();
+
+                  BlocProvider.of<AuthenticationCubit>(context)
+                      .fmcgRegisterDistributor(params);
+                }
+              },
+              text: "Register",
+              textStyle: TextStyleConstants.medium(
+                context,
+                fontSize: 16,
+                color: AppColors.white,
+              ),
+            ),
+            SizedBox(height: MediaQuery.of(context).padding.bottom),
+          ],
+        ),
       ),
     );
   }
 
   Widget brandForm() {
-    return Form(
-      key: formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(
-            height: 20,
-          ),
-          CommonTextField(
-            titleText: "Brand Name",
-            hintText: "Enter Brand Name",
-            controller: brandNameController,
-            textInputType: TextInputType.emailAddress,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (String? value) {
-              if (value == null || value.trim().isEmpty) {
-                return "Required";
-              }
-
-              return null;
-            },
-          ),
-          SizedBox(height: 12),
-          CommonTextField(
-            titleText: "Name/Firm name",
-            hintText: "Enter Name/Firm name",
-            controller: nameController,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (String? val) {
-              if (val == null || val.isEmpty) {
-                return "Required";
-              }
-
-              return null;
-            },
-          ),
-          SizedBox(height: 12),
-          CommonTextField(
-            titleText: "Email",
-            hintText: "Enter Email",
-            controller: emailController,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (String? val) {
-              if (val == null || val.isEmpty) {
-                return "Required";
-              }
-              if (val.isEmailValid == false) {
-                return "Enter valid email";
-              }
-
-              return null;
-            },
-          ),
-          SizedBox(height: 12),
-          CommonDropdown<FmcgCountryCodeList>(
-            label: 'Country Code',
-            hint: 'Select Country Code',
-            dropdownKey: countryCodeKey,
-            asyncItems: (filter, loadProps) {
-              return fetchCountryCode(filter, loadProps);
-            },
-            selectedItem: null,
-            itemAsString: (item) => item.countryText ?? "",
-            onChanged: (item) {
-              selectedCountryCode = item;
-            },
-            validator: (item) => item == null ? "Required" : null,
-            compareFn: (a, b) => a.countryText == b.countryText,
-          ),
-          SizedBox(height: 12),
-          CommonTextField(
-            titleText: "Mobile",
-            hintText: "Enter Mobile",
-            controller: mobileController,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            textInputType: TextInputType.phone,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            validator: (String? val) {
-              if (val == null || val.isEmpty) {
-                return "Required";
-              }
-
-              return null;
-            },
-          ),
-          SizedBox(height: 12),
-          CommonDropdown<FmcgSellerBusinessTypeList>(
-            label: 'What Best describes your business?',
-            hint: 'Select business.',
-            dropdownKey: fmcgSellerBusinessTypeListKey,
-            asyncItems: (filter, loadProps) {
-              return fetchFmcgSellerBusinessTypeList(filter, loadProps);
-            },
-            selectedItem: null,
-            itemAsString: (item) => item.name ?? "",
-            validator: (value) => value == null ? "Required" : null,
-            onChanged: (item) {
-              selectedFmcgSellerBusinessTypeList = item;
-            },
-            compareFn: (a, b) => a.name == b.name,
-          ),
-          SizedBox(height: 12),
-          CommonDropdown<FmcgSellerProductCategoryList>(
-            label: 'Which product categories do you sell?',
-            hint: 'Select product categories.',
-            dropdownKey: fmcgSellerProductCategoryListKey,
-            asyncItems: (filter, loadProps) {
-              return fetchFmcgSellerProductCategoryList(filter, loadProps);
-            },
-            selectedItem: null,
-            validator: (value) => value == null ? "Required" : null,
-            itemAsString: (item) => item.name ?? "",
-            onChanged: (item) {
-              selectedFmcgSellerProductCategoryList = item;
-            },
-            compareFn: (a, b) => a.name == b.name,
-          ),
-          SizedBox(height: 12),
-          CommonDropdown<FmcgSellerPartnershipTypeList>(
-            label: 'What type of Partnership are you seeking?',
-            hint: 'Select type of Partnership.',
-            dropdownKey: fmcgSellerPartnershipTypeListKey,
-            asyncItems: (filter, loadProps) {
-              return fetchFmcgSellerPartnershipTypeList(filter, loadProps);
-            },
-            selectedItem: null,
-            itemAsString: (item) => item.name ?? "",
-            onChanged: (item) {
-              selectedFmcgSellerPartnershipTypeList = item;
-            },
-            validator: (value) => value == null ? "Required" : null,
-            compareFn: (a, b) => a.name == b.name,
-          ),
-          SizedBox(height: 12),
-          CommonDropdown<FmcgSellerServiceLabelList>(
-            label: 'Do you offer Private label / white label services',
-            hint: 'Select services',
-            dropdownKey: fmcgSellerServiceLabelListKey,
-            asyncItems: (filter, loadProps) {
-              return fetchFmcgSellerServiceLabelList(filter, loadProps);
-            },
-            selectedItem: null,
-            itemAsString: (item) => item.name ?? "",
-            onChanged: (item) {
-              selectedFmcgSellerServiceLabelList = item;
-            },
-            validator: (value) => value == null ? "Required" : null,
-            compareFn: (a, b) => a.name == b.name,
-          ),
-          SizedBox(height: 12),
-          CommonDropdown<FmcgSellerExportingProductsList>(
-            label: 'Are you currently exporting your products?',
-            hint: 'Select currently exporting products.',
-            dropdownKey: fmcgSellerExportingProductsListKey,
-            asyncItems: (filter, loadProps) {
-              return fetchFmcgSellerExportingProductsList(filter, loadProps);
-            },
-            selectedItem: null,
-            itemAsString: (item) => item.name ?? "",
-            onChanged: (item) {
-              selectedFmcgSellerExportingProductsList = item;
-            },
-            validator: (value) => value == null ? "Required" : null,
-            compareFn: (a, b) => a.name == b.name,
-          ),
-          SizedBox(height: 20),
-          CommonButton(
-            onPressed: () async {
-              late FmcgRegisterSellerParams params;
-              if (formKey.currentState!.validate()) {
-                params = FmcgRegisterSellerParams(
-                  token: "2018APR031848",
-                  brandName: brandNameController.text,
-                  contactName: nameController.text,
-                  countryCode: selectedCountryCode?.countryCode ?? '',
-                  emailId: emailController.text,
-                  mobileNo: mobileController.text,
-                  osType: Platform.isAndroid ? "Android" : "iOS",
-                  fcmToken:
-                      await secureStorageService.read(AppStrings.fcmToken) ??
-                          "",
-                  manufacturer: manufacturer,
-                  model: model,
-                  osVersionRelease: osVersionRelease,
-                  appVersion: appVersion,
-                  deviceId: deviceId,
-                  businessType: selectedFmcgSellerBusinessTypeList?.name ?? '',
-                  productCategory:
-                      selectedFmcgSellerProductCategoryList?.name ?? '',
-                  partnershipType:
-                      selectedFmcgSellerPartnershipTypeList?.name ?? '',
-                  serviceLabel: selectedFmcgSellerServiceLabelList?.name ?? '',
-                  exportingProducts:
-                      selectedFmcgSellerExportingProductsList?.name ?? '',
-                  countryId: (selectedCountryCode?.id ?? "").toString(),
-                );
-                if (!context.mounted) {
-                  return;
-                }
-                FocusManager.instance.primaryFocus?.unfocus();
-
-                BlocProvider.of<AuthenticationCubit>(context)
-                    .fmcgRegisterSeller(params);
-              }
-            },
-            text: "Register",
-            textStyle: TextStyleConstants.medium(
-              context,
-              fontSize: 16,
-              color: AppColors.white,
+    return SafeArea(
+      top: false,
+      child: Form(
+        key: formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              height: 20,
             ),
-          ),
-          SizedBox(height: 20),
-        ],
+            CommonTextField(
+              titleText: "Brand Name",
+              hintText: "Enter Brand Name",
+              controller: brandNameController,
+              textInputType: TextInputType.emailAddress,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (String? value) {
+                if (value == null || value.trim().isEmpty) {
+                  return "Required";
+                }
+
+                return null;
+              },
+            ),
+            SizedBox(height: 12),
+            CommonTextField(
+              titleText: "Name/Firm name",
+              hintText: "Enter Name/Firm name",
+              controller: nameController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (String? val) {
+                if (val == null || val.isEmpty) {
+                  return "Required";
+                }
+
+                return null;
+              },
+            ),
+            SizedBox(height: 12),
+            CommonTextField(
+              titleText: "Email",
+              hintText: "Enter Email",
+              controller: emailController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (String? val) {
+                if (val == null || val.isEmpty) {
+                  return "Required";
+                }
+                if (val.isEmailValid == false) {
+                  return "Enter valid email";
+                }
+
+                return null;
+              },
+            ),
+            SizedBox(height: 12),
+            CommonDropdown<FmcgCountryCodeList>(
+              label: 'Country Code',
+              hint: 'Select Country Code',
+              dropdownKey: countryCodeKey,
+              asyncItems: (filter, loadProps) {
+                return fetchCountryCode(filter, loadProps);
+              },
+              selectedItem: null,
+              itemAsString: (item) => item.countryText ?? "",
+              onChanged: (item) {
+                selectedCountryCode = item;
+              },
+              validator: (item) => item == null ? "Required" : null,
+              compareFn: (a, b) => a.countryText == b.countryText,
+            ),
+            SizedBox(height: 12),
+            CommonTextField(
+              titleText: "Mobile",
+              hintText: "Enter Mobile",
+              controller: mobileController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              textInputType: TextInputType.phone,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              validator: (String? val) {
+                if (val == null || val.isEmpty) {
+                  return "Required";
+                }
+
+                return null;
+              },
+            ),
+            SizedBox(height: 12),
+            CommonDropdown<FmcgSellerBusinessTypeList>(
+              label: 'What Best describes your business?',
+              hint: 'Select business.',
+              dropdownKey: fmcgSellerBusinessTypeListKey,
+              asyncItems: (filter, loadProps) {
+                return fetchFmcgSellerBusinessTypeList(filter, loadProps);
+              },
+              selectedItem: null,
+              itemAsString: (item) => item.name ?? "",
+              validator: (value) => value == null ? "Required" : null,
+              onChanged: (item) {
+                selectedFmcgSellerBusinessTypeList = item;
+              },
+              compareFn: (a, b) => a.name == b.name,
+            ),
+            SizedBox(height: 12),
+            CommonDropdown<FmcgSellerProductCategoryList>(
+              label: 'Which product categories do you sell?',
+              hint: 'Select product categories.',
+              dropdownKey: fmcgSellerProductCategoryListKey,
+              asyncItems: (filter, loadProps) {
+                return fetchFmcgSellerProductCategoryList(filter, loadProps);
+              },
+              selectedItem: null,
+              validator: (value) => value == null ? "Required" : null,
+              itemAsString: (item) => item.name ?? "",
+              onChanged: (item) {
+                selectedFmcgSellerProductCategoryList = item;
+              },
+              compareFn: (a, b) => a.name == b.name,
+            ),
+            SizedBox(height: 12),
+            CommonDropdown<FmcgSellerPartnershipTypeList>(
+              label: 'What type of Partnership are you seeking?',
+              hint: 'Select type of Partnership.',
+              dropdownKey: fmcgSellerPartnershipTypeListKey,
+              asyncItems: (filter, loadProps) {
+                return fetchFmcgSellerPartnershipTypeList(filter, loadProps);
+              },
+              selectedItem: null,
+              itemAsString: (item) => item.name ?? "",
+              onChanged: (item) {
+                selectedFmcgSellerPartnershipTypeList = item;
+              },
+              validator: (value) => value == null ? "Required" : null,
+              compareFn: (a, b) => a.name == b.name,
+            ),
+            SizedBox(height: 12),
+            CommonDropdown<FmcgSellerServiceLabelList>(
+              label: 'Do you offer Private label / white label services',
+              hint: 'Select services',
+              dropdownKey: fmcgSellerServiceLabelListKey,
+              asyncItems: (filter, loadProps) {
+                return fetchFmcgSellerServiceLabelList(filter, loadProps);
+              },
+              selectedItem: null,
+              itemAsString: (item) => item.name ?? "",
+              onChanged: (item) {
+                selectedFmcgSellerServiceLabelList = item;
+              },
+              validator: (value) => value == null ? "Required" : null,
+              compareFn: (a, b) => a.name == b.name,
+            ),
+            SizedBox(height: 12),
+            CommonDropdown<FmcgSellerExportingProductsList>(
+              label: 'Are you currently exporting your products?',
+              hint: 'Select currently exporting products.',
+              dropdownKey: fmcgSellerExportingProductsListKey,
+              asyncItems: (filter, loadProps) {
+                return fetchFmcgSellerExportingProductsList(filter, loadProps);
+              },
+              selectedItem: null,
+              itemAsString: (item) => item.name ?? "",
+              onChanged: (item) {
+                selectedFmcgSellerExportingProductsList = item;
+              },
+              validator: (value) => value == null ? "Required" : null,
+              compareFn: (a, b) => a.name == b.name,
+            ),
+            SizedBox(height: 20),
+            CommonButton(
+              onPressed: () async {
+                late FmcgRegisterSellerParams params;
+                if (formKey.currentState!.validate()) {
+                  params = FmcgRegisterSellerParams(
+                    token: "2018APR031848",
+                    brandName: brandNameController.text,
+                    contactName: nameController.text,
+                    countryCode: selectedCountryCode?.countryCode ?? '',
+                    emailId: emailController.text,
+                    mobileNo: mobileController.text,
+                    osType: Platform.isAndroid ? "Android" : "iOS",
+                    fcmToken:
+                        await secureStorageService.read(AppStrings.fcmToken) ??
+                            "",
+                    manufacturer: manufacturer,
+                    model: model,
+                    osVersionRelease: osVersionRelease,
+                    appVersion: appVersion,
+                    deviceId: deviceId,
+                    businessType:
+                        selectedFmcgSellerBusinessTypeList?.name ?? '',
+                    productCategory:
+                        selectedFmcgSellerProductCategoryList?.name ?? '',
+                    partnershipType:
+                        selectedFmcgSellerPartnershipTypeList?.name ?? '',
+                    serviceLabel:
+                        selectedFmcgSellerServiceLabelList?.name ?? '',
+                    exportingProducts:
+                        selectedFmcgSellerExportingProductsList?.name ?? '',
+                    countryId: (selectedCountryCode?.id ?? "").toString(),
+                  );
+                  if (!context.mounted) {
+                    return;
+                  }
+                  FocusManager.instance.primaryFocus?.unfocus();
+
+                  BlocProvider.of<AuthenticationCubit>(context)
+                      .fmcgRegisterSeller(params);
+                }
+              },
+              text: "Register",
+              textStyle: TextStyleConstants.medium(
+                context,
+                fontSize: 16,
+                color: AppColors.white,
+              ),
+            ),
+            SizedBox(height: MediaQuery.of(context).padding.bottom),
+          ],
+        ),
       ),
     );
   }

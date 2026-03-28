@@ -46,15 +46,10 @@ class CommonAppbar extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverAppBar(
       pinned: true,
-      elevation: 0,
+      elevation: 5,
       expandedHeight: expandedHeight,
       automaticallyImplyLeading: false,
       backgroundColor: Colors.white,
-      systemOverlayStyle: SystemUiOverlayStyle(
-        statusBarColor: Colors.white,
-        statusBarBrightness: statusBarBrightness,
-        statusBarIconBrightness: statusBarIconBrightness,
-      ),
       flexibleSpace: LayoutBuilder(
         builder: (context, constraints) {
           final double topSafe = MediaQuery.of(context).padding.top;

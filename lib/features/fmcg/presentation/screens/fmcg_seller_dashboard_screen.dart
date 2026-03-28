@@ -57,7 +57,7 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen> {
       searchText: search,
       category: categories == null || categories.isEmpty
           ? ""
-          : categories.join(","), // 🔥 important
+          : categories.join("###"),
     );
 
     await chatCubit.getDistributorList(params);
@@ -426,7 +426,7 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen> {
                       context, enquiry.quotationUserId.toString()),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 28,
+                      horizontal: 24,
                       vertical: 12,
                     ),
                     decoration: BoxDecoration(
@@ -442,7 +442,7 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen> {
                       "Connect",
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 15,
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
