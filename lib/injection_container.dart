@@ -41,6 +41,7 @@ import 'features/my_account/injection_container_my_account.dart'
 import 'features/notification/injection_container_notification.dart'
     as di_notification;
 import 'features/fmcg/injection_container_chat.dart' as di_chat;
+import 'features/socket/injection_container_chats.dart' as di_chats;
 
 import 'core/utils/app_strings.dart';
 import 'core/utils/constants.dart';
@@ -111,6 +112,7 @@ Future<void> init(Future<void> Function(RemoteMessage) handler) async {
   await di_notification.init();
   await di_add_negotiation.init();
   await di_chat.init();
+  await di_chats.init();
 
   //! init variable
   Constants.isLogin = bool.tryParse(

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
@@ -14,6 +15,7 @@ import 'package:tradologie_app/core/utils/responsive.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/features/app/injection_container_app.dart';
+import 'package:tradologie_app/features/socket/presentation/chat_view.dart';
 
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/assets_manager.dart';
@@ -178,6 +180,17 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         sl<NavigationService>()
                             .pushNamed(Routes.fmcgSignIn, arguments: true);
                         AnalyticsService.logEvent("fmcg_buyer_button_clicked");
+                      },
+                    ),
+                    BusinessCard(
+                      title: "Chat",
+                      subtitle: "Register/Login as Distributor.",
+                      image: "assets/images/fmcg_image.jpg",
+                      onTap: () async {
+                        Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                                builder: (context) => const ChatView()));
                       },
                     ),
                     // BusinessCard(
