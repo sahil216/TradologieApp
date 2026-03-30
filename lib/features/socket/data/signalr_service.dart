@@ -1,69 +1,56 @@
-import 'package:signalr_netcore/signalr_client.dart';
+import 'dart:async';
+
+import 'package:signalr_netcore/http_connection_options.dart';
+import 'package:signalr_netcore/hub_connection.dart';
+import 'package:signalr_netcore/hub_connection_builder.dart';
+import 'package:signalr_netcore/itransport.dart';
+import 'package:tradologie_app/features/socket/presentation/chat_view_model.dart';
 
 class SignalRService {
-  late HubConnection _connection;
+  HubConnection? hub;
 
-  Function(String user, String message)? onMessageReceived;
+  String baseUrl = "https://connect.tradologie.com";
+  String myUserId = "";
 
-  Future<void> connect(String token, String userId) async {
-    _connection = HubConnectionBuilder()
+  final _messageController = StreamController<ChatMessage>.broadcast();
+
+  Stream<ChatMessage> get messageStream => _messageController.stream;
+
+  final _connectionController = StreamController<bool>.broadcast();
+  Stream<bool> get connectionStream => _connectionController.stream;
+
+  Future<void> connect(String userId) async {
+    myUserId = userId;
+
+    hub = HubConnectionBuilder()
         .withUrl(
-          "https://connect.tradologie.com/signalr",
+          "$baseUrl/chathub",
           options: HttpConnectionOptions(
             transport: HttpTransportType.WebSockets,
-            accessTokenFactory: () async => token,
           ),
         )
-        .withAutomaticReconnect()
         .build();
 
-    /// 🔥 RECEIVE MESSAGE
-    _connection.on("receiveMessage", (args) {
-      if (args != null && args.length >= 2) {
-        final user = args[0].toString();
-        final message = args[1].toString();
+    // ✅ RECEIVE MESSAGE
+    hub!.on("receiveMessage", (args) {
+      final user = args![0] as String;
+      final message = args[1] as String;
 
-        onMessageReceived?.call(user, message);
-      }
+      _messageController.add(ChatMessage(user, message));
     });
 
-    /// ✅ FIXED CALLBACK SIGNATURES
-    _connection.onclose(({Exception? error}) {
-      print("❌ Connection closed: $error");
-    });
+    await hub!.start();
+    await hub!.invoke("Connect", args: [userId]);
 
-    _connection.onreconnecting(({Exception? error}) {
-      print("🔄 Reconnecting...");
-    });
-
-    _connection.onreconnected(({String? connectionId}) {
-      print("✅ Reconnected");
-    });
-
-    /// 🚀 START CONNECTION
-    await _connection.start();
-
-    print("✅ Connected");
-
-    /// 👤 CONNECT USER (IMPORTANT)
-    await _connection.invoke("Connect", args: [userId]);
+    _connectionController.add(true);
   }
 
-  /// 📤 SEND MESSAGE
-  Future<void> sendMessage(
-      String fromUser, String toUser, String message) async {
-    if (_connection.state != HubConnectionState.Connected) {
-      print("❌ Not connected yet");
-      return;
-    }
-
-    await _connection.invoke(
-      "SendMessage",
-      args: [fromUser, toUser, message],
-    );
+  Future<void> sendMessage(String toUser, String message) async {
+    await hub!.invoke("SendMessage", args: [myUserId, toUser, message]);
   }
 
-  Future<void> disconnect() async {
-    await _connection.stop();
+  void dispose() {
+    _messageController.close();
+    _connectionController.close();
   }
 }
