@@ -101,8 +101,8 @@ class _ChatViewState extends State<ChatView> {
                       if (controller.text.trim().isEmpty) return;
 
                       context.read<ChatsCubit>().sendMessage(
-                            "2", // toUser
-                            controller.text,
+                            toUser: "2",
+                            message: controller.text,
                           );
 
                       controller.clear();

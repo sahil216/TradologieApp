@@ -18,11 +18,29 @@ class ChatsCubit extends Cubit<List<ChatMessage>> {
     });
   }
 
-  Future<void> sendMessage(String toUser, String message) async {
-    await _service.sendMessage(toUser, message);
+  Future<void> sendMessage({
+    required String toUser,
+    required String message,
+    String? file,
+    String? fileType,
+  }) async {
+    await _service.sendMessage(
+      toUser: toUser,
+      message: message,
+      file: file,
+      fileType: fileType,
+    );
 
-    // Optimistic update
-    emit([...state, ChatMessage("me", message)]);
+    emit([
+      ...state,
+      ChatMessage(
+        user: "me",
+        message: message,
+        file: file,
+        fileType: fileType,
+        type: "Seller",
+      )
+    ]);
   }
 
   @override
@@ -36,5 +54,35 @@ class ChatsCubit extends Cubit<List<ChatMessage>> {
 class ChatMessage {
   final String user;
   final String message;
-  ChatMessage(this.user, this.message);
+  final String? file;
+  final String? fileType;
+  final String? type;
+
+  ChatMessage({
+    required this.user,
+    required this.message,
+    this.file,
+    this.fileType,
+    this.type,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      "fromUserId": user,
+      "message": message,
+      "file": file,
+      "fileType": fileType,
+      "type": type,
+    };
+  }
+
+  factory ChatMessage.fromJson(Map<String, dynamic> json) {
+    return ChatMessage(
+      user: json["fromUserId"] ?? "",
+      message: json["message"] ?? "",
+      file: json["file"],
+      fileType: json["fileType"],
+      type: json["type"],
+    );
+  }
 }

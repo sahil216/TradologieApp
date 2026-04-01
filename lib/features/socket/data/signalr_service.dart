@@ -39,26 +39,22 @@ class SignalRService {
       try {
         if (arguments == null || arguments.isEmpty) return;
 
-        /// Case 1: Backend sends JSON object
-        if (arguments[0] is Map) {
-          final data = arguments[0] as Map;
+        final raw = arguments[0];
 
-          final message = ChatMessage(
-            data["fromUserId"],
-            data["message"],
-          );
+        if (raw is Map) {
+          final data = Map<String, dynamic>.from(raw);
 
+          final message = ChatMessage.fromJson(data);
           _messageController.add(message);
         }
 
-        /// Case 2: Backend sends multiple params
-        else if (arguments.length >= 2) {
-          final fromUser = arguments[0]?.toString() ?? "";
-          final messageText = arguments[1]?.toString() ?? "";
+        /// If backend sends JSON string
+        else if (raw is String) {
+          final decoded = jsonDecode(raw);
+          final data = Map<String, dynamic>.from(decoded);
 
-          _messageController.add(
-            ChatMessage(fromUser, messageText),
-          );
+          final message = ChatMessage.fromJson(data);
+          _messageController.add(message);
         }
       } catch (e) {
         print("Receive message error: $e");
@@ -84,11 +80,24 @@ class SignalRService {
     _connectionController.add(true);
   }
 
-  Future<void> sendMessage(String toUser, String message) async {
+  Future<void> sendMessage({
+    required String toUser,
+    required String message,
+    String? file,
+    String? fileType,
+    String type = "Seller",
+  }) async {
     if (hub?.state == HubConnectionState.Connected) {
+      final messageObj = {
+        "message": message,
+        "file": file,
+        "fileType": fileType,
+        "type": type,
+      };
+
       await hub!.invoke(
         "SendMessage",
-        args: [myUserId, toUser, message],
+        args: [myUserId, toUser, messageObj],
       );
     }
   }
