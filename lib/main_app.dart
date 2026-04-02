@@ -6,7 +6,8 @@ import 'package:tradologie_app/features/add_negotiation/presentation/cubit/add_n
 import 'package:tradologie_app/features/fmcg/presentation/cubit/chat_cubit.dart';
 import 'package:tradologie_app/features/notification/presentation/cubit/notification_cubit.dart';
 import 'package:tradologie_app/features/my_account/presentation/cubit/my_account_cubit.dart';
-import 'package:tradologie_app/features/socket/presentation/chat_view_model.dart';
+import 'package:tradologie_app/features/socket/presentation/chat_bloc.dart';
+import 'package:tradologie_app/features/socket/presentation/cubit/attachement_cubit.dart';
 import 'package:tradologie_app/features/webview/presentation/cubit/webview_cubit.dart';
 
 import 'config/routes/app_router.dart';
@@ -35,7 +36,8 @@ class MainApp extends StatelessWidget {
         BlocProvider(create: (context) => sl<NotificationCubit>()),
         BlocProvider(create: (context) => sl<AddNegotiationCubit>()),
         BlocProvider(create: (context) => sl<ChatCubit>()),
-        BlocProvider(create: (context) => sl<ChatsCubit>()),
+        BlocProvider(create: (context) => sl<ChatBloc>()),
+        BlocProvider(create: (context) => sl<AttachmentCubit>()),
       ],
       child: MultiBlocListener(
         listeners: [

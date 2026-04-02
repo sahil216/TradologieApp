@@ -15,7 +15,8 @@ import 'package:tradologie_app/core/utils/responsive.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/features/app/injection_container_app.dart';
-import 'package:tradologie_app/features/socket/presentation/chat_view.dart';
+import 'package:tradologie_app/features/socket/presentation/screen/chat_view.dart';
+import 'package:tradologie_app/features/socket/presentation/screen/message_bubble.dart';
 
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/assets_manager.dart';
@@ -190,7 +191,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         Navigator.push(
                             context,
                             CupertinoPageRoute(
-                                builder: (context) => const ChatView()));
+                                builder: (context) => const ChatView(
+                                      myUserId: '1',
+                                      toUserId: '2',
+                                    )));
                       },
                     ),
                     // BusinessCard(
