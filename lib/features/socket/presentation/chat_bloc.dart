@@ -43,7 +43,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       ChatConnectEvent event, Emitter<ChatState> emit) async {
     emit(const ChatConnecting());
     try {
-      await _service.connect(event.userId);
+      await _service.connect(event.userId, role: event.role);
 
       _msgSub = _service.messageStream.listen((msg) {
         add(ChatMessageReceivedEvent(msg));
@@ -84,9 +84,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     emit(current.copyWith(messages: [...current.messages, optimistic]));
 
     try {
-      await _service.sendMessage(event.toUser, event.message);
+      // Pass the full ChatMessage model — service calls .toJson() before invoking hub
+      await _service.sendMessage(event.toUser, optimistic);
     } catch (_) {
-      // message stays in list but UI can reflect failure via isUploading if needed
+      // message stays in list; isUploading can surface failure if needed
     }
   }
 
@@ -112,7 +113,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       await _service.sendImage(
         toUser: event.toUser,
         file: event.file,
-        fileType: "image",
+        mimeType: "image/jpeg",
         fileName: optimistic.message,
       );
       _updateLast(optimistic, isUploading: false);
@@ -199,9 +200,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     }
   }
 
-  // ─────────────── Typing ───────────────
+  // // ─────────────── Typing ───────────────
   // void _onTyping(ChatTypingEvent event, Emitter<ChatState> emit) {
-  //   // _service.sendTyping(event.toUser);
+  //   _service.sendTyping(event.toUser);
   // }
 
   void _onUserTyping(ChatUserTypingEvent event, Emitter<ChatState> emit) {

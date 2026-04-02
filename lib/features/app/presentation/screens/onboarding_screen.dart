@@ -191,7 +191,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         Navigator.push(
                             context,
                             CupertinoPageRoute(
-                                builder: (context) => const ChatView(
+                                builder: (context) => ChatPage(
                                       myUserId: '1',
                                       toUserId: '2',
                                     )));

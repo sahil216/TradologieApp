@@ -7,10 +7,12 @@ import 'package:tradologie_app/features/socket/presentation/cubit/attachement_cu
 import 'package:tradologie_app/features/socket/presentation/screen/chat_input_bar.dart';
 import 'package:tradologie_app/features/socket/presentation/screen/message_bubble.dart';
 import 'package:tradologie_app/features/socket/presentation/screen/typing_indicator.dart';
+import '../../../../injection_container.dart';
 
 class ChatView extends StatefulWidget {
   final String myUserId;
   final String toUserId;
+  final String role; // "Seller", "Buyer", etc. — passed to SignalR
   final String? recipientName;
   final String? recipientAvatarUrl;
 
@@ -18,6 +20,7 @@ class ChatView extends StatefulWidget {
     super.key,
     required this.myUserId,
     required this.toUserId,
+    required this.role,
     this.recipientName,
     this.recipientAvatarUrl,
   });
@@ -33,7 +36,9 @@ class _ChatViewState extends State<ChatView> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      context.read<ChatBloc>().add(ChatConnectEvent(widget.myUserId));
+      context
+          .read<ChatBloc>()
+          .add(ChatConnectEvent(widget.myUserId, role: widget.role));
     });
   }
 
@@ -120,18 +125,16 @@ class _ChatViewState extends State<ChatView> {
                     message: state.reason ?? "Disconnected",
                     color: Colors.red,
                     showRetry: true,
-                    onRetry: () => context
-                        .read<ChatBloc>()
-                        .add(ChatConnectEvent(widget.myUserId)),
+                    onRetry: () => context.read<ChatBloc>().add(
+                        ChatConnectEvent(widget.myUserId, role: widget.role)),
                   );
                 } else if (state is ChatError) {
                   return ConnectionBanner(
                     message: state.message,
                     color: Colors.red,
                     showRetry: true,
-                    onRetry: () => context
-                        .read<ChatBloc>()
-                        .add(ChatConnectEvent(widget.myUserId)),
+                    onRetry: () => context.read<ChatBloc>().add(
+                        ChatConnectEvent(widget.myUserId, role: widget.role)),
                   );
                 }
                 return const SizedBox.shrink();
@@ -336,6 +339,43 @@ class _DateDivider extends StatelessWidget {
           ),
           const Expanded(child: Divider()),
         ],
+      ),
+    );
+  }
+}
+
+class ChatPage extends StatelessWidget {
+  final String myUserId;
+  final String toUserId;
+  final String? recipientName;
+
+  final String role;
+
+  ChatPage({
+    super.key,
+    this.myUserId = "1",
+    this.toUserId = "2",
+    this.recipientName,
+    this.role = "Seller", // set to your app's actual role
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        // sl<ChatBloc>() calls the factory — fresh instance per page
+        BlocProvider<ChatBloc>(
+          create: (_) => sl<ChatBloc>(),
+        ),
+        BlocProvider<AttachmentCubit>(
+          create: (_) => sl<AttachmentCubit>(),
+        ),
+      ],
+      child: ChatView(
+        myUserId: myUserId,
+        toUserId: toUserId,
+        recipientName: recipientName ?? "User $toUserId",
+        role: 'seller',
       ),
     );
   }
