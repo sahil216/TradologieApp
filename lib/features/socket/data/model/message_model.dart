@@ -1,5 +1,5 @@
 class ChatMessage {
-  final String user; // fromUserId
+  final String? user; // fromUserId
   final String message;
   final String? file; // base64 string or file URL
   final String?
@@ -14,7 +14,7 @@ class ChatMessage {
   final DateTime? timestamp;
 
   ChatMessage({
-    required this.user,
+    this.user,
     required this.message,
     this.file,
     this.fileType,
@@ -39,8 +39,7 @@ class ChatMessage {
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
     return ChatMessage(
-      user: json["fromUserId"] ?? "",
-      message: json["message"] ?? "",
+      message: json["message"],
       file: json["file"],
       fileType: json["fileType"],
       type: json["type"], // role string from BE

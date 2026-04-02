@@ -47,20 +47,31 @@ class SignalRService {
         if (arguments == null || arguments.isEmpty) return;
 
         ChatMessage? msg;
+        final raw = arguments[1];
 
-        if (arguments[0] is Map) {
-          // BE sends full object: { fromUserId, message, file, fileType, type }
-          msg = ChatMessage.fromJson(
-              Map<String, dynamic>.from(arguments[0] as Map));
+        if (raw is Map) {
+          // Case 1: SignalR deserialised it into a Map already
+          msg = ChatMessage.fromJson(Map<String, dynamic>.from(raw));
+          _messageController.add(msg);
+        } else if (raw is String) {
+          // Case 2: Backend sent a JSON-encoded string — parse it first
+          final decoded = jsonDecode(raw);
+          if (decoded is Map) {
+            msg = ChatMessage.fromJson(Map<String, dynamic>.from(decoded));
+            _messageController.add(msg);
+          } else {
+            // Plain string fallback
+            msg = ChatMessage(user: "", message: raw);
+            _messageController.add(msg);
+          }
         } else if (arguments.length >= 2) {
-          // BE sends positional args
+          // Case 3: Backend sends positional args (fromUserId, message)
           msg = ChatMessage(
             user: arguments[0]?.toString() ?? "",
             message: arguments[1]?.toString() ?? "",
           );
+          _messageController.add(msg);
         }
-
-        if (msg != null) _messageController.add(msg);
       } catch (e) {
         print("receiveMessage error: $e");
       }
@@ -69,11 +80,11 @@ class SignalRService {
     /// ===========================
     /// TYPING INDICATOR
     /// ===========================
-    hub!.on("userTyping", (arguments) {
-      if (arguments != null && arguments.isNotEmpty) {
-        _typingController.add(arguments[0]?.toString() ?? "");
-      }
-    });
+    // hub!.on("userTyping", (arguments) {
+    //   if (arguments != null && arguments.isNotEmpty) {
+    //     _typingController.add(arguments[0]?.toString() ?? "");
+    //   }
+    // });
 
     hub!.onclose(({Exception? error}) {
       _connectionController.add(false);
@@ -99,8 +110,7 @@ class SignalRService {
   /// Plain text message
   Future<void> sendMessage(String toUser, ChatMessage chatMessage) async {
     if (hub?.state != HubConnectionState.Connected) return;
-    await hub!
-        .invoke("SendMessage", args: [myUserId, toUser, chatMessage.toJson()]);
+    await hub!.invoke("SendMessage", args: [chatMessage.toJson(), toUser]);
   }
 
   /// Image from camera or gallery
