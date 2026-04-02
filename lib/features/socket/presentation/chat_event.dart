@@ -68,7 +68,7 @@ class ChatSendVoiceEvent extends ChatEvent {
 }
 
 class ChatMessageReceivedEvent extends ChatEvent {
-  final ChatMessageModel message;
+  final ChatMessage message;
   const ChatMessageReceivedEvent(this.message);
 
   @override
@@ -83,13 +83,13 @@ class ChatConnectionChangedEvent extends ChatEvent {
   List<Object?> get props => [isConnected];
 }
 
-class ChatTypingEvent extends ChatEvent {
-  final String toUser;
-  const ChatTypingEvent(this.toUser);
+// class ChatTypingEvent extends ChatEvent {
+//   final String toUser;
+//   const ChatTypingEvent(this.toUser);
 
-  @override
-  List<Object?> get props => [toUser];
-}
+//   @override
+//   List<Object?> get props => [toUser];
+// }
 
 class ChatUserTypingEvent extends ChatEvent {
   final String userId;
@@ -124,7 +124,7 @@ class ChatRecordingTickEvent extends ChatEvent {
 }
 
 class ChatUpdateMessageEvent extends ChatEvent {
-  final ChatMessageModel message;
+  final ChatMessage message;
   const ChatUpdateMessageEvent(this.message);
 
   @override

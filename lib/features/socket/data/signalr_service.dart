@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:signalr_netcore/http_connection_options.dart';
 import 'package:signalr_netcore/hub_connection.dart';
@@ -11,8 +12,8 @@ class SignalRService {
   final String baseUrl = "http://connect.tradologie.com";
   String myUserId = "";
 
-  final _messageController = StreamController<ChatMessageModel>.broadcast();
-  Stream<ChatMessageModel> get messageStream => _messageController.stream;
+  final _messageController = StreamController<ChatMessage>.broadcast();
+  Stream<ChatMessage> get messageStream => _messageController.stream;
 
   final _connectionController = StreamController<bool>.broadcast();
   Stream<bool> get connectionStream => _connectionController.stream;
@@ -34,69 +35,55 @@ class SignalRService {
         .build();
 
     /// ===========================
-    /// RECEIVE TEXT MESSAGE
+    /// RECEIVE MESSAGE
     /// ===========================
     hub!.on("receiveMessage", (arguments) {
       try {
         if (arguments == null || arguments.isEmpty) return;
 
+        ChatMessage? message;
+
         if (arguments[0] is Map) {
-          final data = arguments[0] as Map;
-          final message = ChatMessageModel(
-            id: DateTime.now().millisecondsSinceEpoch.toString(),
-            fromUserId: data["fromUserId"] ?? "",
-            message: data["message"] ?? "",
-            type: MessageType.text,
-            timestamp: DateTime.now(),
+          // Backend sends a JSON object
+          message = ChatMessage.fromJson(
+            Map<String, dynamic>.from(arguments[0] as Map),
           );
-          _messageController.add(message);
         } else if (arguments.length >= 2) {
-          final fromUser = arguments[0]?.toString() ?? "";
-          final messageText = arguments[1]?.toString() ?? "";
-          _messageController.add(ChatMessageModel(
-            id: DateTime.now().millisecondsSinceEpoch.toString(),
-            fromUserId: fromUser,
-            message: messageText,
-            type: MessageType.text,
-            timestamp: DateTime.now(),
-          ));
+          // Backend sends multiple positional params
+          message = ChatMessage(
+            user: arguments[0]?.toString() ?? "",
+            message: arguments[1]?.toString() ?? "",
+            type: "text",
+          );
         }
+
+        if (message != null) _messageController.add(message);
       } catch (e) {
-        print("Receive message error: $e");
+        print("receiveMessage error: $e");
       }
     });
 
     /// ===========================
-    /// RECEIVE FILE/ATTACHMENT
+    /// RECEIVE FILE / ATTACHMENT
     /// ===========================
     hub!.on("receiveFile", (arguments) {
       try {
         if (arguments == null || arguments.isEmpty) return;
 
         if (arguments[0] is Map) {
-          final data = arguments[0] as Map;
-          final rawType = data["fileType"]?.toString() ?? "file";
-          final type = _parseMessageType(rawType);
-          final message = ChatMessageModel(
-            id: DateTime.now().millisecondsSinceEpoch.toString(),
-            fromUserId: data["fromUserId"] ?? "",
+          final data = Map<String, dynamic>.from(arguments[0] as Map);
+          // Map server file payload into ChatMessage
+          final message = ChatMessage(
+            user: data["fromUserId"] ?? "",
             message: data["fileName"] ?? "Attachment",
-            type: type,
-            attachmentUrl: data["fileUrl"],
-            fileName: data["fileName"],
-            fileSize: data["fileSize"] != null
-                ? int.tryParse(data["fileSize"].toString())
-                : null,
-            duration: data["duration"] != null
-                ? Duration(
-                    seconds: int.tryParse(data["duration"].toString()) ?? 0)
-                : null,
-            timestamp: DateTime.now(),
+            file: data["fileUrl"],
+            fileType: data["fileType"],
+            type: "file",
           );
           _messageController.add(message);
         }
       } catch (e) {
-        print("Receive file error: $e");
+        print("receiveFile error: $e");
       }
     });
 
@@ -123,78 +110,101 @@ class SignalRService {
     _connectionController.add(true);
   }
 
+  /// Send a plain text message
   Future<void> sendMessage(String toUser, String message) async {
-    if (hub?.state == HubConnectionState.Connected) {
-      await hub!.invoke(
-        "SendMessage",
-        args: [myUserId, toUser, message],
-      );
-    }
+    if (hub?.state != HubConnectionState.Connected) return;
+
+    final payload = ChatMessage(
+      user: myUserId,
+      message: message,
+      type: "text",
+    );
+
+    await hub!.invoke(
+      "SendMessage",
+      args: [myUserId, toUser, message],
+    );
   }
 
-  Future<void> sendFile({
+  /// Send an image (camera or gallery)
+  Future<void> sendImage({
     required String toUser,
     required File file,
-    required String fileType,
+    required String fileType, // "image"
     String? fileName,
-    int? duration,
   }) async {
-    if (hub?.state == HubConnectionState.Connected) {
-      final bytes = await file.readAsBytes();
-      final base64 = _encodeBase64(bytes);
-      await hub!.invoke(
-        "SendFile",
-        args: [
-          myUserId,
-          toUser,
-          base64,
-          fileType,
-          fileName ?? file.path.split('/').last,
-          bytes.length,
-          if (duration != null) duration,
-        ],
-      );
-    }
+    if (hub?.state != HubConnectionState.Connected) return;
+
+    final bytes = await file.readAsBytes();
+    final base64Data = base64Encode(bytes);
+    final name = fileName ?? file.path.split('/').last;
+
+    final payload = ChatMessage(
+      user: myUserId,
+      message: name,
+      file: base64Data,
+      fileType: fileType,
+      type: "file",
+    );
+
+    await hub!.invoke("SendFile", args: [payload.toJson(), toUser]);
   }
 
-  Future<void> sendTyping(String toUser) async {
-    if (hub?.state == HubConnectionState.Connected) {
-      await hub!.invoke("Typing", args: [myUserId, toUser]);
-    }
+  /// Send a PDF
+  Future<void> sendPdf({
+    required String toUser,
+    required File file,
+    String? fileName,
+  }) async {
+    if (hub?.state != HubConnectionState.Connected) return;
+
+    final bytes = await file.readAsBytes();
+    final base64Data = base64Encode(bytes);
+    final name = fileName ?? file.path.split('/').last;
+
+    final payload = ChatMessage(
+      user: myUserId,
+      message: name,
+      file: base64Data,
+      fileType: "pdf",
+      type: "file",
+    );
+
+    await hub!.invoke("SendFile", args: [payload.toJson(), toUser]);
   }
 
-  String _encodeBase64(List<int> bytes) {
-    const base64Chars =
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-    var result = '';
-    for (var i = 0; i < bytes.length; i += 3) {
-      final b0 = bytes[i];
-      final b1 = i + 1 < bytes.length ? bytes[i + 1] : 0;
-      final b2 = i + 2 < bytes.length ? bytes[i + 2] : 0;
-      result += base64Chars[(b0 >> 2) & 0x3F];
-      result += base64Chars[((b0 & 0x03) << 4) | ((b1 >> 4) & 0x0F)];
-      result += i + 1 < bytes.length
-          ? base64Chars[((b1 & 0x0F) << 2) | ((b2 >> 6) & 0x03)]
-          : '=';
-      result += i + 2 < bytes.length ? base64Chars[b2 & 0x3F] : '=';
-    }
-    return result;
+  /// Send a voice recording
+  Future<void> sendVoice({
+    required String toUser,
+    required File file,
+    required Duration duration,
+  }) async {
+    if (hub?.state != HubConnectionState.Connected) return;
+
+    final bytes = await file.readAsBytes();
+    final base64Data = base64Encode(bytes);
+
+    final payload = ChatMessage(
+      user: myUserId,
+      message: "Voice message (${_formatDuration(duration)})",
+      file: base64Data,
+      fileType: "audio",
+      type: "file",
+    );
+
+    await hub!.invoke("SendFile", args: [payload.toJson(), toUser]);
   }
 
-  MessageType _parseMessageType(String type) {
-    switch (type.toLowerCase()) {
-      case 'image':
-        return MessageType.image;
-      case 'pdf':
-        return MessageType.pdf;
-      case 'audio':
-      case 'voice':
-        return MessageType.voice;
-      case 'video':
-        return MessageType.video;
-      default:
-        return MessageType.file;
-    }
+  // Future<void> sendTyping(String toUser) async {
+  //   if (hub?.state == HubConnectionState.Connected) {
+  //     await hub!.invoke("Typing", args: [myUserId, toUser]);
+  //   }
+  // }
+
+  String _formatDuration(Duration d) {
+    final m = d.inMinutes.toString().padLeft(2, '0');
+    final s = (d.inSeconds % 60).toString().padLeft(2, '0');
+    return '$m:$s';
   }
 
   Future<void> disconnect() async {

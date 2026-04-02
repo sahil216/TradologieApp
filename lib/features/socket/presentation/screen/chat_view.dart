@@ -185,14 +185,14 @@ class _ChatViewState extends State<ChatView> {
                         return const TypingIndicator();
                       }
                       final msg = messages[index];
-                      final showDate = index == 0 ||
-                          !_isSameDay(
-                            messages[index - 1].timestamp,
-                            msg.timestamp,
-                          );
+                      // final showDate = index == 0 ||
+                      //     !_isSameDay(
+                      //       messages[index - 1].timestamp,
+                      //       msg.timestamp,
+                      //     );
                       return Column(
                         children: [
-                          if (showDate) _DateDivider(date: msg.timestamp),
+                          // if (showDate) _DateDivider(date: msg.timestamp),
                           MessageBubble(message: msg),
                         ],
                       );

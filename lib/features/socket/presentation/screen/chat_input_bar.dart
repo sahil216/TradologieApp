@@ -38,7 +38,7 @@ class _ChatInputBarState extends State<ChatInputBar>
 
       // Typing indicator
       if (has) {
-        context.read<ChatBloc>().add(ChatTypingEvent(widget.toUserId));
+        // context.read<ChatBloc>().add(ChatTypingEvent(widget.toUserId));
       }
     });
 

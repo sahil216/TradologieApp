@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:tradologie_app/features/socket/data/model/message_model.dart';
 
 class MessageBubble extends StatelessWidget {
-  final ChatMessageModel message;
+  final ChatMessage message;
 
   const MessageBubble({super.key, required this.message});
 
@@ -52,7 +52,15 @@ class MessageBubble extends StatelessWidget {
           ),
           if (isMe) ...[
             const SizedBox(width: 4),
-            _StatusIcon(status: message.status),
+            if (message.isUploading)
+              const SizedBox(
+                width: 12,
+                height: 12,
+                child: CircularProgressIndicator(
+                    strokeWidth: 1.5, color: Colors.grey),
+              )
+            else
+              const Icon(Icons.check, size: 14, color: Colors.grey),
           ],
         ],
       ),
@@ -60,27 +68,17 @@ class MessageBubble extends StatelessWidget {
   }
 
   Widget _buildContent(bool isMe) {
-    switch (message.type) {
-      case MessageType.text:
-        return _TextContent(message: message, isMe: isMe);
-      case MessageType.image:
-        return _ImageContent(message: message, isMe: isMe);
-      case MessageType.pdf:
-        return _PdfContent(message: message, isMe: isMe);
-      case MessageType.voice:
-        return _VoiceContent(message: message, isMe: isMe);
-      case MessageType.video:
-      case MessageType.file:
-        return _FileContent(message: message, isMe: isMe);
-    }
+    if (message.isImage) return _ImageContent(message: message, isMe: isMe);
+    if (message.isPdf) return _PdfContent(message: message, isMe: isMe);
+    if (message.isAudio) return _VoiceContent(message: message, isMe: isMe);
+    return _TextContent(message: message, isMe: isMe);
   }
 }
 
 // ─────────────── Text ───────────────
 class _TextContent extends StatelessWidget {
-  final ChatMessageModel message;
+  final ChatMessage message;
   final bool isMe;
-
   const _TextContent({required this.message, required this.isMe});
 
   @override
@@ -115,9 +113,8 @@ class _TextContent extends StatelessWidget {
 
 // ─────────────── Image ───────────────
 class _ImageContent extends StatelessWidget {
-  final ChatMessageModel message;
+  final ChatMessage message;
   final bool isMe;
-
   const _ImageContent({required this.message, required this.isMe});
 
   @override
@@ -131,7 +128,6 @@ class _ImageContent extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          // Image
           ConstrainedBox(
             constraints: const BoxConstraints(
               minWidth: 160,
@@ -141,29 +137,16 @@ class _ImageContent extends StatelessWidget {
             ),
             child: _buildImage(),
           ),
-          // Upload overlay
           if (message.isUploading)
             Positioned.fill(
               child: Container(
                 color: Colors.black38,
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2),
-                      const SizedBox(height: 6),
-                      Text(
-                        "${(message.uploadProgress * 100).toInt()}%",
-                        style:
-                            const TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                    ],
-                  ),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                      color: Colors.white, strokeWidth: 2),
                 ),
               ),
             ),
-          // Time stamp
           Positioned(
             bottom: 6,
             right: 8,
@@ -185,23 +168,19 @@ class _ImageContent extends StatelessWidget {
   }
 
   Widget _buildImage() {
+    // Local file (just taken / picked)
     if (message.localFilePath != null) {
-      return Image.file(
-        File(message.localFilePath!),
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => _placeholder(),
-      );
+      return Image.file(File(message.localFilePath!),
+          fit: BoxFit.cover, errorBuilder: (_, __, ___) => _placeholder());
     }
-    if (message.attachmentUrl != null) {
-      return Image.network(
-        message.attachmentUrl!,
-        fit: BoxFit.cover,
-        loadingBuilder: (_, child, progress) {
-          if (progress == null) return child;
-          return const Center(child: CircularProgressIndicator());
-        },
-        errorBuilder: (_, __, ___) => _placeholder(),
-      );
+    // Remote URL from server (file field holds URL after upload)
+    if (message.file != null && message.file!.startsWith('http')) {
+      return Image.network(message.file!,
+          fit: BoxFit.cover,
+          loadingBuilder: (_, child, progress) => progress == null
+              ? child
+              : const Center(child: CircularProgressIndicator()),
+          errorBuilder: (_, __, ___) => _placeholder());
     }
     return _placeholder();
   }
@@ -216,9 +195,8 @@ class _ImageContent extends StatelessWidget {
 
 // ─────────────── PDF ───────────────
 class _PdfContent extends StatelessWidget {
-  final ChatMessageModel message;
+  final ChatMessage message;
   final bool isMe;
-
   const _PdfContent({required this.message, required this.isMe});
 
   @override
@@ -239,75 +217,48 @@ class _PdfContent extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Center(
-                  child: Text(
-                    "PDF",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                    ),
-                  ),
+                  child: Text("PDF",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13)),
                 ),
               ),
               const SizedBox(width: 10),
               Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      message.fileName ?? message.message,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: isMe ? Colors.white : Colors.black87,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 13,
-                      ),
-                    ),
-                    if (message.formattedFileSize.isNotEmpty) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        message.formattedFileSize,
-                        style: TextStyle(
-                          color: isMe
-                              ? Colors.white.withOpacity(0.7)
-                              : Colors.grey,
-                          fontSize: 11,
-                        ),
-                      ),
-                    ],
-                  ],
+                child: Text(
+                  message.message,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: isMe ? Colors.white : Colors.black87,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 13,
+                  ),
                 ),
               ),
+              const SizedBox(width: 6),
               if (message.isUploading)
                 const SizedBox(
                   width: 20,
                   height: 20,
                   child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
+                      strokeWidth: 2, color: Colors.white),
                 )
               else
-                Icon(
-                  Icons.download,
-                  color: isMe ? Colors.white70 : Colors.grey,
-                  size: 20,
-                ),
+                Icon(Icons.download,
+                    color: isMe ? Colors.white70 : Colors.grey, size: 20),
             ],
           ),
           const SizedBox(height: 6),
           Align(
             alignment: Alignment.centerRight,
-            child: Text(
-              message.formattedTime,
-              style: TextStyle(
-                color: isMe
-                    ? Colors.white.withOpacity(0.65)
-                    : Colors.grey.shade500,
-                fontSize: 11,
-              ),
-            ),
+            child: Text(message.formattedTime,
+                style: TextStyle(
+                    color: isMe
+                        ? Colors.white.withOpacity(0.65)
+                        : Colors.grey.shade500,
+                    fontSize: 11)),
           ),
         ],
       ),
@@ -317,9 +268,8 @@ class _PdfContent extends StatelessWidget {
 
 // ─────────────── Voice ───────────────
 class _VoiceContent extends StatefulWidget {
-  final ChatMessageModel message;
+  final ChatMessage message;
   final bool isMe;
-
   const _VoiceContent({required this.message, required this.isMe});
 
   @override
@@ -328,7 +278,6 @@ class _VoiceContent extends StatefulWidget {
 
 class _VoiceContentState extends State<_VoiceContent> {
   bool _isPlaying = false;
-  double _progress = 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -362,26 +311,19 @@ class _VoiceContentState extends State<_VoiceContent> {
                 ),
               ),
               const SizedBox(width: 10),
-              Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Waveform visualization
-                    _WaveformBar(
-                      progress: _progress,
-                      isMe: isMe,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      message.formattedDuration,
-                      style: TextStyle(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _WaveformBar(isMe: isMe),
+                  const SizedBox(height: 4),
+                  Text(
+                    message.formattedDuration,
+                    style: TextStyle(
                         fontSize: 11,
                         color:
-                            isMe ? Colors.white.withOpacity(0.7) : Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
+                            isMe ? Colors.white.withOpacity(0.7) : Colors.grey),
+                  ),
+                ],
               ),
               if (message.isUploading)
                 Padding(
@@ -390,9 +332,8 @@ class _VoiceContentState extends State<_VoiceContent> {
                     width: 16,
                     height: 16,
                     child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: isMe ? Colors.white70 : Colors.blue,
-                    ),
+                        strokeWidth: 2,
+                        color: isMe ? Colors.white70 : Colors.blue),
                   ),
                 ),
             ],
@@ -400,15 +341,12 @@ class _VoiceContentState extends State<_VoiceContent> {
           const SizedBox(height: 4),
           Align(
             alignment: Alignment.centerRight,
-            child: Text(
-              message.formattedTime,
-              style: TextStyle(
-                color: isMe
-                    ? Colors.white.withOpacity(0.65)
-                    : Colors.grey.shade500,
-                fontSize: 11,
-              ),
-            ),
+            child: Text(message.formattedTime,
+                style: TextStyle(
+                    color: isMe
+                        ? Colors.white.withOpacity(0.65)
+                        : Colors.grey.shade500,
+                    fontSize: 11)),
           ),
         ],
       ),
@@ -417,14 +355,11 @@ class _VoiceContentState extends State<_VoiceContent> {
 }
 
 class _WaveformBar extends StatelessWidget {
-  final double progress;
   final bool isMe;
-
-  const _WaveformBar({required this.progress, required this.isMe});
+  const _WaveformBar({required this.isMe});
 
   @override
   Widget build(BuildContext context) {
-    // Simulated waveform heights
     const bars = [
       0.4,
       0.7,
@@ -452,100 +387,20 @@ class _WaveformBar extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: List.generate(bars.length, (i) {
-          final filled = i / bars.length <= progress;
-          return Container(
-            width: 3,
-            height: 22 * bars[i],
-            margin: const EdgeInsets.symmetric(horizontal: 1),
-            decoration: BoxDecoration(
-              color: filled
-                  ? (isMe ? Colors.white : Colors.blue)
-                  : (isMe
-                      ? Colors.white.withOpacity(0.35)
-                      : Colors.blue.withOpacity(0.3)),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          );
-        }),
-      ),
-    );
-  }
-}
-
-// ─────────────── Generic File ───────────────
-class _FileContent extends StatelessWidget {
-  final ChatMessageModel message;
-  final bool isMe;
-
-  const _FileContent({required this.message, required this.isMe});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(12),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.insert_drive_file,
-            color: isMe ? Colors.white70 : Colors.blue,
-            size: 36,
-          ),
-          const SizedBox(width: 8),
-          Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  message.fileName ?? "File",
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: isMe ? Colors.white : Colors.black87,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                Text(
-                  message.formattedTime,
-                  style: TextStyle(
+        children: bars
+            .map((h) => Container(
+                  width: 3,
+                  height: 22 * h,
+                  margin: const EdgeInsets.symmetric(horizontal: 1),
+                  decoration: BoxDecoration(
                     color: isMe
-                        ? Colors.white.withOpacity(0.65)
-                        : Colors.grey.shade500,
-                    fontSize: 11,
+                        ? Colors.white.withOpacity(0.7)
+                        : Colors.blue.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(2),
                   ),
-                ),
-              ],
-            ),
-          ),
-        ],
+                ))
+            .toList(),
       ),
     );
-  }
-}
-
-// ─────────────── Status Icon ───────────────
-class _StatusIcon extends StatelessWidget {
-  final MessageStatus status;
-
-  const _StatusIcon({required this.status});
-
-  @override
-  Widget build(BuildContext context) {
-    switch (status) {
-      case MessageStatus.sending:
-        return const SizedBox(
-          width: 12,
-          height: 12,
-          child:
-              CircularProgressIndicator(strokeWidth: 1.5, color: Colors.grey),
-        );
-      case MessageStatus.sent:
-        return const Icon(Icons.check, size: 14, color: Colors.grey);
-      case MessageStatus.delivered:
-        return const Icon(Icons.done_all, size: 14, color: Colors.blue);
-      case MessageStatus.failed:
-        return const Icon(Icons.error_outline, size: 14, color: Colors.red);
-    }
   }
 }

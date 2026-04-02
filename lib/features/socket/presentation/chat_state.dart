@@ -17,7 +17,7 @@ class ChatConnecting extends ChatState {
 }
 
 class ChatConnected extends ChatState {
-  final List<ChatMessageModel> messages;
+  final List<ChatMessage> messages;
   final bool isTyping;
   final String typingUserId;
   final bool isRecording;
@@ -34,7 +34,7 @@ class ChatConnected extends ChatState {
   });
 
   ChatConnected copyWith({
-    List<ChatMessageModel>? messages,
+    List<ChatMessage>? messages,
     bool? isTyping,
     String? typingUserId,
     bool? isRecording,

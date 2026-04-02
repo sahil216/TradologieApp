@@ -1,54 +1,89 @@
-enum MessageType { text, image, pdf, voice, video, file }
-
-enum MessageStatus { sending, sent, delivered, failed }
-
-class ChatMessageModel {
-  final String id;
-  final String fromUserId;
+class ChatMessage {
+  final String user;
   final String message;
-  final MessageType type;
-  final MessageStatus status;
-  final DateTime timestamp;
+  final String? file;
+  final String? fileType;
+  final String? type;
 
-  // Attachment fields
-  final String? attachmentUrl;
+  // UI-only fields (not sent to server)
   final String? localFilePath;
-  final String? fileName;
-  final int? fileSize;
   final Duration? duration;
+  final bool isMe;
   final bool isUploading;
-  final double uploadProgress;
+  final DateTime? timestamp;
 
-  const ChatMessageModel({
-    required this.id,
-    required this.fromUserId,
+  ChatMessage({
+    required this.user,
     required this.message,
-    required this.type,
-    this.status = MessageStatus.sent,
-    required this.timestamp,
-    this.attachmentUrl,
+    this.file,
+    this.fileType,
+    this.type,
     this.localFilePath,
-    this.fileName,
-    this.fileSize,
     this.duration,
+    bool? isMe,
     this.isUploading = false,
-    this.uploadProgress = 0.0,
-  });
+    DateTime? timestamp,
+  })  : isMe = isMe ?? user == "me",
+        timestamp = timestamp ?? DateTime.now();
 
-  bool get isMe => fromUserId == "me";
-
-  String get formattedTime {
-    final h = timestamp.hour.toString().padLeft(2, '0');
-    final m = timestamp.minute.toString().padLeft(2, '0');
-    return "$h:$m";
+  Map<String, dynamic> toJson() {
+    return {
+      "fromUserId": user,
+      "message": message,
+      "file": file,
+      "fileType": fileType,
+      "type": type,
+    };
   }
 
-  String get formattedFileSize {
-    if (fileSize == null) return '';
-    if (fileSize! < 1024) return '${fileSize}B';
-    if (fileSize! < 1024 * 1024)
-      return '${(fileSize! / 1024).toStringAsFixed(1)}KB';
-    return '${(fileSize! / (1024 * 1024)).toStringAsFixed(1)}MB';
+  factory ChatMessage.fromJson(Map<String, dynamic> json) {
+    return ChatMessage(
+      user: json["fromUserId"] ?? "",
+      message: json["message"] ?? "",
+      file: json["file"],
+      fileType: json["fileType"],
+      type: json["type"],
+    );
+  }
+
+  ChatMessage copyWith({
+    String? user,
+    String? message,
+    String? file,
+    String? fileType,
+    String? type,
+    String? localFilePath,
+    Duration? duration,
+    bool? isMe,
+    bool? isUploading,
+    DateTime? timestamp,
+  }) {
+    return ChatMessage(
+      user: user ?? this.user,
+      message: message ?? this.message,
+      file: file ?? this.file,
+      fileType: fileType ?? this.fileType,
+      type: type ?? this.type,
+      localFilePath: localFilePath ?? this.localFilePath,
+      duration: duration ?? this.duration,
+      isMe: isMe ?? this.isMe,
+      isUploading: isUploading ?? this.isUploading,
+      timestamp: timestamp ?? this.timestamp,
+    );
+  }
+
+  // ── Helpers ────────────────────────────────────────────────
+  bool get isImage => fileType == "image";
+  bool get isPdf => fileType == "pdf";
+  bool get isAudio => fileType == "audio" || fileType == "voice";
+  bool get isFile => type == "file";
+  bool get isText => type == "text" || (type == null && file == null);
+
+  String get formattedTime {
+    final t = timestamp ?? DateTime.now();
+    final h = t.hour.toString().padLeft(2, '0');
+    final m = t.minute.toString().padLeft(2, '0');
+    return '$h:$m';
   }
 
   String get formattedDuration {
@@ -56,37 +91,5 @@ class ChatMessageModel {
     final m = duration!.inMinutes.toString().padLeft(2, '0');
     final s = (duration!.inSeconds % 60).toString().padLeft(2, '0');
     return '$m:$s';
-  }
-
-  ChatMessageModel copyWith({
-    String? id,
-    String? fromUserId,
-    String? message,
-    MessageType? type,
-    MessageStatus? status,
-    DateTime? timestamp,
-    String? attachmentUrl,
-    String? localFilePath,
-    String? fileName,
-    int? fileSize,
-    Duration? duration,
-    bool? isUploading,
-    double? uploadProgress,
-  }) {
-    return ChatMessageModel(
-      id: id ?? this.id,
-      fromUserId: fromUserId ?? this.fromUserId,
-      message: message ?? this.message,
-      type: type ?? this.type,
-      status: status ?? this.status,
-      timestamp: timestamp ?? this.timestamp,
-      attachmentUrl: attachmentUrl ?? this.attachmentUrl,
-      localFilePath: localFilePath ?? this.localFilePath,
-      fileName: fileName ?? this.fileName,
-      fileSize: fileSize ?? this.fileSize,
-      duration: duration ?? this.duration,
-      isUploading: isUploading ?? this.isUploading,
-      uploadProgress: uploadProgress ?? this.uploadProgress,
-    );
   }
 }

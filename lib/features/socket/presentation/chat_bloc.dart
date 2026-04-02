@@ -10,7 +10,7 @@ import 'chat_state.dart';
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final SignalRService _service;
-  AudioRecorder? _recorder;
+  AudioRecorder? _recorder; // lazy — avoids MissingPluginException at startup
 
   StreamSubscription? _msgSub;
   StreamSubscription? _connSub;
@@ -29,7 +29,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<ChatSendVoiceEvent>(_onSendVoice);
     on<ChatMessageReceivedEvent>(_onMessageReceived);
     on<ChatConnectionChangedEvent>(_onConnectionChanged);
-    on<ChatTypingEvent>(_onTyping);
+    // on<ChatTypingEvent>(_onTyping);
     on<ChatUserTypingEvent>(_onUserTyping);
     on<ChatStartRecordingEvent>(_onStartRecording);
     on<ChatStopRecordingEvent>(_onStopRecording);
@@ -38,6 +38,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<ChatUpdateMessageEvent>(_onUpdateMessage);
   }
 
+  // ─────────────── Connect ───────────────
   Future<void> _onConnect(
       ChatConnectEvent event, Emitter<ChatState> emit) async {
     emit(const ChatConnecting());
@@ -47,11 +48,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       _msgSub = _service.messageStream.listen((msg) {
         add(ChatMessageReceivedEvent(msg));
       });
-
       _connSub = _service.connectionStream.listen((connected) {
         add(ChatConnectionChangedEvent(connected));
       });
-
       _typingSub = _service.typingStream.listen((userId) {
         add(ChatUserTypingEvent(userId));
       });
@@ -68,194 +67,120 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     emit(const ChatDisconnected());
   }
 
+  // ─────────────── Send Text ───────────────
   Future<void> _onSendMessage(
       ChatSendMessageEvent event, Emitter<ChatState> emit) async {
     if (state is! ChatConnected) return;
     final current = state as ChatConnected;
 
-    final optimistic = ChatMessageModel(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      fromUserId: "me",
+    final optimistic = ChatMessage(
+      user: "1",
       message: event.message,
-      type: MessageType.text,
-      status: MessageStatus.sending,
-      timestamp: DateTime.now(),
+      type: "text",
+      isMe: true,
+      isUploading: false,
     );
 
     emit(current.copyWith(messages: [...current.messages, optimistic]));
 
     try {
       await _service.sendMessage(event.toUser, event.message);
-      final updated = optimistic.copyWith(status: MessageStatus.sent);
-      final updatedMessages = current.messages.map((m) {
-        return m.id == optimistic.id ? updated : m;
-      }).toList()
-        ..add(updated);
-
-      emit(current.copyWith(
-        messages: current.messages
-            .map((m) => m.id == optimistic.id
-                ? optimistic.copyWith(status: MessageStatus.sent)
-                : m)
-            .toList(),
-      ));
-    } catch (e) {
-      emit(current.copyWith(
-        messages: current.messages
-            .map((m) => m.id == optimistic.id
-                ? optimistic.copyWith(status: MessageStatus.failed)
-                : m)
-            .toList(),
-      ));
+    } catch (_) {
+      // message stays in list but UI can reflect failure via isUploading if needed
     }
   }
 
+  // ─────────────── Send Image ───────────────
   Future<void> _onSendImage(
       ChatSendImageEvent event, Emitter<ChatState> emit) async {
     if (state is! ChatConnected) return;
     final current = state as ChatConnected;
 
-    final tempId = DateTime.now().millisecondsSinceEpoch.toString();
-    final optimistic = ChatMessageModel(
-      id: tempId,
-      fromUserId: "me",
-      message: "Photo",
-      type: MessageType.image,
+    final optimistic = ChatMessage(
+      user: "me",
+      message: event.file.path.split('/').last,
+      fileType: "image",
+      type: "file",
       localFilePath: event.file.path,
-      fileName: event.file.path.split('/').last,
-      fileSize: await event.file.length(),
-      status: MessageStatus.sending,
-      timestamp: DateTime.now(),
+      isMe: true,
       isUploading: true,
     );
 
     emit(current.copyWith(messages: [...current.messages, optimistic]));
 
     try {
-      await _service.sendFile(
+      await _service.sendImage(
         toUser: event.toUser,
         file: event.file,
-        fileType: 'image',
-        fileName: optimistic.fileName,
+        fileType: "image",
+        fileName: optimistic.message,
       );
-      emit((state as ChatConnected).copyWith(
-        messages: (state as ChatConnected)
-            .messages
-            .map((m) => m.id == tempId
-                ? m.copyWith(status: MessageStatus.sent, isUploading: false)
-                : m)
-            .toList(),
-      ));
-    } catch (e) {
-      emit((state as ChatConnected).copyWith(
-        messages: (state as ChatConnected)
-            .messages
-            .map((m) => m.id == tempId
-                ? m.copyWith(status: MessageStatus.failed, isUploading: false)
-                : m)
-            .toList(),
-      ));
+      _updateLast(optimistic, isUploading: false);
+    } catch (_) {
+      _updateLast(optimistic, isUploading: false);
     }
   }
 
+  // ─────────────── Send PDF ───────────────
   Future<void> _onSendPdf(
       ChatSendPdfEvent event, Emitter<ChatState> emit) async {
     if (state is! ChatConnected) return;
     final current = state as ChatConnected;
 
-    final tempId = DateTime.now().millisecondsSinceEpoch.toString();
     final fileName = event.file.path.split('/').last;
-    final fileSize = await event.file.length();
-
-    final optimistic = ChatMessageModel(
-      id: tempId,
-      fromUserId: "me",
+    final optimistic = ChatMessage(
+      user: "me",
       message: fileName,
-      type: MessageType.pdf,
+      fileType: "pdf",
+      type: "file",
       localFilePath: event.file.path,
-      fileName: fileName,
-      fileSize: fileSize,
-      status: MessageStatus.sending,
-      timestamp: DateTime.now(),
+      isMe: true,
       isUploading: true,
     );
 
     emit(current.copyWith(messages: [...current.messages, optimistic]));
 
     try {
-      await _service.sendFile(
-        toUser: event.toUser,
-        file: event.file,
-        fileType: 'pdf',
-        fileName: fileName,
-      );
-      emit((state as ChatConnected).copyWith(
-        messages: (state as ChatConnected)
-            .messages
-            .map((m) => m.id == tempId
-                ? m.copyWith(status: MessageStatus.sent, isUploading: false)
-                : m)
-            .toList(),
-      ));
-    } catch (e) {
-      emit((state as ChatConnected).copyWith(
-        messages: (state as ChatConnected)
-            .messages
-            .map((m) => m.id == tempId
-                ? m.copyWith(status: MessageStatus.failed, isUploading: false)
-                : m)
-            .toList(),
-      ));
+      await _service.sendPdf(
+          toUser: event.toUser, file: event.file, fileName: fileName);
+      _updateLast(optimistic, isUploading: false);
+    } catch (_) {
+      _updateLast(optimistic, isUploading: false);
     }
   }
 
+  // ─────────────── Send Voice ───────────────
   Future<void> _onSendVoice(
       ChatSendVoiceEvent event, Emitter<ChatState> emit) async {
     if (state is! ChatConnected) return;
     final current = state as ChatConnected;
 
-    final tempId = DateTime.now().millisecondsSinceEpoch.toString();
-    final optimistic = ChatMessageModel(
-      id: tempId,
-      fromUserId: "me",
+    final optimistic = ChatMessage(
+      user: "me",
       message: "Voice message",
-      type: MessageType.voice,
+      fileType: "audio",
+      type: "file",
       localFilePath: event.file.path,
       duration: event.duration,
-      status: MessageStatus.sending,
-      timestamp: DateTime.now(),
+      isMe: true,
       isUploading: true,
     );
 
     emit(current.copyWith(messages: [...current.messages, optimistic]));
 
     try {
-      await _service.sendFile(
+      await _service.sendVoice(
         toUser: event.toUser,
         file: event.file,
-        fileType: 'audio',
-        duration: event.duration.inSeconds,
+        duration: event.duration,
       );
-      emit((state as ChatConnected).copyWith(
-        messages: (state as ChatConnected)
-            .messages
-            .map((m) => m.id == tempId
-                ? m.copyWith(status: MessageStatus.sent, isUploading: false)
-                : m)
-            .toList(),
-      ));
-    } catch (e) {
-      emit((state as ChatConnected).copyWith(
-        messages: (state as ChatConnected)
-            .messages
-            .map((m) => m.id == tempId
-                ? m.copyWith(status: MessageStatus.failed, isUploading: false)
-                : m)
-            .toList(),
-      ));
+      _updateLast(optimistic, isUploading: false);
+    } catch (_) {
+      _updateLast(optimistic, isUploading: false);
     }
   }
 
+  // ─────────────── Receive ───────────────
   void _onMessageReceived(
       ChatMessageReceivedEvent event, Emitter<ChatState> emit) {
     if (state is! ChatConnected) return;
@@ -270,17 +195,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         emit(const ChatDisconnected(reason: "Connection lost"));
       }
     } else {
-      if (state is! ChatConnected) {
-        emit(const ChatConnected());
-      }
+      if (state is! ChatConnected) emit(const ChatConnected());
     }
   }
 
-  void _onTyping(ChatTypingEvent event, Emitter<ChatState> emit) {
-    _typingTimer?.cancel();
-    _service.sendTyping(event.toUser);
-    _typingTimer = Timer(const Duration(seconds: 2), () {});
-  }
+  // ─────────────── Typing ───────────────
+  // void _onTyping(ChatTypingEvent event, Emitter<ChatState> emit) {
+  //   // _service.sendTyping(event.toUser);
+  // }
 
   void _onUserTyping(ChatUserTypingEvent event, Emitter<ChatState> emit) {
     if (state is! ChatConnected) return;
@@ -295,14 +217,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     });
   }
 
+  // ─────────────── Recording ───────────────
   Future<void> _onStartRecording(
       ChatStartRecordingEvent event, Emitter<ChatState> emit) async {
     if (state is! ChatConnected) return;
     final current = state as ChatConnected;
 
     try {
-      _recorder ??=
-          AudioRecorder(); // created lazily — avoids MissingPluginException at startup
+      _recorder ??= AudioRecorder();
       final hasPermission = await _recorder!.hasPermission();
       if (!hasPermission) return;
 
@@ -325,7 +247,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         add(ChatRecordingTickEvent(_recordingDuration));
       });
     } catch (e) {
-      emit(ChatError('Microphone permission denied'));
+      emit(ChatError('Microphone error: $e'));
     }
   }
 
@@ -336,36 +258,35 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     _recordingTimer?.cancel();
     final path = await _recorder?.stop();
+    final capturedDuration = _recordingDuration;
+    _recordingDuration = Duration.zero;
 
     emit(
         current.copyWith(isRecording: false, recordingDuration: Duration.zero));
 
-    if (path != null && _recordingDuration.inSeconds >= 1) {
+    if (path != null && capturedDuration.inSeconds >= 1) {
       add(ChatSendVoiceEvent(
         toUser: event.toUser,
         file: File(path),
-        duration: _recordingDuration,
+        duration: capturedDuration,
       ));
     }
-    _recordingDuration = Duration.zero;
   }
 
   Future<void> _onCancelRecording(
       ChatCancelRecordingEvent event, Emitter<ChatState> emit) async {
     if (state is! ChatConnected) return;
-    final current = state as ChatConnected;
-
     _recordingTimer?.cancel();
     await _recorder?.stop();
     _recordingDuration = Duration.zero;
 
     if (_recordingPath != null) {
-      final file = File(_recordingPath!);
-      if (await file.exists()) await file.delete();
+      final f = File(_recordingPath!);
+      if (await f.exists()) await f.delete();
     }
 
-    emit(
-        current.copyWith(isRecording: false, recordingDuration: Duration.zero));
+    emit((state as ChatConnected)
+        .copyWith(isRecording: false, recordingDuration: Duration.zero));
   }
 
   void _onRecordingTick(ChatRecordingTickEvent event, Emitter<ChatState> emit) {
@@ -378,9 +299,20 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     final current = state as ChatConnected;
     emit(current.copyWith(
       messages: current.messages
-          .map((m) => m.id == event.message.id ? event.message : m)
+          .map((m) => m == event.message ? event.message : m)
           .toList(),
     ));
+  }
+
+  // ─────────────── Helper ───────────────
+  /// Update the last message matching [original] in the current state.
+  void _updateLast(ChatMessage original, {required bool isUploading}) {
+    if (state is! ChatConnected) return;
+    final current = state as ChatConnected;
+    final updated = current.messages.map((m) {
+      return m == original ? m.copyWith(isUploading: isUploading) : m;
+    }).toList();
+    emit(current.copyWith(messages: updated));
   }
 
   @override
