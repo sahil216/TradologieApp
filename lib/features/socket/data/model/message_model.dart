@@ -30,15 +30,16 @@ class ChatMessage {
   /// Wire format sent to / received from the backend
   Map<String, dynamic> toJson() {
     return {
-      "Message": message,
-      "File": file,
-      "FileType": fileType,
-      "Type": type, // role: "Seller" / "Buyer"
+      "message": message,
+      "file": file,
+      "fileType": fileType,
+      "type": type, // role: "Seller" / "Buyer"
     };
   }
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
     return ChatMessage(
+      user: json["fromUserId"],
       message: json["message"],
       file: json["file"],
       fileType: json["fileType"],

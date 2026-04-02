@@ -110,7 +110,8 @@ class SignalRService {
   /// Plain text message
   Future<void> sendMessage(String toUser, ChatMessage chatMessage) async {
     if (hub?.state != HubConnectionState.Connected) return;
-    await hub!.invoke("SendMessage", args: [chatMessage.toJson(), toUser]);
+    await hub!
+        .invoke("SendMessage", args: [myUserId, toUser, chatMessage.toJson()]);
   }
 
   /// Image from camera or gallery
