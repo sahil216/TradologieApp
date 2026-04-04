@@ -6,6 +6,7 @@ import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/features/contact_us/more_options_screen.dart';
+import 'package:tradologie_app/features/fmcg/domain/entities/chat_list.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/chat_list_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_buyer_dashboard_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_my_account_screen.dart';
@@ -17,11 +18,13 @@ import 'package:tradologie_app/features/webview/presentation/screens/webview_scr
 class CommonFMCGFloatingNavBar extends StatelessWidget {
   final int index;
   final Function(int) onTap;
+  final int unreadCount;
 
   const CommonFMCGFloatingNavBar({
     super.key,
     required this.index,
     required this.onTap,
+    this.unreadCount = 0,
   });
 
   @override
@@ -42,8 +45,9 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
         children: [
           if (Constants.isBuyer == true) ...[
             _item(0, Icons.dashboard_outlined, "BrandHub"),
-            _item(1, Icons.local_grocery_store_outlined, "FMCG"),
-            _item(2, Icons.menu_rounded, "More"),
+            _item(1, Icons.chat_outlined, "Chats"),
+            _item(2, Icons.local_grocery_store_outlined, "FMCG"),
+            _item(3, Icons.menu_rounded, "More"),
           ] else ...[
             _item(0, Icons.dashboard_outlined, "Dashboard"),
             _item(1, Icons.chat_outlined, "Chats"),
@@ -58,6 +62,7 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
 
   Widget _item(int i, IconData icon, String label) {
     final bool selected = i == index;
+    final bool isChat = label == "Chats";
 
     const activeColor = Color(0xFF0A9FED);
     const inactiveColor = Colors.black87;
@@ -68,7 +73,6 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            /// 🔴 Top Indicator
             AnimatedContainer(
               duration: const Duration(milliseconds: 250),
               height: 3,
@@ -80,16 +84,33 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
               ),
             ),
 
-            /// Icon
-            Icon(
-              icon,
-              size: 20,
-              color: selected ? activeColor : inactiveColor,
+            /// 🔥 ICON WITH BADGE
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Icon(
+                  icon,
+                  size: 20,
+                  color: selected ? activeColor : inactiveColor,
+                ),
+                if (isChat && unreadCount > 0)
+                  Positioned(
+                    right: -6,
+                    top: -4,
+                    child: Container(
+                      width: 10,
+                      height: 10,
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+              ],
             ),
 
             const SizedBox(height: 4),
 
-            /// Label
             Text(
               label,
               overflow: TextOverflow.ellipsis,
@@ -107,7 +128,9 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
 }
 
 class FMCGMainScreen extends StatefulWidget {
-  const FMCGMainScreen({super.key});
+  const FMCGMainScreen({
+    super.key,
+  });
 
   @override
   State<FMCGMainScreen> createState() => _FMCGMainScreenState();
@@ -116,7 +139,15 @@ class FMCGMainScreen extends StatefulWidget {
 class _FMCGMainScreenState extends State<FMCGMainScreen> {
   int currentIndex = 0;
 
+  int unreadCount = 0;
   SecureStorageService secureStorage = SecureStorageService();
+
+  // void updateUnreadCount(List<ChatList> chats) {
+  //   unreadCount = chats.fold(0, (sum, chat) {
+  //     return sum + (chat.unreadCount ?? 0);
+  //   });
+  //   setState(() {});
+  // }
 
   Future<void> nameUpdate() async {
     Constants.name = Constants.isFmcg == true
@@ -156,6 +187,7 @@ class _FMCGMainScreenState extends State<FMCGMainScreen> {
   ];
   final List<Widget> buyerScreens = [
     FmcgBuyerDashboardScreen(),
+    ChatListScreen(),
     Constants.isAndroid14OrBelow && Platform.isAndroid
         ? InAppWebViewScreen(
             params: WebviewParams(
@@ -186,6 +218,7 @@ class _FMCGMainScreenState extends State<FMCGMainScreen> {
       bottomNavigationBar: CommonFMCGFloatingNavBar(
         index: currentIndex,
         onTap: onTabChanged,
+        unreadCount: unreadCount,
       ),
     );
   }

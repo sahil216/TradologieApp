@@ -18,6 +18,7 @@ import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_pos
 import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_sell_stock_listing.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/post_stock_requirement_screen.dart';
+import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_products_screen.dart';
 import 'package:tradologie_app/features/my_account/presentation/screens/buyer_my_account_screens/add_address_screen.dart';
 import 'package:tradologie_app/features/my_account/presentation/screens/buyer_my_account_screens/edit_account_screen.dart';
 import 'package:tradologie_app/features/my_account/presentation/screens/my_account_screen.dart';
@@ -97,6 +98,7 @@ class Routes {
   static const String chatListScreen = '/chatListScreen';
   static const String chatScreen = '/chatScreen';
   static const String fmcgMainScreen = '/fmcgMainScreen';
+  static const String fmcgProductCatalogueRoute = '/fmcgProductCatalogue';
 }
 
 class AppRoutes {
@@ -171,6 +173,12 @@ class AppRoutes {
       case Routes.dashboardRoute:
         return CupertinoPageRoute(builder: (context) {
           return const DashboardScreen();
+        });
+      case Routes.fmcgProductCatalogueRoute:
+        return CupertinoPageRoute(builder: (context) {
+          return FmcgProductsScreen(
+            brandId: routeSettings.arguments as String,
+          );
         });
       case Routes.buyerDashboardRoute:
         return CupertinoPageRoute(builder: (context) {

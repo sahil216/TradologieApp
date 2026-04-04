@@ -8,15 +8,24 @@ class ChatListParams {
   final String sellerID;
   final String token;
   final String deviceID;
+  final String buyerID;
+  final String type;
 
   ChatListParams({
     required this.sellerID,
     required this.token,
     required this.deviceID,
+    required this.buyerID,
+    required this.type,
   });
 
-  Map<String, dynamic> toJson() =>
-      {"SellerID": sellerID, "Token": token, "DeviceID": deviceID};
+  Map<String, dynamic> toJson() => {
+        "SellerID": sellerID,
+        "Token": token,
+        "DeviceID": deviceID,
+        "BuyerID": buyerID,
+        "Type": type,
+      };
 }
 
 class ChatListUsecase implements UseCase<List<ChatList>, ChatListParams> {

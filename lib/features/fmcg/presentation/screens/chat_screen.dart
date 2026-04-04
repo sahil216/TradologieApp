@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -113,8 +114,8 @@ class _ChatScreenState extends State<ChatScreen>
       token: token,
       contents: message ?? "",
       chatID: chatId ?? "0",
-      buyerID: widget.chat.quotationUserId ?? "",
-      sellerID: Constants.isBuyer ? widget.chat.userId ?? "" : loginId,
+      buyerID: Constants.isBuyer ? loginId : widget.chat.quotationUserId ?? "",
+      sellerID: Constants.isBuyer ? widget.chat.sellerId ?? "" : loginId,
       deviceID: Constants.deviceID,
       isMessage: isMessage,
       fileType: "",
@@ -347,7 +348,9 @@ class _ChatScreenState extends State<ChatScreen>
               return Column(
                 children: [
                   ChatTopBar(
-                    name: widget.chat.name ?? "",
+                    name: Constants.isBuyer
+                        ? widget.chat.userId ?? ""
+                        : widget.chat.name ?? "",
                     imageUrl: "",
                     notificationCount: 2,
                     isOnline:

@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 
 class ChatList extends Equatable {
   String? quotationUserId;
+  String? sellerId;
   String? userId;
   String? name;
   String? countryCode;
@@ -17,6 +18,7 @@ class ChatList extends Equatable {
   ChatList({
     this.quotationUserId,
     this.userId,
+    this.sellerId,
     this.name,
     this.countryCode,
     this.mobile,
@@ -33,6 +35,7 @@ class ChatList extends Equatable {
   List<Object?> get props => [
         quotationUserId,
         userId,
+        sellerId,
         name,
         countryCode,
         mobile,

@@ -11,6 +11,7 @@ import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_brands_li
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_distributor_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_file_url_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_initial_chat_id_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_products_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_documents_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_profile_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/update_seller_documents_usecase.dart';
@@ -21,6 +22,8 @@ abstract class ChatRemoteDataSource {
   Future<ResponseWrapper<dynamic>?> chatData(ChatDataParams params);
   Future<ResponseWrapper<dynamic>?> getDistributorList(
       GetDistributorListParams params);
+  Future<ResponseWrapper<dynamic>?> getProductsList(
+      GetProductsListParams params);
   Future<ResponseWrapper<dynamic>?> fmcgGetSellerProfile(
       GetSellerProfileParams params);
   Future<ResponseWrapper<dynamic>?> fmcgUpdateSellerProfile(
@@ -145,6 +148,15 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       GetInitialChatIdParams params) async {
     return await apiConsumer.post(
       EndPoints.getInitialChatId,
+      body: params.toJson(),
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> getProductsList(
+      GetProductsListParams params) async {
+    return await apiConsumer.post(
+      EndPoints.getProductsList,
       body: params.toJson(),
     );
   }

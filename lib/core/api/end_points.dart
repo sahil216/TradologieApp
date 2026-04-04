@@ -37,6 +37,8 @@ class EndPoints {
     return '$baseUrl/${userType.name}/login';
   }
 
+  static String getProductsList = '$baseUrl/FMCG/FMCGBrandProuctList';
+
   static String countryCodeList = '$baseUrlSupplier/GetOTPCountry';
   // FMCG
   static String fmcgSellerSignin = "$baseUrl/FMCG/FMCGSellerLogin";

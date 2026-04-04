@@ -272,3 +272,25 @@ class GetInitialChatIdError extends ChatState {
   @override
   List<Object> get props => [failure];
 }
+
+class ProductsListIsLoading extends ChatState {}
+
+class ProductsListSuccess extends ChatState {
+  final List<GetProductsList> data;
+
+  const ProductsListSuccess({
+    required this.data,
+  });
+
+  @override
+  List<Object> get props => [data];
+}
+
+class ProductsListError extends ChatState {
+  final Failure failure;
+
+  const ProductsListError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}

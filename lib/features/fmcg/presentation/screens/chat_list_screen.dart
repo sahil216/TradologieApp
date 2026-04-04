@@ -6,6 +6,7 @@ import 'package:tradologie_app/core/utils/extensions.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_appbar.dart';
+import 'package:tradologie_app/core/widgets/common_fmcg_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/features/fmcg/domain/entities/chat_list.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_list_usecase.dart';
@@ -24,6 +25,9 @@ class _ChatListScreenState extends State<ChatListScreen>
     with SingleTickerProviderStateMixin {
   List<ChatList>? chatList;
 
+  List<ChatList> filteredChatList = [];
+  String searchQuery = "";
+
   ChatCubit get chatCubit => BlocProvider.of(context);
   SecureStorageService secureStorage = SecureStorageService();
 
@@ -32,6 +36,8 @@ class _ChatListScreenState extends State<ChatListScreen>
       sellerID: await secureStorage.read(AppStrings.loginId) ?? "",
       token: await secureStorage.read(AppStrings.apiVerificationCode) ?? "",
       deviceID: Constants.deviceID,
+      buyerID: await secureStorage.read(AppStrings.loginId) ?? "",
+      type: Constants.isBuyer == true ? "Buyer" : "Seller",
     );
 
     await chatCubit.getChatList(params);
@@ -41,6 +47,25 @@ class _ChatListScreenState extends State<ChatListScreen>
   void initState() {
     super.initState();
     getChatList();
+  }
+
+  void _onSearchChanged(String query) {
+    searchQuery = query.toLowerCase();
+
+    if (chatList == null) return;
+
+    setState(() {
+      if (searchQuery.isEmpty) {
+        filteredChatList = chatList!;
+      } else {
+        filteredChatList = chatList!.where((chat) {
+          final name = (chat.name ?? "").toLowerCase();
+          final mobile = (chat.mobile ?? "").toLowerCase();
+
+          return name.contains(searchQuery) || mobile.contains(searchQuery);
+        }).toList();
+      }
+    });
   }
 
   Future<void> _refreshChats() async {
@@ -56,6 +81,7 @@ class _ChatListScreenState extends State<ChatListScreen>
         listener: (context, state) async {
           if (state is GetChatListSuccess) {
             chatList = state.data;
+            filteredChatList = state.data;
           }
           if (state is GetChatListError) {
             // CommonToast.showFailureToast(state.failure);
@@ -78,15 +104,22 @@ class _ChatListScreenState extends State<ChatListScreen>
                           showBackButton: false,
                           showNotification: false,
                         ),
+                        SliverPersistentHeader(
+                          pinned: true,
+                          delegate: SearchBarDelegate(
+                            showFilter: false,
+                            onSearchChanged: _onSearchChanged,
+                          ),
+                        ),
 
                         ChatListSliver(
-                          items: chatList ?? [],
+                          items: filteredChatList,
                           onToggle: (i) async {
                             final shouldRefresh = await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (_) => ChatScreen(
-                                  chat: chatList?[i] ?? ChatList(),
+                                  chat: filteredChatList[i],
                                 ),
                               ),
                             );
@@ -261,7 +294,9 @@ class ChatRow extends StatelessWidget {
                   ),
                   child: Center(
                     child: Text(
-                      getInitial(enquiry.name),
+                      getInitial(Constants.isBuyer
+                          ? enquiry.userId ?? ""
+                          : enquiry.name),
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -281,7 +316,7 @@ class ChatRow extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                                "${enquiry.name ?? ""} - ${enquiry.mobile ?? ""}",
+                                "${Constants.isBuyer ? enquiry.userId ?? "" : enquiry.name ?? ""} ${Constants.isBuyer ? "" : "-"} ${Constants.isBuyer ? "" : enquiry.mobile ?? ""}",
                                 style: T.title,
                                 overflow: TextOverflow.ellipsis),
                           ),
@@ -303,8 +338,24 @@ class ChatRow extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 10),
-                // Chevron
-                const Icon(Icons.chevron_right, size: 16, color: T.muted),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.chevron_right, size: 16, color: T.muted),
+                    // const SizedBox(height: 6),
+
+                    // /// 🔴 Unread Dot
+                    // if ((enquiry.unreadCount ?? 0) > 0)
+                    // Container(
+                    //   width: 10,
+                    //   height: 10,
+                    //   decoration: const BoxDecoration(
+                    //     color: Color(0xFF4BBE07),
+                    //     shape: BoxShape.circle,
+                    //   ),
+                    // ),
+                  ],
+                ),
               ],
             ),
           ),

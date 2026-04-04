@@ -3,6 +3,7 @@ import 'package:tradologie_app/features/fmcg/domain/entities/chat_list.dart';
 class ChatListModel extends ChatList {
   ChatListModel({
     super.quotationUserId,
+    super.sellerId,
     super.userId,
     super.name,
     super.countryCode,
@@ -19,6 +20,7 @@ class ChatListModel extends ChatList {
   factory ChatListModel.fromJson(Map<String, dynamic> json) => ChatListModel(
         quotationUserId: json["QuotationUserID"].toString(),
         userId: json["UserID"].toString(),
+        sellerId: json["SellerID"].toString(),
         name: json["Name"].toString(),
         countryCode: json["CountryCode"].toString(),
         mobile: json["Mobile"].toString(),

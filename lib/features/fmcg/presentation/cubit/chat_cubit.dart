@@ -12,6 +12,7 @@ import 'package:tradologie_app/features/fmcg/domain/entities/fmcg_get_seller_pro
 import 'package:tradologie_app/features/fmcg/domain/entities/fmcg_seller_document_detail.dart';
 import 'package:tradologie_app/features/fmcg/domain/entities/get_file_url_response.dart';
 import 'package:tradologie_app/features/fmcg/domain/entities/get_initial_chat_id.dart';
+import 'package:tradologie_app/features/fmcg/domain/entities/get_products_list.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_buyer_brand_interest_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_distributor_interest_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_data_usecase.dart';
@@ -20,6 +21,7 @@ import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_brands_li
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_distributor_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_file_url_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_initial_chat_id_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_products_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_documents_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_profile_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/update_seller_documents_usecase.dart';
@@ -40,6 +42,7 @@ class ChatCubit extends Cubit<ChatState> {
   final AddBuyerBrandInterestUsecase addBuyerBrandInterestUsecase;
   final GetFileUrlUsecase getFileUrlUsecase;
   final GetInitialChatIdUsecase getInitialChatIdUsecase;
+  final GetProductsListUsecase getProductsListUsecase;
 
   ChatCubit(
       {required this.chatListUsecase,
@@ -53,7 +56,8 @@ class ChatCubit extends Cubit<ChatState> {
       required this.addDistributorInterestUsecase,
       required this.addBuyerBrandInterestUsecase,
       required this.getFileUrlUsecase,
-      required this.getInitialChatIdUsecase})
+      required this.getInitialChatIdUsecase,
+      required this.getProductsListUsecase})
       : super(ChatInitial());
 
   Future<void> getChatList(ChatListParams params) async {
@@ -81,6 +85,16 @@ class ChatCubit extends Cubit<ChatState> {
     emit(response.fold(
       (failure) => DistributorListError(failure: failure),
       (res) => DistributorListSuccess(data: res),
+    ));
+  }
+
+  Future<void> getProductsList(GetProductsListParams params) async {
+    emit(ProductsListIsLoading());
+    Either<Failure, List<GetProductsList>> response =
+        await getProductsListUsecase(params);
+    emit(response.fold(
+      (failure) => ProductsListError(failure: failure),
+      (res) => ProductsListSuccess(data: res),
     ));
   }
 

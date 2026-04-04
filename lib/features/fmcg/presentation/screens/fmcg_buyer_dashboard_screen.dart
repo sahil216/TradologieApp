@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tradologie_app/config/routes/app_router.dart';
+import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
@@ -17,6 +19,8 @@ import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_brands_li
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_initial_chat_id_usecase.dart';
 import 'package:tradologie_app/features/fmcg/presentation/cubit/chat_cubit.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/chat_screen.dart';
+
+import '../../../../injection_container.dart';
 
 class FmcgBuyerDashboardScreen extends StatefulWidget {
   const FmcgBuyerDashboardScreen({super.key});
@@ -100,7 +104,7 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
             // CommonToast.showFailureToast(state.failure);
           }
           if (state is GetInitialChatIdSuccess) {
-            selectedChat.userId = state.data.sellerId.toString();
+            selectedChat.sellerId = state.data.sellerId.toString();
             selectedChat.quotationUserId =
                 await secureStorage.read(AppStrings.loginId) ?? "";
 
@@ -162,7 +166,7 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
                               crossAxisCount: 2,
                               crossAxisSpacing: 12,
                               mainAxisSpacing: 12,
-                              childAspectRatio: 0.75,
+                              childAspectRatio: 0.7,
                             ),
                             delegate: SliverChildBuilderDelegate(
                               (context, i) => enquiryCard(
@@ -205,7 +209,7 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
           color: const Color(0xFF0A9FED).withValues(alpha: 0.4),
         ),
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Column(
         children: [
           /// 🔴 BRAND NAME (AMUL STYLE)
@@ -329,7 +333,7 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
               child: GestureDetector(
                 onTap: () async {
                   selectedChat.brandId = enquiry.brandId.toString();
-                  selectedChat.name = enquiry.brandName;
+                  selectedChat.userId = enquiry.brandName;
 
                   chatCubit.getInitialChatId(GetInitialChatIdParams(
                     token: await secureStorage
@@ -360,6 +364,36 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
                       color: Colors.white,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Center(
+              child: GestureDetector(
+                onTap: () async {
+                  sl<NavigationService>().pushNamed(
+                    Routes.fmcgProductCatalogueRoute,
+                    arguments: enquiry.brandId.toString(),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  child: const Text(
+                    "View Catalogue",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      decoration: TextDecoration.underline,
                     ),
                   ),
                 ),
