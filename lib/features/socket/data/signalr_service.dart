@@ -9,23 +9,48 @@ import 'package:tradologie_app/features/socket/data/model/message_model.dart';
 
 class SignalRService {
   HubConnection? hub;
-  final String baseUrl = "https://connect.tradologie.com";
+  final String baseUrl = "https://chat.tradologie.com";
 
   String myUserId = "";
 
   /// The role of the current user as expected by the backend: "Seller", "Buyer", etc.
   String senderRole = "";
 
-  final _messageController = StreamController<ChatMessage>.broadcast();
+  // final _messageController = StreamController<ChatMessage>.broadcast();
+  // Stream<ChatMessage> get messageStream => _messageController.stream;
+
+  // final _connectionController = StreamController<bool>.broadcast();
+  // Stream<bool> get connectionStream => _connectionController.stream;
+
+  // final _typingController = StreamController<String>.broadcast();
+  // Stream<String> get typingStream => _typingController.stream;
+
+  StreamController<ChatMessage> _messageController =
+      StreamController<ChatMessage>.broadcast();
+  StreamController<bool> _connectionController =
+      StreamController<bool>.broadcast();
+  StreamController<String> _typingController =
+      StreamController<String>.broadcast();
+
   Stream<ChatMessage> get messageStream => _messageController.stream;
-
-  final _connectionController = StreamController<bool>.broadcast();
   Stream<bool> get connectionStream => _connectionController.stream;
-
-  final _typingController = StreamController<String>.broadcast();
   Stream<String> get typingStream => _typingController.stream;
 
+  void _ensureControllersOpen() {
+    if (_messageController.isClosed) {
+      _messageController = StreamController<ChatMessage>.broadcast();
+    }
+    if (_connectionController.isClosed) {
+      _connectionController = StreamController<bool>.broadcast();
+    }
+    if (_typingController.isClosed) {
+      _typingController = StreamController<String>.broadcast();
+    }
+  }
+
   Future<void> connect(String userId, {String role = ""}) async {
+    _ensureControllersOpen(); // ← add this at the top
+
     myUserId = userId;
     senderRole = role;
 
@@ -39,73 +64,30 @@ class SignalRService {
         .withAutomaticReconnect()
         .build();
 
-    /// ===========================
-    /// RECEIVE MESSAGE
-    /// ===========================
     hub!.on("receiveMessage", (arguments) {
-      try {
-        if (arguments == null || arguments.isEmpty) return;
+      // ... your existing handler
+    });
 
-        ChatMessage? msg;
-        final raw = arguments[1];
-
-        if (raw is Map) {
-          // Case 1: SignalR deserialised it into a Map already
-          msg = ChatMessage.fromJson(Map<String, dynamic>.from(raw));
-          _messageController.add(msg);
-        } else if (raw is String) {
-          // Case 2: Backend sent a JSON-encoded string — parse it first
-          final decoded = jsonDecode(raw);
-          if (decoded is Map) {
-            msg = ChatMessage.fromJson(Map<String, dynamic>.from(decoded));
-            _messageController.add(msg);
-          } else {
-            // Plain string fallback
-            msg = ChatMessage(user: "", message: raw);
-            _messageController.add(msg);
-          }
-        } else if (arguments.length >= 2) {
-          // Case 3: Backend sends positional args (fromUserId, message)
-          msg = ChatMessage(
-            user: arguments[0]?.toString() ?? "",
-            message: arguments[1]?.toString() ?? "",
-          );
-          _messageController.add(msg);
-        }
-      } catch (e) {
-        print("receiveMessage error: $e");
+    hub!.onclose(({Exception? error}) {
+      if (!_connectionController.isClosed) {
+        _connectionController.add(false);
       }
     });
 
-    /// ===========================
-    /// TYPING INDICATOR
-    /// ===========================
-    // hub!.on("userTyping", (arguments) {
-    //   if (arguments != null && arguments.isNotEmpty) {
-    //     _typingController.add(arguments[0]?.toString() ?? "");
-    //   }
-    // });
-
-    hub!.onclose(({Exception? error}) {
-      _connectionController.add(false);
-    });
-
     hub!.onreconnected(({String? connectionId}) {
-      _connectionController.add(true);
+      if (!_connectionController.isClosed) {
+        _connectionController.add(true);
+      }
       hub!.invoke("Connect", args: [userId]);
     });
 
     await hub!.start();
     await hub!.invoke("Connect", args: [userId]);
-    _connectionController.add(true);
-  }
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // SEND — all methods build a ChatMessage and send .toJson() to the hub
-  // Matches the BE object shape:
-  //   { fromUserId, message, file, fileType, type }
-  //   where type = sender role ("Seller" / "Buyer")
-  // ─────────────────────────────────────────────────────────────────────────
+    if (!_connectionController.isClosed) {
+      _connectionController.add(true);
+    }
+  }
 
   /// Plain text message
   Future<void> sendMessage(String toUser, ChatMessage chatMessage) async {
@@ -191,13 +173,20 @@ class SignalRService {
 
   Future<void> disconnect() async {
     await hub?.stop();
-    _connectionController.add(false);
+
+    // Guard before adding to a potentially closed stream
+    if (!_connectionController.isClosed) {
+      _connectionController.add(false);
+    }
   }
 
-  void dispose() {
-    disconnect();
-    _messageController.close();
-    _connectionController.close();
-    _typingController.close();
+  Future<void> dispose() async {
+    await hub?.stop();
+
+    if (!_messageController.isClosed) _messageController.close();
+    if (!_connectionController.isClosed) _connectionController.close();
+    if (!_typingController.isClosed) _typingController.close();
+
+    hub = null;
   }
 }

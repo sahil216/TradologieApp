@@ -11,6 +11,10 @@ class ChatDataParams {
   final String sellerID;
   final String token;
   final String deviceID;
+  final bool isMessage;
+  final String? fileType;
+  final String? attachmentType;
+  final String? type;
 
   ChatDataParams(
       {required this.contents,
@@ -18,7 +22,11 @@ class ChatDataParams {
       required this.chatID,
       required this.sellerID,
       required this.token,
-      required this.deviceID});
+      required this.deviceID,
+      required this.isMessage,
+      this.fileType,
+      this.attachmentType,
+      this.type});
 
   Map<String, dynamic> toJson() => {
         "BuyerID": buyerID,
@@ -27,6 +35,10 @@ class ChatDataParams {
         "Contents": contents,
         "Token": token,
         "DeviceID": deviceID,
+        "IsMessage": isMessage,
+        "FileType": fileType,
+        "AttachmentType": attachmentType,
+        "Type": type,
       };
 }
 

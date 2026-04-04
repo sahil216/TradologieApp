@@ -6,7 +6,6 @@ import 'package:tradologie_app/core/utils/extensions.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_appbar.dart';
-import 'package:tradologie_app/core/widgets/common_fmcg_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/features/fmcg/domain/entities/chat_list.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_list_usecase.dart';
@@ -79,26 +78,7 @@ class _ChatListScreenState extends State<ChatListScreen>
                           showBackButton: false,
                           showNotification: false,
                         ),
-                        // CommonAppbar(
-                        //   title: "Chats",
-                        //   showBackButton: false,
-                        //   showNotification: false,
-                        //   showSuffixIcon: true,
-                        //   suffixIcon: Row(
-                        //     mainAxisAlignment: MainAxisAlignment.end,
-                        //     crossAxisAlignment: CrossAxisAlignment.end,
-                        //     children: [
-                        //       IconButton(
-                        //           onPressed: () async {
-                        //             await _refreshChats();
-                        //           },
-                        //           icon: Icon(
-                        //             Icons.refresh,
-                        //             color: Colors.green,
-                        //           )),
-                        //     ],
-                        //   ),
-                        // ),
+
                         ChatListSliver(
                           items: chatList ?? [],
                           onToggle: (i) async {

@@ -12,6 +12,9 @@ class ChatData extends Equatable {
   final dynamic ipAddress;
   final String? displayDate;
   final String? displayTime;
+  final String? isMessage;
+  final String? attachmentType;
+  final String? fileType;
 
   const ChatData({
     this.tranId,
@@ -25,6 +28,9 @@ class ChatData extends Equatable {
     this.ipAddress,
     this.displayDate,
     this.displayTime,
+    this.isMessage,
+    this.attachmentType,
+    this.fileType,
   });
 
   @override
@@ -39,6 +45,9 @@ class ChatData extends Equatable {
         insertedDate,
         ipAddress,
         displayDate,
-        displayTime
+        displayTime,
+        isMessage,
+        attachmentType,
+        fileType,
       ];
 }

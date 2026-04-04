@@ -8,6 +8,8 @@ import 'package:tradologie_app/features/fmcg/domain/usecases/chat_data_usecase.d
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_brands_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_distributor_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_file_url_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_initial_chat_id_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_documents_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_profile_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/update_seller_documents_usecase.dart';
@@ -29,6 +31,8 @@ Future<void> init() async {
         getBuyerBrandsListUsecase: sl(),
         addDistributorInterestUsecase: sl(),
         addBuyerBrandInterestUsecase: sl(),
+        getFileUrlUsecase: sl(),
+        getInitialChatIdUsecase: sl(),
       ));
 
   //! Use cases
@@ -55,6 +59,10 @@ Future<void> init() async {
       () => AddDistributorInterestUsecase(chatRepository: sl()));
   sl.registerLazySingleton<AddBuyerBrandInterestUsecase>(
       () => AddBuyerBrandInterestUsecase(chatRepository: sl()));
+  sl.registerLazySingleton<GetFileUrlUsecase>(
+      () => GetFileUrlUsecase(chatRepository: sl()));
+  sl.registerLazySingleton<GetInitialChatIdUsecase>(
+      () => GetInitialChatIdUsecase(chatRepository: sl()));
 
   //! Repository
   sl.registerLazySingleton<ChatRepository>(() => ChatRepositoryImpl(

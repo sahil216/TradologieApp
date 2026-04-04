@@ -228,3 +228,47 @@ class AddDistributorInterestError extends ChatState {
   @override
   List<Object> get props => [failure];
 }
+
+class GetFileUrlIsLoading extends ChatState {}
+
+class GetFileUrlSuccess extends ChatState {
+  final GetFileUrlResponse data;
+
+  const GetFileUrlSuccess({
+    required this.data,
+  });
+
+  @override
+  List<Object> get props => [data];
+}
+
+class GetFileUrlError extends ChatState {
+  final Failure failure;
+
+  const GetFileUrlError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class GetInitialChatIdIsLoading extends ChatState {}
+
+class GetInitialChatIdSuccess extends ChatState {
+  final GetInitialChatId data;
+
+  const GetInitialChatIdSuccess({
+    required this.data,
+  });
+
+  @override
+  List<Object> get props => [data];
+}
+
+class GetInitialChatIdError extends ChatState {
+  final Failure failure;
+
+  const GetInitialChatIdError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}

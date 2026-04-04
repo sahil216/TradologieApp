@@ -317,14 +317,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   }
 
   @override
-  Future<void> close() {
+  Future<void> close() async {
     _msgSub?.cancel();
     _connSub?.cancel();
     _typingSub?.cancel();
     _typingTimer?.cancel();
     _recordingTimer?.cancel();
     _recorder?.dispose();
-    _service.dispose();
+    await _service.dispose();
     return super.close();
   }
 }

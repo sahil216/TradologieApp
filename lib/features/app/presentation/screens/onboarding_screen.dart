@@ -183,20 +183,20 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         AnalyticsService.logEvent("fmcg_buyer_button_clicked");
                       },
                     ),
-                    BusinessCard(
-                      title: "Chat",
-                      subtitle: "Register/Login as Distributor.",
-                      image: "assets/images/fmcg_image.jpg",
-                      onTap: () async {
-                        Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                                builder: (context) => ChatPage(
-                                      myUserId: '1',
-                                      toUserId: '2',
-                                    )));
-                      },
-                    ),
+                    // BusinessCard(
+                    //   title: "Chat",
+                    //   subtitle: "Register/Login as Distributor.",
+                    //   image: "assets/images/fmcg_image.jpg",
+                    //   onTap: () async {
+                    //     Navigator.push(
+                    //         context,
+                    //         CupertinoPageRoute(
+                    //             builder: (context) => ChatPage(
+                    //                   myUserId: '1',
+                    //                   toUserId: '2',
+                    //                 )));
+                    //   },
+                    // ),
                     // BusinessCard(
                     //   title: "E-mandi",
                     //   subtitle: "List & Sell Agro Commodities",

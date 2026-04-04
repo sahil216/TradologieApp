@@ -10,10 +10,13 @@ import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_fmcg_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
+import 'package:tradologie_app/features/fmcg/domain/entities/chat_list.dart';
 import 'package:tradologie_app/features/fmcg/domain/entities/fmcg_buyer_brands_list.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_buyer_brand_interest_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_brands_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_initial_chat_id_usecase.dart';
 import 'package:tradologie_app/features/fmcg/presentation/cubit/chat_cubit.dart';
+import 'package:tradologie_app/features/fmcg/presentation/screens/chat_screen.dart';
 
 class FmcgBuyerDashboardScreen extends StatefulWidget {
   const FmcgBuyerDashboardScreen({super.key});
@@ -32,6 +35,8 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
   SecureStorageService secureStorage = SecureStorageService();
 
   ChatCubit get chatCubit => BlocProvider.of(context);
+
+  ChatList selectedChat = ChatList();
 
   void getBuyerBrandsList({
     String search = "",
@@ -94,6 +99,23 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
           if (state is AddBuyerBrandInterestError) {
             // CommonToast.showFailureToast(state.failure);
           }
+          if (state is GetInitialChatIdSuccess) {
+            selectedChat.userId = state.data.sellerId.toString();
+            selectedChat.quotationUserId =
+                await secureStorage.read(AppStrings.loginId) ?? "";
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ChatScreen(
+                  chat: selectedChat,
+                ),
+              ),
+            );
+          }
+          if (state is GetInitialChatIdError) {
+            // CommonToast.showFailureToast(state.failure);
+          }
         },
         child: SafeArea(
           top: false,
@@ -111,11 +133,6 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
                           title: 'Brand Hub',
                           showBackButton: false,
                           showNotification: false,
-                          // showSearch: true,
-                          // showFilter: false,
-                          // showBackButton: false,
-                          // onFilterPressed: () {},
-                          // onSearchChanged: _onSearchChanged,
                         ),
                         SliverPersistentHeader(
                           pinned: true,
@@ -145,7 +162,7 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
                               crossAxisCount: 2,
                               crossAxisSpacing: 12,
                               mainAxisSpacing: 12,
-                              childAspectRatio: 0.9,
+                              childAspectRatio: 0.75,
                             ),
                             delegate: SliverChildBuilderDelegate(
                               (context, i) => enquiryCard(
@@ -165,7 +182,8 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
               BlocBuilder<ChatCubit, ChatState>(
                 builder: (context, state) {
                   if (state is GetBuyerBrandsListIsLoading ||
-                      state is AddBuyerBrandInterestIsLoading) {
+                      state is AddBuyerBrandInterestIsLoading ||
+                      state is GetInitialChatIdIsLoading) {
                     return const Positioned.fill(child: CommonLoader());
                   }
                   return const SizedBox.shrink();
@@ -304,6 +322,49 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 12),
+          Expanded(
+            child: Center(
+              child: GestureDetector(
+                onTap: () async {
+                  selectedChat.brandId = enquiry.brandId.toString();
+                  selectedChat.name = enquiry.brandName;
+
+                  chatCubit.getInitialChatId(GetInitialChatIdParams(
+                    token: await secureStorage
+                            .read(AppStrings.apiVerificationCode) ??
+                        "",
+                    deviceId: Constants.deviceID,
+                    buyerId: await secureStorage.read(AppStrings.loginId) ?? "",
+                    brandId: enquiry.brandId.toString(),
+                  ));
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(25),
+                    gradient: const LinearGradient(
+                      colors: [
+                        Color(0xFF2DAAE1),
+                        Color(0xFF1B8ED1),
+                      ],
+                    ),
+                  ),
+                  child: const Text(
+                    "Connect",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),

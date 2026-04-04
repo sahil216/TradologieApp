@@ -13,6 +13,9 @@ class ChatDataModel extends ChatData {
     super.ipAddress,
     super.displayDate,
     super.displayTime,
+    super.isMessage,
+    super.attachmentType,
+    super.fileType,
   });
 
   factory ChatDataModel.fromJson(Map<String, dynamic> json) => ChatDataModel(
@@ -27,5 +30,8 @@ class ChatDataModel extends ChatData {
         ipAddress: json["IPAddress"].toString(),
         displayDate: json["DisplayDate"],
         displayTime: json["DisplayTime"],
+        isMessage: json["IsMessage"],
+        attachmentType: json["AttachmentType"].toString(),
+        fileType: json["FileType"].toString(),
       );
 }

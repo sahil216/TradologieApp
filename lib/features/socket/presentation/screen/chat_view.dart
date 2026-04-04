@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tradologie_app/features/fmcg/domain/entities/chat_list.dart';
 import 'package:tradologie_app/features/socket/presentation/chat_bloc.dart';
 import 'package:tradologie_app/features/socket/presentation/chat_event.dart';
 import 'package:tradologie_app/features/socket/presentation/chat_state.dart';
@@ -188,14 +189,9 @@ class _ChatViewState extends State<ChatView> {
                         return const TypingIndicator();
                       }
                       final msg = messages[index];
-                      // final showDate = index == 0 ||
-                      //     !_isSameDay(
-                      //       messages[index - 1].timestamp,
-                      //       msg.timestamp,
-                      //     );
+
                       return Column(
                         children: [
-                          // if (showDate) _DateDivider(date: msg.timestamp),
                           MessageBubble(message: msg),
                         ],
                       );
@@ -348,15 +344,16 @@ class ChatPage extends StatelessWidget {
   final String myUserId;
   final String toUserId;
   final String? recipientName;
-
+  final ChatList chatList;
   final String role;
 
-  ChatPage({
+  const ChatPage({
     super.key,
     this.myUserId = "1",
     this.toUserId = "2",
     this.recipientName,
-    this.role = "Seller", // set to your app's actual role
+    this.role = "Seller",
+    required this.chatList, // set to your app's actual role
   });
 
   @override

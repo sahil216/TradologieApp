@@ -1,7 +1,7 @@
 import 'package:tradologie_app/features/fmcg/domain/entities/chat_list.dart';
 
 class ChatListModel extends ChatList {
-  const ChatListModel({
+  ChatListModel({
     super.quotationUserId,
     super.userId,
     super.name,

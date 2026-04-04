@@ -3,18 +3,23 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/error/failures.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
+import 'package:tradologie_app/features/fmcg/data/models/get_file_url_response_model.dart';
 import 'package:tradologie_app/features/fmcg/domain/entities/chat_data.dart';
 import 'package:tradologie_app/features/fmcg/domain/entities/chat_list.dart';
 import 'package:tradologie_app/features/fmcg/domain/entities/distributor_enquiry_list.dart';
 import 'package:tradologie_app/features/fmcg/domain/entities/fmcg_buyer_brands_list.dart';
 import 'package:tradologie_app/features/fmcg/domain/entities/fmcg_get_seller_profile.dart';
 import 'package:tradologie_app/features/fmcg/domain/entities/fmcg_seller_document_detail.dart';
+import 'package:tradologie_app/features/fmcg/domain/entities/get_file_url_response.dart';
+import 'package:tradologie_app/features/fmcg/domain/entities/get_initial_chat_id.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_buyer_brand_interest_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_distributor_interest_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_data_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_brands_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_distributor_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_file_url_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_initial_chat_id_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_documents_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_profile_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/update_seller_documents_usecase.dart';
@@ -33,6 +38,8 @@ class ChatCubit extends Cubit<ChatState> {
   final GetBuyerBrandsListUsecase getBuyerBrandsListUsecase;
   final AddDistributorInterestUsecase addDistributorInterestUsecase;
   final AddBuyerBrandInterestUsecase addBuyerBrandInterestUsecase;
+  final GetFileUrlUsecase getFileUrlUsecase;
+  final GetInitialChatIdUsecase getInitialChatIdUsecase;
 
   ChatCubit(
       {required this.chatListUsecase,
@@ -44,7 +51,9 @@ class ChatCubit extends Cubit<ChatState> {
       required this.updateSellerDocumentsUsecase,
       required this.getBuyerBrandsListUsecase,
       required this.addDistributorInterestUsecase,
-      required this.addBuyerBrandInterestUsecase})
+      required this.addBuyerBrandInterestUsecase,
+      required this.getFileUrlUsecase,
+      required this.getInitialChatIdUsecase})
       : super(ChatInitial());
 
   Future<void> getChatList(ChatListParams params) async {
@@ -140,6 +149,26 @@ class ChatCubit extends Cubit<ChatState> {
     emit(response.fold(
       (failure) => AddDistributorInterestError(failure: failure),
       (res) => AddDistributorInterestSuccess(data: res),
+    ));
+  }
+
+  Future<void> getFileUrl(GetFileUrlParams params) async {
+    emit(GetFileUrlIsLoading());
+    Either<Failure, GetFileUrlResponse> response =
+        await getFileUrlUsecase(params);
+    emit(response.fold(
+      (failure) => GetFileUrlError(failure: failure),
+      (res) => GetFileUrlSuccess(data: res),
+    ));
+  }
+
+  Future<void> getInitialChatId(GetInitialChatIdParams params) async {
+    emit(GetInitialChatIdIsLoading());
+    Either<Failure, GetInitialChatId> response =
+        await getInitialChatIdUsecase(params);
+    emit(response.fold(
+      (failure) => GetInitialChatIdError(failure: failure),
+      (res) => GetInitialChatIdSuccess(data: res),
     ));
   }
 }

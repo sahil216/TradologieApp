@@ -1,20 +1,20 @@
 import 'package:equatable/equatable.dart';
 
 class ChatList extends Equatable {
-  final String? quotationUserId;
-  final String? userId;
-  final String? name;
-  final String? countryCode;
-  final String? mobile;
-  final String? email;
-  final String? brandId;
-  final String? brandName;
-  final String? insertedDate;
-  final String? updatedDate;
-  final String? chatInsertedDate;
-  final String? loginStatus;
+  String? quotationUserId;
+  String? userId;
+  String? name;
+  String? countryCode;
+  String? mobile;
+  String? email;
+  String? brandId;
+  String? brandName;
+  String? insertedDate;
+  String? updatedDate;
+  String? chatInsertedDate;
+  String? loginStatus;
 
-  const ChatList({
+  ChatList({
     this.quotationUserId,
     this.userId,
     this.name,

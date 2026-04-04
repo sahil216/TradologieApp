@@ -29,6 +29,9 @@ class EndPoints {
     return '$supplierImageurl/images/Auction/$url.webp';
   }
 
+  // Get File URL
+  static String getFileUrl = 'https://connect.tradologie.com/api/chat/file';
+
   // Login
   static String signIn(UserType userType) {
     return '$baseUrl/${userType.name}/login';
@@ -135,6 +138,8 @@ class EndPoints {
   static String getNegotiation(UserType userType) {
     return '$baseUrl/${userType.name}/auctionlist';
   }
+
+  static String getInitialChatId = '$baseUrl/FMCG/FMCGBuyerInitialChatID';
 
   // Add Negotiation
   static String getCategoryList = '$baseUrlBuyer/category';
