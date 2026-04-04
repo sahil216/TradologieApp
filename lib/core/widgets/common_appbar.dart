@@ -69,17 +69,23 @@ class CommonAppbar extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               /// 🤍 PURE WHITE NOTCH BACKGROUND
-              showWebview == true
-                  ? Container(
-                      color: Colors.white,
-                    )
-                  : Container(
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Color(0xFF042B4D), Color(0xFF064474)],
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(10),
+                  bottomRight: Radius.circular(10),
+                ),
+                child: showWebview == true
+                    ? Container(
+                        color: Colors.white,
+                      )
+                    : Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Color(0xFF042B4D), Color(0xFF064474)],
+                          ),
                         ),
                       ),
-                    ),
+              ),
 
               /// 💎 LIQUID GLASS (NO BASELINE CUT)
               Positioned(
@@ -87,11 +93,15 @@ class CommonAppbar extends StatelessWidget {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                child: ClipRect(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(10),
+                    bottomRight: Radius.circular(10),
+                  ),
                   child: Container(
                     decoration: showWebview == true
-                        ? BoxDecoration(color: Colors.white)
-                        : BoxDecoration(
+                        ? const BoxDecoration(color: Colors.white)
+                        : const BoxDecoration(
                             gradient: LinearGradient(
                               colors: [Color(0xFF042B4D), Color(0xFF064474)],
                             ),
@@ -99,92 +109,96 @@ class CommonAppbar extends StatelessWidget {
                   ),
                 ),
               ),
-
-              /// ⭐ SINGLE SAFEAREA STACK (NO DUPLICATES)
               SafeArea(
                 bottom: false,
-                child: Stack(
-                  children: [
-                    /// 🔙 BACK BUTTON
-                    if (showBackButton)
-                      Positioned(
-                        left: 12,
-                        bottom: baseline,
-                        child: GestureDetector(
-                          onTap: onBackTap ?? () => Navigator.maybePop(context),
-                          child: _glassActionWrapper(
-                            const Icon(
-                              Icons.arrow_back_ios_new,
-                              size: 18,
-                              color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: 8.0,
+                  ),
+                  child: Stack(
+                    children: [
+                      /// 🔙 BACK BUTTON
+                      if (showBackButton)
+                        Positioned(
+                          left: 12,
+                          bottom: baseline,
+                          child: GestureDetector(
+                            onTap:
+                                onBackTap ?? () => Navigator.maybePop(context),
+                            child: _glassActionWrapper(
+                              const Icon(
+                                Icons.arrow_back_ios_new,
+                                size: 18,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
-                      ),
 
-                    /// 🍏 TITLE
-                    Align(
-                      alignment: AlignmentGeometry.bottomCenter,
-                      child: Transform.scale(
-                        scale: scale,
-                        alignment: Alignment.bottomLeft,
-                        child: showLogo == true
-                            ? Padding(
-                                padding: const EdgeInsets.only(bottom: 10.0),
-                                child: Image.asset(
-                                  ImgAssets.companyLogo,
-                                  height: 40,
-                                ),
-                              )
-                            : Padding(
-                                padding: const EdgeInsets.only(bottom: 8.0),
-                                child: Text(
-                                  title,
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w500,
+                      /// 🍏 TITLE
+                      Align(
+                        alignment: AlignmentGeometry.bottomCenter,
+                        child: Transform.scale(
+                          scale: scale,
+                          alignment: Alignment.bottomLeft,
+                          child: showLogo == true
+                              ? Padding(
+                                  padding: const EdgeInsets.only(bottom: 10.0),
+                                  child: Image.asset(
+                                    ImgAssets.companyLogo,
+                                    height: 40,
+                                  ),
+                                )
+                              : Padding(
+                                  padding: const EdgeInsets.only(bottom: 8.0),
+                                  child: Text(
+                                    title,
+                                    style: const TextStyle(
+                                      fontSize: 24,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
                                 ),
+                        ),
+                      ),
+
+                      /// ➕ ADD ACTION (ONLY ONE PLACE)
+                      if (addAction != null)
+                        Positioned(
+                          right: showNotification ? 70 : 12,
+                          bottom: baseline,
+                          child: _glassActionWrapper(addAction!),
+                        ),
+
+                      /// 🔔 NOTIFICATION
+                      if (showNotification)
+                        Positioned(
+                          right: 12,
+                          bottom: baseline,
+                          child: GestureDetector(
+                            onTap: () {
+                              sl<NavigationService>()
+                                  .pushNamed(Routes.notificationScreen);
+                            },
+                            child: _glassActionWrapper(
+                              const Icon(
+                                Icons.notifications_none,
+                                color: Colors.white,
                               ),
-                      ),
-                    ),
-
-                    /// ➕ ADD ACTION (ONLY ONE PLACE)
-                    if (addAction != null)
-                      Positioned(
-                        right: showNotification ? 70 : 12,
-                        bottom: baseline,
-                        child: _glassActionWrapper(addAction!),
-                      ),
-
-                    /// 🔔 NOTIFICATION
-                    if (showNotification)
-                      Positioned(
-                        right: 12,
-                        bottom: baseline,
-                        child: GestureDetector(
-                          onTap: () {
-                            sl<NavigationService>()
-                                .pushNamed(Routes.notificationScreen);
-                          },
-                          child: _glassActionWrapper(
-                            const Icon(
-                              Icons.notifications_none,
-                              color: Colors.white,
                             ),
                           ),
                         ),
-                      ),
-                    if (showSuffixIcon == true)
-                      Positioned(
-                        right: 12,
-                        bottom: baseline,
-                        child: _glassActionWrapper(
-                          suffixIcon ?? SizedBox(),
+                      if (showSuffixIcon == true)
+                        Positioned(
+                          right: 12,
+                          bottom: baseline,
+                          child: _glassActionWrapper(
+                            suffixIcon ?? SizedBox(),
+                          ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],

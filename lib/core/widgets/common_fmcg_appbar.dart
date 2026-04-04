@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 // /// A reusable fixed-height SliverAppBar matching the deep navy gradient design.
@@ -118,27 +120,27 @@ class _SearchField extends StatelessWidget {
     return Container(
       height: 44,
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.12),
+        color: Colors.grey.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.25),
+          color: Colors.grey.withValues(alpha: 0.25),
           width: 1,
         ),
       ),
       child: TextField(
         controller: controller,
         onChanged: onChanged,
-        style: const TextStyle(color: Colors.white, fontSize: 15),
+        style: const TextStyle(color: Colors.black, fontSize: 15),
         cursorColor: Colors.white70,
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: TextStyle(
-            color: Colors.white.withValues(alpha: 0.55),
+            color: Colors.black.withValues(alpha: 0.55),
             fontSize: 15,
           ),
           prefixIcon: Icon(
             Icons.search_rounded,
-            color: Colors.white.withValues(alpha: 0.6),
+            color: Colors.black.withValues(alpha: 0.6),
             size: 20,
           ),
           border: InputBorder.none,
@@ -164,17 +166,17 @@ class _FilterButton extends StatelessWidget {
         width: 44,
         height: 44,
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.12),
+          color: Colors.grey.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: Colors.white.withValues(alpha: 0.25),
+            color: Colors.grey.withValues(alpha: 0.25),
             width: 1,
           ),
         ),
         child: Center(
           child: Icon(
             Icons.tune_rounded, // sliders / filter icon
-            color: Colors.white.withValues(alpha: 0.9),
+            color: Colors.black.withValues(alpha: 0.9),
             size: 20,
           ),
         ),
@@ -226,7 +228,7 @@ class SearchBarDelegate extends SliverPersistentHeaderDelegate {
   });
 
   @override
-  double get minExtent => 70;
+  double get minExtent => 0;
 
   @override
   double get maxExtent => 70;
@@ -234,31 +236,58 @@ class SearchBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return SizedBox.expand(
-      child: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF042B4D), Color(0xFF064474)],
-          ),
-        ),
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 14),
-        child: Row(
-          children: [
-            Expanded(
-              child: _SearchField(
-                controller: TextEditingController(),
-                hint: 'Search',
-                onChanged: onSearchChanged,
+    final progress = (shrinkOffset / maxExtent).clamp(0.0, 1.0);
+
+    /// 👇 Blur intensity (0 → 12)
+    final blur = 0 + (progress * 24);
+
+    /// 👇 Fade out search
+    final opacity = 1 - progress;
+
+    return SizedBox(
+        height: maxExtent,
+        child: Stack(fit: StackFit.expand, children: [
+          /// 🌫️ BLUR BACKGROUND (Glass effect)
+          ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+              child: Container(
+                color: Color(0xFFF4F4F4), // fades in
               ),
             ),
-            if (showFilter) ...[
-              const SizedBox(width: 10),
-              _FilterButton(onPressed: onFilterPressed),
-            ],
-          ],
-        ),
-      ),
-    );
+          ),
+          Opacity(
+            opacity: opacity,
+            child: Transform.translate(
+              offset: Offset(0, -shrinkOffset),
+              child: SizedBox.expand(
+                child: Container(
+                  decoration: const BoxDecoration(
+                      // gradient: LinearGradient(
+                      //   colors: [Color(0xFF042B4D), Color(0xFF064474)],
+                      // ),
+                      ),
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 14),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _SearchField(
+                          controller: TextEditingController(),
+                          hint: 'Search',
+                          onChanged: onSearchChanged,
+                        ),
+                      ),
+                      if (showFilter) ...[
+                        const SizedBox(width: 10),
+                        _FilterButton(onPressed: onFilterPressed),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          )
+        ]));
   }
 
   @override

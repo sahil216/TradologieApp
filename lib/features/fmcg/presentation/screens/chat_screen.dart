@@ -114,7 +114,7 @@ class _ChatScreenState extends State<ChatScreen>
       contents: message ?? "",
       chatID: chatId ?? "0",
       buyerID: widget.chat.quotationUserId ?? "",
-      sellerID: widget.chat.userId ?? loginId,
+      sellerID: Constants.isBuyer ? widget.chat.userId ?? "" : loginId,
       deviceID: Constants.deviceID,
       isMessage: isMessage,
       fileType: "",
@@ -1418,10 +1418,10 @@ class ChatTopBar extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.call),
-                ),
+                // IconButton(
+                //   onPressed: () {},
+                //   icon: const Icon(Icons.call),
+                // ),
               ],
             ),
           ),
