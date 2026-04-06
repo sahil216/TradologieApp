@@ -14,6 +14,7 @@ class ChatList extends Equatable {
   String? updatedDate;
   String? chatInsertedDate;
   String? loginStatus;
+  bool? isReadMessage;
 
   ChatList({
     this.quotationUserId,
@@ -29,6 +30,7 @@ class ChatList extends Equatable {
     this.updatedDate,
     this.chatInsertedDate,
     this.loginStatus,
+    this.isReadMessage,
   });
 
   @override
@@ -46,5 +48,6 @@ class ChatList extends Equatable {
         updatedDate,
         chatInsertedDate,
         loginStatus,
+        isReadMessage,
       ];
 }

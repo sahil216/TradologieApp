@@ -177,7 +177,7 @@ class AppRoutes {
       case Routes.fmcgProductCatalogueRoute:
         return CupertinoPageRoute(builder: (context) {
           return FmcgProductsScreen(
-            brandId: routeSettings.arguments as String,
+            params: routeSettings.arguments as ProductsListParams,
           );
         });
       case Routes.buyerDashboardRoute:

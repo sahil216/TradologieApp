@@ -10,7 +10,6 @@ class CommonAppbar extends StatelessWidget {
   final String title;
   final double expandedHeight;
 
-  /// ⭐ NEW CONTROLS
   final bool showBackButton;
   final bool showNotification;
   final bool? showLogo;
@@ -19,7 +18,7 @@ class CommonAppbar extends StatelessWidget {
   final VoidCallback? onBackTap;
   final VoidCallback? onNotificationTap;
 
-  final Widget? addAction; // 👈 pill button
+  final Widget? addAction;
   final Brightness statusBarBrightness;
   final Brightness statusBarIconBrightness;
   final bool? showSuffixIcon;
@@ -61,59 +60,37 @@ class CommonAppbar extends StatelessWidget {
           final ease = Curves.easeOutQuart.transform(percent);
           final scale = 0.88 + (ease * .12);
 
-          /// ⭐ MASTER BASELINE (EVERYTHING LOCKED HERE)
           const double baseline = 8;
 
           return Stack(
             fit: StackFit.expand,
             children: [
-              /// 🤍 PURE WHITE NOTCH BACKGROUND
+              /// 🎨 SINGLE UNIFIED GRADIENT — top-center dark blue → bottom-center white
               ClipRRect(
                 borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(10),
-                  bottomRight: Radius.circular(10),
+                  bottomLeft: Radius.circular(0),
+                  bottomRight: Radius.circular(0),
                 ),
                 child: showWebview == true
-                    ? Container(
-                        color: Colors.white,
-                      )
+                    ? Container(color: Colors.white)
                     : Container(
                         decoration: const BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [Color(0xFF042B4D), Color(0xFF064474)],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Color(0xFF042B4D), // dark navy at top
+                              Color(0xFFF4F4F4), // white at bottom
+                            ],
                           ),
                         ),
                       ),
               ),
 
-              /// 💎 LIQUID GLASS (NO BASELINE CUT)
-              Positioned(
-                top: topSafe,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(10),
-                    bottomRight: Radius.circular(10),
-                  ),
-                  child: Container(
-                    decoration: showWebview == true
-                        ? const BoxDecoration(color: Colors.white)
-                        : const BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [Color(0xFF042B4D), Color(0xFF064474)],
-                            ),
-                          ),
-                  ),
-                ),
-              ),
               SafeArea(
                 bottom: false,
                 child: Padding(
-                  padding: const EdgeInsets.only(
-                    bottom: 8.0,
-                  ),
+                  padding: const EdgeInsets.only(bottom: 8.0),
                   child: Stack(
                     children: [
                       if (showBackButton)
@@ -127,7 +104,7 @@ class CommonAppbar extends StatelessWidget {
                               const Icon(
                                 Icons.arrow_back_ios_new,
                                 size: 18,
-                                color: Colors.white,
+                                color: Colors.black,
                               ),
                             ),
                           ),
@@ -135,7 +112,7 @@ class CommonAppbar extends StatelessWidget {
 
                       /// 🍏 TITLE
                       Align(
-                        alignment: AlignmentGeometry.bottomCenter,
+                        alignment: Alignment.bottomCenter,
                         child: Transform.scale(
                           scale: scale,
                           alignment: Alignment.bottomLeft,
@@ -153,7 +130,7 @@ class CommonAppbar extends StatelessWidget {
                                     title,
                                     style: const TextStyle(
                                       fontSize: 24,
-                                      color: Colors.white,
+                                      color: Colors.black,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
@@ -161,7 +138,7 @@ class CommonAppbar extends StatelessWidget {
                         ),
                       ),
 
-                      /// ➕ ADD ACTION (ONLY ONE PLACE)
+                      /// ➕ ADD ACTION
                       if (addAction != null)
                         Positioned(
                           right: showNotification ? 70 : 12,
@@ -182,17 +159,18 @@ class CommonAppbar extends StatelessWidget {
                             child: _glassActionWrapper(
                               const Icon(
                                 Icons.notifications_none,
-                                color: Colors.white,
+                                color: Colors.black,
                               ),
                             ),
                           ),
                         ),
+
                       if (showSuffixIcon == true)
                         Positioned(
                           right: 12,
                           bottom: baseline,
                           child: _glassActionWrapper(
-                            suffixIcon ?? SizedBox(),
+                            suffixIcon ?? const SizedBox(),
                           ),
                         ),
                     ],

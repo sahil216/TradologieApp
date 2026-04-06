@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
@@ -13,6 +15,7 @@ import 'package:tradologie_app/features/fmcg/domain/usecases/chat_list_usecase.d
 import 'package:tradologie_app/features/fmcg/presentation/cubit/chat_cubit.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/chat_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_distributor_enq.dart';
+import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_main_screen.dart';
 
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
@@ -43,10 +46,22 @@ class _ChatListScreenState extends State<ChatListScreen>
     await chatCubit.getChatList(params);
   }
 
+  Timer? _timer;
+  void _startPolling() {
+    _timer = Timer.periodic(const Duration(seconds: 10), (_) => getChatList());
+  }
+
   @override
   void initState() {
     super.initState();
     getChatList();
+    _startPolling();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   void _onSearchChanged(String query) {
@@ -117,6 +132,8 @@ class _ChatListScreenState extends State<ChatListScreen>
                         ChatListSliver(
                           items: filteredChatList,
                           onToggle: (i) async {
+                            // NavBarVisibility.of(context).hide();
+
                             final shouldRefresh = await Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -126,9 +143,7 @@ class _ChatListScreenState extends State<ChatListScreen>
                               ),
                             );
 
-                            if (shouldRefresh == true) {
-                              await _refreshChats();
-                            }
+                            await _refreshChats();
                           },
                         ),
 
@@ -239,14 +254,14 @@ class _ChatListScreenState extends State<ChatListScreen>
                   );
                 },
               ),
-              BlocBuilder<ChatCubit, ChatState>(
-                builder: (context, state) {
-                  if (state is GetChatListIsLoading) {
-                    return Positioned.fill(child: const CommonLoader());
-                  }
-                  return SizedBox.shrink();
-                },
-              ),
+              // BlocBuilder<ChatCubit, ChatState>(
+              //   builder: (context, state) {
+              //     if (state is GetChatListIsLoading) {
+              //       return Positioned.fill(child: const CommonLoader());
+              //     }
+              //     return SizedBox.shrink();
+              //   },
+              // ),
             ],
           ),
         ),
@@ -340,22 +355,22 @@ class ChatRow extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 10),
-                Column(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.chevron_right, size: 16, color: T.muted),
                     // const SizedBox(height: 6),
 
                     // /// 🔴 Unread Dot
-                    // if ((enquiry.unreadCount ?? 0) > 0)
-                    // Container(
-                    //   width: 10,
-                    //   height: 10,
-                    //   decoration: const BoxDecoration(
-                    //     color: Color(0xFF4BBE07),
-                    //     shape: BoxShape.circle,
-                    //   ),
-                    // ),
+                    if (enquiry.isReadMessage == false)
+                      Container(
+                        width: 10,
+                        height: 10,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF4BBE07),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    const Icon(Icons.chevron_right, size: 16, color: T.muted),
                   ],
                 ),
               ],

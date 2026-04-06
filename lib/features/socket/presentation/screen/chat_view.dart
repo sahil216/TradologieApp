@@ -292,14 +292,11 @@ class _ChatViewState extends State<ChatView> {
       ],
     );
   }
-
-  bool _isSameDay(DateTime a, DateTime b) =>
-      a.year == b.year && a.month == b.month && a.day == b.day;
 }
 
-class _DateDivider extends StatelessWidget {
+class DateDivider extends StatelessWidget {
   final DateTime date;
-  const _DateDivider({required this.date});
+  const DateDivider({super.key, required this.date});
 
   String _format(DateTime d) {
     final now = DateTime.now();

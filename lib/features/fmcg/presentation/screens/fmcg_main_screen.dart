@@ -14,6 +14,50 @@ import 'package:tradologie_app/features/webview/presentation/screens/in_app_webv
 import 'package:tradologie_app/features/webview/presentation/screens/viewmodel/webview_params.dart';
 import 'package:tradologie_app/features/webview/presentation/screens/webview_screen.dart';
 
+// ── Nav bar visibility controller ─────────────────────────────────────────────
+// Any child screen can show/hide the bottom bar by calling:
+//
+//   NavBarVisibility.of(context).show();
+//   NavBarVisibility.of(context).hide();
+//
+// No prop drilling needed — works from anywhere in the widget tree.
+
+class NavBarVisibilityController extends ChangeNotifier {
+  bool _visible = true;
+  bool get visible => _visible;
+
+  void show() {
+    if (!_visible) {
+      _visible = true;
+      notifyListeners();
+    }
+  }
+
+  void hide() {
+    if (_visible) {
+      _visible = false;
+      notifyListeners();
+    }
+  }
+}
+
+class NavBarVisibility extends InheritedNotifier<NavBarVisibilityController> {
+  const NavBarVisibility({
+    super.key,
+    required NavBarVisibilityController controller,
+    required super.child,
+  }) : super(notifier: controller);
+
+  static NavBarVisibilityController of(BuildContext context) {
+    final inherited =
+        context.dependOnInheritedWidgetOfExactType<NavBarVisibility>();
+    assert(inherited != null, 'No NavBarVisibility found in context');
+    return inherited!.notifier!;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 class CommonFMCGFloatingNavBar extends StatelessWidget {
   final int index;
   final Function(int) onTap;
@@ -31,7 +75,7 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
     return Container(
       height: 70 + MediaQuery.of(context).padding.bottom,
       padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).padding.bottom, // 🔥 KEY FIX
+        bottom: MediaQuery.of(context).padding.bottom,
       ),
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -82,8 +126,6 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-
-            /// 🔥 ICON WITH BADGE
             Stack(
               clipBehavior: Clip.none,
               children: [
@@ -107,9 +149,7 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
                   ),
               ],
             ),
-
             const SizedBox(height: 4),
-
             Text(
               label,
               overflow: TextOverflow.ellipsis,
@@ -126,10 +166,34 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
   }
 }
 
-class FMCGMainScreen extends StatefulWidget {
-  const FMCGMainScreen({
-    super.key,
+// ── Per-tab navigator wrapper ─────────────────────────────────────────────────
+// Each tab gets its own Navigator so pushing a new screen stays inside the
+// body area and the bottom bar remains visible at all times.
+
+class _TabNavigator extends StatelessWidget {
+  final Widget rootScreen;
+  final String navigatorKey;
+
+  const _TabNavigator({
+    required this.rootScreen,
+    required this.navigatorKey,
   });
+
+  @override
+  Widget build(BuildContext context) {
+    return Navigator(
+      key: ValueKey(navigatorKey),
+      onGenerateRoute: (_) => MaterialPageRoute(
+        builder: (_) => rootScreen,
+      ),
+    );
+  }
+}
+
+// ── Main Screen ───────────────────────────────────────────────────────────────
+
+class FMCGMainScreen extends StatefulWidget {
+  const FMCGMainScreen({super.key});
 
   @override
   State<FMCGMainScreen> createState() => _FMCGMainScreenState();
@@ -137,16 +201,16 @@ class FMCGMainScreen extends StatefulWidget {
 
 class _FMCGMainScreenState extends State<FMCGMainScreen> {
   int currentIndex = 0;
-
   int unreadCount = 0;
   SecureStorageService secureStorage = SecureStorageService();
+  final NavBarVisibilityController _navBarController =
+      NavBarVisibilityController();
 
-  // void updateUnreadCount(List<ChatList> chats) {
-  //   unreadCount = chats.fold(0, (sum, chat) {
-  //     return sum + (chat.unreadCount ?? 0);
-  //   });
-  //   setState(() {});
-  // }
+  // One navigator key per tab so each tab keeps its own back-stack
+  final List<GlobalKey<NavigatorState>> _navigatorKeys = List.generate(
+    5,
+    (_) => GlobalKey<NavigatorState>(),
+  );
 
   Future<void> nameUpdate() async {
     Constants.name = Constants.isFmcg == true
@@ -162,62 +226,112 @@ class _FMCGMainScreenState extends State<FMCGMainScreen> {
   }
 
   @override
-  initState() {
+  void initState() {
     super.initState();
     nameUpdate();
     analyticsUpdate();
   }
 
-  final List<Widget> screens = [
-    FmcgSellerDashboardScreen(),
-    ChatListScreen(),
-    FmcgMyAccountScreen(),
-    MoreOptionsScreen(),
-    Constants.isAndroid14OrBelow && Platform.isAndroid
-        ? InAppWebViewScreen(
-            params: WebviewParams(
-                url: Constants.analyticsUrl, canPop: false, isAppBar: true))
-        : WebViewScreen(
-            params: WebviewParams(
-            url: Constants.analyticsUrl,
-            canPop: false,
-            isAppBar: true,
-          )),
-  ];
-  final List<Widget> buyerScreens = [
-    FmcgBuyerDashboardScreen(),
-    ChatListScreen(),
-    Constants.isAndroid14OrBelow && Platform.isAndroid
-        ? InAppWebViewScreen(
-            params: WebviewParams(
+  // ── Root screens (one per tab) ─────────────────────────────────────────────
+  List<Widget> get _sellerRoots => [
+        FmcgSellerDashboardScreen(),
+        ChatListScreen(),
+        FmcgMyAccountScreen(),
+        MoreOptionsScreen(),
+        Constants.isAndroid14OrBelow && Platform.isAndroid
+            ? InAppWebViewScreen(
+                params: WebviewParams(
+                    url: Constants.analyticsUrl, canPop: false, isAppBar: true))
+            : WebViewScreen(
+                params: WebviewParams(
+                url: Constants.analyticsUrl,
+                canPop: false,
+                isAppBar: true,
+              )),
+      ];
+
+  List<Widget> get _buyerRoots => [
+        FmcgBuyerDashboardScreen(),
+        ChatListScreen(),
+        Constants.isAndroid14OrBelow && Platform.isAndroid
+            ? InAppWebViewScreen(
+                params: WebviewParams(
+                    url: "https://www.tradologie.com/fmcg-view",
+                    canPop: false,
+                    isAppBar: true))
+            : WebViewScreen(
+                params: WebviewParams(
                 url: "https://www.tradologie.com/fmcg-view",
                 canPop: false,
-                isAppBar: true))
-        : WebViewScreen(
-            params: WebviewParams(
-            url: "https://www.tradologie.com/fmcg-view",
-            canPop: false,
-            isAppBar: true,
-          )),
-    MoreOptionsScreen(),
-  ];
+                isAppBar: true,
+              )),
+        MoreOptionsScreen(),
+      ];
 
   void onTabChanged(int index) {
-    setState(() {
-      currentIndex = index;
-    });
+    // If tapping the already-active tab, pop to its root
+    if (index == currentIndex) {
+      _navigatorKeys[index].currentState?.popUntil((r) => r.isFirst);
+      return;
+    }
+    setState(() => currentIndex = index);
+  }
+
+  // Handle Android back button — pop within the nested navigator first
+  Future<bool> _onWillPop() async {
+    final canPop = _navigatorKeys[currentIndex].currentState?.canPop() ?? false;
+    if (canPop) {
+      _navigatorKeys[currentIndex].currentState?.pop();
+      return false; // don't pop the main screen
+    }
+    return true; // let the OS handle it (exit app)
+  }
+
+  @override
+  void dispose() {
+    _navBarController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AdaptiveScaffold(
-      body: Constants.isBuyer == true
-          ? buyerScreens[currentIndex]
-          : screens[currentIndex],
-      bottomNavigationBar: CommonFMCGFloatingNavBar(
-        index: currentIndex,
-        onTap: onTabChanged,
-        unreadCount: unreadCount,
+    final roots = Constants.isBuyer == true ? _buyerRoots : _sellerRoots;
+
+    return NavBarVisibility(
+      controller: _navBarController,
+      child: WillPopScope(
+        onWillPop: _onWillPop,
+        child: AdaptiveScaffold(
+          body: Stack(
+            children: List.generate(roots.length, (i) {
+              return Offstage(
+                offstage: currentIndex != i,
+                child: Navigator(
+                  key: _navigatorKeys[i],
+                  onGenerateRoute: (_) => MaterialPageRoute(
+                    builder: (_) => roots[i],
+                  ),
+                ),
+              );
+            }),
+          ),
+          bottomNavigationBar: ListenableBuilder(
+            listenable: _navBarController,
+            builder: (context, _) {
+              return AnimatedSize(
+                duration: const Duration(milliseconds: 280),
+                curve: Curves.easeInOut,
+                child: _navBarController.visible
+                    ? CommonFMCGFloatingNavBar(
+                        index: currentIndex,
+                        onTap: onTabChanged,
+                        unreadCount: unreadCount,
+                      )
+                    : const SizedBox.shrink(),
+              );
+            },
+          ),
+        ),
       ),
     );
   }

@@ -263,7 +263,9 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              sl<NavigationService>().pop();
+            },
             child: const Text("Cancel"),
           ),
           GestureDetector(

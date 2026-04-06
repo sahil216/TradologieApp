@@ -67,7 +67,6 @@ dependencies:
   signalr_netcore: ^1.4.4
   provider: ^6.1.5+1
   http: ^1.6.0
-  flutter_webrtc: ^1.4.1
   record: ^6.2.0
 
 dev_dependencies:

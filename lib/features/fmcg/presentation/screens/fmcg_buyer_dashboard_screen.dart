@@ -19,6 +19,8 @@ import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_brands_li
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_initial_chat_id_usecase.dart';
 import 'package:tradologie_app/features/fmcg/presentation/cubit/chat_cubit.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/chat_screen.dart';
+import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_main_screen.dart';
+import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_products_screen.dart';
 
 import '../../../../injection_container.dart';
 
@@ -169,8 +171,41 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
                               childAspectRatio: 0.7,
                             ),
                             delegate: SliverChildBuilderDelegate(
-                              (context, i) => enquiryCard(
-                                distributorList?[i] ?? FmcgBuyerBrandsList(),
+                              (context, i) => GestureDetector(
+                                onTap: () async {
+                                  NavBarVisibility.of(context).show();
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => FmcgProductsScreen(
+                                          params: ProductsListParams(
+                                        brandId: distributorList?[i]
+                                                .brandId
+                                                .toString() ??
+                                            "",
+                                        brandName: distributorList?[i]
+                                                .brandName
+                                                .toString() ??
+                                            "",
+                                      )),
+                                    ),
+                                  );
+                                  // sl<NavigationService>().pushNamed(
+                                  //     Routes.fmcgProductCatalogueRoute,
+                                  //     arguments: ProductsListParams(
+                                  //       brandId: distributorList?[i]
+                                  //               .brandId
+                                  //               .toString() ??
+                                  //           "",
+                                  //       brandName: distributorList?[i]
+                                  //               .brandName
+                                  //               .toString() ??
+                                  //           "",
+                                  //     ));
+                                },
+                                child: enquiryCard(
+                                  distributorList?[i] ?? FmcgBuyerBrandsList(),
+                                ),
                               ),
                               childCount: distributorList?.length ?? 0,
                             ),
@@ -374,10 +409,26 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
             child: Center(
               child: GestureDetector(
                 onTap: () async {
-                  sl<NavigationService>().pushNamed(
-                    Routes.fmcgProductCatalogueRoute,
-                    arguments: enquiry.brandId.toString(),
+                  NavBarVisibility.of(context).show();
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => FmcgProductsScreen(
+                        params: ProductsListParams(
+                          brandId: enquiry.brandId.toString(),
+                          brandName: enquiry.brandName.toString(),
+                        ),
+                      ),
+                    ),
                   );
+
+                  // sl<NavigationService>().pushNamed(
+                  //   Routes.fmcgProductCatalogueRoute,
+                  //   arguments: ProductsListParams(
+                  //     brandId: enquiry.brandId.toString(),
+                  //     brandName: enquiry.brandName.toString(),
+                  //   ),
+                  // );
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
