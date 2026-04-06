@@ -389,8 +389,10 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
                   ),
                   child: const Text(
                     "View Catalogue",
+                    maxLines: 1,
                     style: TextStyle(
                       color: Colors.black,
+                      overflow: TextOverflow.ellipsis,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       decoration: TextDecoration.underline,

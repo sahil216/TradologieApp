@@ -112,7 +112,19 @@ extension ListValues on List {
 
 extension DateTimeValues on DateTime {
   String get dateTimeFormat {
-    return DateFormat('dd-MM-yyyy HH:mm').format(this);
+    return DateFormat('dd-MM-yyyy HH:mm:ss').format(this);
+  }
+
+  String get dateStringFormat {
+    return DateFormat(
+      'EEEE, d MMMM y',
+    ).format(this);
+  }
+}
+
+extension DateTimeBEValues on DateTime {
+  String get dateTimeBEFormat {
+    return DateFormat('yyyy-MM-dd HH:mm:ss').format(this);
   }
 
   String get dateStringFormat {

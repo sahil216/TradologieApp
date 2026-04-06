@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:tradologie_app/core/error/failures.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
+import 'package:tradologie_app/core/utils/extensions.dart';
 import 'package:tradologie_app/features/fmcg/domain/entities/chat_data.dart';
 import 'package:tradologie_app/features/fmcg/domain/repositories/chat_repositories.dart';
 
@@ -39,6 +40,7 @@ class ChatDataParams {
         "FileType": fileType,
         "AttachmentType": attachmentType,
         "Type": type,
+        "LastLoginTime": DateTime.now().dateTimeBEFormat,
       };
 }
 

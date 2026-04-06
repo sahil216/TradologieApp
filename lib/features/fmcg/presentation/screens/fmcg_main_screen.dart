@@ -45,12 +45,12 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
         children: [
           if (Constants.isBuyer == true) ...[
             _item(0, Icons.dashboard_outlined, "BrandHub"),
-            _item(1, Icons.chat_outlined, "Chats"),
+            _item(1, Icons.chat_outlined, "Connect"),
             _item(2, Icons.local_grocery_store_outlined, "FMCG"),
             _item(3, Icons.menu_rounded, "More"),
           ] else ...[
             _item(0, Icons.dashboard_outlined, "Dashboard"),
-            _item(1, Icons.chat_outlined, "Chats"),
+            _item(1, Icons.chat_outlined, "Connect"),
             _item(2, Icons.account_circle_outlined, "Account"),
             _item(3, Icons.menu_rounded, "More"),
             _item(4, Icons.analytics, "Analytics"),

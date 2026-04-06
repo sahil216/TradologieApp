@@ -100,7 +100,9 @@ class _ChatListScreenState extends State<ChatListScreen>
                       slivers: [
                         /// App Bar
                         CommonAppbar(
-                          title: "Chats",
+                          title: Constants.isBuyer
+                              ? "Brand Connect"
+                              : "Distributor Connect",
                           showBackButton: false,
                           showNotification: false,
                         ),
