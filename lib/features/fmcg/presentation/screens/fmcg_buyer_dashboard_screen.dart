@@ -35,7 +35,7 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
 
   // Search & Filter state
   final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = '';
+  String searchQuery = '';
   SecureStorageService secureStorage = SecureStorageService();
 
   ChatCubit get chatCubit => BlocProvider.of(context);
@@ -72,7 +72,7 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
     super.initState();
     getBuyerBrandsList();
     _searchController.addListener(() {
-      setState(() => _searchQuery = _searchController.text.toLowerCase());
+      setState(() => searchQuery = _searchController.text.toLowerCase());
     });
   }
 

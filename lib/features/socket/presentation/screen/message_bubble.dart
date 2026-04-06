@@ -41,7 +41,7 @@ class MessageBubble extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
+                    color: Colors.black.withValues(alpha: 0.06),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
@@ -100,8 +100,9 @@ class _TextContent extends StatelessWidget {
           Text(
             message.formattedTime,
             style: TextStyle(
-              color:
-                  isMe ? Colors.white.withOpacity(0.65) : Colors.grey.shade500,
+              color: isMe
+                  ? Colors.white.withValues(alpha: 0.65)
+                  : Colors.grey.shade500,
               fontSize: 11,
             ),
           ),
@@ -256,7 +257,7 @@ class _PdfContent extends StatelessWidget {
             child: Text(message.formattedTime,
                 style: TextStyle(
                     color: isMe
-                        ? Colors.white.withOpacity(0.65)
+                        ? Colors.white.withValues(alpha: 0.65)
                         : Colors.grey.shade500,
                     fontSize: 11)),
           ),
@@ -299,7 +300,7 @@ class _VoiceContentState extends State<_VoiceContent> {
                   height: 40,
                   decoration: BoxDecoration(
                     color: isMe
-                        ? Colors.white.withOpacity(0.2)
+                        ? Colors.white.withValues(alpha: 0.2)
                         : Colors.blue.shade50,
                     shape: BoxShape.circle,
                   ),
@@ -320,8 +321,9 @@ class _VoiceContentState extends State<_VoiceContent> {
                     message.formattedDuration,
                     style: TextStyle(
                         fontSize: 11,
-                        color:
-                            isMe ? Colors.white.withOpacity(0.7) : Colors.grey),
+                        color: isMe
+                            ? Colors.white.withValues(alpha: 0.7)
+                            : Colors.grey),
                   ),
                 ],
               ),
@@ -344,7 +346,7 @@ class _VoiceContentState extends State<_VoiceContent> {
             child: Text(message.formattedTime,
                 style: TextStyle(
                     color: isMe
-                        ? Colors.white.withOpacity(0.65)
+                        ? Colors.white.withValues(alpha: 0.65)
                         : Colors.grey.shade500,
                     fontSize: 11)),
           ),
@@ -394,8 +396,8 @@ class _WaveformBar extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(horizontal: 1),
                   decoration: BoxDecoration(
                     color: isMe
-                        ? Colors.white.withOpacity(0.7)
-                        : Colors.blue.withOpacity(0.5),
+                        ? Colors.white.withValues(alpha: 0.7)
+                        : Colors.blue.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ))

@@ -60,7 +60,6 @@ class CommonAppbar extends StatelessWidget {
 
           final ease = Curves.easeOutQuart.transform(percent);
           final scale = 0.88 + (ease * .12);
-          final blur = 14 + (1 - ease) * 10;
 
           /// ⭐ MASTER BASELINE (EVERYTHING LOCKED HERE)
           const double baseline = 8;

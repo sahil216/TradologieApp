@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_appbar.dart';
-import 'package:tradologie_app/core/widgets/common_fmcg_appbar.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/stepper_screens/fmcg_documents_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/stepper_screens/fmcg_profile_screen.dart';
@@ -100,9 +99,9 @@ class _FmcgMyAccountScreenState extends State<FmcgMyAccountScreen>
   }
 
   Future<void> _loadToken() async {
-    final _token = await _secureStorage.read(AppStrings.apiVerificationCode);
+    final token = await _secureStorage.read(AppStrings.apiVerificationCode);
     setState(() {
-      token = _token;
+      this.token = token;
     });
   }
 

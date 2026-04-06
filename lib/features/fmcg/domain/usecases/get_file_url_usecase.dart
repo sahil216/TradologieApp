@@ -4,8 +4,6 @@ import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:tradologie_app/core/error/failures.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
-import 'package:tradologie_app/features/fmcg/data/models/get_file_url_response_model.dart';
-import 'package:tradologie_app/features/fmcg/domain/entities/distributor_enquiry_list.dart';
 import 'package:tradologie_app/features/fmcg/domain/entities/get_file_url_response.dart';
 import 'package:tradologie_app/features/fmcg/domain/repositories/chat_repositories.dart';
 

@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
@@ -15,8 +14,6 @@ import 'package:tradologie_app/core/utils/responsive.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/features/app/injection_container_app.dart';
-import 'package:tradologie_app/features/socket/presentation/screen/chat_view.dart';
-import 'package:tradologie_app/features/socket/presentation/screen/message_bubble.dart';
 
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/assets_manager.dart';

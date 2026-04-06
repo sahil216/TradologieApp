@@ -1,8 +1,6 @@
 import 'package:tradologie_app/core/api/api_consumer.dart';
 import 'package:tradologie_app/core/api/end_points.dart';
 import 'package:tradologie_app/core/response_wrapper/response_wrapper.dart';
-import 'package:tradologie_app/core/usecases/usecase.dart';
-import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_buyer_brand_interest_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_distributor_interest_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_data_usecase.dart';

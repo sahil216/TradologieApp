@@ -29,8 +29,6 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
-  bool _gifReady = false;
-
   // Animation controller for the logo fade + slide in
   late final AnimationController _logoController;
   late final Animation<double> _logoOpacity;
@@ -81,9 +79,6 @@ class _SplashScreenState extends State<SplashScreen>
     //   const AssetImage("assets/images/splash.gif"),
     //   context,
     // );
-
-    if (!mounted) return;
-    setState(() => _gifReady = true);
 
     // Start logo animation shortly after GIF appears
     Future.delayed(const Duration(milliseconds: 300), () {

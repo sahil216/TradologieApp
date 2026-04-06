@@ -74,7 +74,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.06),
+                  color: Colors.black.withValues(alpha: 0.06),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -128,7 +128,7 @@ class ConnectionBanner extends StatelessWidget {
       duration: const Duration(milliseconds: 300),
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
-      color: color.withOpacity(0.9),
+      color: color.withValues(alpha: 0.9),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

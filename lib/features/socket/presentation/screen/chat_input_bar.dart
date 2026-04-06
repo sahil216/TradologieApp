@@ -329,7 +329,7 @@ class _AttachOption extends StatelessWidget {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: color, size: 26),
@@ -439,7 +439,7 @@ class _IconBtn extends StatelessWidget {
         height: 40,
         decoration: BoxDecoration(
           color: active
-              ? const Color(0xFF1976D2).withOpacity(0.1)
+              ? const Color(0xFF1976D2).withValues(alpha: 0.1)
               : Colors.transparent,
           shape: BoxShape.circle,
         ),

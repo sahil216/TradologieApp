@@ -120,7 +120,7 @@ class _CategoryFilterSheetState extends State<CategoryFilterSheet> {
                         : const Color(0xFFF2F7FB),
                     borderRadius: BorderRadius.circular(30),
                     border: Border.all(
-                      color: const Color(0xFF0A9FED).withOpacity(0.4),
+                      color: const Color(0xFF0A9FED).withValues(alpha: 0.4),
                     ),
                   ),
                   child: Row(

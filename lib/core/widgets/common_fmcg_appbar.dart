@@ -185,37 +185,6 @@ class _FilterButton extends StatelessWidget {
   }
 }
 
-// ─── Nav button (back / action) ─────────────────────────────────────────────
-
-class _NavButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback? onPressed;
-
-  const _NavButton({required this.icon, this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        width: 36,
-        height: 36,
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.15),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.2),
-            width: 1,
-          ),
-        ),
-        child: Icon(icon, color: Colors.white, size: 18),
-      ),
-    );
-  }
-}
-
-// ─── Demo / Usage example ───────────────────────────────────────────────────
-
 class SearchBarDelegate extends SliverPersistentHeaderDelegate {
   final bool showFilter;
   final ValueChanged<String>? onSearchChanged;

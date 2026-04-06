@@ -6,7 +6,6 @@ import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/features/contact_us/more_options_screen.dart';
-import 'package:tradologie_app/features/fmcg/domain/entities/chat_list.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/chat_list_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_buyer_dashboard_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_my_account_screen.dart';
