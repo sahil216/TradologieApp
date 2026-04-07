@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 
 import 'package:intl/intl.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
+import 'package:tradologie_app/features/fmcg/domain/entities/chat_list.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/utils/extensions.dart';
@@ -388,6 +389,18 @@ class Constants {
         );
       },
     );
+  }
+
+  static final ValueNotifier<bool> hasUnread = ValueNotifier(false);
+
+  static void update(List<ChatList> chats) {
+    final unreadExists = chats.any((e) => e.isReadMessage == false);
+
+    hasUnread.value = unreadExists;
+  }
+
+  static void clear() {
+    hasUnread.value = false;
   }
 
   // static void showNormalToast({

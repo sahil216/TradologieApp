@@ -97,6 +97,7 @@ class _ChatListScreenState extends State<ChatListScreen>
           if (state is GetChatListSuccess) {
             chatList = state.data;
             filteredChatList = state.data;
+            Constants.update(state.data);
           }
           if (state is GetChatListError) {
             // CommonToast.showFailureToast(state.failure);
@@ -366,7 +367,7 @@ class ChatRow extends StatelessWidget {
                         width: 10,
                         height: 10,
                         decoration: const BoxDecoration(
-                          color: Color(0xFF4BBE07),
+                          color: Colors.red,
                           shape: BoxShape.circle,
                         ),
                       ),

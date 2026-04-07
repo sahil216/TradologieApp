@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tradologie_app/features/dashboard/presentation/widgets/buyer_banner_engine.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
@@ -112,6 +113,31 @@ class _FmcgProductsScreenState extends State<FmcgProductsScreen>
                           showNotification: false,
                         ),
                         SliverToBoxAdapter(child: const SizedBox(height: 16)),
+                        SliverToBoxAdapter(
+                          child: BuyerDashboardBannerEngine(
+                            banners: [
+                              AppBanner(
+                                image:
+                                    "https://www.tradologie.com/DOCS/mobileapp/${widget.params.brandId}/banner1.webp",
+                                title: "",
+                                subtitle: "",
+                              ),
+                              AppBanner(
+                                image:
+                                    "https://www.tradologie.com/DOCS/mobileapp/${widget.params.brandId}/banner2.webp",
+                                title: "",
+                                subtitle: "",
+                              ),
+                              AppBanner(
+                                image:
+                                    "https://www.tradologie.com/DOCS/mobileapp/${widget.params.brandId}/banner3.webp",
+                                title: "",
+                                subtitle: "",
+                              ),
+                            ],
+                          ),
+                        ),
+                        SliverToBoxAdapter(child: const SizedBox(height: 16)),
                         SliverPadding(
                           padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
                           sliver: SliverGrid(
@@ -152,7 +178,7 @@ class _FmcgProductsScreenState extends State<FmcgProductsScreen>
                 curve: Curves.easeOutCubic,
                 right: 16,
                 bottom: _isChatOpen
-                    ? MediaQuery.of(context).size.height * 0.15
+                    ? MediaQuery.of(context).size.height * 0.10
                     : -500,
                 child: AnimatedOpacity(
                   duration: const Duration(milliseconds: 280),
@@ -160,7 +186,8 @@ class _FmcgProductsScreenState extends State<FmcgProductsScreen>
                   child: IgnorePointer(
                     ignoring: !_isChatOpen,
                     child: _ChatbotPopup(
-                        chatbotUrl: "https://www.tradologie.com/fmcg-view"),
+                        chatbotUrl:
+                            "https://www.tradologie.com/AIChatbotView?BrandID=${widget.params.brandId}"),
                   ),
                 ),
               ),
@@ -168,7 +195,7 @@ class _FmcgProductsScreenState extends State<FmcgProductsScreen>
               // ── FAB ────────────────────────────────────────────────────────
               Positioned(
                 right: 20,
-                bottom: 40,
+                bottom: 10,
                 child: _buildChatFab(),
               ),
             ],

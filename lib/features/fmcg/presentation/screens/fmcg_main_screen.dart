@@ -79,9 +79,6 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
       ),
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(20),
-        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -105,7 +102,7 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
 
   Widget _item(int i, IconData icon, String label) {
     final bool selected = i == index;
-    final bool isChat = label == "Chats";
+    final bool isChat = i == 1;
 
     const activeColor = Color(0xFF0A9FED);
     const inactiveColor = Colors.black87;
@@ -319,16 +316,18 @@ class _FMCGMainScreenState extends State<FMCGMainScreen> {
             listenable: _navBarController,
             builder: (context, _) {
               return AnimatedSize(
-                duration: const Duration(milliseconds: 280),
-                curve: Curves.easeInOut,
-                child: _navBarController.visible
-                    ? CommonFMCGFloatingNavBar(
+                  duration: const Duration(milliseconds: 280),
+                  curve: Curves.easeInOut,
+                  child: ValueListenableBuilder<bool>(
+                    valueListenable: Constants.hasUnread,
+                    builder: (context, hasUnread, _) {
+                      return CommonFMCGFloatingNavBar(
                         index: currentIndex,
                         onTap: onTabChanged,
-                        unreadCount: unreadCount,
-                      )
-                    : const SizedBox.shrink(),
-              );
+                        unreadCount: hasUnread ? 1 : 0, // just flag-based
+                      );
+                    },
+                  ));
             },
           ),
         ),
