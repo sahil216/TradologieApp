@@ -17,8 +17,6 @@ import 'package:tradologie_app/features/fmcg/presentation/screens/chat_screen.da
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_distributor_enq.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_main_screen.dart';
 
-// https://drive.google.com/drive/folders/1ujvnm4IJUaVmp2nVNj2rHkyDZ4iz6CXl?usp=share_link
-
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
 
