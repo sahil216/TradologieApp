@@ -344,14 +344,35 @@ class _ChatbotPopupState extends State<_ChatbotPopup> {
             setState(() => _isLoading = false);
           },
         ),
-      )
-      ..loadRequest(Uri.parse(widget.chatbotUrl));
+      );
+    _webViewController.clearCache();
+    _webViewController.clearLocalStorage();
+
+    _webViewController.loadRequest(
+      Uri.parse(_getFreshUrl(widget.chatbotUrl)),
+      headers: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+      },
+    );
 
     // Android file picker handler (mirrors your WebViewScreen)
     if (_webViewController.platform is AndroidWebViewController) {
       (_webViewController.platform as AndroidWebViewController)
           .setOnShowFileSelector((_) async => []);
     }
+  }
+
+  String _getFreshUrl(String url) {
+    final uri = Uri.parse(url);
+    final newUri = uri.replace(
+      queryParameters: {
+        ...uri.queryParameters,
+        't': DateTime.now().millisecondsSinceEpoch.toString(),
+      },
+    );
+    return newUri.toString();
   }
 
   @override

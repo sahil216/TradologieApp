@@ -120,6 +120,9 @@ class _ChatScreenState extends State<ChatScreen>
       fileType: "",
       attachmentType: isFile ? "file" : "image",
       type: Constants.isBuyer ? "Buyer" : "Seller",
+      brandId: Constants.isBuyer
+          ? widget.chat.brandId ?? ""
+          : await secureStorage.read(AppStrings.brandId) ?? "",
     ));
   }
 

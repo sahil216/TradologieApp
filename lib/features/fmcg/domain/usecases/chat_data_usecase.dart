@@ -16,6 +16,7 @@ class ChatDataParams {
   final String? fileType;
   final String? attachmentType;
   final String? type;
+  final String brandId;
 
   ChatDataParams(
       {required this.contents,
@@ -27,7 +28,8 @@ class ChatDataParams {
       required this.isMessage,
       this.fileType,
       this.attachmentType,
-      this.type});
+      this.type,
+      required this.brandId});
 
   Map<String, dynamic> toJson() => {
         "BuyerID": buyerID,
@@ -41,6 +43,7 @@ class ChatDataParams {
         "AttachmentType": attachmentType,
         "Type": type,
         "LastLoginTime": DateTime.now().dateTimeBEFormat,
+        "BrandID": brandId
       };
 }
 

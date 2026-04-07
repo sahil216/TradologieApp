@@ -16,6 +16,7 @@ import 'package:tradologie_app/features/fmcg/presentation/cubit/chat_cubit.dart'
 import 'package:tradologie_app/features/fmcg/presentation/screens/chat_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_distributor_enq.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_main_screen.dart';
+import 'package:tradologie_app/features/socket/presentation/screen/chat_view.dart';
 
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
