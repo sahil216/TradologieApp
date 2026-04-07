@@ -164,6 +164,9 @@ class _ChatScreenState extends State<ChatScreen>
           padding: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom + 120),
           child: Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.5,
+            ),
             margin: const EdgeInsets.fromLTRB(12, 0, 12, 24),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -176,59 +179,63 @@ class _ChatScreenState extends State<ChatScreen>
                 ),
               ],
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  margin: const EdgeInsets.only(top: 10, bottom: 6),
-                  height: 4,
-                  width: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(20, 8, 20, 4),
-                  child: Text(
-                    "Add Attachment",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF1F2937),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(
+                      top: 10,
+                    ),
+                    height: 4,
+                    width: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(4),
                     ),
                   ),
-                ),
-                const Divider(height: 16, indent: 20, endIndent: 20),
-                _AttachmentOption(
-                  icon: Icons.camera_alt_rounded,
-                  label: "Camera",
-                  color: const Color(0xFF0A84FF),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _pickFromCamera();
-                  },
-                ),
-                _AttachmentOption(
-                  icon: Icons.photo_library_rounded,
-                  label: "Gallery",
-                  color: const Color(0xFF34C759),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _pickFromGallery();
-                  },
-                ),
-                _AttachmentOption(
-                  icon: Icons.insert_drive_file_rounded,
-                  label: "File",
-                  color: const Color(0xFFFF9500),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _pickFile();
-                  },
-                ),
-                const SizedBox(height: 8),
-              ],
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(20, 4, 20, 4),
+                    child: Text(
+                      "Add Attachment",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF1F2937),
+                      ),
+                    ),
+                  ),
+                  const Divider(height: 16, indent: 20, endIndent: 20),
+                  _AttachmentOption(
+                    icon: Icons.camera_alt_rounded,
+                    label: "Camera",
+                    color: const Color(0xFF0A84FF),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _pickFromCamera();
+                    },
+                  ),
+                  _AttachmentOption(
+                    icon: Icons.photo_library_rounded,
+                    label: "Gallery",
+                    color: const Color(0xFF34C759),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _pickFromGallery();
+                    },
+                  ),
+                  _AttachmentOption(
+                    icon: Icons.insert_drive_file_rounded,
+                    label: "File",
+                    color: const Color(0xFFFF9500),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _pickFile();
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
             ),
           ),
         );
