@@ -1,11 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/features/contact_us/more_options_screen.dart';
+import 'package:tradologie_app/features/fmcg/presentation/cubit/nav_cubit.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/chat_list_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_buyer_dashboard_screen.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_my_account_screen.dart';
@@ -197,7 +199,7 @@ class FMCGMainScreen extends StatefulWidget {
 }
 
 class _FMCGMainScreenState extends State<FMCGMainScreen> {
-  int currentIndex = 0;
+  late NavigationCubit navCubit;
   int unreadCount = 0;
   SecureStorageService secureStorage = SecureStorageService();
   final NavBarVisibilityController _navBarController =
@@ -266,23 +268,23 @@ class _FMCGMainScreenState extends State<FMCGMainScreen> {
       ];
 
   void onTabChanged(int index) {
-    // If tapping the already-active tab, pop to its root
-    if (index == currentIndex) {
+    if (index == navCubit.state) {
       _navigatorKeys[index].currentState?.popUntil((r) => r.isFirst);
       return;
     }
-    setState(() => currentIndex = index);
+
+    navCubit.setTab(index);
   }
 
   // Handle Android back button — pop within the nested navigator first
-  Future<bool> _onWillPop() async {
-    final canPop = _navigatorKeys[currentIndex].currentState?.canPop() ?? false;
-    if (canPop) {
-      _navigatorKeys[currentIndex].currentState?.pop();
-      return false; // don't pop the main screen
-    }
-    return true; // let the OS handle it (exit app)
-  }
+  // Future<bool> _onWillPop() async {
+  //   final canPop = _navigatorKeys[currentIndex].currentState?.canPop() ?? false;
+  //   if (canPop) {
+  //     _navigatorKeys[currentIndex].currentState?.pop();
+  //     return false; // don't pop the main screen
+  //   }
+  //   return true; // let the OS handle it (exit app)
+  // }
 
   @override
   void dispose() {
@@ -292,12 +294,21 @@ class _FMCGMainScreenState extends State<FMCGMainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    navCubit = context.watch<NavigationCubit>();
+
+    final currentIndex = navCubit.state;
     final roots = Constants.isBuyer == true ? _buyerRoots : _sellerRoots;
 
     return NavBarVisibility(
       controller: _navBarController,
-      child: WillPopScope(
-        onWillPop: _onWillPop,
+      child: BlocListener<NavigationCubit, int>(
+        listener: (context, index) {
+          if (index == 1) {
+            _navigatorKeys[1].currentState?.popUntil((r) => r.isFirst);
+          }
+
+          setState(() {}); // rebuild UI
+        },
         child: AdaptiveScaffold(
           body: Stack(
             children: List.generate(roots.length, (i) {
@@ -322,7 +333,7 @@ class _FMCGMainScreenState extends State<FMCGMainScreen> {
                     valueListenable: Constants.hasUnread,
                     builder: (context, hasUnread, _) {
                       return CommonFMCGFloatingNavBar(
-                        index: currentIndex,
+                        index: navCubit.state,
                         onTap: onTabChanged,
                         unreadCount: hasUnread ? 1 : 0, // just flag-based
                       );

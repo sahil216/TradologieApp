@@ -16,11 +16,12 @@ import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_profile_
 import 'package:tradologie_app/features/fmcg/domain/usecases/update_seller_documents_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/update_seller_profile_usecase.dart';
 import 'package:tradologie_app/features/fmcg/presentation/cubit/chat_cubit.dart';
+import 'package:tradologie_app/features/fmcg/presentation/cubit/nav_cubit.dart';
 
 final sl = GetIt.instance;
 
 Future<void> init() async {
-  //! Blocs
+  sl.registerFactory<NavigationCubit>(() => NavigationCubit());
   sl.registerFactory<ChatCubit>(() => ChatCubit(
         chatListUsecase: sl(),
         chatDataUsecase: sl(),

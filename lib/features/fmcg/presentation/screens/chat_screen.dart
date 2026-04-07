@@ -156,75 +156,80 @@ class _ChatScreenState extends State<ChatScreen>
 
   void _showAttachmentPicker() {
     showModalBottomSheet(
+      useSafeArea: true,
       context: context,
       backgroundColor: Colors.transparent,
       builder: (_) {
-        return Container(
-          margin: const EdgeInsets.fromLTRB(12, 0, 12, 24),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.08),
-                blurRadius: 24,
-                offset: const Offset(0, -4),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                margin: const EdgeInsets.only(top: 10, bottom: 6),
-                height: 4,
-                width: 40,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(4),
+        return Padding(
+          padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom + 120),
+          child: Container(
+            margin: const EdgeInsets.fromLTRB(12, 0, 12, 24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 24,
+                  offset: const Offset(0, -4),
                 ),
-              ),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(20, 8, 20, 4),
-                child: Text(
-                  "Add Attachment",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF1F2937),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(top: 10, bottom: 6),
+                  height: 4,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(4),
                   ),
                 ),
-              ),
-              const Divider(height: 16, indent: 20, endIndent: 20),
-              _AttachmentOption(
-                icon: Icons.camera_alt_rounded,
-                label: "Camera",
-                color: const Color(0xFF0A84FF),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickFromCamera();
-                },
-              ),
-              _AttachmentOption(
-                icon: Icons.photo_library_rounded,
-                label: "Gallery",
-                color: const Color(0xFF34C759),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickFromGallery();
-                },
-              ),
-              _AttachmentOption(
-                icon: Icons.insert_drive_file_rounded,
-                label: "File",
-                color: const Color(0xFFFF9500),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickFile();
-                },
-              ),
-              const SizedBox(height: 8),
-            ],
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(20, 8, 20, 4),
+                  child: Text(
+                    "Add Attachment",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1F2937),
+                    ),
+                  ),
+                ),
+                const Divider(height: 16, indent: 20, endIndent: 20),
+                _AttachmentOption(
+                  icon: Icons.camera_alt_rounded,
+                  label: "Camera",
+                  color: const Color(0xFF0A84FF),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _pickFromCamera();
+                  },
+                ),
+                _AttachmentOption(
+                  icon: Icons.photo_library_rounded,
+                  label: "Gallery",
+                  color: const Color(0xFF34C759),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _pickFromGallery();
+                  },
+                ),
+                _AttachmentOption(
+                  icon: Icons.insert_drive_file_rounded,
+                  label: "File",
+                  color: const Color(0xFFFF9500),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _pickFile();
+                  },
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
           ),
         );
       },
@@ -353,7 +358,7 @@ class _ChatScreenState extends State<ChatScreen>
                     name: Constants.isBuyer
                         ? widget.chat.userId ?? ""
                         : widget.chat.name ?? "",
-                    imageUrl: "",
+                    imageUrl: widget.chat.profileImage ?? "",
                     notificationCount: 2,
                     isOnline:
                         widget.chat.loginStatus?.toLowerCase() == "online",
@@ -1385,17 +1390,23 @@ class ChatTopBar extends StatelessWidget {
                         color: Colors.grey.shade300,
                         border: Border.all(color: T.faint, width: 1),
                       ),
-                      child: Center(
-                        child: Text(
-                          getInitial(name),
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ),
+                      child: (imageUrl.isEmpty)
+                          ? Center(
+                              child: Text(
+                                getInitial(name),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: T.ink,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            )
+                          : ClipOval(
+                              child: Image.network(
+                                  "https://www.tradologie.com/docs/$imageUrl",
+                                  fit: BoxFit.cover),
+                            ),
                     ),
                     if (isOnline)
                       Positioned(

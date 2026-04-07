@@ -4,6 +4,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/features/dashboard/presentation/widgets/buyer_banner_engine.dart';
+import 'package:tradologie_app/features/fmcg/domain/entities/chat_list.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_initial_chat_id_usecase.dart';
+import 'package:tradologie_app/features/fmcg/presentation/cubit/nav_cubit.dart';
+import 'package:tradologie_app/features/fmcg/presentation/screens/chat_screen.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
@@ -85,6 +89,8 @@ class _FmcgProductsScreenState extends State<FmcgProductsScreen>
     }
   }
 
+  ChatList selectedChat = ChatList();
+
   @override
   Widget build(BuildContext context) {
     return AdaptiveScaffold(
@@ -93,6 +99,24 @@ class _FmcgProductsScreenState extends State<FmcgProductsScreen>
         listener: (context, state) async {
           if (state is ProductsListSuccess) {
             setState(() => productsList = state.data);
+          }
+          if (state is GetInitialChatIdSuccess) {
+            selectedChat.sellerId = state.data.sellerId.toString();
+            selectedChat.quotationUserId =
+                await secureStorage.read(AppStrings.loginId) ?? "";
+            Navigator.pop(context);
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ChatScreen(
+                  chat: selectedChat,
+                ),
+              ),
+            );
+          }
+          if (state is GetInitialChatIdError) {
+            // CommonToast.showFailureToast(state.failure);
           }
         },
         child: SafeArea(
@@ -146,11 +170,13 @@ class _FmcgProductsScreenState extends State<FmcgProductsScreen>
                               crossAxisCount: 2,
                               crossAxisSpacing: 12,
                               mainAxisSpacing: 12,
-                              childAspectRatio: 0.8,
+                              childAspectRatio: 0.7,
                             ),
                             delegate: SliverChildBuilderDelegate(
                               (context, i) => productCard(
                                 productsList?[i] ?? GetProductsList(),
+                                widget.params.brandName,
+                                widget.params.brandId,
                               ),
                               childCount: productsList?.length ?? 0,
                             ),
@@ -165,7 +191,8 @@ class _FmcgProductsScreenState extends State<FmcgProductsScreen>
               // ── Loading overlay ────────────────────────────────────────────
               BlocBuilder<ChatCubit, ChatState>(
                 builder: (context, state) {
-                  if (state is ProductsListIsLoading) {
+                  if (state is ProductsListIsLoading ||
+                      state is GetInitialChatIdIsLoading) {
                     return const Positioned.fill(child: CommonLoader());
                   }
                   return const SizedBox.shrink();
@@ -186,8 +213,15 @@ class _FmcgProductsScreenState extends State<FmcgProductsScreen>
                   child: IgnorePointer(
                     ignoring: !_isChatOpen,
                     child: _ChatbotPopup(
-                        chatbotUrl:
-                            "https://www.tradologie.com/AIChatbotView?BrandID=${widget.params.brandId}"),
+                      chatbotUrl:
+                          "https://www.tradologie.com/AIChatbotView?BrandID=${widget.params.brandId}",
+                      onDirectConnect: () {
+                        setState(() {
+                          _isChatOpen = false;
+                          context.read<NavigationCubit>().goToChat();
+                        }); // 👈 CLOSE FAB
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -257,7 +291,8 @@ class _FmcgProductsScreenState extends State<FmcgProductsScreen>
     );
   }
 
-  Widget productCard(GetProductsList enquiry) {
+  Widget productCard(
+      GetProductsList enquiry, String brandName, String brandId) {
     return SizedBox.expand(
       child: Material(
         elevation: 2,
@@ -298,6 +333,48 @@ class _FmcgProductsScreenState extends State<FmcgProductsScreen>
                   color: Color(0xFF2B2B2B),
                 ),
               ),
+              const SizedBox(height: 12),
+              Center(
+                child: GestureDetector(
+                  onTap: () async {
+                    selectedChat.brandId = brandId.toString();
+                    selectedChat.userId = brandName;
+
+                    chatCubit.getInitialChatId(GetInitialChatIdParams(
+                      token: await secureStorage
+                              .read(AppStrings.apiVerificationCode) ??
+                          "",
+                      deviceId: Constants.deviceID,
+                      buyerId:
+                          await secureStorage.read(AppStrings.loginId) ?? "",
+                      brandId: brandId.toString(),
+                    ));
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25),
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFF2DAAE1),
+                          Color(0xFF1B8ED1),
+                        ],
+                      ),
+                    ),
+                    child: const Text(
+                      "Enquire Now",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -310,7 +387,8 @@ class _FmcgProductsScreenState extends State<FmcgProductsScreen>
 
 class _ChatbotPopup extends StatefulWidget {
   final String chatbotUrl;
-  const _ChatbotPopup({required this.chatbotUrl});
+  final VoidCallback? onDirectConnect;
+  const _ChatbotPopup({required this.chatbotUrl, this.onDirectConnect});
 
   @override
   State<_ChatbotPopup> createState() => _ChatbotPopupState();
@@ -337,6 +415,18 @@ class _ChatbotPopupState extends State<_ChatbotPopup> {
       ..setBackgroundColor(Colors.white)
       ..setNavigationDelegate(
         NavigationDelegate(
+          onNavigationRequest: (request) {
+            final url = request.url;
+
+            debugPrint("🌐 URL: $url");
+
+            if (url.contains("direct-connect")) {
+              widget.onDirectConnect?.call(); // 👈 CLOSE FAB
+              return NavigationDecision.prevent; // optional (stop loading)
+            }
+
+            return NavigationDecision.navigate;
+          },
           onPageStarted: (_) => setState(() => _isLoading = true),
           onPageFinished: (_) => setState(() => _isLoading = false),
           onWebResourceError: (error) {

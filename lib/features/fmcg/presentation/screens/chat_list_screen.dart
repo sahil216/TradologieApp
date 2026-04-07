@@ -311,19 +311,25 @@ class ChatRow extends StatelessWidget {
                     shape: BoxShape.circle,
                     border: Border.all(color: T.faint, width: 1),
                   ),
-                  child: Center(
-                    child: Text(
-                      getInitial(Constants.isBuyer
-                          ? enquiry.userId ?? ""
-                          : enquiry.name),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: T.ink,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ),
+                  child: (enquiry.profileImage?.isEmpty ?? true)
+                      ? Center(
+                          child: Text(
+                            getInitial(Constants.isBuyer
+                                ? enquiry.userId ?? ""
+                                : enquiry.name),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: T.ink,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        )
+                      : ClipOval(
+                          child: Image.network(
+                              "https://www.tradologie.com/docs/${enquiry.profileImage}",
+                              fit: BoxFit.cover),
+                        ),
                 ),
                 const SizedBox(width: 14),
                 // Content

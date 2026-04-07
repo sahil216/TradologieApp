@@ -16,6 +16,7 @@ class ChatListModel extends ChatList {
     super.chatInsertedDate,
     super.loginStatus,
     super.isReadMessage,
+    super.profileImage,
   });
 
   factory ChatListModel.fromJson(Map<String, dynamic> json) => ChatListModel(
@@ -33,5 +34,6 @@ class ChatListModel extends ChatList {
         chatInsertedDate: json["ChatInsertedDate"].toString(),
         loginStatus: json["LoginStatus"].toString(),
         isReadMessage: json["IsReadMsg"],
+        profileImage: json["ProfileImage"].toString(),
       );
 }

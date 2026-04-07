@@ -15,6 +15,7 @@ class ChatList extends Equatable {
   String? chatInsertedDate;
   String? loginStatus;
   bool? isReadMessage;
+  String? profileImage;
 
   ChatList({
     this.quotationUserId,
@@ -31,6 +32,7 @@ class ChatList extends Equatable {
     this.chatInsertedDate,
     this.loginStatus,
     this.isReadMessage,
+    this.profileImage,
   });
 
   @override
@@ -49,5 +51,6 @@ class ChatList extends Equatable {
         chatInsertedDate,
         loginStatus,
         isReadMessage,
+        profileImage,
       ];
 }
