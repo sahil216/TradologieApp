@@ -361,7 +361,9 @@ class _SendOtpScreenState extends State<SendOtpScreen>
                                                       FocusManager
                                                           .instance.primaryFocus
                                                           ?.unfocus();
-                                                      Constants.isBuyer == true
+
+
+                                                     /* Constants.isBuyer == true
                                                           ? BlocProvider.of<
                                                                       AuthenticationCubit>(
                                                                   context)
@@ -372,6 +374,47 @@ class _SendOtpScreenState extends State<SendOtpScreen>
                                                                   context)
                                                               .sendOtp(params,
                                                                   false);
+
+                                                      */
+
+
+
+
+
+                                                      if (Constants.isFmcg) {
+                                                        if (Constants.isBuyer) {
+
+
+                                                        // for FMCG Buyer
+
+
+                                                        } else {
+
+                                                          BlocProvider.of<
+                                                              AuthenticationCubit>(
+                                                              context)
+                                                              .sendOtpFMCGSeller(params,
+                                                              false);
+                                                        }
+                                                      } else {
+                                                        if (Constants.isBuyer) {
+
+                                                          BlocProvider.of<
+                                                              AuthenticationCubit>(
+                                                              context)
+                                                              .sendOtpBuyer(
+                                                              params, false);
+
+                                                        } else {
+                                                          BlocProvider.of<
+                                                              AuthenticationCubit>(
+                                                              context)
+                                                              .sendOtp(params,
+                                                              false);
+                                                        }
+                                                      }
+
+
                                                     } else {
                                                       CommonToast.error(
                                                           "Please Enter the Details to Continue");

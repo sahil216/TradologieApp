@@ -20,6 +20,7 @@ abstract class AuthenticationRemoteDataSource {
   Future<ResponseWrapper<dynamic>?> buyerSignIn(SigninParams params);
   Future<ResponseWrapper<dynamic>?> register(RegisterParams params);
   Future<ResponseWrapper<dynamic>?> sendOtp(SendOtpParams params);
+  Future<ResponseWrapper<dynamic>?> sendFMCGSellerOtp(SendOtpParams params);
   Future<ResponseWrapper<dynamic>?> verifyOtp(VerifyOtpParams params);
   Future<ResponseWrapper<dynamic>?> sendOtpBuyer(SendOtpParams params);
   Future<ResponseWrapper<dynamic>?> verifyOtpBuyer(VerifyOtpParams params);
@@ -82,13 +83,11 @@ class AuthenticationRemoteDataSourceImpl
     );
   }
 
-  @override
-  Future<ResponseWrapper<dynamic>?> sendOtp(SendOtpParams params) async {
-    return await apiConsumer.post(
-      EndPoints.sendOtp(UserType.supplier),
-      body: params.toJson(),
-    );
-  }
+
+
+
+
+
 
   @override
   Future<ResponseWrapper<dynamic>?> verifyOtp(VerifyOtpParams params) async {
@@ -278,4 +277,26 @@ class AuthenticationRemoteDataSourceImpl
       body: null,
     );
   }
+
+
+
+
+
+  @override
+  Future<ResponseWrapper<dynamic>?> sendOtp(SendOtpParams params) async {
+    return await apiConsumer.post(
+      EndPoints.sendOtp(UserType.supplier),
+      body: params.toJson(),
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> sendFMCGSellerOtp(SendOtpParams params) async {
+    return await apiConsumer.post(
+      EndPoints.sendSellerOTPForLogin(UserType.supplier),
+      body: params.toJson(),
+    );
+  }
+
+
 }

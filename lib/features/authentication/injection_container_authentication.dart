@@ -36,7 +36,12 @@ Future<void> init() async {
   sl.registerFactory<AuthenticationCubit>(() => AuthenticationCubit(
         signInUsecase: sl(),
         registerUsecase: sl(),
+
+
         sendOtpUsecase: sl(),
+        sendOtpUsecaseFMCGseller: sl(),
+
+
         verifyOtpUsecase: sl(),
         buyerSigninUsecase: sl(),
         signOutUsecase: sl(),
@@ -61,8 +66,19 @@ Future<void> init() async {
       ));
 
   //! Use cases
+
+
+
+
+
   sl.registerLazySingleton<SendOtpUsecase>(
       () => SendOtpUsecase(authenticationRepository: sl()));
+
+
+  sl.registerLazySingleton<SendOtpUsecaseFMCGseller>(
+      () => SendOtpUsecaseFMCGseller(authenticationRepository: sl()));
+
+
   sl.registerLazySingleton<SignInUsecase>(
       () => SignInUsecase(authenticationRepository: sl()));
   sl.registerLazySingleton<RegisterUsecase>(

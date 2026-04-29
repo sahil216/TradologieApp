@@ -8,7 +8,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
-
+import '../../../../core/utils/assets_manager.dart';
+import '../../../../core/utils/responsive.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
@@ -27,6 +28,7 @@ import '../../../../core/widgets/common_social_icons.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../cubit/authentication_cubit.dart';
+
 
 class FmcgSellerSignin extends StatefulWidget {
   final bool isBuyer;
@@ -122,6 +124,9 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
 
   @override
   Widget build(BuildContext context) {
+
+    final r = Responsive(context);
+
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: AdaptiveScaffold(
@@ -351,34 +356,41 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
                                         ),
                                       ),
                                       SizedBox(height: 20),
-                                      // SizedBox(
-                                      //   width: r.isTablet
-                                      //       ? 420
-                                      //       : double.infinity,
-                                      //   child: CommonButton(
-                                      //     onPressed: () {
-                                      //       Navigator.pop(context);
-                                      //     },
-                                      //     text: CommonStrings
-                                      //         .sendOtpViaWhatsapp,
-                                      //     backgroundColor:
-                                      //         AppColors.white,
-                                      //     borderSide: BorderSide(
-                                      //       color: AppColors
-                                      //           .green, // or any color you want
-                                      //       width: 2,
-                                      //     ),
-                                      //     icon: Image.asset(
-                                      //         ImgAssets.whatsappIcon),
-                                      //     textStyle:
-                                      //         TextStyleConstants
-                                      //             .medium(
-                                      //       context,
-                                      //       fontSize: 16,
-                                      //       color: AppColors.black,
-                                      //     ),
-                                      //   ),
-                                      // ),
+                                      SizedBox(
+                                        width: r.isTablet
+                                            ? 420
+                                            : double.infinity,
+                                        child: CommonButton(
+                                          onPressed: () {
+                                          //  Navigator.pop(context);
+
+
+                                            // code by Gopal
+
+                                            sl<NavigationService>().pushNamed(
+                                                Routes.sendOtpScreen);
+
+                                          },
+                                          text: CommonStrings
+                                              .sendOtpViaWhatsapp,
+                                          backgroundColor:
+                                              AppColors.white,
+                                          borderSide: BorderSide(
+                                            color: AppColors
+                                                .green, // or any color you want
+                                            width: 2,
+                                          ),
+                                          icon: Image.asset(
+                                              ImgAssets.whatsappIcon),
+                                          textStyle:
+                                              TextStyleConstants
+                                                  .medium(
+                                            context,
+                                            fontSize: 16,
+                                            color: AppColors.black,
+                                          ),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),

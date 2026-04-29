@@ -29,7 +29,7 @@ import '../usecases/register_usecase.dart';
 import '../usecases/sign_in_usecase.dart';
 
 abstract class AuthenticationRepository {
-  Future<Either<Failure, SendOtpResult>> sendOtp(SendOtpParams params);
+
   Future<Either<Failure, VerifyOtpResult>> verifyOtp(VerifyOtpParams params);
   Future<Either<Failure, SendOtpResult>> sendOtpBuyer(SendOtpParams params);
   Future<Either<Failure, VerifyOtpResult>> verifyOtpBuyer(
@@ -69,4 +69,8 @@ abstract class AuthenticationRepository {
       fmcgSellerServiceLabelList(NoParams params);
   Future<Either<Failure, List<FmcgSellerExportingProductsList>>>
       fmcgSellerExportingProductsList(NoParams params);
+
+
+  Future<Either<Failure, SendOtpResult>> sendOtp(SendOtpParams params);
+  Future<Either<Failure, SendOtpResult>> sendOtpFMCGseller(SendOtpParams params);
 }

@@ -50,6 +50,9 @@ part 'authentication_state.dart';
 
 class AuthenticationCubit extends Cubit<AuthenticationState> {
   final SendOtpUsecase sendOtpUsecase;
+  final SendOtpUsecaseFMCGseller sendOtpUsecaseFMCGseller;
+
+
   final SignInUsecase signInUsecase;
   final RegisterUsecase registerUsecase;
   final VerifyOtpUsecase verifyOtpUsecase;
@@ -81,6 +84,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
 
   AuthenticationCubit({
     required this.sendOtpUsecase,
+    required this.sendOtpUsecaseFMCGseller,
     required this.signInUsecase,
     required this.registerUsecase,
     required this.verifyOtpUsecase,
@@ -106,14 +110,6 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     required this.fmcgSellerServiceLabelListUsecase,
   }) : super(AuthenticationInitial());
 
-  Future<void> sendOtp(SendOtpParams params, bool isResend) async {
-    emit(SendOtpIsLoading());
-    Either<Failure, SendOtpResult> response = await sendOtpUsecase(params);
-    emit(response.fold(
-      (failure) => SendOtpError(failure: failure),
-      (res) => SendOtpSuccess(data: res, isResend: isResend),
-    ));
-  }
 
   Future<void> fmcgSellerSignin(FmcgSellerSigninParams params) async {
     emit(FmcgSellerSigninIsLoading());
@@ -156,6 +152,13 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       (res) => SendOtpSuccess(data: res, isResend: isResend),
     ));
   }
+
+
+
+
+
+
+
 
   Future<void> verifyOtpBuyer(VerifyOtpParams params) async {
     emit(VerifyOtpIsLoading());
@@ -349,4 +352,41 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       (res) => FmcgSellerExportingProductsListSuccess(data: res),
     ));
   }
+
+
+
+
+  Future<void> sendOtp(SendOtpParams params, bool isResend) async {
+    emit(SendOtpIsLoading());
+    Either<Failure, SendOtpResult> response = await sendOtpUsecase(params);
+    emit(response.fold(
+          (failure) => SendOtpError(failure: failure),
+          (res) => SendOtpSuccess(data: res, isResend: isResend),
+    ));
+  }
+
+
+
+
+
+
+  Future<void> sendOtpFMCGSeller(SendOtpParams params, bool isResend) async {
+    emit(SendOtpIsLoading());
+    Either<Failure, SendOtpResult> response = await sendOtpUsecaseFMCGseller(params);
+    emit(response.fold(
+          (failure) => SendOtpError(failure: failure),
+          (res) => SendOtpSuccess(data: res, isResend: isResend),
+    ));
+  }
+
+
+
+
+
+
+
+
+
+
+
 }

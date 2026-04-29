@@ -67,6 +67,10 @@ class _ChatScreenState extends State<ChatScreen>
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
 
+
+
+
+
   @override
   void initState() {
     super.initState();
@@ -81,6 +85,41 @@ class _ChatScreenState extends State<ChatScreen>
     _scrollController.dispose();
     super.dispose();
   }
+
+  // code by Gopal for preventing back and exit app
+
+
+  DateTime? lastBackPressTime;
+
+  Future<bool> _onWillPop() async {
+    final now = DateTime.now();
+
+    if (lastBackPressTime == null ||
+        now.difference(lastBackPressTime!) > const Duration(seconds: 2)) {
+      lastBackPressTime = now;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Press back again to exit")),
+      );
+
+      return false; // don't exit
+    }
+
+    return true; // exit app
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // ── Polling ────────────────────────────────────────────────────────────────
 
@@ -336,149 +375,250 @@ class _ChatScreenState extends State<ChatScreen>
   Widget build(BuildContext context) {
     final primaryColor = HexColor('#0A84FF');
 
-    return AdaptiveScaffold(
-      body: BlocListener<ChatCubit, ChatState>(
-        listenWhen: (prev, curr) => prev != curr,
-        listener: (context, state) {
-          if (state is ChatDataSuccess) {
-            setState(() => chatData = state.data);
-            WidgetsBinding.instance
-                .addPostFrameCallback((_) => _scrollToBottom());
-          }
-          if (state is ChatDataError) {
-            // CommonToast.showFailureToast(state.failure);
-          }
-          if (state is GetFileUrlSuccess) {
-            setState(() => fileUrlResponse = state.data);
-            _sendFile(_isFilePicked, fileUrlResponse?.fileUrl ?? "");
-          }
-          if (state is GetFileUrlError) {
-            CommonToast.showFailureToast(state.failure);
-          }
-        },
-        child: SafeArea(
-          child: BlocBuilder<ChatCubit, ChatState>(
-            builder: (context, state) {
-              return Column(
-                children: [
-                  ChatTopBar(
-                    name: Constants.isBuyer
-                        ? widget.chat.userId ?? ""
-                        : widget.chat.name ?? "",
-                    imageUrl: widget.chat.profileImage ?? "",
-                    notificationCount: 2,
-                    isOnline:
-                        widget.chat.loginStatus?.toLowerCase() == "online",
-                    onBackTap: () => Navigator.pop(context),
-                    onNotificationTap: () {},
-                  ),
-                  Expanded(
-                    child: CustomScrollView(
-                      controller: _scrollController,
-                      physics: const BouncingScrollPhysics(),
-                      slivers: [
-                        SliverPadding(
-                          padding: const EdgeInsets.fromLTRB(14, 10, 14, 16),
-                          sliver: SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                                final msg = chatData?[index];
-                                final isMe = msg?.msgType?.toLowerCase() ==
-                                    (Constants.isBuyer ? "buyer" : "seller");
 
-                                // Parse MsgContent JSON
-                                Map<String, dynamic>? data;
-                                try {
-                                  if ((msg?.msgContent ?? "").isNotEmpty) {
-                                    data = jsonDecode(msg!.msgContent!);
+
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+
+        // 👇 Force block (do nothing)
+      },
+      child:  AdaptiveScaffold(
+        body: BlocListener<ChatCubit, ChatState>(
+          listenWhen: (prev, curr) => prev != curr,
+          listener: (context, state) {
+            if (state is ChatDataSuccess) {
+              setState(() => chatData = state.data);
+              WidgetsBinding.instance
+                  .addPostFrameCallback((_) => _scrollToBottom());
+            }
+            if (state is ChatDataError) {
+              // CommonToast.showFailureToast(state.failure);
+            }
+            if (state is GetFileUrlSuccess) {
+              setState(() => fileUrlResponse = state.data);
+              _sendFile(_isFilePicked, fileUrlResponse?.fileUrl ?? "");
+            }
+            if (state is GetFileUrlError) {
+              CommonToast.showFailureToast(state.failure);
+            }
+          },
+          child: SafeArea(
+            child: BlocBuilder<ChatCubit, ChatState>(
+              builder: (context, state) {
+                return Column(
+                  children: [
+                    ChatTopBar(
+                      name: Constants.isBuyer
+                          ? widget.chat.userId ?? ""
+                          : widget.chat.name ?? "",
+                      imageUrl: widget.chat.profileImage ?? "",
+                      notificationCount: 2,
+                      isOnline:
+                      widget.chat.loginStatus?.toLowerCase() == "online",
+                      onBackTap: () => Navigator.pop(context),
+                      onNotificationTap: () {},
+                    ),
+                    Expanded(
+                      child: CustomScrollView(
+                        controller: _scrollController,
+                        physics: const BouncingScrollPhysics(),
+                        slivers: [
+                          SliverPadding(
+                            padding: const EdgeInsets.fromLTRB(14, 10, 14, 16),
+                            sliver: SliverList(
+                              delegate: SliverChildBuilderDelegate(
+                                    (context, index) {
+                                  final msg = chatData?[index];
+                                  final isMe = msg?.msgType?.toLowerCase() ==
+                                      (Constants.isBuyer ? "buyer" : "seller");
+
+                                  // Parse MsgContent JSON
+                                  Map<String, dynamic>? data;
+                                  try {
+                                    if ((msg?.msgContent ?? "").isNotEmpty) {
+                                      data = jsonDecode(msg!.msgContent!);
+                                    }
+                                  } catch (_) {
+                                    data = null;
                                   }
-                                } catch (_) {
-                                  data = null;
-                                }
 
-                                final String contentUrl =
-                                    data?["Message"] ?? "";
-                                final bool isMessage =
-                                    msg?.isMessage?.toLowerCase() == "true";
-                                final String attachmentType =
-                                    (msg?.attachmentType ?? "").toLowerCase();
+                                  final String contentUrl =
+                                      data?["Message"] ?? "";
+                                  final bool isMessage =
+                                      msg?.isMessage?.toLowerCase() == "true";
+                                  final String attachmentType =
+                                  (msg?.attachmentType ?? "").toLowerCase();
 
-                                return Column(
-                                  children: [
-                                    if ((msg?.displayDate ?? "").isNotEmpty)
-                                      _DateChip(date: msg?.displayDate ?? ""),
-                                    Align(
-                                      alignment: isMe
-                                          ? Alignment.centerRight
-                                          : Alignment.centerLeft,
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 4),
-                                        child: ConstrainedBox(
-                                          constraints: BoxConstraints(
-                                            maxWidth: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.74,
+                                  return Column(
+                                    children: [
+                                      if ((msg?.displayDate ?? "").isNotEmpty)
+                                        _DateChip(date: msg?.displayDate ?? ""),
+                                      Align(
+                                        alignment: isMe
+                                            ? Alignment.centerRight
+                                            : Alignment.centerLeft,
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 4),
+                                          child: ConstrainedBox(
+                                            constraints: BoxConstraints(
+                                              maxWidth: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                                  0.74,
+                                            ),
+                                            // ── Conditional bubble ───────────
+                                            child: isMessage
+                                            // 1️⃣ Normal text message
+                                                ? _TextBubble(
+                                              message: contentUrl,
+                                              time: msg?.displayTime ?? "",
+                                              isMe: isMe,
+                                              primaryColor: primaryColor,
+                                            )
+                                                : attachmentType == "image"
+                                            // 2️⃣ Image message
+                                                ? _ImageBubble(
+                                              imageUrl: contentUrl,
+                                              time: msg?.displayTime ??
+                                                  "",
+                                              isMe: isMe,
+                                              primaryColor:
+                                              primaryColor,
+                                            )
+                                            // 3️⃣ File message
+                                                : _FileBubble(
+                                              fileUrl: contentUrl,
+                                              time: msg?.displayTime ??
+                                                  "",
+                                              isMe: isMe,
+                                              primaryColor:
+                                              primaryColor,
+                                            ),
                                           ),
-                                          // ── Conditional bubble ───────────
-                                          child: isMessage
-                                              // 1️⃣ Normal text message
-                                              ? _TextBubble(
-                                                  message: contentUrl,
-                                                  time: msg?.displayTime ?? "",
-                                                  isMe: isMe,
-                                                  primaryColor: primaryColor,
-                                                )
-                                              : attachmentType == "image"
-                                                  // 2️⃣ Image message
-                                                  ? _ImageBubble(
-                                                      imageUrl: contentUrl,
-                                                      time: msg?.displayTime ??
-                                                          "",
-                                                      isMe: isMe,
-                                                      primaryColor:
-                                                          primaryColor,
-                                                    )
-                                                  // 3️⃣ File message
-                                                  : _FileBubble(
-                                                      fileUrl: contentUrl,
-                                                      time: msg?.displayTime ??
-                                                          "",
-                                                      isMe: isMe,
-                                                      primaryColor:
-                                                          primaryColor,
-                                                    ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                );
-                              },
-                              childCount: chatData?.length ?? 0,
+                                    ],
+                                  );
+                                },
+                                childCount: chatData?.length ?? 0,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  _InputBar(
-                    controller: controller,
-                    primaryColor: primaryColor,
-                    onAttachTap: _showAttachmentPicker,
-                    onSend: _sendMessage,
-                  ),
-                ],
-              );
-            },
+                    _InputBar(
+                      controller: controller,
+                      primaryColor: primaryColor,
+                      onAttachTap: _showAttachmentPicker,
+                      onSend: _sendMessage,
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
         ),
+      ),
+    );
+
+
+
+
+  }
+}
+
+// ─── 1️⃣ Text bubble ──────────────────────────────────────────────────────────
+
+
+// Updated by Gopal _TextBubble class ( added tick of read and unread)
+
+
+class _TextBubble extends StatelessWidget {
+  final String message;
+  final String time;
+  final bool isMe;
+  //final bool isRead; // 👈 NEW
+  final Color primaryColor;
+
+  const _TextBubble({
+    required this.message,
+    required this.time,
+    required this.isMe,
+    //required this.isRead, // 👈 NEW
+    required this.primaryColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+
+    final bool isRead = true;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: isMe ?   Colors.white:primaryColor,
+        borderRadius: BorderRadius.only(
+          topLeft: const Radius.circular(18),
+          topRight: const Radius.circular(18),
+          bottomLeft: Radius.circular(isMe ? 18 : 4),
+          bottomRight: Radius.circular(isMe ? 4 : 18),
+        ),
+        border: isMe ? null : Border.all(color: Colors.black12),
+      ),
+      child: Column(
+        crossAxisAlignment:
+        isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            message,
+            style: TextStyleConstants.medium(
+              context,
+              color: isMe ?  const Color(0xff1F2937):Colors.white ,
+              fontSize: 15,
+            ),
+          ),
+          const SizedBox(height: 6),
+
+          // 👇 TIME + TICKS
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                time,
+                style: TextStyleConstants.medium(
+                  context,
+                  color: isMe ?  Colors.grey.shade600 : Colors.white70,
+                  fontSize: 11,
+                ),
+              ),
+
+              if (isMe) ...[
+                const SizedBox(width: 4),
+                Icon(
+                  isRead ? Icons.done_all : Icons.done,
+                  size: 16,
+                  color: isRead ? Colors.blue : Colors.white70,
+                ),
+              ],
+            ],
+          ),
+        ],
       ),
     );
   }
 }
 
-// ─── 1️⃣ Text bubble ──────────────────────────────────────────────────────────
+
+
+
+/*
+
+
+// old code without tick
 
 class _TextBubble extends StatelessWidget {
   final String message;
@@ -534,6 +674,15 @@ class _TextBubble extends StatelessWidget {
     );
   }
 }
+
+
+
+*/
+
+
+
+
+
 
 // ─── 2️⃣ Image bubble ─────────────────────────────────────────────────────────
 
@@ -1111,6 +1260,14 @@ class _LocalFilePreviewCard extends StatelessWidget {
 
 // ─── Input bar ────────────────────────────────────────────────────────────────
 
+
+
+
+
+// Old One =>
+
+/*
+
 class _InputBar extends StatelessWidget {
   final TextEditingController controller;
   final Color primaryColor;
@@ -1143,24 +1300,7 @@ class _InputBar extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            GestureDetector(
-              onTap: onAttachTap,
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
-                margin: const EdgeInsets.only(right: 8),
-                decoration: BoxDecoration(
-                  color: const Color(0xffF3F5F7),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.black12),
-                ),
-                child: Icon(
-                  Icons.attach_file_rounded,
-                  color: Colors.grey.shade600,
-                  size: 22,
-                ),
-              ),
-            ),
+
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
@@ -1188,6 +1328,48 @@ class _InputBar extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 10),
+            Row(
+              children: [
+                GestureDetector(
+                  onTap: onAttachTap,
+                  child: Container(
+                    padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+                    margin: const EdgeInsets.only(right: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xffF3F5F7),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.black12),
+                    ),
+                    child: Icon(
+                      Icons.attach_file_rounded,
+                      color: Colors.grey.shade600,
+                      size: 22,
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: (){
+
+                  },
+                  child: Container(
+                    padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+                    margin: const EdgeInsets.only(right: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xffF3F5F7),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.black12),
+                    ),
+                    child: Icon(
+                      Icons.camera_alt,
+                      color: Colors.grey.shade600,
+                      size: 22,
+                    ),
+                  ),
+                ),
+              ],
+            ),
             GestureDetector(
               onTap: onSend,
               child: Container(
@@ -1205,7 +1387,8 @@ class _InputBar extends StatelessWidget {
                   ],
                 ),
                 child: const Icon(
-                  Icons.send_rounded,
+                  //Icons.send_rounded,
+                  Icons.keyboard_voice_rounded,
                   color: Colors.white,
                   size: 22,
                 ),
@@ -1217,6 +1400,181 @@ class _InputBar extends StatelessWidget {
     );
   }
 }
+
+*/
+
+
+// created by Gopal
+
+
+class _InputBar extends StatefulWidget {
+  final TextEditingController controller;
+  final Color primaryColor;
+  final VoidCallback onAttachTap;
+  final VoidCallback onSend;
+
+  const _InputBar({
+    required this.controller,
+    required this.primaryColor,
+    required this.onAttachTap,
+    required this.onSend,
+  });
+
+  @override
+  State<_InputBar> createState() => _InputBarState();
+}
+
+class _InputBarState extends State<_InputBar> {
+  bool isTyping = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_handleTyping);
+  }
+
+  void _handleTyping() {
+    final typingNow = widget.controller.text.trim().isNotEmpty;
+    if (typingNow != isTyping) {
+      setState(() => isTyping = typingNow);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_handleTyping);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 14,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xffF3F5F7),
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(color: Colors.black12),
+                ),
+                child: TextField(
+                  controller: widget.controller,
+                  minLines: 1,
+                  maxLines: 4,
+                  textInputAction: TextInputAction.send,
+                  decoration: InputDecoration(
+                    hintText: "Type your message...",
+                    hintStyle: TextStyle(
+                      color: Colors.grey.shade500,
+                      fontSize: 15,
+                    ),
+                    contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                    border: InputBorder.none,
+                  ),
+                  onSubmitted: (_) => widget.onSend(),
+                ),
+              ),
+            ),
+
+            const SizedBox(width: 10),
+
+            // 👇 Attach + Camera (camera hidden when typing)
+            Row(
+              children: [
+                GestureDetector(
+                  onTap: widget.onAttachTap,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 10),
+                    margin: const EdgeInsets.only(right: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xffF3F5F7),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.black12),
+                    ),
+                    child: Icon(
+                      Icons.attach_file_rounded,
+                      color: Colors.grey.shade600,
+                      size: 22,
+                    ),
+                  ),
+                ),
+
+                // 👇 Hide camera when typing
+                if (!isTyping)
+                  GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 10),
+                      margin: const EdgeInsets.only(right: 8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xffF3F5F7),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.black12),
+                      ),
+                      child: Icon(
+                        Icons.camera_alt,
+                        color: Colors.grey.shade600,
+                        size: 22,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+
+            // 👇 Mic ↔ Send button
+            GestureDetector(
+              onTap: widget.onSend,
+              child: Container(
+                height: 48,
+                width: 52,
+                decoration: BoxDecoration(
+                  color: widget.primaryColor,
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: [
+                    BoxShadow(
+                      color: widget.primaryColor.withValues(alpha: 0.28),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  isTyping
+                      ? Icons.send_rounded
+                      : Icons.keyboard_voice_rounded,
+                  color: Colors.white,
+                  size: 22,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+
+
 
 // ─── Attachment option row ────────────────────────────────────────────────────
 

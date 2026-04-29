@@ -36,7 +36,8 @@ class EndPoints {
   static String signIn(UserType userType) {
     return '$baseUrl/${userType.name}/login';
   }
-
+  static String fmcgBaseUrlDistributor =
+      'https://api.tradologie.com/FMCG';
   static String getProductsList = '$baseUrl/FMCG/FMCGBrandProuctList';
 
   static String countryCodeList = '$baseUrlSupplier/GetOTPCountry';
@@ -97,10 +98,7 @@ class EndPoints {
 
   static String getCustomerDetailsById = '$baseUrlBuyer/GetCustomerDetailsByID';
 
-  // Send OTP
-  static String sendOtp(UserType userType) {
-    return '$baseUrl/${userType.name}/SendOTPForLoginV1';
-  }
+
 
   static String sendOtpBuyer(UserType userType) {
     return '$baseUrl/${userType.name}/SendOTPForCustomerLoginV1';
@@ -227,4 +225,22 @@ class EndPoints {
   static String getNotification(UserType userType) {
     return '$baseUrl/${userType.name}/FCMLogNotification';
   }
+
+
+
+// Send OTP
+  static String sendOtp(UserType userType) {
+    return '$baseUrl/${userType.name}/SendOTPForLoginV1';
+  }
+
+  // FMCG seller
+
+  static String sendSellerOTPForLogin(UserType userType) {
+    return '$baseUrl/${userType.name}/AddFMCGSellerSendOTP';
+  }
+
+
+
+
+
 }

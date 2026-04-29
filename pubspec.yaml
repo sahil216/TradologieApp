@@ -21,8 +21,10 @@ dependencies:
   collection: ^1.18.0
   intl: ^0.20.2
 
+
   #! Image
   image_picker: ^1.1.2
+  image_cropper: ^12.2.1
 
   #! Network
   internet_connection_checker: ^3.0.1

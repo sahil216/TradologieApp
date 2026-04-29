@@ -4,6 +4,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:tradologie_app/core/utils/app_colors.dart';
@@ -79,6 +80,55 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
   final ImagePicker _picker = ImagePicker();
   bool isImage = false;
 
+
+  // new code Gopal  after cropping
+
+
+  Future<void> _pickImage(ImageSource source) async {
+    final picked = await _picker.pickImage(
+      source: source,
+      imageQuality: 70,
+    );
+
+    if (picked != null) {
+      // 👇 Crop image
+      final croppedFile = await ImageCropper().cropImage(
+        sourcePath: picked.path,
+        compressQuality: 80,
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Crop Image',
+            toolbarColor: Colors.black,
+            toolbarWidgetColor: Colors.white,
+            lockAspectRatio: false,
+          ),
+          IOSUiSettings(
+            title: 'Crop Image',
+          ),
+        ],
+      );
+
+      if (croppedFile != null) {
+        final file = File(croppedFile.path);
+
+        setState(() {
+          _selectedImage = file;
+          isImage = true;
+        });
+      }
+    }
+  }
+
+
+
+
+
+
+
+/*  old code without cropping
+
+
+
   Future<void> _pickImage(ImageSource source) async {
     final picked = await _picker.pickImage(
       source: source,
@@ -90,7 +140,7 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
       isImage = true;
       setState(() => _selectedImage = file);
     }
-  }
+  }*/
 
   void _showPickerOptions() {
     showModalBottomSheet(
@@ -271,13 +321,13 @@ class _FmcgProfileScreenState extends State<FmcgProfileScreen>
                                       ),
                                       child: _selectedImage != null
                                           ? CircleAvatar(
-                                              radius: 40,
+                                              radius: 80,
                                               backgroundColor:
                                                   Colors.grey.shade200,
                                               backgroundImage:
                                                   FileImage(_selectedImage!))
                                           : CircleAvatar(
-                                              radius: 40,
+                                              radius: 80,
                                               backgroundColor:
                                                   Colors.grey.shade200,
                                               backgroundImage:

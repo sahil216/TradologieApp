@@ -16,6 +16,14 @@ class SendOtpUsecase implements UseCase<SendOtpResult, SendOtpParams> {
   Future<Either<Failure, SendOtpResult>> call(SendOtpParams params) =>
       authenticationRepository.sendOtp(params);
 }
+class SendOtpUsecaseFMCGseller implements UseCase<SendOtpResult, SendOtpParams> {
+  final AuthenticationRepository authenticationRepository;
+
+  SendOtpUsecaseFMCGseller({required this.authenticationRepository});
+  @override
+  Future<Either<Failure, SendOtpResult>> call(SendOtpParams params) =>
+      authenticationRepository.sendOtpFMCGseller(params);
+}
 
 class SendOtpParams extends Equatable {
   final String mobileNo;
@@ -32,7 +40,8 @@ class SendOtpParams extends Equatable {
         "Token": "2018APR031848",
         "MobileNo": mobileNo,
         "CountryCode": countryCode.countryValue,
-        if (Constants.isBuyer == false) "VendorName": name,
-        if (Constants.isBuyer == true) "CustomerName": name
+        if (Constants.isFmcg == true) "Name": name,
+   //     if (Constants.isBuyer == false) "VendorName": name,
+    //    if (Constants.isBuyer == true) "CustomerName": name
       };
 }

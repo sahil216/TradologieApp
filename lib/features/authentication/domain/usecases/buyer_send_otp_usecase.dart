@@ -10,6 +10,8 @@ class BuyerSendOtpUsecase implements UseCase<SendOtpResult, SendOtpParams> {
   final AuthenticationRepository authenticationRepository;
 
   BuyerSendOtpUsecase({required this.authenticationRepository});
+
+
   @override
   Future<Either<Failure, SendOtpResult>> call(SendOtpParams params) =>
       authenticationRepository.sendOtpBuyer(params);

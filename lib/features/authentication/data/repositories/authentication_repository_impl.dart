@@ -61,18 +61,6 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     required this.sharedPreferences,
   });
 
-  @override
-  Future<Either<Failure, SendOtpResult>> sendOtp(SendOtpParams params) async {
-    try {
-      final response = await authenticationRemoteDataSource.sendOtp(params);
-      if (response != null && response.success) {
-        return Right(SendOtpResultModel.fromJson(response.data));
-      }
-      return Left(UserFailure(response?.message, response?.code));
-    } on Failure catch (e) {
-      return Left(e);
-    }
-  }
 
   @override
   Future<Either<Failure, VerifyOtpResult>> verifyOtp(
@@ -653,4 +641,41 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       return Left(e);
     }
   }
+
+
+
+
+  @override
+  Future<Either<Failure, SendOtpResult>> sendOtp(SendOtpParams params) async {
+    try {
+      final response = await authenticationRemoteDataSource.sendOtp(params);
+      if (response != null && response.success) {
+        return Right(SendOtpResultModel.fromJson(response.data));
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+
+
+  @override
+  Future<Either<Failure, SendOtpResult>> sendOtpFMCGseller(SendOtpParams params) async {
+    try {
+      final response = await authenticationRemoteDataSource.sendFMCGSellerOtp(params);
+      if (response != null && response.success) {
+        return Right(SendOtpResultModel.fromJson(response.data));
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+
+
+
+
+
 }
