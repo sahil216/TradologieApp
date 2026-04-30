@@ -32,6 +32,9 @@ class SendOtpError extends AuthenticationState {
 
 class VerifyOtpIsLoading extends AuthenticationState {}
 
+
+
+
 class VerifyOtpSuccess extends AuthenticationState {
   final VerifyOtpResult data;
 
@@ -40,6 +43,24 @@ class VerifyOtpSuccess extends AuthenticationState {
   @override
   List<Object> get props => [data];
 }
+
+
+
+
+class VerifyOtpSuccessFMCGSeller extends AuthenticationState {
+  final FMCGSellerUserDetail data;
+
+  const VerifyOtpSuccessFMCGSeller({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+
+
+
+
+
 
 class VerifyOtpError extends AuthenticationState {
   final Failure failure;

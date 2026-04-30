@@ -1,4 +1,4 @@
-enum UserType { supplier, buyer }
+enum UserType { supplier, buyer , FMCG }
 
 class EndPoints {
   static const String baseUrlWithoutApi = 'https://tradologie.com/';
@@ -72,9 +72,7 @@ class EndPoints {
   static String fmcgSellerExportingProductsList =
       "$baseUrl/FMCG/FMCGBrandExportingProductsList";
   // Verify
-  static String verifyOtp(UserType userType) {
-    return '$baseUrl/${userType.name}/VerifyOTPForLogin';
-  }
+
 
   static String verifyOtpBuyer(UserType userType) {
     return '$baseUrl/${userType.name}/VerifyOTPForLogin';
@@ -237,10 +235,18 @@ class EndPoints {
 
   static String sendSellerOTPForLogin(UserType userType) {
     return '$baseUrl/${userType.name}/AddFMCGSellerSendOTP';
+   // return '$baseUrl/FMCG/AddFMCGSellerSendOTP';
   }
 
 
+  static String verifyOtp(UserType userType) {
+    return '$baseUrl/${userType.name}/VerifyOTPForLogin';
+  }
 
+  static String verifyOtpFMCGSeller(UserType userType) {
+   // return '$baseUrl/FMCG/VerifySellerOTPForLogin';
+    return '$baseUrl/${userType.name}/VerifySellerOTPForLogin';
+  }
 
 
 }

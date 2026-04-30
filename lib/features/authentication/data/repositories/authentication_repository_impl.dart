@@ -43,6 +43,7 @@ import '../../../../core/utils/app_strings.dart';
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/secure_storage_service.dart';
 import '../../domain/entities/login_success.dart';
+import '../../domain/entities/verify_otp_fmcg_seller.dart';
 import '../../domain/entities/verify_otp_result.dart';
 import '../../domain/repositories/authentication_repository.dart';
 import '../../domain/usecases/register_usecase.dart';
@@ -51,6 +52,7 @@ import '../../domain/usecases/sign_in_usecase.dart';
 import '../../domain/usecases/verify_otp_usecase.dart';
 import '../datasources/authentication_remote_data_source.dart';
 import '../models/buyer_login_success_model.dart';
+import '../models/verify_otp_fmcgseller_model.dart';
 
 class AuthenticationRepositoryImpl implements AuthenticationRepository {
   final AuthenticationRemoteDataSource authenticationRemoteDataSource;
@@ -61,52 +63,6 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     required this.sharedPreferences,
   });
 
-
-  @override
-  Future<Either<Failure, VerifyOtpResult>> verifyOtp(
-      VerifyOtpParams params) async {
-    try {
-      final response = await authenticationRemoteDataSource.verifyOtp(params);
-      if (response != null && response.success) {
-        Constants.isLogin = true;
-        Constants.token = response.data["APIVerificationCode"] ?? "";
-        SecureStorageService secureStorage = SecureStorageService();
-
-        await secureStorage.write(AppStrings.appSession, "true");
-
-        await secureStorage.write(AppStrings.apiVerificationCode,
-            response.data["APIVerificationCode"] ?? "");
-
-        await secureStorage.write(
-            AppStrings.imageExist, response.data["ImageExist"] ?? "");
-
-        await secureStorage.write(
-            AppStrings.sellerTimeZone, response.data["SellerTimeZone"] ?? "");
-
-        await secureStorage.write(
-            AppStrings.mobileNo, response.data["MobileNo"] ?? "");
-
-        await secureStorage.write(AppStrings.registrationStatus,
-            response.data["RegistrationStatus"] ?? "");
-
-        await secureStorage.write(
-            AppStrings.projectType, response.data["Project_Type"] ?? "");
-
-        await secureStorage.write(
-            AppStrings.userId, response.data["UserID"] ?? "");
-
-        await secureStorage.write(
-            AppStrings.vendorName, response.data["VendorName"] ?? "");
-
-        await secureStorage.write(
-            AppStrings.vendorId, response.data["VendorID"].toString());
-        return Right(VerifyOtpResultModel.fromJson(response.data));
-      }
-      return Left(UserFailure(response?.message, response?.code));
-    } on Failure catch (e) {
-      return Left(e);
-    }
-  }
 
   @override
   Future<Either<Failure, SendOtpResult>> sendOtpBuyer(
@@ -673,6 +629,107 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     }
   }
 
+
+
+
+
+
+
+
+
+
+  @override
+  Future<Either<Failure, VerifyOtpResult>> verifyOtp(
+      VerifyOtpParams params) async {
+    try {
+      final response = await authenticationRemoteDataSource.verifyOtp(params);
+      if (response != null && response.success) {
+        Constants.isLogin = true;
+        Constants.token = response.data["APIVerificationCode"] ?? "";
+        SecureStorageService secureStorage = SecureStorageService();
+
+        await secureStorage.write(AppStrings.appSession, "true");
+
+        await secureStorage.write(AppStrings.apiVerificationCode,
+            response.data["APIVerificationCode"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.imageExist, response.data["ImageExist"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.sellerTimeZone, response.data["SellerTimeZone"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.mobileNo, response.data["MobileNo"] ?? "");
+
+        await secureStorage.write(AppStrings.registrationStatus,
+            response.data["RegistrationStatus"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.projectType, response.data["Project_Type"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.userId, response.data["UserID"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.vendorName, response.data["VendorName"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.vendorId, response.data["VendorID"].toString());
+        return Right(VerifyOtpResultModel.fromJson(response.data));
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+
+  @override
+  Future<Either<Failure, FMCGSellerUserDetail>> verifyOtpFMCGSeller(
+      VerifyOtpParams params) async {
+    try {
+      final response = await authenticationRemoteDataSource.verifyOtpFMCGSeller(params);
+      if (response != null && response.success) {
+        Constants.isLogin = true;
+        Constants.token = response.data["FMCGUserDetail"]["ApiVerificationCode"] ?? "";
+        SecureStorageService secureStorage = SecureStorageService();
+
+        await secureStorage.write(AppStrings.appSession, "true");
+
+        await secureStorage.write(AppStrings.apiVerificationCode,
+            response.data["FMCGUserDetail"]["ApiVerificationCode"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.imageExist, response.data["ImageExist"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.sellerTimeZone, response.data["SellerTimeZone"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.mobileNo, response.data["MobileNo"] ?? "");
+
+        await secureStorage.write(AppStrings.registrationStatus,
+            response.data["RegistrationStatus"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.projectType, response.data["Project_Type"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.userId, response.data["UserID"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.vendorName, response.data["VendorName"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.vendorId, response.data["VendorID"].toString());
+        return Right(FMCGSellerVerifyOtpModel.fromJson(response.data));
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
 
 
 

@@ -25,12 +25,16 @@ import 'package:tradologie_app/features/authentication/domain/usecases/send_otp_
 import 'package:tradologie_app/features/authentication/domain/usecases/verify_otp_usecase.dart';
 
 import '../../../../core/error/failures.dart';
+import '../entities/verify_otp_fmcg_seller.dart';
 import '../usecases/register_usecase.dart';
 import '../usecases/sign_in_usecase.dart';
 
 abstract class AuthenticationRepository {
 
-  Future<Either<Failure, VerifyOtpResult>> verifyOtp(VerifyOtpParams params);
+
+
+
+
   Future<Either<Failure, SendOtpResult>> sendOtpBuyer(SendOtpParams params);
   Future<Either<Failure, VerifyOtpResult>> verifyOtpBuyer(
       VerifyOtpParams params);
@@ -71,6 +75,15 @@ abstract class AuthenticationRepository {
       fmcgSellerExportingProductsList(NoParams params);
 
 
+
+
+
   Future<Either<Failure, SendOtpResult>> sendOtp(SendOtpParams params);
   Future<Either<Failure, SendOtpResult>> sendOtpFMCGseller(SendOtpParams params);
+
+
+  Future<Either<Failure, VerifyOtpResult>> verifyOtp(VerifyOtpParams params);
+  Future<Either<Failure, FMCGSellerUserDetail>> verifyOtpFMCGSeller(VerifyOtpParams params);
+
+
 }

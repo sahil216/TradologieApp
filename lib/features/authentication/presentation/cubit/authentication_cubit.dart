@@ -40,6 +40,7 @@ import 'package:tradologie_app/features/authentication/domain/usecases/get_count
 import 'package:tradologie_app/features/authentication/domain/usecases/sign_out_usecase.dart';
 
 import '../../../../core/error/failures.dart';
+import '../../domain/entities/verify_otp_fmcg_seller.dart';
 import '../../domain/entities/verify_otp_result.dart';
 import '../../domain/usecases/verify_otp_usecase.dart';
 import '../../domain/usecases/register_usecase.dart';
@@ -53,9 +54,12 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   final SendOtpUsecaseFMCGseller sendOtpUsecaseFMCGseller;
 
 
+  final VerifyOtpUsecase verifyOtpUsecase;
+  final VerifyOtpUsecaseFMCGSeller verifyOtpUsecaseFMCGSeller;
+
+
   final SignInUsecase signInUsecase;
   final RegisterUsecase registerUsecase;
-  final VerifyOtpUsecase verifyOtpUsecase;
   final BuyerSigninUsecase buyerSigninUsecase;
   final SignOutUsecase signOutUsecase;
   final BuyerSendOtpUsecase buyerSendOtpUsecase;
@@ -88,6 +92,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     required this.signInUsecase,
     required this.registerUsecase,
     required this.verifyOtpUsecase,
+    required this.verifyOtpUsecaseFMCGSeller,
     required this.buyerSigninUsecase,
     required this.signOutUsecase,
     required this.buyerSendOtpUsecase,
@@ -135,14 +140,6 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     ));
   }
 
-  Future<void> verifyOtp(VerifyOtpParams params) async {
-    emit(VerifyOtpIsLoading());
-    Either<Failure, VerifyOtpResult> response = await verifyOtpUsecase(params);
-    emit(response.fold(
-      (failure) => VerifyOtpError(failure: failure),
-      (res) => VerifyOtpSuccess(data: res),
-    ));
-  }
 
   Future<void> sendOtpBuyer(SendOtpParams params, bool isResend) async {
     emit(SendOtpIsLoading());
@@ -379,6 +376,27 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     ));
   }
 
+
+
+
+  Future<void> verifyOtp(VerifyOtpParams params) async {
+    emit(VerifyOtpIsLoading());
+    Either<Failure, VerifyOtpResult> response = await verifyOtpUsecase(params);
+    emit(response.fold(
+          (failure) => VerifyOtpError(failure: failure),
+          (res) => VerifyOtpSuccess(data: res),
+    ));
+  }
+
+
+  Future<void> verifyOtpFMCGSeller(VerifyOtpParams params) async {
+    emit(VerifyOtpIsLoading());
+    Either<Failure, FMCGSellerUserDetail> response = await verifyOtpUsecaseFMCGSeller(params);
+    emit(response.fold(
+          (failure) => VerifyOtpError(failure: failure),
+          (res) => VerifyOtpSuccessFMCGSeller(data: res),
+    ));
+  }
 
 
 

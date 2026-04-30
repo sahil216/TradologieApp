@@ -3,7 +3,6 @@ import 'package:equatable/equatable.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/country_code_list.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/send_otp_result.dart';
-
 import '../../../../core/error/failures.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../repositories/authentication_repository.dart';
@@ -16,6 +15,8 @@ class SendOtpUsecase implements UseCase<SendOtpResult, SendOtpParams> {
   Future<Either<Failure, SendOtpResult>> call(SendOtpParams params) =>
       authenticationRepository.sendOtp(params);
 }
+
+
 class SendOtpUsecaseFMCGseller implements UseCase<SendOtpResult, SendOtpParams> {
   final AuthenticationRepository authenticationRepository;
 
@@ -36,12 +37,45 @@ class SendOtpParams extends Equatable {
   @override
   List<Object?> get props => [mobileNo, countryCode];
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() =>
+      {
+
+
         "Token": "2018APR031848",
         "MobileNo": mobileNo,
-        "CountryCode": countryCode.countryValue,
-        if (Constants.isFmcg == true) "Name": name,
-   //     if (Constants.isBuyer == false) "VendorName": name,
-    //    if (Constants.isBuyer == true) "CustomerName": name
+
+
+        //"CountryCode": "+91",
+
+
+
+          // if (Constants.isFmcg && Constants.isBuyer)
+          // yet to implement
+
+        if (!Constants.isFmcg && Constants.isBuyer)...{
+          "VendorName": name,
+          "CountryCode": countryCode.countryValue,
+        },
+
+
+        if (!Constants.isFmcg && !Constants.isBuyer)...{
+          "CustomerName": name,
+          "CountryCode": countryCode.countryValue,
+        },
+
+
+        if (Constants.isFmcg && !Constants.isBuyer)...{
+          "Name": name,
+          "CountryCode": formatCountryCode(countryCode.countryValue!),
+          // Non-FMCG logic
+        }
+
+
       };
+
+
+}
+
+String formatCountryCode(String input) {
+  return "+${input.split('~').last}";
 }

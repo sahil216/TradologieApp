@@ -169,15 +169,47 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen>
           listenWhen: (previous, current) => previous != current,
           listener: (context, state) async {
             if (state is VerifyOtpSuccess) {
-              if (Constants.isBuyer == true) {
-                AnalyticsService.logEvent("buyer_otp_login_success");
-                Navigator.pushNamedAndRemoveUntil(
-                    context, Routes.mainRoute, (route) => false);
+
+
+              if (Constants.isFmcg) {
+                if (Constants.isBuyer) {
+
+
+                  // for FMCG Buyer
+
+
+                } else {
+
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    Routes.fmcgMainScreen,
+                        (route) => false,
+                  );
+                }
               } else {
-                AnalyticsService.logEvent("seller_otp_login_success");
-                Navigator.pushNamedAndRemoveUntil(
-                    context, Routes.mainRoute, (route) => false);
+                if (Constants.isBuyer) {
+
+                  AnalyticsService.logEvent("buyer_otp_login_success");
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, Routes.mainRoute, (route) => false);
+
+                } else {
+                  AnalyticsService.logEvent("seller_otp_login_success");
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, Routes.mainRoute, (route) => false);
+                }
               }
+
+
+
+
+
+
+
+
+
+
+
 
               // Navigator.pushReplacementNamed(
               //   context,
@@ -197,6 +229,13 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen>
               //   ).toString(),
               // );
             }
+            if (state is VerifyOtpSuccessFMCGSeller) {
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                Routes.fmcgMainScreen,
+                (route) => false,
+              );
+            }
             if (state is VerifyOtpError) {
               CommonToast.showFailureToast(state.failure);
             }
@@ -210,7 +249,8 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen>
                   result = result &&
                       (current is VerifyOtpIsLoading ||
                           current is VerifyOtpError ||
-                          current is VerifyOtpSuccess);
+                          current is VerifyOtpSuccess ||
+                          current is VerifyOtpSuccessFMCGSeller);
 
                   return result;
                 },
@@ -380,10 +420,25 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen>
                                             return;
                                           }
 
+
+                                          //30-04Gopal
+
+
+
+
+
+
+
+
+
                                           params = VerifyOtpParams(
+
+                                            CountryCode: widget.params.countryCode.countryValue!,
+                                            Name: widget.params.name,
                                             mobileNo: widget.params.mobileNo,
                                             otp: textCodeController.text,
                                             deviceId: deviceId,
+
                                             osType: Platform.isAndroid
                                                 ? "Android"
                                                 : "iOS",
@@ -395,20 +450,74 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen>
                                             model: model,
                                             osVersionRelease: osVersionRelease,
                                             appVersion: appVersion,
+
+
                                           );
                                           if (!context.mounted) return;
 
                                           FocusManager.instance.primaryFocus
                                               ?.unfocus();
+
+
+
+
+
+
+/*
                                           Constants.isBuyer == true
                                               ? BlocProvider.of<
                                                           AuthenticationCubit>(
                                                       context)
                                                   .verifyOtpBuyer(params)
+
+
+
                                               : BlocProvider.of<
                                                           AuthenticationCubit>(
                                                       context)
+                                                  .verifyOtp(params);*/
+
+
+                                          // 30-04Gopal code update 30-04
+
+                                          if (Constants.isFmcg) {
+                                            if (Constants.isBuyer) {
+
+
+                                              // for FMCG Buyer
+
+
+                                            } else {
+
+
+                                              BlocProvider.of<
+                                                  AuthenticationCubit>(
+                                                  context)
+                                                  .verifyOtpFMCGSeller(params);
+
+
+                                            }
+                                          } else {
+                                            if (Constants.isBuyer) {
+
+                                              BlocProvider.of<
+                                                  AuthenticationCubit>(
+                                                  context)
+                                                  .verifyOtpBuyer(params);
+
+                                            } else {
+                                              BlocProvider.of<
+                                                  AuthenticationCubit>(
+                                                  context)
                                                   .verifyOtp(params);
+                                            }
+                                          }
+
+
+
+
+
+
                                         },
                                         text: CommonStrings.verifyAndContinue,
                                         textStyle: TextStyleConstants.medium(
