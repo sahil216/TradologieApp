@@ -48,3 +48,23 @@ class BuyerNegotiationError extends NegotiationState {
   @override
   List<Object> get props => [failure];
 }
+
+class DemoNegotiationIsLoading extends NegotiationState {}
+
+class DemoNegotiationSuccess extends NegotiationState {
+  final Negotiation data;
+
+  const DemoNegotiationSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class DemoNegotiationError extends NegotiationState {
+  final Failure failure;
+
+  const DemoNegotiationError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}

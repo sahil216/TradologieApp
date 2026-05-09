@@ -19,16 +19,19 @@ class GetProductsListParams {
   final String token;
   final String deviceId;
   final String brandId;
+  final String buyerId;
 
   GetProductsListParams({
     required this.token,
     required this.deviceId,
     required this.brandId,
+    required this.buyerId,
   });
 
   Map<String, dynamic> toJson() => {
         "Token": token,
         "DeviceID": deviceId,
         "BrandID": brandId,
+        "BuyerID": buyerId,
       };
 }

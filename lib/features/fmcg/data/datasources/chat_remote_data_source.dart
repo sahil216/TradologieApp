@@ -3,10 +3,15 @@ import 'package:tradologie_app/core/api/end_points.dart';
 import 'package:tradologie_app/core/response_wrapper/response_wrapper.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_buyer_brand_interest_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_distributor_interest_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/add_quotation_cart_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_data_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_quotation_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_brands_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_distributor_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_chatbot_query_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_chatbot_tran_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_fmcg_quotation_tran_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_file_url_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_initial_chat_id_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_products_list_usecase.dart';
@@ -17,28 +22,60 @@ import 'package:tradologie_app/features/fmcg/domain/usecases/update_seller_profi
 
 abstract class ChatRemoteDataSource {
   Future<ResponseWrapper<dynamic>?> getChatList(ChatListParams params);
+
   Future<ResponseWrapper<dynamic>?> chatData(ChatDataParams params);
+
   Future<ResponseWrapper<dynamic>?> getDistributorList(
       GetDistributorListParams params);
+
   Future<ResponseWrapper<dynamic>?> getProductsList(
       GetProductsListParams params);
+
+  Future<ResponseWrapper<dynamic>?> getProductsListForSeller(
+      GetProductsListParams params);
+
   Future<ResponseWrapper<dynamic>?> fmcgGetSellerProfile(
       GetSellerProfileParams params);
+
   Future<ResponseWrapper<dynamic>?> fmcgUpdateSellerProfile(
       UpdateSellerProfileParams params);
+
   Future<ResponseWrapper<dynamic>?> fmcgGetSellerDocuments(
       GetSellerDocumentsParams params);
+
   Future<ResponseWrapper<dynamic>?> fmcgUpdateSellerDocuments(
       UpdateSellerDocumentsParams params);
+
   Future<ResponseWrapper<dynamic>?> getBuyerBrandsList(
       GetBuyerBrandsListParams params);
+
   Future<ResponseWrapper<dynamic>?> addBuyerBrandInterest(
       AddBuyerBrandInterestParams params);
+
   Future<ResponseWrapper<dynamic>?> addDistributorInterest(
       AddDistributorInterestParams params);
+
   Future<ResponseWrapper<dynamic>?> getFileUrl(GetFileUrlParams params);
+
   Future<ResponseWrapper<dynamic>?> getInitialChatId(
       GetInitialChatIdParams params);
+
+  Future<ResponseWrapper<dynamic>?> getChatbotQueryList(
+      ChatbotQueryListParams params);
+
+  Future<ResponseWrapper<dynamic>?> getChatbotTranList(
+      ChatbotTranListParams params);
+
+  Future<ResponseWrapper<dynamic>?> getFmcgQuotationList(
+      ChatbotQueryListParams params);
+
+  Future<ResponseWrapper<dynamic>?> getFmcgQuotationTranList(
+      QuotationTranListParams params);
+
+  Future<ResponseWrapper<dynamic>?> addQuotationCart(AddQuotationCartParams params);
+
+  Future<ResponseWrapper<dynamic>?> getBuyerQuotationList(
+      GetBuyerQuotationListParams params);
 }
 
 class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
@@ -155,6 +192,69 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       GetProductsListParams params) async {
     return await apiConsumer.post(
       EndPoints.getProductsList,
+      body: params.toJson(),
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> getProductsListForSeller(
+      GetProductsListParams params) async {
+    return await apiConsumer.post(
+      EndPoints.getProductsListForSeller,
+      body: params.toJson(),
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> getChatbotQueryList(
+      ChatbotQueryListParams params) async {
+    return await apiConsumer.post(
+      EndPoints.chatbotQueryList,
+      body: params.toJson(),
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> getChatbotTranList(
+      ChatbotTranListParams params) async {
+    return await apiConsumer.post(
+      EndPoints.chatbotTranList,
+      body: params.toJson(),
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> getFmcgQuotationList(
+      ChatbotQueryListParams params) async {
+    return await apiConsumer.post(
+      EndPoints.fmcgQuotationList,
+      body: params.toJson(),
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> getFmcgQuotationTranList(
+      QuotationTranListParams params) async {
+    return await apiConsumer.post(
+      EndPoints.fmcgQuotationTranList,
+      body: params.toJson(),
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> addQuotationCart(
+      AddQuotationCartParams params) async {
+    return await apiConsumer.post(
+      EndPoints.fmcgAddQuotationCart,
+      body: params.toJson(),
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> getBuyerQuotationList(
+      GetBuyerQuotationListParams params) async {
+    return await apiConsumer.post(
+      EndPoints.fmcgBuyerQuotationList,
       body: params.toJson(),
     );
   }

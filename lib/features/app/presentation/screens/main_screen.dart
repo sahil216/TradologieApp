@@ -11,7 +11,7 @@ import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/chat_list_screen.dart';
-import 'package:tradologie_app/features/contact_us/coming_soon_screen.dart';
+import 'package:tradologie_app/features/contact_us/demo_auction_screen.dart';
 import 'package:tradologie_app/features/contact_us/more_options_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/buyer_dashboard_screen.dart';
 import 'package:tradologie_app/features/dashboard/presentation/screens/dashboard_screen.dart';
@@ -68,13 +68,25 @@ class _MainScreenState extends State<MainScreen>
         height: 20,
         page: MyAccountScreen(),
       ),
+
+
+      TabViewModel(
+        icon: _appCubit.bottomNavIndex == 3
+            ? Icon(Icons.description)
+            : Icon(Icons.description_outlined),
+        name: 'Demo',
+        height: 20,
+        page: const DemoAuctionScreen(isDemoAuction: true),
+      ),
+
       TabViewModel(
         icon:
-            _appCubit.bottomNavIndex == 3 ? Icon(Icons.menu) : Icon(Icons.menu),
+        _appCubit.bottomNavIndex == 4 ? Icon(Icons.menu) : Icon(Icons.menu),
         name: 'More',
         height: 20,
         page: MoreOptionsScreen(),
       ),
+
     ];
   }
 
@@ -94,7 +106,7 @@ class _MainScreenState extends State<MainScreen>
             : Icon(Icons.dashboard_outlined),
         name: 'Dashboard',
         height: 20,
-        page: const ComingSoonScreen(),
+        page: const DemoAuctionScreen(),
       ),
       // TabViewModel(
       //   icon: _appCubit.bottomNavIndex == 2
@@ -285,6 +297,7 @@ class _MainScreenState extends State<MainScreen>
                     HapticFeedback.selectionClick();
                     _appCubit.changeTab(i);
                   },
+                  showDemo: Constants.isBuyer != true,
                 ),
               ],
             ),
@@ -298,15 +311,20 @@ class _MainScreenState extends State<MainScreen>
 class CommonFloatingNavBar extends StatelessWidget {
   final int index;
   final Function(int) onTap;
+  final bool showDemo;
 
   const CommonFloatingNavBar({
     super.key,
     required this.index,
     required this.onTap,
+    required this.showDemo,
   });
 
   @override
   Widget build(BuildContext context) {
+    final int demoIndex = 3;
+    final int moreIndex = showDemo ? 4 : 3;
+
     return Positioned(
       left: 20,
       right: 20,
@@ -332,14 +350,41 @@ class CommonFloatingNavBar extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _item(0, Icons.dashboard_outlined, "Dashboard"),
-                  _item(1, Icons.description_outlined, "Negotiation"),
-                  _item(2, Icons.person_outline, "Account"),
-                  _item(3, Icons.menu, "More"),
-                ],
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minWidth: constraints.maxWidth,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _item(0, Icons.dashboard_outlined, "Dashboard"),
+                          _item(1, Icons.description_outlined, "Negotiation"),
+                          _item(2, Icons.person_outline, "Account"),
+
+                          if (showDemo)
+                            _itemWidget(
+                              demoIndex,
+                              Image.asset(
+                                "assets/images/demo_logo.png",
+                                width: 22,
+                                height: 22,
+                                color: index == demoIndex
+                                    ? Colors.white
+                                    : Colors.black54,
+                              ),
+                              "Demo",
+                            ),
+                          _item(moreIndex, Icons.menu, "More"),
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -370,6 +415,41 @@ class CommonFloatingNavBar extends StatelessWidget {
               size: 22,
               color: active ? Colors.white : Colors.black54,
             ),
+            if (active) ...[
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ]
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _itemWidget(int i, Widget icon, String label) {
+    final bool active = i == index;
+
+    return GestureDetector(
+      onTap: () => onTap(i),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        padding: EdgeInsets.symmetric(
+          horizontal: active ? 16 : 12,
+          vertical: 8,
+        ),
+        decoration: BoxDecoration(
+          color: active ? Colors.black : Colors.transparent,
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Row(
+          children: [
+            icon,
             if (active) ...[
               const SizedBox(width: 6),
               Text(

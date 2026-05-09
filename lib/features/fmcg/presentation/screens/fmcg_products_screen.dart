@@ -6,8 +6,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/features/dashboard/presentation/widgets/buyer_banner_engine.dart';
 import 'package:tradologie_app/features/fmcg/domain/entities/chat_list.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_initial_chat_id_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/add_quotation_cart_usecase.dart';
 import 'package:tradologie_app/features/fmcg/presentation/cubit/nav_cubit.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/chat_screen.dart';
+import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_buyer_quotation_cart_screen.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
@@ -41,6 +43,7 @@ class _FmcgProductsScreenState extends State<FmcgProductsScreen>
   SecureStorageService secureStorage = SecureStorageService();
 
   bool _isChatOpen = false;
+  final Set<int> _addingQuotationForProductIds = <int>{};
 
   // ── FAB pulse animation ────────────────────────────────────────────────────
   late AnimationController _fabPulseController;
@@ -74,6 +77,7 @@ class _FmcgProductsScreenState extends State<FmcgProductsScreen>
       token: await secureStorage.read(AppStrings.apiVerificationCode) ?? "",
       deviceId: Constants.deviceID,
       brandId: widget.params.brandId,
+      buyerId: await secureStorage.read(AppStrings.loginId) ?? "",
     );
     await chatCubit.getProductsList(params);
   }
@@ -93,12 +97,42 @@ class _FmcgProductsScreenState extends State<FmcgProductsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final int quotationCartCount = (productsList ?? [])
+        .where((p) => p.isAddedForQuotation == true)
+        .length;
+
     return AdaptiveScaffold(
       body: BlocListener<ChatCubit, ChatState>(
         listenWhen: (previous, current) => previous != current,
         listener: (context, state) async {
           if (state is ProductsListSuccess) {
             setState(() => productsList = state.data);
+          }
+          if (state is AddQuotationCartIsLoading) {
+            setState(() => _addingQuotationForProductIds.add(state.productId));
+          }
+          if (state is AddQuotationCartSuccess) {
+            setState(() {
+              _addingQuotationForProductIds.remove(state.productId);
+              productsList = (productsList ?? [])
+                  .map((p) => p.productId == state.productId
+                      ? p.copyWith(isAddedForQuotation: true)
+                      : p)
+                  .toList();
+            });
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.message)),
+              );
+            }
+          }
+          if (state is AddQuotationCartError) {
+            setState(() => _addingQuotationForProductIds.clear());
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.failure.msg ?? "Error")),
+              );
+            }
           }
           if (state is GetInitialChatIdSuccess) {
             selectedChat.sellerId = state.data.sellerId.toString();
@@ -135,6 +169,61 @@ class _FmcgProductsScreenState extends State<FmcgProductsScreen>
                           title: widget.params.brandName,
                           showBackButton: true,
                           showNotification: false,
+                          addAction: GestureDetector(
+                            onTap: () {
+                              final brandIdInt =
+                                  int.tryParse(widget.params.brandId) ?? 0;
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => FmcgBuyerQuotationCartScreen(
+                                    args: FmcgBuyerQuotationCartArgs(
+                                      brandId: brandIdInt,
+                                      brandName: widget.params.brandName,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                const Icon(
+                                  Icons.shopping_cart_outlined,
+                                  color: Colors.black,
+                                ),
+                                if (quotationCartCount > 0)
+                                  Positioned(
+                                    right: -6,
+                                    top: -6,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFE53935),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      constraints: const BoxConstraints(
+                                        minWidth: 18,
+                                        minHeight: 18,
+                                      ),
+                                      child: Text(
+                                        quotationCartCount > 99
+                                            ? "99+"
+                                            : quotationCartCount.toString(),
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
                         ),
                         SliverToBoxAdapter(child: const SizedBox(height: 16)),
                         SliverToBoxAdapter(
@@ -293,6 +382,11 @@ class _FmcgProductsScreenState extends State<FmcgProductsScreen>
 
   Widget productCard(
       GetProductsList enquiry, String brandName, String brandId) {
+    final bool isAddedForQuotation = enquiry.isAddedForQuotation == true;
+    final int? productId = enquiry.productId;
+    final bool isAdding = productId != null &&
+        _addingQuotationForProductIds.contains(productId);
+
     return SizedBox.expand(
       child: Material(
         elevation: 2,
@@ -334,6 +428,71 @@ class _FmcgProductsScreenState extends State<FmcgProductsScreen>
                 ),
               ),
               const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: (isAddedForQuotation || isAdding)
+                      ? null
+                      : () async {
+                          final token = await secureStorage
+                                  .read(AppStrings.apiVerificationCode) ??
+                              "";
+                          final buyerIdStr =
+                              await secureStorage.read(AppStrings.loginId) ??
+                                  "";
+                          final buyerId = int.tryParse(buyerIdStr) ?? 0;
+
+                          if (productId == null ||
+                              enquiry.attributeValue1Id == null ||
+                              enquiry.attributeValue2Id == null ||
+                              enquiry.productTranId == null ||
+                              buyerId == 0) {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        "Unable to send for quotation (missing data).")),
+                              );
+                            }
+                            return;
+                          }
+
+                          chatCubit.addQuotationCart(
+                            AddQuotationCartParams(
+                              token: token,
+                              deviceId: Constants.deviceID,
+                              productId: productId,
+                              brandId: int.tryParse(brandId) ?? 0,
+                              attributeValue1Id: enquiry.attributeValue1Id!,
+                              attributeValue2Id: enquiry.attributeValue2Id!,
+                              productTranId: enquiry.productTranId!,
+                              buyerId: buyerId,
+                            ),
+                          );
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isAddedForQuotation
+                        ? Colors.grey.shade400
+                        : const Color(0xFF2DAAE1),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: Text(
+                    isAddedForQuotation
+                        ? "Already sent"
+                        : (isAdding ? "Sending..." : "Send for quotation"),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
               Center(
                 child: GestureDetector(
                   onTap: () async {

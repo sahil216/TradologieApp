@@ -347,7 +347,7 @@ class _SendOtpScreenState extends State<SendOtpScreen>
                                                     if (textMobileController
                                                             .text.isNotEmpty &&
                                                         textFullNameController
-                                                            .text.isNotEmpty) {
+                                                            .text.trim().isNotEmpty) {
                                                       params = SendOtpParams(
                                                           mobileNo:
                                                               textMobileController
@@ -387,13 +387,13 @@ class _SendOtpScreenState extends State<SendOtpScreen>
 
                                                       if (Constants.isFmcg) {
                                                         if (Constants.isBuyer) {
-
-
-                                                        // for FMCG Buyer
-
-
+                                                          BlocProvider.of<
+                                                                  AuthenticationCubit>(
+                                                              context)
+                                                              .sendOtpFMCGBuyer(
+                                                                  params,
+                                                                  false);
                                                         } else {
-
                                                           BlocProvider.of<
                                                               AuthenticationCubit>(
                                                               context)

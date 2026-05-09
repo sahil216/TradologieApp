@@ -3,6 +3,7 @@ import 'package:tradologie_app/features/negotiation/domain/entities/buyer_negoti
 
 import '../../../../core/error/failures.dart';
 import '../entities/negotiation.dart';
+import '../usecases/demo_negotiation_usecase.dart';
 import '../usecases/get_negotiation_usecase.dart';
 
 abstract class NegotiationRepository {
@@ -10,4 +11,6 @@ abstract class NegotiationRepository {
       GetNegotiationParams params);
   Future<Either<Failure, BuyerNegotiation>> buyerNegotiationData(
       GetNegotiationParams params);
+  Future<Either<Failure, Negotiation>> demoNegotiationData(
+      DemoNegotiationParams params);
 }

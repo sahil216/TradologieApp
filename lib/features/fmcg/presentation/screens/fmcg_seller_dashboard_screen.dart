@@ -190,7 +190,7 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen> {
                                     crossAxisCount: 2,
                                     crossAxisSpacing: 12,
                                     mainAxisSpacing: 12,
-                                    childAspectRatio: 0.62,
+                                    childAspectRatio: 0.55,
                                   ),
                                   delegate: SliverChildBuilderDelegate(
                                     (context, i) =>
@@ -339,40 +339,59 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// 🔹 HEADER
-            Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color(0xFF0A9FED).withValues(alpha: 0.15),
-                  ),
-                  child: Center(
-                    child: Text(
-                      _initial(enquiry.name),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF0A9FED),
+            /// 🔹 HEADER — name centered on card; avatar on left
+            SizedBox(
+              height: 48,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: Center(
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color:
+                              const Color(0xFF0A9FED).withValues(alpha: 0.15),
+                        ),
+                        child: Center(
+                          child: Text(
+                            _initial(enquiry.name),
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF0A9FED),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    enquiry.name ?? "—",
-                    maxLines: 2,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF2B2B2B),
+                  Positioned.fill(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 48, right: 4),
+                      child: Center(
+                        child: Text(
+                          enquiry.name ?? "—",
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF2B2B2B),
+                            height: 1.2,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
 
             const SizedBox(height: 10),
@@ -419,33 +438,61 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen> {
             ),
 
             const SizedBox(height: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (enquiry.isInterest == true) ...[
+                  Icon(Icons.thumb_up ,
+                      size: 22, color: const Color(0xFF6390DD)),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Liked you',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF6390DD).withValues(alpha: 0.95),
+                      height: 1.1,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            const SizedBox(height: 12),
 
-            /// 🔹 BUTTON
+            /// 🔹 BUTTON — full width, fixed height (no clipping)
             Expanded(
-              child: Center(
-                child: GestureDetector(
-                  onTap: () => _showConfirmation(
-                      context, enquiry.quotationUserId.toString()),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(25),
-                      gradient: const LinearGradient(
-                        colors: [
-                          Color(0xFF2DAAE1),
-                          Color(0xFF1B8ED1),
-                        ],
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => _showConfirmation(
+                        context, enquiry.quotationUserId.toString()),
+                    borderRadius: BorderRadius.circular(22),
+                    child: Ink(
+                      height: 44,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(22),
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0xFF2DAAE1),
+                            Color(0xFF1B8ED1),
+                          ],
+                        ),
                       ),
-                    ),
-                    child: const Text(
-                      "Connect",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                      child: const Center(
+                        child: Text(
+                          "Connect",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ),
                   ),

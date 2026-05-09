@@ -4,13 +4,20 @@ import 'package:tradologie_app/features/fmcg/data/repositories/chat_repository_i
 import 'package:tradologie_app/features/fmcg/domain/repositories/chat_repositories.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_buyer_brand_interest_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_distributor_interest_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/add_quotation_cart_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_data_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_quotation_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_brands_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_distributor_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_chatbot_query_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_chatbot_tran_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_fmcg_quotation_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_fmcg_quotation_tran_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_file_url_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_initial_chat_id_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_products_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_products_list_for_seller_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_documents_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_profile_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/update_seller_documents_usecase.dart';
@@ -36,6 +43,13 @@ Future<void> init() async {
         getFileUrlUsecase: sl(),
         getInitialChatIdUsecase: sl(),
         getProductsListUsecase: sl(),
+        getProductsListForSellerUsecase: sl(),
+        getChatbotQueryListUsecase: sl(),
+        getChatbotTranListUsecase: sl(),
+        getFmcgQuotationListUsecase: sl(),
+        getFmcgQuotationTranListUsecase: sl(),
+        addQuotationCartUsecase: sl(),
+        getBuyerQuotationListUsecase: sl(),
       ));
 
   //! Use cases
@@ -68,6 +82,20 @@ Future<void> init() async {
       () => GetInitialChatIdUsecase(chatRepository: sl()));
   sl.registerLazySingleton<GetProductsListUsecase>(
       () => GetProductsListUsecase(chatRepository: sl()));
+  sl.registerLazySingleton<GetProductsListForSellerUsecase>(
+      () => GetProductsListForSellerUsecase(chatRepository: sl()));
+  sl.registerLazySingleton<GetChatbotQueryListUsecase>(
+      () => GetChatbotQueryListUsecase(chatRepository: sl()));
+  sl.registerLazySingleton<GetChatbotTranListUsecase>(
+      () => GetChatbotTranListUsecase(chatRepository: sl()));
+  sl.registerLazySingleton<GetFmcgQuotationListUsecase>(
+      () => GetFmcgQuotationListUsecase(chatRepository: sl()));
+  sl.registerLazySingleton<GetFmcgQuotationTranListUsecase>(
+      () => GetFmcgQuotationTranListUsecase(chatRepository: sl()));
+  sl.registerLazySingleton<AddQuotationCartUsecase>(
+      () => AddQuotationCartUsecase(chatRepository: sl()));
+  sl.registerLazySingleton<GetBuyerQuotationListUsecase>(
+      () => GetBuyerQuotationListUsecase(chatRepository: sl()));
 
   //! Repository
   sl.registerLazySingleton<ChatRepository>(() => ChatRepositoryImpl(

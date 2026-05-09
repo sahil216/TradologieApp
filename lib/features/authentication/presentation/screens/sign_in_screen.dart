@@ -5,6 +5,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
@@ -114,6 +117,67 @@ class _SignInScreenState extends State<SignInScreen>
 
   final showPassword = ValueNotifier(false);
   final formKey = GlobalKey<FormState>();
+
+  Future<void> _signInWithGoogle() async {
+    try {
+      final google = GoogleSignIn.instance;
+      await google.initialize();
+      final GoogleSignInAccount googleUser = await google.authenticate();
+
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      if (!mounted) return;
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        Routes.mainRoute,
+        (route) => false,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      CommonToast.error("Google sign-in failed");
+    }
+  }
+
+  /// Uses classic Facebook login tracking so Firebase receives a standard OAuth access token.
+  Future<void> _signInWithFacebook() async {
+    if (!Platform.isAndroid && !Platform.isIOS) {
+      if (!mounted) return;
+      CommonToast.error("Facebook sign-in is only available on Android and iOS");
+      return;
+    }
+    try {
+      final LoginResult result = await FacebookAuth.instance.login(
+        permissions: const ['email', 'public_profile'],
+        loginTracking: LoginTracking.enabled,
+      );
+      if (result.status == LoginStatus.cancelled) {
+        return;
+      }
+      if (result.status != LoginStatus.success || result.accessToken == null) {
+        if (!mounted) return;
+        CommonToast.error(result.message ?? "Facebook sign-in failed");
+        return;
+      }
+      final credential = FacebookAuthProvider.credential(
+        result.accessToken!.tokenString,
+      );
+      await FirebaseAuth.instance.signInWithCredential(credential);
+      if (!mounted) return;
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        Routes.mainRoute,
+        (route) => false,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      CommonToast.error("Facebook sign-in failed");
+    }
+  }
 
   @override
   void dispose() {
@@ -342,6 +406,50 @@ class _SignInScreenState extends State<SignInScreen>
                                         ),
                                       ),
                                       SizedBox(height: 20),
+                                      SizedBox(
+                                        width:
+                                            r.isTablet ? 420 : double.infinity,
+                                        child: CommonButton(
+                                          onPressed: _signInWithGoogle,
+                                          text: "Continue with Gmail",
+                                          backgroundColor: AppColors.white,
+                                          borderSide: BorderSide(
+                                            color: AppColors.red,
+                                            width: 2,
+                                          ),
+                                          icon: Image.asset(ImgAssets.google),
+                                          textStyle: TextStyleConstants.medium(
+                                            context,
+                                            fontSize: 16,
+                                            color: AppColors.black,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: 12),
+                                      SizedBox(
+                                        width:
+                                            r.isTablet ? 420 : double.infinity,
+                                        child: CommonButton(
+                                          onPressed:(){
+                                            CommonToast.error("facebook login coming soon ");
+                                          },
+
+                                          //_signInWithFacebook,
+                                          text: "Continue with Facebook",
+                                          backgroundColor: AppColors.white,
+                                          borderSide: BorderSide(
+                                            color: AppColors.defaultText,
+                                            width: 2,
+                                          ),
+                                          icon: Image.asset(ImgAssets.facebook),
+                                          textStyle: TextStyleConstants.medium(
+                                            context,
+                                            fontSize: 16,
+                                            color: AppColors.black,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: 12),
                                       SizedBox(
                                         width:
                                             r.isTablet ? 420 : double.infinity,

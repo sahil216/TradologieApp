@@ -26,6 +26,15 @@ class SendOtpUsecaseFMCGseller implements UseCase<SendOtpResult, SendOtpParams> 
       authenticationRepository.sendOtpFMCGseller(params);
 }
 
+class SendOtpUsecaseFMCGbuyer implements UseCase<SendOtpResult, SendOtpParams> {
+  final AuthenticationRepository authenticationRepository;
+
+  SendOtpUsecaseFMCGbuyer({required this.authenticationRepository});
+  @override
+  Future<Either<Failure, SendOtpResult>> call(SendOtpParams params) =>
+      authenticationRepository.sendOtpFMCGbuyer(params);
+}
+
 class SendOtpParams extends Equatable {
   final String mobileNo;
   final CountryCodeList countryCode;
@@ -49,17 +58,20 @@ class SendOtpParams extends Equatable {
 
 
 
-          // if (Constants.isFmcg && Constants.isBuyer)
-          // yet to implement
+        if (Constants.isFmcg && Constants.isBuyer)...{
+          "Name": name,
+          "CountryCode": formatCountryCode(countryCode.countryValue!),
+        },
 
         if (!Constants.isFmcg && Constants.isBuyer)...{
-          "VendorName": name,
+
+          "CustomerName": name,
           "CountryCode": countryCode.countryValue,
         },
 
 
         if (!Constants.isFmcg && !Constants.isBuyer)...{
-          "CustomerName": name,
+          "VendorName": name,
           "CountryCode": countryCode.countryValue,
         },
 

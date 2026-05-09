@@ -56,6 +56,15 @@ class VerifyOtpSuccessFMCGSeller extends AuthenticationState {
   List<Object> get props => [data];
 }
 
+class VerifyOtpSuccessFMCGBuyer extends AuthenticationState {
+  final FmcgBuyerLoginSuccess data;
+
+  const VerifyOtpSuccessFMCGBuyer({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
 
 
 

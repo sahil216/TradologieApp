@@ -42,9 +42,11 @@ Future<void> init() async {
 
         sendOtpUsecase: sl(),
         sendOtpUsecaseFMCGseller: sl(),
+        sendOtpUsecaseFMCGbuyer: sl(),
 
         verifyOtpUsecase: sl(),
         verifyOtpUsecaseFMCGSeller: sl(),
+        verifyOtpUsecaseFMCGbuyer: sl(),
 
 
 
@@ -85,11 +87,15 @@ Future<void> init() async {
       () => SendOtpUsecase(authenticationRepository: sl()));
   sl.registerLazySingleton<SendOtpUsecaseFMCGseller>(
       () => SendOtpUsecaseFMCGseller(authenticationRepository: sl()));
+  sl.registerLazySingleton<SendOtpUsecaseFMCGbuyer>(
+      () => SendOtpUsecaseFMCGbuyer(authenticationRepository: sl()));
 
   sl.registerLazySingleton<VerifyOtpUsecase>(
           () => VerifyOtpUsecase(authenticationRepository: sl()));
   sl.registerLazySingleton<VerifyOtpUsecaseFMCGSeller>(
           () => VerifyOtpUsecaseFMCGSeller(authenticationRepository: sl()));
+  sl.registerLazySingleton<VerifyOtpUsecaseFMCGbuyer>(
+      () => VerifyOtpUsecaseFMCGbuyer(authenticationRepository: sl()));
 
 
 

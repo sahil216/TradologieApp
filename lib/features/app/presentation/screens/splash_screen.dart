@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
+import 'package:tradologie_app/core/utils/store_update_prompt.dart';
 
 import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
@@ -86,8 +87,10 @@ class _SplashScreenState extends State<SplashScreen>
       _logoController.forward();
     });
 
-    // Navigate after GIF finishes — adjust to match your GIF duration
-    Future.delayed(const Duration(seconds: 3), () {
+    // Navigate after splash — check Play Store / App Store first, then route.
+    Future.delayed(const Duration(seconds: 3), () async {
+      if (!mounted) return;
+      await promptStoreUpdateIfAvailable(context);
       if (!mounted) return;
       _goNext(context);
     });

@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/usecases/usecase.dart';
+import '../entities/fmcg_buyer_login_success.dart';
 import '../entities/verify_otp_fmcg_seller.dart';
 import '../entities/verify_otp_result.dart';
 import '../repositories/authentication_repository.dart';
@@ -25,6 +26,18 @@ class VerifyOtpUsecaseFMCGSeller implements UseCase<FMCGSellerUserDetail, Verify
   @override
   Future<Either<Failure, FMCGSellerUserDetail>> call(VerifyOtpParams params) =>
       authenticationRepository.verifyOtpFMCGSeller(params);
+}
+
+class VerifyOtpUsecaseFMCGbuyer
+    implements UseCase<FmcgBuyerLoginSuccess, VerifyOtpParams> {
+  final AuthenticationRepository authenticationRepository;
+
+  VerifyOtpUsecaseFMCGbuyer({required this.authenticationRepository});
+
+  @override
+  Future<Either<Failure, FmcgBuyerLoginSuccess>> call(
+          VerifyOtpParams params) =>
+      authenticationRepository.verifyOtpFMCGbuyer(params);
 }
 
 class VerifyOtpParams extends Equatable {
@@ -70,11 +83,16 @@ class VerifyOtpParams extends Equatable {
       ];
 
   Map<String, dynamic> toJson() => {
-        if (Constants.isFmcg && !Constants.isBuyer) ...{
-          "Name": Name,
+        if (Constants.isFmcg) ...{
+         // "Name": Name,
           "CountryCode": formatCountryCode(CountryCode),
+        }else...{
+          "CountryCode":CountryCode,
         },
 
+   // VendorName
+
+        "Name": Name,
         "Token": "2018APR031848",
         "MobileNo": mobileNo,
         "OTP": otp,

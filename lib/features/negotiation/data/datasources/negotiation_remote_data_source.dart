@@ -1,6 +1,7 @@
 import '../../../../core/api/api_consumer.dart';
 import '../../../../core/api/end_points.dart';
 import '../../../../core/response_wrapper/response_wrapper.dart';
+import '../../domain/usecases/demo_negotiation_usecase.dart';
 import '../../domain/usecases/get_negotiation_usecase.dart';
 
 abstract class NegotiationRemoteDataSource {
@@ -8,6 +9,8 @@ abstract class NegotiationRemoteDataSource {
       GetNegotiationParams params);
   Future<ResponseWrapper<dynamic>?> buyerNegotiationData(
       GetNegotiationParams params);
+  Future<ResponseWrapper<dynamic>?> demoNegotiationData(
+      DemoNegotiationParams params);
 }
 
 class NegotiationRemoteDataSourceImpl implements NegotiationRemoteDataSource {
@@ -29,6 +32,15 @@ class NegotiationRemoteDataSourceImpl implements NegotiationRemoteDataSource {
       GetNegotiationParams params) async {
     return await apiConsumer.post(
       EndPoints.getNegotiation(UserType.buyer),
+      body: params.toJson(),
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> demoNegotiationData(
+      DemoNegotiationParams params) async {
+    return await apiConsumer.post(
+      EndPoints.demoAuctionList,
       body: params.toJson(),
     );
   }

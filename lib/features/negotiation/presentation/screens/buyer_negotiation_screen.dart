@@ -13,8 +13,10 @@ import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/common_single_child_scroll_view.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
+import 'package:tradologie_app/core/widgets/custom_button.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
+import 'package:tradologie_app/core/widgets/custom_icon_button.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/features/negotiation/domain/entities/buyer_negotitation_detail.dart';
 import 'package:tradologie_app/features/negotiation/presentation/cubit/negotiation_cubit.dart';
@@ -239,6 +241,55 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen>
                 },
               );
             } else if (state.failure is UserFailure) {
+              if (state.failure.msg?.toLowerCase().trim() ==
+                  "no record found!") {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        color: AppColors.red,
+                        size: 200,
+                      ),
+                      CommonText(
+                        state.failure.msg ?? '',
+                        textAlign: TextAlign.center,
+                        style: TextStyleConstants.semiBold(
+                          context,
+                          color: AppColors.black,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      CommonButton(
+                        onPressed: () {
+                          sl<NavigationService>().pushNamed(
+                            Routes.supplierListScreen,
+                          );
+                        },
+                        text: 'Add Negotiation',
+                      ),
+                      const SizedBox(height: 24),
+                      CustomIconButton(
+                        onPressed: () {
+                          getNegotiationData();
+                        },
+                        backgroundColor: AppColors.white,
+                        shape: BoxShape.circle,
+                        iconHeight: 50,
+                        iconColor: AppColors.red,
+                        widget: Icon(
+                          Icons.rotate_right,
+                          size: 24,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
               return CustomErrorWidget(
                 onPress: () {
                   getNegotiationData();

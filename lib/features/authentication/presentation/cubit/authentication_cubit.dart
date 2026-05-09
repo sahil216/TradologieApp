@@ -52,10 +52,12 @@ part 'authentication_state.dart';
 class AuthenticationCubit extends Cubit<AuthenticationState> {
   final SendOtpUsecase sendOtpUsecase;
   final SendOtpUsecaseFMCGseller sendOtpUsecaseFMCGseller;
+  final SendOtpUsecaseFMCGbuyer sendOtpUsecaseFMCGbuyer;
 
 
   final VerifyOtpUsecase verifyOtpUsecase;
   final VerifyOtpUsecaseFMCGSeller verifyOtpUsecaseFMCGSeller;
+  final VerifyOtpUsecaseFMCGbuyer verifyOtpUsecaseFMCGbuyer;
 
 
   final SignInUsecase signInUsecase;
@@ -89,10 +91,12 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   AuthenticationCubit({
     required this.sendOtpUsecase,
     required this.sendOtpUsecaseFMCGseller,
+    required this.sendOtpUsecaseFMCGbuyer,
     required this.signInUsecase,
     required this.registerUsecase,
     required this.verifyOtpUsecase,
     required this.verifyOtpUsecaseFMCGSeller,
+    required this.verifyOtpUsecaseFMCGbuyer,
     required this.buyerSigninUsecase,
     required this.signOutUsecase,
     required this.buyerSendOtpUsecase,
@@ -376,6 +380,16 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     ));
   }
 
+  Future<void> sendOtpFMCGBuyer(SendOtpParams params, bool isResend) async {
+    emit(SendOtpIsLoading());
+    Either<Failure, SendOtpResult> response =
+        await sendOtpUsecaseFMCGbuyer(params);
+    emit(response.fold(
+      (failure) => SendOtpError(failure: failure),
+      (res) => SendOtpSuccess(data: res, isResend: isResend),
+    ));
+  }
+
 
 
 
@@ -395,6 +409,16 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     emit(response.fold(
           (failure) => VerifyOtpError(failure: failure),
           (res) => VerifyOtpSuccessFMCGSeller(data: res),
+    ));
+  }
+
+  Future<void> verifyOtpFMCGBuyer(VerifyOtpParams params) async {
+    emit(VerifyOtpIsLoading());
+    Either<Failure, FmcgBuyerLoginSuccess> response =
+        await verifyOtpUsecaseFMCGbuyer(params);
+    emit(response.fold(
+      (failure) => VerifyOtpError(failure: failure),
+      (res) => VerifyOtpSuccessFMCGBuyer(data: res),
     ));
   }
 

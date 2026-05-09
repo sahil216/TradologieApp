@@ -90,11 +90,18 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen>
 
   void _onResendTap() {
     if (!_canResend) return;
-    Constants.isBuyer == true
-        ? BlocProvider.of<AuthenticationCubit>(context)
-            .sendOtpBuyer(widget.params, true)
-        : BlocProvider.of<AuthenticationCubit>(context)
-            .sendOtp(widget.params, true);
+    final cubit = BlocProvider.of<AuthenticationCubit>(context);
+    if (Constants.isFmcg) {
+      if (Constants.isBuyer) {
+        cubit.sendOtpFMCGBuyer(widget.params, true);
+      } else {
+        cubit.sendOtpFMCGSeller(widget.params, true);
+      }
+    } else if (Constants.isBuyer) {
+      cubit.sendOtpBuyer(widget.params, true);
+    } else {
+      cubit.sendOtp(widget.params, true);
+    }
 
     _startTimer();
   }
@@ -169,41 +176,24 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen>
           listenWhen: (previous, current) => previous != current,
           listener: (context, state) async {
             if (state is VerifyOtpSuccess) {
-
-
-              if (Constants.isFmcg) {
-                if (Constants.isBuyer) {
-
-
-                  // for FMCG Buyer
-
-
-                } else {
-
-                  Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    Routes.fmcgMainScreen,
-                        (route) => false,
-                  );
-                }
+              if (Constants.isBuyer) {
+                AnalyticsService.logEvent("buyer_otp_login_success");
+                Navigator.pushNamedAndRemoveUntil(
+                    context, Routes.mainRoute, (route) => false);
               } else {
-                if (Constants.isBuyer) {
-
-                  AnalyticsService.logEvent("buyer_otp_login_success");
-                  Navigator.pushNamedAndRemoveUntil(
-                      context, Routes.mainRoute, (route) => false);
-
-                } else {
-                  AnalyticsService.logEvent("seller_otp_login_success");
-                  Navigator.pushNamedAndRemoveUntil(
-                      context, Routes.mainRoute, (route) => false);
-                }
+                AnalyticsService.logEvent("seller_otp_login_success");
+                Navigator.pushNamedAndRemoveUntil(
+                    context, Routes.mainRoute, (route) => false);
               }
-
-
-
-
-
+            }
+            if (state is VerifyOtpSuccessFMCGBuyer) {
+              AnalyticsService.logEvent("fmcg_buyer_otp_login_success");
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                Routes.fmcgMainScreen,
+                (route) => false,
+              );
+            }
 
 
 
@@ -228,7 +218,6 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen>
               //     },
               //   ).toString(),
               // );
-            }
             if (state is VerifyOtpSuccessFMCGSeller) {
               Navigator.pushNamedAndRemoveUntil(
                 context,
@@ -250,7 +239,8 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen>
                       (current is VerifyOtpIsLoading ||
                           current is VerifyOtpError ||
                           current is VerifyOtpSuccess ||
-                          current is VerifyOtpSuccessFMCGSeller);
+                          current is VerifyOtpSuccessFMCGSeller ||
+                          current is VerifyOtpSuccessFMCGBuyer);
 
                   return result;
                 },
@@ -482,20 +472,15 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen>
 
                                           if (Constants.isFmcg) {
                                             if (Constants.isBuyer) {
-
-
-                                              // for FMCG Buyer
-
-
-                                            } else {
-
-
                                               BlocProvider.of<
-                                                  AuthenticationCubit>(
+                                                      AuthenticationCubit>(
+                                                  context)
+                                                  .verifyOtpFMCGBuyer(params);
+                                            } else {
+                                              BlocProvider.of<
+                                                      AuthenticationCubit>(
                                                   context)
                                                   .verifyOtpFMCGSeller(params);
-
-
                                             }
                                           } else {
                                             if (Constants.isBuyer) {

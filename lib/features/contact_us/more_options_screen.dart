@@ -26,6 +26,7 @@ import 'package:tradologie_app/features/authentication/presentation/cubit/authen
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../injection_container.dart';
+import '../fmcg/presentation/screens/fmcg_products_mycatalogue.dart';
 
 class MoreOptionsScreen extends StatefulWidget {
   const MoreOptionsScreen({super.key});
@@ -167,6 +168,61 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
                                 .pushNamed(Routes.contactUsScreen);
                           },
                         ),
+
+
+
+                        if (Constants.isFmcg && !Constants.isBuyer)...{
+                          _ultraTile(
+                            icon: Icons.smart_toy,
+                            title: "Chat Bot Queries",
+                            onTap: () {
+                              sl<NavigationService>()
+                                  .pushNamed(Routes.chatbotqueryscreen);
+                            },
+                          ),
+
+                            _ultraTile(
+                          icon: Icons.category,
+                          title: "My Catalogue",
+                          onTap: () async {
+                            final brandId =
+                                await secureStorage.read(AppStrings.brandId) ??
+                                    '0';
+                            final storedBrandName =
+                                await secureStorage.read(AppStrings.brandName);
+                            final brandName = (storedBrandName != null &&
+                                    storedBrandName.isNotEmpty)
+                                ? storedBrandName
+                                : (await secureStorage.read(
+                                        AppStrings.fmcgName)) ??
+                                    '';
+
+                            if (!context.mounted) return;
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => FmcgProductsMycatalogue(
+                                  params: ProductsListMyCatalogueParams(
+                                    brandId: brandId,
+                                    brandName: brandName,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+
+                          _ultraTile(
+                            icon: Icons.receipt_long_outlined,
+                            title: "Quotation List",
+                            onTap: () {
+                              sl<NavigationService>().pushNamed(
+                                Routes.fmcgQuotationListScreen,
+                              );
+                            },
+                          ),
+                        },
+
 
                         _ultraTile(
                           icon: Icons.share_outlined,

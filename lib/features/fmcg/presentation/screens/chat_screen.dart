@@ -5,12 +5,16 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:speech_to_text/speech_to_text.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/hex_color.dart';
+import 'package:tradologie_app/core/utils/exit_app_dialog.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
@@ -86,36 +90,6 @@ class _ChatScreenState extends State<ChatScreen>
     super.dispose();
   }
 
-  // code by Gopal for preventing back and exit app
-
-
-  DateTime? lastBackPressTime;
-
-  Future<bool> _onWillPop() async {
-    final now = DateTime.now();
-
-    if (lastBackPressTime == null ||
-        now.difference(lastBackPressTime!) > const Duration(seconds: 2)) {
-      lastBackPressTime = now;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Press back again to exit")),
-      );
-
-      return false; // don't exit
-    }
-
-    return true; // exit app
-  }
-
-
-
-
-
-
-
-
-
 
 
 
@@ -141,11 +115,11 @@ class _ChatScreenState extends State<ChatScreen>
   }
 
   void getData(
-    String? message,
-    String? chatId,
-    bool isMessage,
-    bool isFile,
-  ) async {
+      String? message,
+      String? chatId,
+      bool isMessage,
+      bool isFile,
+      ) async {
     token = await secureStorage.read(AppStrings.apiVerificationCode) ?? "";
     loginId = await secureStorage.read(AppStrings.loginId) ?? "";
     chatCubit.chatData(ChatDataParams(
@@ -284,18 +258,45 @@ class _ChatScreenState extends State<ChatScreen>
 
   // ── Pickers ────────────────────────────────────────────────────────────────
 
+  Future<String?> _cropPickedImage(String sourcePath) async {
+    final toolbarColor = HexColor('#0A84FF');
+    try {
+      final cropped = await ImageCropper().cropImage(
+        sourcePath: sourcePath,
+        compressQuality: 85,
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Crop image',
+            toolbarColor: toolbarColor,
+            toolbarWidgetColor: Colors.white,
+            lockAspectRatio: false,
+          ),
+          IOSUiSettings(
+            title: 'Crop image',
+          ),
+        ],
+      );
+      return cropped?.path;
+    } catch (e) {
+      if (kDebugMode) print('Crop error: $e');
+      CommonToast.error('Could not crop image.');
+      return null;
+    }
+  }
+
   Future<void> _pickFromCamera() async {
     try {
       final XFile? photo = await _imagePicker.pickImage(
           source: ImageSource.camera, imageQuality: 85);
-      if (photo != null) {
-        _isFilePicked = false;
-        _showPreviewSheet(AttachmentItem(
-          type: AttachmentType.image,
-          path: photo.path,
-          name: photo.name,
-        ));
-      }
+      if (photo == null || !mounted) return;
+      final croppedPath = await _cropPickedImage(photo.path);
+      if (croppedPath == null || !mounted) return;
+      _isFilePicked = false;
+      _showPreviewSheet(AttachmentItem(
+        type: AttachmentType.image,
+        path: croppedPath,
+        name: photo.name,
+      ));
     } catch (e) {
       if (kDebugMode) print("Camera error: $e");
       CommonToast.error("Could not open camera.");
@@ -306,14 +307,15 @@ class _ChatScreenState extends State<ChatScreen>
     try {
       final XFile? image = await _imagePicker.pickImage(
           source: ImageSource.gallery, imageQuality: 85);
-      if (image != null) {
-        _isFilePicked = false;
-        _showPreviewSheet(AttachmentItem(
-          type: AttachmentType.image,
-          path: image.path,
-          name: image.name,
-        ));
-      }
+      if (image == null || !mounted) return;
+      final croppedPath = await _cropPickedImage(image.path);
+      if (croppedPath == null || !mounted) return;
+      _isFilePicked = false;
+      _showPreviewSheet(AttachmentItem(
+        type: AttachmentType.image,
+        path: croppedPath,
+        name: image.name,
+      ));
     } catch (e) {
       if (kDebugMode) print("Gallery error: $e");
       CommonToast.error("Could not open gallery.");
@@ -381,10 +383,10 @@ class _ChatScreenState extends State<ChatScreen>
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
-
-        // 👇 Force block (do nothing)
+        if (!mounted) return;
+        showExitAppConfirmationDialog(context);
       },
-      child:  AdaptiveScaffold(
+      child: AdaptiveScaffold(
         body: BlocListener<ChatCubit, ChatState>(
           listenWhen: (prev, curr) => prev != curr,
           listener: (context, state) {
@@ -521,13 +523,11 @@ class _ChatScreenState extends State<ChatScreen>
               },
             ),
           ),
+
+
         ),
       ),
     );
-
-
-
-
   }
 }
 
@@ -722,7 +722,7 @@ class _ImageBubble extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment:
-              isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             ClipRRect(
@@ -752,7 +752,7 @@ class _ImageBubble extends StatelessWidget {
                           child: CircularProgressIndicator(
                             value: progress.expectedTotalBytes != null
                                 ? progress.cumulativeBytesLoaded /
-                                    progress.expectedTotalBytes!
+                                progress.expectedTotalBytes!
                                 : null,
                             color: isMe ? Colors.white : primaryColor,
                             strokeWidth: 2,
@@ -796,7 +796,7 @@ class _ImageBubble extends StatelessWidget {
                           SizedBox(width: 4),
                           Text("Tap to view",
                               style:
-                                  TextStyle(color: Colors.white, fontSize: 10)),
+                              TextStyle(color: Colors.white, fontSize: 10)),
                         ],
                       ),
                     ),
@@ -903,7 +903,7 @@ class _FileBubble extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment:
-              isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             Row(
@@ -954,7 +954,7 @@ class _FileBubble extends StatelessWidget {
                             "Tap to open",
                             style: TextStyle(
                               color:
-                                  isMe ? Colors.white70 : Colors.grey.shade500,
+                              isMe ? Colors.white70 : Colors.grey.shade500,
                               fontSize: 11,
                             ),
                           ),
@@ -1112,13 +1112,13 @@ class _AttachmentPreviewSheet extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: isImage
                   ? ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: Image.file(
-                        File(attachment.path),
-                        fit: BoxFit.contain,
-                        width: double.infinity,
-                      ),
-                    )
+                borderRadius: BorderRadius.circular(16),
+                child: Image.file(
+                  File(attachment.path),
+                  fit: BoxFit.contain,
+                  width: double.infinity,
+                ),
+              )
                   : _LocalFilePreviewCard(attachment: attachment),
             ),
           ),
@@ -1424,25 +1424,259 @@ class _InputBar extends StatefulWidget {
   State<_InputBar> createState() => _InputBarState();
 }
 
-class _InputBarState extends State<_InputBar> {
+class _InputBarState extends State<_InputBar> with SingleTickerProviderStateMixin {
   bool isTyping = false;
+
+  final SpeechToText _speech = SpeechToText();
+  bool _speechAvailable = false;
+  bool _isListening = false;
+  bool _receivedSpeechThisSession = false;
+  bool _speechJustCompleted = false;
+  String _textBeforeSpeech = '';
+  Timer? _listeningSyncTimer;
+  DateTime? _listenUiStartedAt;
+  bool _engineWasListeningThisSession = false;
+
+  late final AnimationController _pulseController;
+  late final Animation<double> _pulseOpacity;
 
   @override
   void initState() {
     super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+    _pulseOpacity = Tween<double>(begin: 0.45, end: 1.0).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
     widget.controller.addListener(_handleTyping);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _initSpeech());
+  }
+
+  void _syncListeningPulse() {
+    if (_isListening) {
+      _pulseController.repeat(reverse: true);
+    } else {
+      _pulseController.stop();
+      _pulseController.value = 1.0;
+    }
+  }
+
+  /// Native stop (e.g. pause timeout) does not always emit [onStatus]; keep UI in sync.
+  void _stopListeningSyncLoop() {
+    _listeningSyncTimer?.cancel();
+    _listeningSyncTimer = null;
+  }
+
+  void _startListeningSyncLoop() {
+    _stopListeningSyncLoop();
+    _listeningSyncTimer =
+        Timer.periodic(const Duration(milliseconds: 200), (_) {
+          if (!mounted) {
+            _stopListeningSyncLoop();
+            return;
+          }
+          final engineListening = _speech.isListening;
+          if (!_isListening || engineListening) return;
+
+          final started = _listenUiStartedAt;
+          final gaveUpWaiting = started != null &&
+              DateTime.now().difference(started) > const Duration(seconds: 3);
+          if (!_engineWasListeningThisSession && !gaveUpWaiting) {
+            return;
+          }
+
+          setState(() {
+            _isListening = false;
+            if (_receivedSpeechThisSession) {
+              _speechJustCompleted = true;
+            }
+            _syncListeningPulse();
+          });
+          _listenUiStartedAt = null;
+          _engineWasListeningThisSession = false;
+          _stopListeningSyncLoop();
+        });
+  }
+
+  void _applyListeningFromEngine() {
+    final engineListening = _speech.isListening;
+    if (engineListening) {
+      _engineWasListeningThisSession = true;
+    }
+    if (_isListening == engineListening) return;
+    setState(() {
+      _isListening = engineListening;
+      if (!engineListening && _receivedSpeechThisSession) {
+        _speechJustCompleted = true;
+      }
+      _syncListeningPulse();
+    });
+    if (!engineListening) {
+      _listenUiStartedAt = null;
+      _engineWasListeningThisSession = false;
+      _stopListeningSyncLoop();
+    }
+  }
+
+  Future<void> _initSpeech() async {
+    _speechAvailable = await _speech.initialize(
+      onError: (e) {
+        if (kDebugMode) print('SpeechToText error: ${e.errorMsg}');
+        if (mounted) {
+          setState(() {
+            _isListening = false;
+            _syncListeningPulse();
+          });
+          _stopListeningSyncLoop();
+          CommonToast.error('Speech recognition error');
+        }
+      },
+      onStatus: (status) {
+        if (!mounted) return;
+        _applyListeningFromEngine();
+      },
+    );
+    if (mounted) setState(() {});
+  }
+
+  void _onSpeechResult(SpeechRecognitionResult result) {
+    if (!mounted) return;
+    final words = result.recognizedWords;
+    if (words.trim().isNotEmpty) {
+      _receivedSpeechThisSession = true;
+    }
+    final prefix = _textBeforeSpeech;
+    final sep = prefix.isNotEmpty && words.trim().isNotEmpty ? ' ' : '';
+    final combined = '$prefix$sep$words';
+    widget.controller.text = combined;
+    widget.controller.selection =
+        TextSelection.collapsed(offset: widget.controller.text.length);
+    setState(() => isTyping = widget.controller.text.trim().isNotEmpty);
+  }
+
+  Future<void> _toggleSpeechToText() async {
+    if (!_speechAvailable) {
+      CommonToast.error('Speech recognition is not available on this device.');
+      return;
+    }
+    if (_isListening) {
+      await _speech.stop();
+      if (mounted) {
+        setState(() {
+          _isListening = false;
+          if (_receivedSpeechThisSession) {
+            _speechJustCompleted = true;
+          }
+          _syncListeningPulse();
+        });
+        _listenUiStartedAt = null;
+        _engineWasListeningThisSession = false;
+        _stopListeningSyncLoop();
+      }
+      return;
+    }
+    _textBeforeSpeech = widget.controller.text;
+    _listenUiStartedAt = DateTime.now();
+    _engineWasListeningThisSession = false;
+    setState(() {
+      _isListening = true;
+      _receivedSpeechThisSession = false;
+      _speechJustCompleted = false;
+      _syncListeningPulse();
+    });
+    _startListeningSyncLoop();
+    try {
+      await _speech.listen(
+        onResult: _onSpeechResult,
+        listenOptions: SpeechListenOptions(
+          listenMode: ListenMode.dictation,
+          partialResults: true,
+        ),
+        listenFor: const Duration(minutes: 2),
+        pauseFor: const Duration(seconds: 5),
+      );
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isListening = false;
+          _syncListeningPulse();
+        });
+        _listenUiStartedAt = null;
+        _engineWasListeningThisSession = false;
+        _stopListeningSyncLoop();
+        CommonToast.error('Could not start listening.');
+      }
+    }
   }
 
   void _handleTyping() {
     final typingNow = widget.controller.text.trim().isNotEmpty;
-    if (typingNow != isTyping) {
-      setState(() => isTyping = typingNow);
+    final clearSpeechHighlight =
+        _speechJustCompleted && widget.controller.text.trim().isEmpty;
+    if (typingNow != isTyping || clearSpeechHighlight) {
+      setState(() {
+        if (typingNow != isTyping) isTyping = typingNow;
+        if (clearSpeechHighlight) _speechJustCompleted = false;
+      });
     }
+  }
+
+  Widget _voiceMicButton() {
+    const outer = 40.0;
+    if (_isListening) {
+      return SizedBox(
+        width: outer,
+        height: outer,
+        child: Icon(
+          Icons.voice_chat,
+          color: widget.primaryColor,
+          size: 22,
+        ),
+      );
+    }
+    if (_speechJustCompleted) {
+      return SizedBox(
+        width: outer,
+        height: outer,
+        child: Center(
+          child: Container(
+            width: 28,
+            height: 28,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: widget.primaryColor,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.voice_chat,
+              color: Colors.white,
+              size: 16,
+            ),
+          ),
+        ),
+      );
+    }
+    return SizedBox(
+      width: outer,
+      height: outer,
+      child: Icon(
+        Icons.voice_chat,
+        color: Colors.grey.shade600,
+        size: 22,
+      ),
+    );
   }
 
   @override
   void dispose() {
+    _stopListeningSyncLoop();
+    _pulseController.dispose();
     widget.controller.removeListener(_handleTyping);
+    if (_speech.isListening) {
+      _speech.stop();
+    }
     super.dispose();
   }
 
@@ -1462,108 +1696,161 @@ class _InputBarState extends State<_InputBar> {
             ),
           ],
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xffF3F5F7),
-                  borderRadius: BorderRadius.circular(28),
-                  border: Border.all(color: Colors.black12),
-                ),
-                child: TextField(
-                  controller: widget.controller,
-                  minLines: 1,
-                  maxLines: 4,
-                  textInputAction: TextInputAction.send,
-                  decoration: InputDecoration(
-                    hintText: "Type your message...",
-                    hintStyle: TextStyle(
-                      color: Colors.grey.shade500,
-                      fontSize: 15,
-                    ),
-                    contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-                    border: InputBorder.none,
-                  ),
-                  onSubmitted: (_) => widget.onSend(),
-                ),
-              ),
-            ),
-
-            const SizedBox(width: 10),
-
-            // 👇 Attach + Camera (camera hidden when typing)
-            Row(
-              children: [
-                GestureDetector(
-                  onTap: widget.onAttachTap,
+            if (_isListening)
+              Padding(
+                padding: const EdgeInsets.only(left: 4, right: 4, bottom: 8),
+                child: AnimatedBuilder(
+                  animation: _pulseOpacity,
+                  builder: (context, child) {
+                    return Opacity(
+                      opacity: _pulseOpacity.value,
+                      child: child,
+                    );
+                  },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        vertical: 12, horizontal: 10),
-                    margin: const EdgeInsets.only(right: 8),
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: widget.primaryColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: widget.primaryColor.withValues(alpha: 0.35),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.mic_rounded,
+                          size: 18,
+                          color: widget.primaryColor,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Listening… speak to convert to text',
+                            style: TextStyle(
+                              color: widget.primaryColor,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: Container(
                     decoration: BoxDecoration(
                       color: const Color(0xffF3F5F7),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(28),
                       border: Border.all(color: Colors.black12),
                     ),
+                    padding: const EdgeInsets.only(left: 2, right: 4),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+
+
+                        Expanded(
+                          child: TextField(
+                            controller: widget.controller,
+                            minLines: 1,
+                            maxLines: 4,
+                            textInputAction: TextInputAction.send,
+                            decoration: InputDecoration(
+                              hintText: "Type your message...",
+                              hintStyle: TextStyle(
+                                color: Colors.grey.shade500,
+                                fontSize: 15,
+                              ),
+                              isDense: true,
+                              contentPadding: const EdgeInsets.fromLTRB(
+                                4,
+                                10,
+                                12,
+                                10,
+                              ),
+                              border: InputBorder.none,
+                            ),
+                            onSubmitted: (_) => widget.onSend(),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 2),
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            visualDensity: VisualDensity.compact,
+                            constraints: const BoxConstraints(
+                              minWidth: 40,
+                              minHeight: 40,
+                            ),
+                            onPressed: widget.onAttachTap,
+                            icon: Icon(
+                              Icons.attach_file_rounded,
+                              color: Colors.grey.shade600,
+                              size: 22,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 2),
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            visualDensity: VisualDensity.compact,
+                            constraints: const BoxConstraints(
+                              minWidth: 40,
+                              minHeight: 40,
+                            ),
+                            onPressed: _toggleSpeechToText,
+                            icon: _voiceMicButton(),
+                          ),
+                        ),
+
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(width: 10),
+
+                // 👇 Mic ↔ Send button
+                GestureDetector(
+                  onTap: widget.onSend,
+                  child: Container(
+                    height: 48,
+                    width: 52,
+                    decoration: BoxDecoration(
+                      color: widget.primaryColor,
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: [
+                        BoxShadow(
+                          color: widget.primaryColor.withValues(alpha: 0.28),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
                     child: Icon(
-                      Icons.attach_file_rounded,
-                      color: Colors.grey.shade600,
+                      isTyping
+                          ? Icons.send_rounded
+                          : Icons.keyboard_voice_rounded,
+                      color: Colors.white,
                       size: 22,
                     ),
                   ),
                 ),
-
-                // 👇 Hide camera when typing
-                if (!isTyping)
-                  GestureDetector(
-                    onTap: () {},
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 12, horizontal: 10),
-                      margin: const EdgeInsets.only(right: 8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xffF3F5F7),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.black12),
-                      ),
-                      child: Icon(
-                        Icons.camera_alt,
-                        color: Colors.grey.shade600,
-                        size: 22,
-                      ),
-                    ),
-                  ),
               ],
-            ),
-
-            // 👇 Mic ↔ Send button
-            GestureDetector(
-              onTap: widget.onSend,
-              child: Container(
-                height: 48,
-                width: 52,
-                decoration: BoxDecoration(
-                  color: widget.primaryColor,
-                  borderRadius: BorderRadius.circular(18),
-                  boxShadow: [
-                    BoxShadow(
-                      color: widget.primaryColor.withValues(alpha: 0.28),
-                      blurRadius: 12,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  isTyping
-                      ? Icons.send_rounded
-                      : Icons.keyboard_voice_rounded,
-                  color: Colors.white,
-                  size: 22,
-                ),
-              ),
             ),
           ],
         ),
@@ -1757,21 +2044,21 @@ class ChatTopBar extends StatelessWidget {
                       ),
                       child: (imageUrl.isEmpty)
                           ? Center(
-                              child: Text(
-                                getInitial(name),
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: T.ink,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            )
+                        child: Text(
+                          getInitial(name),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: T.ink,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      )
                           : ClipOval(
-                              child: Image.network(
-                                  "https://www.tradologie.com/docs/$imageUrl",
-                                  fit: BoxFit.cover),
-                            ),
+                        child: Image.network(
+                            "https://www.tradologie.com/docs/$imageUrl",
+                            fit: BoxFit.cover),
+                      ),
                     ),
                     if (isOnline)
                       Positioned(

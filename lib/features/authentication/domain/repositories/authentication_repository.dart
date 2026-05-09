@@ -80,10 +80,13 @@ abstract class AuthenticationRepository {
 
   Future<Either<Failure, SendOtpResult>> sendOtp(SendOtpParams params);
   Future<Either<Failure, SendOtpResult>> sendOtpFMCGseller(SendOtpParams params);
+  Future<Either<Failure, SendOtpResult>> sendOtpFMCGbuyer(SendOtpParams params);
 
 
   Future<Either<Failure, VerifyOtpResult>> verifyOtp(VerifyOtpParams params);
   Future<Either<Failure, FMCGSellerUserDetail>> verifyOtpFMCGSeller(VerifyOtpParams params);
+  Future<Either<Failure, FmcgBuyerLoginSuccess>> verifyOtpFMCGbuyer(
+      VerifyOtpParams params);
 
 
 }

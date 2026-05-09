@@ -33,6 +33,10 @@ import '../../features/authentication/presentation/screens/send_otp_screen.dart'
 import '../../features/authentication/presentation/screens/sign_in_screen.dart';
 import '../../features/authentication/presentation/screens/sign_up_screen.dart';
 import '../../features/authentication/presentation/screens/verify_otp_screen.dart';
+import '../../features/fmcg/presentation/screens/ChatbotQueryScreen.dart';
+import '../../features/fmcg/presentation/screens/chatbot_tran_screen.dart';
+import '../../features/fmcg/presentation/screens/fmcg_quotation_list_screen.dart';
+import '../../features/fmcg/presentation/screens/fmcg_quotation_tran_screen.dart';
 import '../../features/notification/presentation/screens/notification_screen.dart';
 import '../../features/webview/presentation/screens/in_app_webview_screen.dart';
 import '../../features/webview/presentation/screens/viewmodel/webview_params.dart';
@@ -91,6 +95,10 @@ class Routes {
 
   //! Contact Us Screen
   static const String contactUsScreen = '/contactUsScreen';
+  static const String chatbotqueryscreen = '/chatbotqueryscreen';
+  static const String chatbotTranScreen = '/chatbotTranScreen';
+  static const String fmcgQuotationListScreen = '/fmcgQuotationListScreen';
+  static const String fmcgQuotationTranScreen = '/fmcgQuotationTranScreen';
   //! Notifications
   static const String notificationScreen = '/notificationScreen';
 
@@ -243,6 +251,42 @@ class AppRoutes {
           },
           fullscreenDialog: false,
         );
+
+
+          case Routes.chatbotqueryscreen:
+        return CupertinoPageRoute(
+          builder: (context) {
+            return const Chatbotqueryscreen();
+          },
+          fullscreenDialog: false,
+        );
+
+      case Routes.chatbotTranScreen:
+        return CupertinoPageRoute(
+          builder: (context) {
+            final args = routeSettings.arguments as ChatbotTranScreenArgs;
+            return ChatbotTranScreen(args: args);
+          },
+        );
+
+      case Routes.fmcgQuotationListScreen:
+        return CupertinoPageRoute(
+          builder: (context) => const FmcgQuotationListScreen(),
+        );
+
+      case Routes.fmcgQuotationTranScreen:
+        return CupertinoPageRoute(
+          builder: (context) {
+            final args =
+                routeSettings.arguments as FmcgQuotationTranScreenArgs;
+            return FmcgQuotationTranScreen(args: args);
+          },
+        );
+
+
+
+
+
 
       case Routes.notificationScreen:
         return CupertinoPageRoute(builder: (context) {

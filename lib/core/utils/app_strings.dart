@@ -24,6 +24,7 @@ class AppStrings {
   static const String fmcgName = 'fmcg_name';
   static const String loginId = 'login_id';
   static const String brandId = 'brand_id';
+  static const String brandName = 'brand_name';
   static const String analyticsUrl = 'analytics_url';
   static const String quotationUserId = 'quotation_user_id';
 

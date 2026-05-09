@@ -5,6 +5,7 @@ import 'package:tradologie_app/features/negotiation/data/models/buyer_negotitati
 import 'package:tradologie_app/features/negotiation/data/models/negotiation_model.dart';
 import 'package:tradologie_app/features/negotiation/domain/entities/buyer_negotiation.dart';
 import 'package:tradologie_app/features/negotiation/domain/entities/negotiation.dart';
+import 'package:tradologie_app/features/negotiation/domain/usecases/demo_negotiation_usecase.dart';
 import 'package:tradologie_app/features/negotiation/domain/usecases/get_negotiation_usecase.dart';
 
 import '../../../../core/error/user_failure.dart';
@@ -48,6 +49,22 @@ class NegotiationRepositoryImpl implements NegotiationRepository {
         // Right((response.data as List)
         //     .map((e) => NegotiationModel.fromJson(e))
         //     .toList());
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, Negotiation>> demoNegotiationData(
+      DemoNegotiationParams params) async {
+    try {
+      final response = await negotiationRemoteDataSource.demoNegotiationData(
+        params,
+      );
+      if (response != null && response.success) {
+        return Right(NegotiationModel.fromJson(response.data));
       }
       return Left(UserFailure(response?.message, response?.code));
     } on Failure catch (e) {

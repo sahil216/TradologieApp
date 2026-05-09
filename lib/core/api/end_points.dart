@@ -39,11 +39,17 @@ class EndPoints {
   static String fmcgBaseUrlDistributor =
       'https://api.tradologie.com/FMCG';
   static String getProductsList = '$baseUrl/FMCG/FMCGBrandProuctList';
+  static String getProductsListForSeller =
+      '$baseUrl/FMCG/FMCGBrandProuctListForSeller';
 
   static String countryCodeList = '$baseUrlSupplier/GetOTPCountry';
   // FMCG
   static String fmcgSellerSignin = "$baseUrl/FMCG/FMCGSellerLogin";
   static String fmcgBuyerSignin = "$baseUrl/FMCG/FMCGBuyerLogin";
+  static String fmcgSendBuyerOtpForLogin =
+      "$baseUrl/FMCG/SendBuyerOTPForLogin";
+  static String fmcgVerifyBuyerOtpForLogin =
+      "$baseUrl/FMCG/VerifyBuyerOTPForLogin";
   static String fmcgCountryCodeList = "$baseUrl/FMCG/FMCGReqCountryList";
   static String fmcgRegisterDistributor = "$baseUrl/FMCG/FMCGDistributorship";
   static String fmcgRegisterSeller = "$baseUrl/FMCG/FMCGReqEnquiry";
@@ -137,7 +143,15 @@ class EndPoints {
     return '$baseUrl/${userType.name}/auctionlist';
   }
 
+  static String demoAuctionList = '$baseUrl/Supplier/DemoAuctionList';
+
   static String getInitialChatId = '$baseUrl/FMCG/FMCGBuyerInitialChatID';
+  static String chatbotQueryList = '$baseUrl/FMCG/ChatbotQueryList';
+  static String chatbotTranList = '$baseUrl/FMCG/ChatbotTranList';
+  static String fmcgQuotationList = '$baseUrl/FMCG/QuotationList';
+  static String fmcgQuotationTranList = '$baseUrl/FMCG/QuotationTranList';
+  static String fmcgAddQuotationCart = '$baseUrl/FMCG/AddQuotationCart';
+  static String fmcgBuyerQuotationList = '$baseUrl/FMCG/BuyerQuotationList';
 
   // Add Negotiation
   static String getCategoryList = '$baseUrlBuyer/category';

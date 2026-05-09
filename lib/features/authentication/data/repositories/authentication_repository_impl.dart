@@ -201,6 +201,8 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
         await secureStorage.write(
             AppStrings.brandId, data.fmcgUserDetail?.brandId ?? "");
         await secureStorage.write(
+            AppStrings.brandName, data.fmcgUserDetail?.brandName ?? "");
+        await secureStorage.write(
             AppStrings.analyticsUrl, data.fmcgUserDetail?.analyticsUrl ?? "");
         Constants.analyticsUrl = data.fmcgUserDetail?.analyticsUrl ?? "";
 
@@ -382,6 +384,8 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
 
         await secureStorage.write(
             AppStrings.brandId, data.fmcgUserDetail?.brandId ?? "");
+        await secureStorage.write(
+            AppStrings.brandName, data.fmcgUserDetail?.brandName ?? "");
 
         return Right(data);
       }
@@ -629,6 +633,21 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, SendOtpResult>> sendOtpFMCGbuyer(
+      SendOtpParams params) async {
+    try {
+      final response =
+          await authenticationRemoteDataSource.sendFMCGBuyerOtp(params);
+      if (response != null && response.success) {
+        return Right(SendOtpResultModel.fromJson(response.data));
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
 
 
 
@@ -724,6 +743,42 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
         await secureStorage.write(
             AppStrings.vendorId, response.data["VendorID"].toString());
         return Right(FMCGSellerVerifyOtpModel.fromJson(response.data));
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, FmcgBuyerLoginSuccess>> verifyOtpFMCGbuyer(
+      VerifyOtpParams params) async {
+    try {
+      final response =
+          await authenticationRemoteDataSource.verifyOtpFMCGBuyer(params);
+      if (response != null && response.success) {
+        Constants.isLogin = true;
+        SecureStorageService secureStorage = SecureStorageService();
+        final data = FmcgBuyerLoginSuccessModel.fromJson(response.data);
+
+        await secureStorage.write(AppStrings.appSession, "true");
+        Constants.token = data.apiVerificationCode ?? "";
+
+        await secureStorage.write(
+            AppStrings.apiVerificationCode, data.apiVerificationCode ?? "");
+
+        await secureStorage.write(AppStrings.mobileNo, data.mobile ?? "");
+
+        await secureStorage.write(AppStrings.userId, data.userId ?? "");
+
+        await secureStorage.write(AppStrings.fmcgName, data.name ?? "");
+
+        await secureStorage.write(
+            AppStrings.loginId, data.quotationUserId.toString());
+
+        await secureStorage.write(AppStrings.brandId, data.brandId.toString());
+
+        return Right(data);
       }
       return Left(UserFailure(response?.message, response?.code));
     } on Failure catch (e) {

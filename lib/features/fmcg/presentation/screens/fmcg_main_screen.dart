@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
+import 'package:tradologie_app/core/utils/exit_app_dialog.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/features/contact_us/more_options_screen.dart';
@@ -94,8 +95,8 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
             _item(0, Icons.dashboard_outlined, "Dashboard"),
             _item(1, Icons.chat_outlined, "Connect"),
             _item(2, Icons.account_circle_outlined, "Account"),
-            _item(3, Icons.menu_rounded, "More"),
-            _item(4, Icons.analytics, "Analytics"),
+            _item(3, Icons.analytics, "Analytics"),
+            _item(4, Icons.menu_rounded, "More"),
           ]
         ],
       ),
@@ -165,30 +166,6 @@ class CommonFMCGFloatingNavBar extends StatelessWidget {
   }
 }
 
-// ── Per-tab navigator wrapper ─────────────────────────────────────────────────
-// Each tab gets its own Navigator so pushing a new screen stays inside the
-// body area and the bottom bar remains visible at all times.
-
-class _TabNavigator extends StatelessWidget {
-  final Widget rootScreen;
-  final String navigatorKey;
-
-  const _TabNavigator({
-    required this.rootScreen,
-    required this.navigatorKey,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Navigator(
-      key: ValueKey(navigatorKey),
-      onGenerateRoute: (_) => MaterialPageRoute(
-        builder: (_) => rootScreen,
-      ),
-    );
-  }
-}
-
 // ── Main Screen ───────────────────────────────────────────────────────────────
 
 class FMCGMainScreen extends StatefulWidget {
@@ -236,7 +213,6 @@ class _FMCGMainScreenState extends State<FMCGMainScreen> {
         FmcgSellerDashboardScreen(),
         ChatListScreen(),
         FmcgMyAccountScreen(),
-        MoreOptionsScreen(),
         Constants.isAndroid14OrBelow && Platform.isAndroid
             ? InAppWebViewScreen(
                 params: WebviewParams(
@@ -247,6 +223,7 @@ class _FMCGMainScreenState extends State<FMCGMainScreen> {
                 canPop: false,
                 isAppBar: true,
               )),
+        MoreOptionsScreen(),
       ];
 
   List<Widget> get _buyerRoots => [
@@ -276,16 +253,6 @@ class _FMCGMainScreenState extends State<FMCGMainScreen> {
     navCubit.setTab(index);
   }
 
-  // Handle Android back button — pop within the nested navigator first
-  // Future<bool> _onWillPop() async {
-  //   final canPop = _navigatorKeys[currentIndex].currentState?.canPop() ?? false;
-  //   if (canPop) {
-  //     _navigatorKeys[currentIndex].currentState?.pop();
-  //     return false; // don't pop the main screen
-  //   }
-  //   return true; // let the OS handle it (exit app)
-  // }
-
   @override
   void dispose() {
     _navBarController.dispose();
@@ -309,7 +276,20 @@ class _FMCGMainScreenState extends State<FMCGMainScreen> {
 
           setState(() {}); // rebuild UI
         },
-        child: AdaptiveScaffold(
+        child: PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) {
+            if (didPop) return;
+            final nestedNav =
+                _navigatorKeys[navCubit.state].currentState;
+            if (nestedNav != null && nestedNav.canPop()) {
+              nestedNav.pop();
+              return;
+            }
+            if (!mounted) return;
+            showExitAppConfirmationDialog(context);
+          },
+          child: AdaptiveScaffold(
           body: Stack(
             children: List.generate(roots.length, (i) {
               return Offstage(
@@ -341,6 +321,7 @@ class _FMCGMainScreenState extends State<FMCGMainScreen> {
                   ));
             },
           ),
+        ),
         ),
       ),
     );

@@ -294,3 +294,163 @@ class ProductsListError extends ChatState {
   @override
   List<Object> get props => [failure];
 }
+
+class ProductsListForSellerIsLoading extends ChatState {}
+
+class ProductsListForSellerSuccess extends ChatState {
+  final List<GetProductsList> data;
+
+  const ProductsListForSellerSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class ProductsListForSellerError extends ChatState {
+  final Failure failure;
+
+  const ProductsListForSellerError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class ChatbotQueryListLoading extends ChatState {}
+
+class ChatbotQueryListSuccess extends ChatState {
+  final List<ChatbotQueryListItem> items;
+  final int totalPages;
+  final int totalRecords;
+
+  const ChatbotQueryListSuccess({
+    required this.items,
+    required this.totalPages,
+    required this.totalRecords,
+  });
+
+  @override
+  List<Object> get props => [items, totalPages, totalRecords];
+}
+
+class ChatbotQueryListError extends ChatState {
+  final Failure failure;
+
+  const ChatbotQueryListError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class ChatbotTranListLoading extends ChatState {}
+
+class ChatbotTranListSuccess extends ChatState {
+  final List<ChatbotTranMessage> messages;
+
+  const ChatbotTranListSuccess({required this.messages});
+
+  @override
+  List<Object> get props => [messages];
+}
+
+class ChatbotTranListError extends ChatState {
+  final Failure failure;
+
+  const ChatbotTranListError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class FmcgQuotationListLoading extends ChatState {}
+
+class FmcgQuotationListSuccess extends ChatState {
+  final List<FmcgQuotationListItem> items;
+  final int totalPages;
+  final int totalRecords;
+
+  const FmcgQuotationListSuccess({
+    required this.items,
+    required this.totalPages,
+    required this.totalRecords,
+  });
+
+  @override
+  List<Object> get props => [items, totalPages, totalRecords];
+}
+
+class FmcgQuotationListError extends ChatState {
+  final Failure failure;
+
+  const FmcgQuotationListError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class FmcgQuotationTranListLoading extends ChatState {}
+
+class FmcgQuotationTranListSuccess extends ChatState {
+  final List<FmcgQuotationTranItem> items;
+
+  const FmcgQuotationTranListSuccess({required this.items});
+
+  @override
+  List<Object> get props => [items];
+}
+
+class FmcgQuotationTranListError extends ChatState {
+  final Failure failure;
+
+  const FmcgQuotationTranListError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class AddQuotationCartIsLoading extends ChatState {
+  final int productId;
+
+  const AddQuotationCartIsLoading({required this.productId});
+
+  @override
+  List<Object> get props => [productId];
+}
+
+class AddQuotationCartSuccess extends ChatState {
+  final int productId;
+  final String message;
+
+  const AddQuotationCartSuccess({required this.productId, required this.message});
+
+  @override
+  List<Object> get props => [productId, message];
+}
+
+class AddQuotationCartError extends ChatState {
+  final Failure failure;
+
+  const AddQuotationCartError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class BuyerQuotationListLoading extends ChatState {}
+
+class BuyerQuotationListSuccess extends ChatState {
+  final List<BuyerQuotationItem> items;
+
+  const BuyerQuotationListSuccess({required this.items});
+
+  @override
+  List<Object> get props => [items];
+}
+
+class BuyerQuotationListError extends ChatState {
+  final Failure failure;
+
+  const BuyerQuotationListError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}

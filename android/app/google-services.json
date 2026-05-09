@@ -12,7 +12,20 @@
           "package_name": "com.tradologie.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "135753122403-bg7bum19qb2gviogkr0avkreagtetmnf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tradologie.app",
+            "certificate_hash": "5422da31aacbfc35d2ea0a7537f9164cfbcb7140"
+          }
+        },
+        {
+          "client_id": "135753122403-3hgdkc1aumf61j12h0up61d22nfr2a9e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAfux8U-5uB5bccMBWRBP4yGmXXQ5OkSac"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "135753122403-28r1ovqmgln6h8c1jmcchmhaoriknp4f.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "135753122403-taksuumtdq1bjt1hmcib6tdhe8nro76r.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.tradologie.app"
+              }
+            }
+          ]
         }
       }
     }

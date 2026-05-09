@@ -1,5 +1,17 @@
 import 'package:tradologie_app/features/fmcg/domain/entities/distributor_enquiry_list.dart';
 
+bool? _parseBool(dynamic value) {
+  if (value == null) return null;
+  if (value is bool) return value;
+  if (value is num) return value != 0;
+  if (value is String) {
+    final s = value.toLowerCase().trim();
+    if (s == 'true' || s == '1' || s == 'yes') return true;
+    if (s == 'false' || s == '0' || s == 'no') return false;
+  }
+  return null;
+}
+
 class DistributorEnquiryListModel extends DistributorEnquiryList {
   const DistributorEnquiryListModel({
     super.quotationUserId,
@@ -48,7 +60,7 @@ class DistributorEnquiryListModel extends DistributorEnquiryList {
         updatedDate: json["UpdatedDate"] == null
             ? null
             : DateTime.parse(json["UpdatedDate"]),
-        isInterest: json["IsInterest"],
+        isInterest: _parseBool(json["IsInterest"]),
         fMCGCategory: json["FMCGCategory"],
         brandPartnershipType: json["BrandPartnershipType"],
         distributionCoverage: json["DistributionCoverage"],

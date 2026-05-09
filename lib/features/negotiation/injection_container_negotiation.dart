@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:tradologie_app/features/negotiation/data/datasources/negotiation_remote_data_source.dart';
 import 'package:tradologie_app/features/negotiation/data/repositories/negotiation_repository_impl.dart';
 import 'package:tradologie_app/features/negotiation/domain/usecases/buyer_negotiation_usecase.dart';
+import 'package:tradologie_app/features/negotiation/domain/usecases/demo_negotiation_usecase.dart';
 import 'package:tradologie_app/features/negotiation/domain/usecases/get_negotiation_usecase.dart';
 import 'package:tradologie_app/features/negotiation/presentation/cubit/negotiation_cubit.dart';
 
@@ -14,6 +15,7 @@ Future<void> init() async {
   sl.registerFactory<NegotiationCubit>(() => NegotiationCubit(
         negotiationUsecase: sl(),
         buyerNegotiationUsecase: sl(),
+        demoNegotiationUsecase: sl(),
       ));
 
   //! Use cases
@@ -22,6 +24,8 @@ Future<void> init() async {
 
   sl.registerLazySingleton<BuyerNegotiationUsecase>(
       () => BuyerNegotiationUsecase(negotiationRepository: sl()));
+  sl.registerLazySingleton<DemoNegotiationUsecase>(
+      () => DemoNegotiationUsecase(negotiationRepository: sl()));
 
   //! Repository
   sl.registerLazySingleton<NegotiationRepository>(
