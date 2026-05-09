@@ -431,7 +431,7 @@ class _SignInScreenState extends State<SignInScreen>
                                             r.isTablet ? 420 : double.infinity,
                                         child: CommonButton(
                                           onPressed:(){
-                                            CommonToast.error("facebook login coming soon ");
+                                            CommonToast.normal("facebook login coming soon ");
                                           },
 
                                           //_signInWithFacebook,
