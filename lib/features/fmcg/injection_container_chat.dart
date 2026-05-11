@@ -3,10 +3,12 @@ import 'package:tradologie_app/features/fmcg/data/datasources/chat_remote_data_s
 import 'package:tradologie_app/features/fmcg/data/repositories/chat_repository_impl.dart';
 import 'package:tradologie_app/features/fmcg/domain/repositories/chat_repositories.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_buyer_brand_interest_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/add_buyer_quotation_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_distributor_interest_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_quotation_cart_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_data_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/delete_quotation_cart_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_quotation_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_brands_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_distributor_list_usecase.dart';
@@ -50,6 +52,8 @@ Future<void> init() async {
         getFmcgQuotationTranListUsecase: sl(),
         addQuotationCartUsecase: sl(),
         getBuyerQuotationListUsecase: sl(),
+        deleteQuotationCartUsecase: sl(),
+        addBuyerQuotationUsecase: sl(),
       ));
 
   //! Use cases
@@ -96,6 +100,10 @@ Future<void> init() async {
       () => AddQuotationCartUsecase(chatRepository: sl()));
   sl.registerLazySingleton<GetBuyerQuotationListUsecase>(
       () => GetBuyerQuotationListUsecase(chatRepository: sl()));
+  sl.registerLazySingleton<DeleteQuotationCartUsecase>(
+      () => DeleteQuotationCartUsecase(chatRepository: sl()));
+  sl.registerLazySingleton<AddBuyerQuotationUsecase>(
+      () => AddBuyerQuotationUsecase(chatRepository: sl()));
 
   //! Repository
   sl.registerLazySingleton<ChatRepository>(() => ChatRepositoryImpl(

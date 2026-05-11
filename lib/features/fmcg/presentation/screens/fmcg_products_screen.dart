@@ -482,7 +482,7 @@ class _FmcgProductsScreenState extends State<FmcgProductsScreen>
                   ),
                   child: Text(
                     isAddedForQuotation
-                        ? "Already sent"
+                        ? "Added for quotation"
                         : (isAdding ? "Sending..." : "Send for quotation"),
                     textAlign: TextAlign.center,
                     style: const TextStyle(

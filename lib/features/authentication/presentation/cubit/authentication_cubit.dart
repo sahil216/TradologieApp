@@ -45,7 +45,9 @@ import '../../domain/entities/verify_otp_result.dart';
 import '../../domain/usecases/verify_otp_usecase.dart';
 import '../../domain/usecases/register_usecase.dart';
 import '../../domain/usecases/send_otp_usecase.dart';
+import '../../domain/usecases/buyer_social_login_usecase.dart';
 import '../../domain/usecases/sign_in_usecase.dart';
+import '../../domain/usecases/supplier_social_login_usecase.dart';
 
 part 'authentication_state.dart';
 
@@ -61,6 +63,8 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
 
 
   final SignInUsecase signInUsecase;
+  final SupplierSocialLoginUsecase supplierSocialLoginUsecase;
+  final BuyerSocialLoginUsecase buyerSocialLoginUsecase;
   final RegisterUsecase registerUsecase;
   final BuyerSigninUsecase buyerSigninUsecase;
   final SignOutUsecase signOutUsecase;
@@ -93,6 +97,8 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     required this.sendOtpUsecaseFMCGseller,
     required this.sendOtpUsecaseFMCGbuyer,
     required this.signInUsecase,
+    required this.supplierSocialLoginUsecase,
+    required this.buyerSocialLoginUsecase,
     required this.registerUsecase,
     required this.verifyOtpUsecase,
     required this.verifyOtpUsecaseFMCGSeller,
@@ -179,6 +185,35 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       (res) => SigninSuccess(data: res),
     ));
   }
+
+
+
+
+  Future<void> supplierSocialSignIn(SupplierSocialLoginParams params) async {
+    emit(SigninIsLoading());
+    final Either<Failure, LoginSuccess?> response =
+        await supplierSocialLoginUsecase(params);
+    emit(response.fold(
+      (failure) => SigninError(failure: failure),
+      (res) => SigninSuccess(data: res),
+    ));
+  }
+
+  Future<void> buyerSocialSignIn(SupplierSocialLoginParams params) async {
+    emit(SigninIsLoading());
+    final Either<Failure, BuyerLoginSuccess?> response =
+        await buyerSocialLoginUsecase(params);
+    emit(response.fold(
+      (failure) => SigninError(failure: failure),
+      (res) => BuyerSigninSuccess(data: res),
+    ));
+  }
+
+
+
+
+
+
 
   Future<void> buyerSignIn(SigninParams params) async {
     emit(SigninIsLoading());

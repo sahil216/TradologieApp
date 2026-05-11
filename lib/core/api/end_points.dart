@@ -36,6 +36,11 @@ class EndPoints {
   static String signIn(UserType userType) {
     return '$baseUrl/${userType.name}/login';
   }
+
+  static String supplierLoginWithSocialMedia =
+      '$baseUrl/Supplier/LoginWithSocialMedia';
+  static String buyerLoginWithSocialMedia =
+      '$baseUrl/Buyer/LoginWithSocialMedia';
   static String fmcgBaseUrlDistributor =
       'https://api.tradologie.com/FMCG';
   static String getProductsList = '$baseUrl/FMCG/FMCGBrandProuctList';
@@ -151,7 +156,9 @@ class EndPoints {
   static String fmcgQuotationList = '$baseUrl/FMCG/QuotationList';
   static String fmcgQuotationTranList = '$baseUrl/FMCG/QuotationTranList';
   static String fmcgAddQuotationCart = '$baseUrl/FMCG/AddQuotationCart';
-  static String fmcgBuyerQuotationList = '$baseUrl/FMCG/BuyerQuotationList';
+  static String fmcgBuyerQuotationCartList = '$baseUrl/FMCG/BuyerQuotationCartList';
+  static String fmcgDeleteQuotationCart = '$baseUrl/FMCG/DeleteQuotationCart';
+  static String fmcgAddBuyerQuotation = '$baseUrl/FMCG/AddBuyerQuotation';
 
   // Add Negotiation
   static String getCategoryList = '$baseUrlBuyer/category';

@@ -3,6 +3,6 @@
     <string name="app_name">Tradologie</string>
     <!-- Facebook Login: replace placeholders with your Meta App ID, Client token, and fb + App ID URL scheme -->
     <string name="facebook_app_id" translatable="false">979913211196843</string>
-    <string name="fb_login_protocol_scheme" translatable="false">e6f21b5ef29abcf4944b1c8812227893</string>
+    <string name="fb_login_protocol_scheme" translatable="false">fb979913211196843</string>
     <string name="facebook_client_token" translatable="false">cd8ff9010dc2f74131bdf8f7ae3559ec</string>
 </resources>

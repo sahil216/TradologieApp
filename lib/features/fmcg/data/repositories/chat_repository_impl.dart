@@ -36,9 +36,11 @@ import 'package:tradologie_app/features/fmcg/domain/entities/fmcg_quotation_tran
 import 'package:tradologie_app/features/fmcg/domain/repositories/chat_repositories.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_buyer_brand_interest_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_distributor_interest_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/add_buyer_quotation_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_quotation_cart_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_data_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/delete_quotation_cart_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_quotation_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_brands_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_distributor_list_usecase.dart';
@@ -396,6 +398,36 @@ class ChatRepositoryImpl implements ChatRepository {
       final response = await chatRemoteDataSource.addQuotationCart(params);
       if (response != null && response.success) {
         return Right(response.message);
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> deleteQuotationCart(
+      DeleteQuotationCartParams params) async {
+    try {
+      final response = await chatRemoteDataSource.deleteQuotationCart(params);
+      if (response != null && response.success) {
+        return Right(response.message);
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, int>> addBuyerQuotation(
+      AddBuyerQuotationParams params) async {
+    try {
+      final response = await chatRemoteDataSource.addBuyerQuotation(params);
+      if (response != null && response.success) {
+        final detail = response.data;
+        if (detail is int) return Right(detail);
+        return Right(int.tryParse(detail?.toString() ?? '') ?? 0);
       }
       return Left(UserFailure(response?.message, response?.code));
     } on Failure catch (e) {

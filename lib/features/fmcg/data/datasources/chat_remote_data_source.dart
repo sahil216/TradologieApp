@@ -4,8 +4,10 @@ import 'package:tradologie_app/core/response_wrapper/response_wrapper.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_buyer_brand_interest_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_distributor_interest_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_quotation_cart_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/add_buyer_quotation_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_data_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/delete_quotation_cart_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_quotation_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_brands_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_distributor_list_usecase.dart';
@@ -73,6 +75,12 @@ abstract class ChatRemoteDataSource {
       QuotationTranListParams params);
 
   Future<ResponseWrapper<dynamic>?> addQuotationCart(AddQuotationCartParams params);
+
+  Future<ResponseWrapper<dynamic>?> deleteQuotationCart(
+      DeleteQuotationCartParams params);
+
+  Future<ResponseWrapper<dynamic>?> addBuyerQuotation(
+      AddBuyerQuotationParams params);
 
   Future<ResponseWrapper<dynamic>?> getBuyerQuotationList(
       GetBuyerQuotationListParams params);
@@ -251,10 +259,28 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   }
 
   @override
+  Future<ResponseWrapper<dynamic>?> deleteQuotationCart(
+      DeleteQuotationCartParams params) async {
+    return await apiConsumer.post(
+      EndPoints.fmcgDeleteQuotationCart,
+      body: params.toJson(),
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> addBuyerQuotation(
+      AddBuyerQuotationParams params) async {
+    return await apiConsumer.post(
+      EndPoints.fmcgAddBuyerQuotation,
+      body: params.toJson(),
+    );
+  }
+
+  @override
   Future<ResponseWrapper<dynamic>?> getBuyerQuotationList(
       GetBuyerQuotationListParams params) async {
     return await apiConsumer.post(
-      EndPoints.fmcgBuyerQuotationList,
+      EndPoints.fmcgBuyerQuotationCartList,
       body: params.toJson(),
     );
   }

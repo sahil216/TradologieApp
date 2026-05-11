@@ -18,21 +18,25 @@ class BuyerLoginSuccessModel extends BuyerLoginSuccess {
     super.isComplete,
   });
 
-  factory BuyerLoginSuccessModel.fromJson(Map<String, dynamic> json) =>
-      BuyerLoginSuccessModel(
-        customerId: json["CustomerID"].toString(),
-        fullName: json["FullName"],
-        userId: json["UserID"],
-        apiVerificationCode: json["APIVerificationCode"],
-        userTimeZone: json["UserTimeZone"],
-        companyName: json["CompanyName"],
-        dob: json["DOB"],
-        gender: json["Gender"],
-        mobileNo: json["mobileNo"],
-        businessNo: json["BusinessNo"],
-        email: json["Email"],
-        registrationStatus: json["RegistrationStatus"],
-        verificationStatus: json["VerificationStatus"].toString(),
-        isComplete: json["IsComplete"],
-      );
+  factory BuyerLoginSuccessModel.fromJson(Map<String, dynamic> json) {
+    final fullName =
+        json["FullName"]?.toString() ?? json["CustomerName"]?.toString();
+    return BuyerLoginSuccessModel(
+      customerId: json["CustomerID"]?.toString(),
+      fullName: fullName,
+      userId: json["UserID"]?.toString(),
+      apiVerificationCode: json["APIVerificationCode"]?.toString(),
+      userTimeZone:
+          json["UserTimeZone"]?.toString() ?? json["SellerTimeZone"]?.toString(),
+      companyName: json["CompanyName"]?.toString(),
+      dob: json["DOB"]?.toString(),
+      gender: json["Gender"]?.toString(),
+      mobileNo: json["mobileNo"]?.toString() ?? json["MobileNo"]?.toString(),
+      businessNo: json["BusinessNo"]?.toString(),
+      email: json["Email"]?.toString(),
+      registrationStatus: json["RegistrationStatus"]?.toString(),
+      verificationStatus: json["VerificationStatus"]?.toString(),
+      isComplete: json["IsComplete"]?.toString(),
+    );
+  }
 }

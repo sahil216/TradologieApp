@@ -14,9 +14,14 @@ import '../../../../core/utils/secure_storage_service.dart';
 import '../../domain/usecases/register_usecase.dart';
 import '../../domain/usecases/send_otp_usecase.dart';
 import '../../domain/usecases/sign_in_usecase.dart';
+import '../../domain/usecases/supplier_social_login_usecase.dart';
 
 abstract class AuthenticationRemoteDataSource {
   Future<ResponseWrapper<dynamic>?> signIn(SigninParams params);
+  Future<ResponseWrapper<dynamic>?> supplierLoginWithSocialMedia(
+      SupplierSocialLoginParams params);
+  Future<ResponseWrapper<dynamic>?> buyerLoginWithSocialMedia(
+      SupplierSocialLoginParams params);
   Future<ResponseWrapper<dynamic>?> buyerSignIn(SigninParams params);
   Future<ResponseWrapper<dynamic>?> register(RegisterParams params);
 
@@ -74,6 +79,24 @@ class AuthenticationRemoteDataSourceImpl
     return await apiConsumer.post(
       EndPoints.signIn(UserType.supplier),
       body: await params.toJson(),
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> supplierLoginWithSocialMedia(
+      SupplierSocialLoginParams params) async {
+    return await apiConsumer.post(
+      EndPoints.supplierLoginWithSocialMedia,
+      body: params.toJson(),
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> buyerLoginWithSocialMedia(
+      SupplierSocialLoginParams params) async {
+    return await apiConsumer.post(
+      EndPoints.buyerLoginWithSocialMedia,
+      body: params.toJson(),
     );
   }
 

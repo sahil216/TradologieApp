@@ -79,7 +79,7 @@ class CommonAppbar extends StatelessWidget {
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [
-                              Color(0xFF042B4D), // dark navy at top
+                              Color(0xFFBBDEFB), // dark navy at top
                               Color(0xFFF4F4F4), // white at bottom
                             ],
                           ),

@@ -28,6 +28,7 @@ import '../../../../core/error/failures.dart';
 import '../entities/verify_otp_fmcg_seller.dart';
 import '../usecases/register_usecase.dart';
 import '../usecases/sign_in_usecase.dart';
+import '../usecases/supplier_social_login_usecase.dart';
 
 abstract class AuthenticationRepository {
 
@@ -39,6 +40,10 @@ abstract class AuthenticationRepository {
   Future<Either<Failure, VerifyOtpResult>> verifyOtpBuyer(
       VerifyOtpParams params);
   Future<Either<Failure, LoginSuccess?>> signIn(SigninParams params);
+  Future<Either<Failure, LoginSuccess?>> supplierLoginWithSocialMedia(
+      SupplierSocialLoginParams params);
+  Future<Either<Failure, BuyerLoginSuccess?>> buyerLoginWithSocialMedia(
+      SupplierSocialLoginParams params);
   Future<Either<Failure, BuyerLoginSuccess?>> buyerSignIn(SigninParams params);
   Future<Either<Failure, bool>> register(RegisterParams params);
   Future<Either<Failure, bool>> signOut(NoParams params);

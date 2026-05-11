@@ -18,9 +18,11 @@ import 'package:tradologie_app/features/fmcg/domain/entities/fmcg_quotation_list
 import 'package:tradologie_app/features/fmcg/domain/entities/fmcg_quotation_tran_item.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_buyer_brand_interest_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_distributor_interest_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/add_buyer_quotation_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_quotation_cart_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_data_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/delete_quotation_cart_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_quotation_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_brands_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_distributor_list_usecase.dart';
@@ -60,6 +62,8 @@ class ChatCubit extends Cubit<ChatState> {
   final GetProductsListForSellerUsecase getProductsListForSellerUsecase;
   final AddQuotationCartUsecase addQuotationCartUsecase;
   final GetBuyerQuotationListUsecase getBuyerQuotationListUsecase;
+  final DeleteQuotationCartUsecase deleteQuotationCartUsecase;
+  final AddBuyerQuotationUsecase addBuyerQuotationUsecase;
 
   ChatCubit(
       {required this.chatListUsecase,
@@ -81,7 +85,9 @@ class ChatCubit extends Cubit<ChatState> {
       required this.getFmcgQuotationTranListUsecase,
       required this.getProductsListForSellerUsecase,
       required this.addQuotationCartUsecase,
-      required this.getBuyerQuotationListUsecase})
+      required this.getBuyerQuotationListUsecase,
+      required this.deleteQuotationCartUsecase,
+      required this.addBuyerQuotationUsecase})
       : super(ChatInitial());
 
   Future<void> getChatList(ChatListParams params) async {
@@ -287,6 +293,34 @@ class ChatCubit extends Cubit<ChatState> {
     emit(response.fold(
       (failure) => BuyerQuotationListError(failure: failure),
       (items) => BuyerQuotationListSuccess(items: items),
+    ));
+  }
+
+  Future<void> deleteQuotationCart(DeleteQuotationCartParams params) async {
+    emit(DeleteQuotationCartLoading(quotationId: params.quotationId));
+    final Either<Failure, String> response =
+        await deleteQuotationCartUsecase(params);
+    emit(response.fold(
+      (failure) => DeleteQuotationCartError(
+        failure: failure,
+        quotationId: params.quotationId,
+      ),
+      (message) => DeleteQuotationCartSuccess(
+        quotationId: params.quotationId,
+        message: message,
+      ),
+    ));
+  }
+
+  Future<void> addBuyerQuotation(AddBuyerQuotationParams params) async {
+    emit(AddBuyerQuotationLoading());
+    final Either<Failure, int> response = await addBuyerQuotationUsecase(params);
+    emit(response.fold(
+      (failure) => AddBuyerQuotationError(failure: failure),
+      (quotationId) => AddBuyerQuotationSuccess(
+        quotationId: quotationId,
+        message: 'Quotation added successfully',
+      ),
     ));
   }
 }

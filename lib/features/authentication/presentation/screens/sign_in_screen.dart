@@ -24,6 +24,7 @@ import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/sign_in_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/supplier_social_login_usecase.dart';
 
 import '../../../../config/routes/app_router.dart';
 import '../../../../core/utils/app_colors.dart';
@@ -37,6 +38,9 @@ import '../cubit/authentication_cubit.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
+
+  /// Set to `true` when you want the Facebook login button visible.
+  static const bool showFacebookLogin = false;
 
   @override
   State<SignInScreen> createState() => _SignInScreenState();
@@ -132,11 +136,85 @@ class _SignInScreenState extends State<SignInScreen>
       await FirebaseAuth.instance.signInWithCredential(credential);
 
       if (!mounted) return;
-      Navigator.pushNamedAndRemoveUntil(
+
+      if (Constants.isFmcg) {
+        if (Constants.isBuyer) {
+        } else {
+
+        }
+      } else {
+        if (Constants.isBuyer) {
+          final firebaseUser = FirebaseAuth.instance.currentUser;
+          final idToken = await firebaseUser?.getIdToken();
+          final email = firebaseUser?.email ?? googleUser.email;
+          final displayName =
+              firebaseUser?.displayName ?? googleUser.displayName ?? '';
+          if (idToken == null ||
+              idToken.isEmpty ||
+              email == null ||
+              email.isEmpty) {
+            CommonToast.error("Google sign-in failed");
+            return;
+          }
+          final fcmToken =
+              await secureStorageService.read(AppStrings.fcmToken) ?? '';
+          if (!mounted) return;
+
+         // CommonToast.normal("id is $displayName");
+         BlocProvider.of<AuthenticationCubit>(context).buyerSocialSignIn(
+            SupplierSocialLoginParams(
+              token: "2018APR031848",
+              userId: email,
+              name: displayName,
+              socialMedia: 'Google',
+              manufacturer: manufacturer,
+              model: model,
+              osVersionRelease: osVersionRelease,
+              appVersion: appVersion,
+              fcmToken: fcmToken.isNotEmpty ? fcmToken : idToken,
+              osType: Platform.isAndroid ? 'Android' : 'iOS',
+              deviceId: deviceId,
+            ),
+          );
+        } else {
+          final firebaseUser = FirebaseAuth.instance.currentUser;
+          final idToken = await firebaseUser?.getIdToken();
+          final email = firebaseUser?.email ?? googleUser.email;
+          final displayName =
+              firebaseUser?.displayName ?? googleUser.displayName ?? '';
+          if (idToken == null ||
+              idToken.isEmpty ||
+              email == null ||
+              email.isEmpty) {
+            CommonToast.error("Google sign-in failed");
+            return;
+          }
+          final fcmToken =
+              await secureStorageService.read(AppStrings.fcmToken) ?? '';
+          if (!mounted) return;
+          BlocProvider.of<AuthenticationCubit>(context).supplierSocialSignIn(
+            SupplierSocialLoginParams(
+              token: "2018APR031848",
+              userId: email,
+              name: displayName,
+              socialMedia: 'Google',
+              manufacturer: manufacturer,
+              model: model,
+              osVersionRelease: osVersionRelease,
+              appVersion: appVersion,
+              fcmToken: fcmToken.isNotEmpty ? fcmToken : idToken,
+              osType: Platform.isAndroid ? 'Android' : 'iOS',
+              deviceId: deviceId,
+            ),
+          );
+        }
+      }
+
+      /* Navigator.pushNamedAndRemoveUntil(
         context,
         Routes.mainRoute,
         (route) => false,
-      );
+      );*/
     } catch (e) {
       if (!mounted) return;
       CommonToast.error("Google sign-in failed");
@@ -425,30 +503,31 @@ class _SignInScreenState extends State<SignInScreen>
                                           ),
                                         ),
                                       ),
-                                      SizedBox(height: 12),
-                                      SizedBox(
-                                        width:
-                                            r.isTablet ? 420 : double.infinity,
-                                        child: CommonButton(
-                                          onPressed:(){
-                                            CommonToast.normal("facebook login coming soon ");
-                                          },
-
-                                          //_signInWithFacebook,
-                                          text: "Continue with Facebook",
-                                          backgroundColor: AppColors.white,
-                                          borderSide: BorderSide(
-                                            color: AppColors.defaultText,
-                                            width: 2,
-                                          ),
-                                          icon: Image.asset(ImgAssets.facebook),
-                                          textStyle: TextStyleConstants.medium(
-                                            context,
-                                            fontSize: 16,
-                                            color: AppColors.black,
+                                      if (SignInScreen.showFacebookLogin) ...[
+                                        SizedBox(height: 12),
+                                        SizedBox(
+                                          width: r.isTablet
+                                              ? 420
+                                              : double.infinity,
+                                          child: CommonButton(
+                                            onPressed: _signInWithFacebook,
+                                            text: "Continue with Facebook",
+                                            backgroundColor: AppColors.white,
+                                            borderSide: BorderSide(
+                                              color: AppColors.defaultText,
+                                              width: 2,
+                                            ),
+                                            icon:
+                                                Image.asset(ImgAssets.facebook),
+                                            textStyle:
+                                                TextStyleConstants.medium(
+                                              context,
+                                              fontSize: 16,
+                                              color: AppColors.black,
+                                            ),
                                           ),
                                         ),
-                                      ),
+                                      ],
                                       SizedBox(height: 12),
                                       SizedBox(
                                         width:

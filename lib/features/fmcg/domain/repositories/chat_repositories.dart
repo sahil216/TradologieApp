@@ -16,9 +16,11 @@ import 'package:tradologie_app/features/fmcg/domain/entities/buyer_quotation_ite
 import 'package:tradologie_app/features/fmcg/domain/entities/get_products_list.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_buyer_brand_interest_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_distributor_interest_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/add_buyer_quotation_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_quotation_cart_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_data_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/chat_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/delete_quotation_cart_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_quotation_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_buyer_brands_list_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_distributor_list_usecase.dart';
@@ -87,6 +89,11 @@ abstract class ChatRepository {
       QuotationTranListParams params);
 
   Future<Either<Failure, String>> addQuotationCart(AddQuotationCartParams params);
+
+  Future<Either<Failure, String>> deleteQuotationCart(
+      DeleteQuotationCartParams params);
+
+  Future<Either<Failure, int>> addBuyerQuotation(AddBuyerQuotationParams params);
 
   Future<Either<Failure, List<BuyerQuotationItem>>> getBuyerQuotationList(
       GetBuyerQuotationListParams params);

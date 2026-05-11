@@ -49,6 +49,7 @@ import '../../domain/repositories/authentication_repository.dart';
 import '../../domain/usecases/register_usecase.dart';
 import '../../domain/usecases/send_otp_usecase.dart';
 import '../../domain/usecases/sign_in_usecase.dart';
+import '../../domain/usecases/supplier_social_login_usecase.dart';
 import '../../domain/usecases/verify_otp_usecase.dart';
 import '../datasources/authentication_remote_data_source.dart';
 import '../models/buyer_login_success_model.dart';
@@ -161,6 +162,100 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
             AppStrings.vendorId, response.data["VendorID"].toString());
 
         return Right(LoginSuccessModel.fromJson(response.data));
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, LoginSuccess?>> supplierLoginWithSocialMedia(
+      SupplierSocialLoginParams params) async {
+    try {
+      final response = await authenticationRemoteDataSource
+          .supplierLoginWithSocialMedia(params);
+      if (response != null && response.success) {
+        Constants.isLogin = true;
+        SecureStorageService secureStorage = SecureStorageService();
+
+        await secureStorage.write(AppStrings.appSession, "true");
+        Constants.token = response.data["APIVerificationCode"] ?? "";
+
+        await secureStorage.write(AppStrings.apiVerificationCode,
+            response.data["APIVerificationCode"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.imageExist, response.data["ImageExist"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.sellerTimeZone, response.data["SellerTimeZone"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.mobileNo, response.data["MobileNo"] ?? "");
+
+        await secureStorage.write(AppStrings.registrationStatus,
+            response.data["RegistrationStatus"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.projectType, response.data["Project_Type"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.userId, response.data["UserID"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.vendorName, response.data["VendorName"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.vendorId, response.data["VendorID"].toString());
+
+        return Right(LoginSuccessModel.fromJson(response.data));
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, BuyerLoginSuccess?>> buyerLoginWithSocialMedia(
+      SupplierSocialLoginParams params) async {
+    try {
+      final response = await authenticationRemoteDataSource
+          .buyerLoginWithSocialMedia(params);
+      if (response != null && response.success) {
+        Constants.isLogin = true;
+        SecureStorageService secureStorage = SecureStorageService();
+        final d = response.data;
+
+        await secureStorage.write(AppStrings.appSession, "true");
+        Constants.token = d["APIVerificationCode"] ?? "";
+
+        await secureStorage.write(
+            AppStrings.apiVerificationCode, d["APIVerificationCode"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.mobileNo, d["mobileNo"] ?? d["MobileNo"] ?? "");
+
+        await secureStorage.write(AppStrings.registrationStatus,
+            d["RegistrationStatus"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.projectType, d["Project_Type"] ?? "");
+
+        await secureStorage.write(AppStrings.userId, d["UserID"] ?? "");
+
+        await secureStorage.write(
+            AppStrings.customerId, d["CustomerID"]?.toString() ?? "");
+
+        await secureStorage.write(AppStrings.customerName,
+            (d["FullName"] ?? d["CustomerName"] ?? "").toString());
+        await secureStorage.write(
+            AppStrings.sellerTimeZone,
+            d["UserTimeZone"] ?? d["SellerTimeZone"] ?? "");
+
+        return Right(BuyerLoginSuccessModel.fromJson(
+            Map<String, dynamic>.from(d as Map)));
       }
       return Left(UserFailure(response?.message, response?.code));
     } on Failure catch (e) {

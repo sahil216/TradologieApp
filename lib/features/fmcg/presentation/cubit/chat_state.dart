@@ -435,6 +435,65 @@ class AddQuotationCartError extends ChatState {
   List<Object> get props => [failure];
 }
 
+class DeleteQuotationCartLoading extends ChatState {
+  final int quotationId;
+
+  const DeleteQuotationCartLoading({required this.quotationId});
+
+  @override
+  List<Object> get props => [quotationId];
+}
+
+class DeleteQuotationCartSuccess extends ChatState {
+  final int quotationId;
+  final String message;
+
+  const DeleteQuotationCartSuccess({
+    required this.quotationId,
+    required this.message,
+  });
+
+  @override
+  List<Object> get props => [quotationId, message];
+}
+
+class DeleteQuotationCartError extends ChatState {
+  final Failure failure;
+  final int quotationId;
+
+  const DeleteQuotationCartError({
+    required this.failure,
+    required this.quotationId,
+  });
+
+  @override
+  List<Object> get props => [failure, quotationId];
+}
+
+class AddBuyerQuotationLoading extends ChatState {}
+
+class AddBuyerQuotationSuccess extends ChatState {
+  final int quotationId;
+  final String message;
+
+  const AddBuyerQuotationSuccess({
+    required this.quotationId,
+    required this.message,
+  });
+
+  @override
+  List<Object> get props => [quotationId, message];
+}
+
+class AddBuyerQuotationError extends ChatState {
+  final Failure failure;
+
+  const AddBuyerQuotationError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
 class BuyerQuotationListLoading extends ChatState {}
 
 class BuyerQuotationListSuccess extends ChatState {

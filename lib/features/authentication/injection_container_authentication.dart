@@ -27,7 +27,9 @@ import 'domain/usecases/buyer_verify_otp_usecase.dart';
 import 'domain/usecases/verify_otp_usecase.dart';
 import 'domain/usecases/register_usecase.dart';
 import 'domain/usecases/send_otp_usecase.dart';
+import 'domain/usecases/buyer_social_login_usecase.dart';
 import 'domain/usecases/sign_in_usecase.dart';
+import 'domain/usecases/supplier_social_login_usecase.dart';
 
 final sl = GetIt.instance;
 
@@ -35,6 +37,8 @@ Future<void> init() async {
   //! Blocs
   sl.registerFactory<AuthenticationCubit>(() => AuthenticationCubit(
         signInUsecase: sl(),
+        supplierSocialLoginUsecase: sl(),
+        buyerSocialLoginUsecase: sl(),
         registerUsecase: sl(),
 
 
@@ -110,6 +114,10 @@ Future<void> init() async {
 
   sl.registerLazySingleton<SignInUsecase>(
       () => SignInUsecase(authenticationRepository: sl()));
+  sl.registerLazySingleton<SupplierSocialLoginUsecase>(
+      () => SupplierSocialLoginUsecase(authenticationRepository: sl()));
+  sl.registerLazySingleton<BuyerSocialLoginUsecase>(
+      () => BuyerSocialLoginUsecase(authenticationRepository: sl()));
   sl.registerLazySingleton<RegisterUsecase>(
       () => RegisterUsecase(authenticationRepository: sl()));
   sl.registerLazySingleton<BuyerSigninUsecase>(

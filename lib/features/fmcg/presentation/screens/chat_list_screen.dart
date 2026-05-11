@@ -340,9 +340,15 @@ class ChatRow extends StatelessWidget {
                       Row(
                         children: [
                           Expanded(
-                            child: Text(
+                            child: /*Text(
                                 "${Constants.isBuyer ? enquiry.userId ?? "" : enquiry.name ?? ""} ${Constants.isBuyer ? "" : "-"} ${Constants.isBuyer ? "" : enquiry.mobile ?? ""}",
-                                style: T.title,
+                               */
+
+                  Text(
+                  "${Constants.isBuyer
+                  ? (enquiry.userId ?? "")
+                      : "${enquiry.name ?? ""} - ${enquiry.countryCode ?? ""}${enquiry.mobile ?? ""}"}",
+                style: T.title,
                                 overflow: TextOverflow.ellipsis),
                           ),
                         ],
