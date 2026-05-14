@@ -41,7 +41,8 @@ class CommonStrings {
 
   static const String tradologieWebsitewithouthttp = 'Tradologie.com';
 
-  static const String sendOtpViaWhatsapp = "Send OTP via WhatsApp";
+  static const String sendOtpViaWhatsapp = "Register / Login via WhatsApp";
+  static const String loginViaWhatsapp = "Login via WhatsApp";
   static const String loginOrSignup = "Login or Signup";
 
   static const String verifyOtp = "Verify OTP";

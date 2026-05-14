@@ -29,9 +29,9 @@ import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../cubit/authentication_cubit.dart';
 
-
 class FmcgSellerSignin extends StatefulWidget {
   final bool isBuyer;
+
   const FmcgSellerSignin({super.key, required this.isBuyer});
 
   @override
@@ -124,7 +124,6 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
 
   @override
   Widget build(BuildContext context) {
-
     final r = Responsive(context);
 
     return GestureDetector(
@@ -248,7 +247,6 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
                                           return null;
                                         },
                                       ),
-
                                       SizedBox(height: 20),
                                       CommonButton(
                                         onPressed: () async {
@@ -302,7 +300,6 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
                                         ),
                                       ),
                                       SizedBox(height: 20),
-
                                       InkWell(
                                         onTap: widget.isBuyer == true
                                             ? () {
@@ -357,24 +354,23 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
                                       ),
                                       SizedBox(height: 20),
                                       SizedBox(
-                                        width: r.isTablet
-                                            ? 420
-                                            : double.infinity,
+                                        width:
+                                            r.isTablet ? 420 : double.infinity,
                                         child: CommonButton(
                                           onPressed: () {
-                                          //  Navigator.pop(context);
-
+                                            //  Navigator.pop(context);
 
                                             // code by Gopal
 
                                             sl<NavigationService>().pushNamed(
                                                 Routes.sendOtpScreen);
-
                                           },
-                                          text: CommonStrings
-                                              .sendOtpViaWhatsapp,
-                                          backgroundColor:
-                                              AppColors.white,
+                                          text: Constants.isFmcg &&
+                                                  Constants.isBuyer
+                                              ? CommonStrings.loginViaWhatsapp
+                                              : CommonStrings
+                                                  .sendOtpViaWhatsapp,
+                                          backgroundColor: AppColors.white,
                                           borderSide: BorderSide(
                                             color: AppColors
                                                 .green, // or any color you want
@@ -382,9 +378,7 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
                                           ),
                                           icon: Image.asset(
                                               ImgAssets.whatsappIcon),
-                                          textStyle:
-                                              TextStyleConstants
-                                                  .medium(
+                                          textStyle: TextStyleConstants.medium(
                                             context,
                                             fontSize: 16,
                                             color: AppColors.black,

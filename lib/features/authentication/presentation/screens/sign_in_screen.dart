@@ -537,8 +537,11 @@ class _SignInScreenState extends State<SignInScreen>
                                             sl<NavigationService>().pushNamed(
                                                 Routes.sendOtpScreen);
                                           },
-                                          text:
-                                              CommonStrings.sendOtpViaWhatsapp,
+                                          text: Constants.isFmcg &&
+                                                  Constants.isBuyer
+                                              ? CommonStrings.loginViaWhatsapp
+                                              : CommonStrings
+                                                  .sendOtpViaWhatsapp,
                                           backgroundColor: AppColors.white,
                                           borderSide: BorderSide(
                                             color: AppColors

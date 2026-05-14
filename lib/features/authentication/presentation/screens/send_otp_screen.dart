@@ -428,8 +428,11 @@ class _SendOtpScreenState extends State<SendOtpScreen>
                                                     CommonToast.error(
                                                         "Please accept Terms and Conditions");
                                                   },
-                                            text: CommonStrings
-                                                .sendOtpViaWhatsapp,
+                                            text: Constants.isFmcg &&
+                                                    Constants.isBuyer
+                                                ? CommonStrings.loginViaWhatsapp
+                                                : CommonStrings
+                                                    .sendOtpViaWhatsapp,
                                             backgroundColor: AppColors.white,
                                             borderSide: BorderSide(
                                               color: AppColors

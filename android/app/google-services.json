@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "135753122403-t0npsdbjia1p3e0d5v0vofesr1jktgrg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tradologie.app",
+            "certificate_hash": "d96171ef49218bec53a736c7e57d82731d7d24f5"
+          }
+        },
+        {
           "client_id": "135753122403-3hgdkc1aumf61j12h0up61d22nfr2a9e.apps.googleusercontent.com",
           "client_type": 3
         }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:tradologie_app/config/routes/app_router.dart';
@@ -157,130 +158,150 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
 
                         const SizedBox(height: 28),
 
-                        /// GENERAL SECTION
                         _sectionTitle(context, "GENERAL"),
 
-                        _ultraTile(
-                          icon: Icons.contact_support_outlined,
-                          title: "Contact Us",
-                          onTap: () {
-                            sl<NavigationService>()
-                                .pushNamed(Routes.contactUsScreen);
-                          },
-                        ),
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                left: 10, top: 10, right: 10, bottom: 10),
+                            child: Column(
+                              children: [
+                                _ultraTile(
+                                    icon: Icons.support_agent,
+                                    title: "Contact Us",
+                                    onTap: () {
+                                      sl<NavigationService>()
+                                          .pushNamed(Routes.contactUsScreen);
+                                    },
+                                    showDivider: true),
+                                if (Constants.isFmcg && !Constants.isBuyer) ...{
+                                  _ultraTile(
+                                      icon: Icons.query_stats_outlined,
+                                      title: "Chat Bot Queries",
+                                      onTap: () {
+                                        sl<NavigationService>().pushNamed(
+                                            Routes.chatbotqueryscreen);
+                                      },
+                                      showDivider: true),
+                                  _ultraTile(
+                                    icon: Icons.badge_rounded,
+                                    title: "My Catalogue",
+                                    showDivider: true,
+                                    onTap: () async {
+                                      final brandId = await secureStorage
+                                              .read(AppStrings.brandId) ??
+                                          '0';
+                                      final storedBrandName =
+                                          await secureStorage
+                                              .read(AppStrings.brandName);
+                                      final brandName = (storedBrandName !=
+                                                  null &&
+                                              storedBrandName.isNotEmpty)
+                                          ? storedBrandName
+                                          : (await secureStorage
+                                                  .read(AppStrings.fmcgName)) ??
+                                              '';
 
-
-
-                        if (Constants.isFmcg && !Constants.isBuyer)...{
-                          _ultraTile(
-                            icon: Icons.smart_toy,
-                            title: "Chat Bot Queries",
-                            onTap: () {
-                              sl<NavigationService>()
-                                  .pushNamed(Routes.chatbotqueryscreen);
-                            },
-                          ),
-
-                            _ultraTile(
-                          icon: Icons.category,
-                          title: "My Catalogue",
-                          onTap: () async {
-                            final brandId =
-                                await secureStorage.read(AppStrings.brandId) ??
-                                    '0';
-                            final storedBrandName =
-                                await secureStorage.read(AppStrings.brandName);
-                            final brandName = (storedBrandName != null &&
-                                    storedBrandName.isNotEmpty)
-                                ? storedBrandName
-                                : (await secureStorage.read(
-                                        AppStrings.fmcgName)) ??
-                                    '';
-
-                            if (!context.mounted) return;
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => FmcgProductsMycatalogue(
-                                  params: ProductsListMyCatalogueParams(
-                                    brandId: brandId,
-                                    brandName: brandName,
+                                      if (!context.mounted) return;
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              FmcgProductsMycatalogue(
+                                            params:
+                                                ProductsListMyCatalogueParams(
+                                              brandId: brandId,
+                                              brandName: brandName,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   ),
+                                  _ultraTile(
+                                    icon: Icons.receipt_long_outlined,
+                                    title: "Quotation List",
+                                    showDivider: true,
+                                    onTap: () {
+                                      sl<NavigationService>().pushNamed(
+                                        Routes.fmcgQuotationListScreen,
+                                      );
+                                    },
+                                  ),
+                                },
+                                _ultraTile(
+                                  icon: Icons.share_outlined,
+                                  title: "Share App",
+                                  showDivider: false,
+                                  onTap: () {
+                                    SharePlus.instance.share(
+                                      ShareParams(
+                                        text:
+                                            '${Constants.name} invited you to try the Tradologie app! https://tradologie.com/app/',
+                                      ),
+                                    );
+                                  },
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-
-                          _ultraTile(
-                            icon: Icons.receipt_long_outlined,
-                            title: "Quotation List",
-                            onTap: () {
-                              sl<NavigationService>().pushNamed(
-                                Routes.fmcgQuotationListScreen,
-                              );
-                            },
+                              ],
+                            ),
                           ),
-                        },
-
-
-                        _ultraTile(
-                          icon: Icons.share_outlined,
-                          title: "Share App",
-                          onTap: () {
-                            SharePlus.instance.share(
-                              ShareParams(
-                                text:
-                                    '${Constants.name} invited you to try the Tradologie app! https://tradologie.com/app/',
-                              ),
-                            );
-                          },
                         ),
 
                         const SizedBox(height: 24),
 
-                        /// ACCOUNT SECTION
                         _sectionTitle(context, "ACCOUNT"),
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                left: 10, top: 10, right: 10, bottom: 10),
+                            child: Column(
+                              children: [
+                                _ultraTile(
+                                  icon: Icons.delete_outline,
+                                  title: "Delete Account",
+                                  color: Colors.redAccent,
+                                  showDivider: true,
+                                  onTap: () async {
+                                    String? result = await showInputDialog(context);
 
-                        _ultraTile(
-                          icon: Icons.delete_outline,
-                          title: "Delete Account",
-                          color: Colors.redAccent,
-                          onTap: () async {
-                            String? result = await showInputDialog(context);
-
-                            if (result != null && result.isNotEmpty) {
-                              if (!context.mounted) return;
-                              context.read<AuthenticationCubit>().deleteAccount(
-                                    DeleteAccountParams(
-                                      token: await secureStorage.read(
+                                    if (result != null && result.isNotEmpty) {
+                                      if (!context.mounted) return;
+                                      context.read<AuthenticationCubit>().deleteAccount(
+                                        DeleteAccountParams(
+                                          token: await secureStorage.read(
                                               AppStrings.apiVerificationCode) ??
-                                          "",
-                                      message: result,
-                                      customerID: Constants.isBuyer
-                                          ? await secureStorage.read(
-                                                  AppStrings.customerId) ??
-                                              ""
-                                          : await secureStorage
-                                                  .read(AppStrings.vendorId) ??
                                               "",
-                                    ),
-                                  );
-                            }
-                          },
+                                          message: result,
+                                          customerID: Constants.isBuyer
+                                              ? await secureStorage.read(
+                                              AppStrings.customerId) ??
+                                              ""
+                                              : await secureStorage
+                                              .read(AppStrings.vendorId) ??
+                                              "",
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
+
+                                _ultraTile(
+                                  icon: Icons.power_settings_new,
+                                  title: "Logout",
+                                  color: Colors.redAccent,
+                                  showDivider: false,
+                                  onTap: () {
+                                    AnalyticsService.logEvent("logout_clicked");
+                                    context
+                                        .read<AuthenticationCubit>()
+                                        .signOut(NoParams());
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
 
-                        _ultraTile(
-                          icon: Icons.logout_rounded,
-                          title: "Logout",
-                          color: Colors.redAccent,
-                          onTap: () {
-                            AnalyticsService.logEvent("logout_clicked");
-                            context
-                                .read<AuthenticationCubit>()
-                                .signOut(NoParams());
-                          },
-                        ),
 
                         const SizedBox(height: 28),
 
@@ -405,8 +426,7 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
           Expanded(
             child: CommonText(
               Constants.name,
-              style: TextStyleConstants.semiBold(
-                context,
+              style: GoogleFonts.manrope(
                 fontSize: 18,
               ),
             ),
@@ -420,14 +440,53 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
     );
   }
 
-  Widget _sectionTitle(BuildContext context, String title) {
+  /* Widget _sectionTitle(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: CommonText(
         title,
-        style: TextStyleConstants.semiBold(
-          context,
-          fontSize: 13,
+        style: GoogleFonts.inter(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+            color: Colors.black38
+        ),
+      ),
+    );
+  }*/
+
+  Widget _sectionTitle(BuildContext context, String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Center(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 30,
+              child: Divider(
+                color: Colors.black26,
+                thickness: 2,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: CommonText(
+                title,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black38,
+                ),
+              ),
+            ),
+            Container(
+              width: 30,
+              child: Divider(
+                color: Colors.black26,
+                thickness: 2,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -438,35 +497,49 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
     required String title,
     required VoidCallback onTap,
     Color? color,
+    required bool showDivider,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: InkWell(
-        borderRadius: BorderRadius.circular(14),
+        // borderRadius: BorderRadius.circular(14),
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 14,
-            vertical: 14,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.grey.shade100,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Row(
-            children: [
-              Icon(icon, size: 22, color: color ?? Colors.black87),
-              const SizedBox(width: 14),
-              Expanded(
-                child: CommonText(
-                  title,
-                  style: TextStyleConstants.medium(context),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 5,
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Icon(icon, size: 22, color: color ?? Colors.black87),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: GoogleFonts.manrope(
+                            fontSize: 14, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    const Icon(
+                      Icons.arrow_forward_ios,
+                      size: 14,
+                      color: Colors.black26,
+                    ),
+                  ],
                 ),
-              ),
-              const Icon(Icons.arrow_forward_ios, size: 14),
-            ],
-          ),
-        ),
+                if (showDivider)
+                  const Padding(
+                    padding: EdgeInsets.only(left: 0, top: 17, right: 0),
+                    child: Divider(
+                      height: 1,
+                      thickness: 0.50,
+                      color: Colors.black12,
+                    ),
+                  ),
+              ],
+            )),
       ),
     );
   }
