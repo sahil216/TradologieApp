@@ -50,7 +50,7 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
     super.initState();
     _appCubit = BlocProvider.of<AppCubit>(context);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       _checkVersion();
       getName();
     });

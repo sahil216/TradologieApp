@@ -7,5 +7,8 @@ class NavigationCubit extends Cubit<int> {
 
   void setTab(int index) => emit(index);
 
+  /// Tab 0: Brand Hub (buyer) / Distributor Enquiry (seller).
+  void resetToHomeTab() => emit(0);
+
   void goToChat() => emit(1); // Chats tab
 }

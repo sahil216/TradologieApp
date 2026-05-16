@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
@@ -19,6 +21,8 @@ import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_signin_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/supplier_social_login_usecase.dart';
+import 'package:tradologie_app/features/fmcg/presentation/fmcg_login_navigation.dart';
 import 'package:tradologie_app/injection_container.dart';
 
 import '../../../../config/routes/app_router.dart';
@@ -114,6 +118,63 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
   final showPassword = ValueNotifier(false);
   final formKey = GlobalKey<FormState>();
 
+  Future<void> _signInWithGoogle() async {
+    if (!Platform.isAndroid) {
+      return;
+    }
+    try {
+      final google = GoogleSignIn.instance;
+      await google.initialize();
+      final GoogleSignInAccount googleUser = await google.authenticate();
+
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      if (!mounted) return;
+
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+      final idToken = await firebaseUser?.getIdToken();
+      final email = firebaseUser?.email ?? googleUser.email;
+      final displayName =
+          firebaseUser?.displayName ?? googleUser.displayName ?? '';
+      if (idToken == null || idToken.isEmpty || email.trim().isEmpty) {
+        CommonToast.error('Google sign-in failed');
+        return;
+      }
+      final fcmToken =
+          await secureStorageService.read(AppStrings.fcmToken) ?? '';
+      if (!mounted) return;
+
+      final params = SupplierSocialLoginParams(
+        token: '2018APR031848',
+        userId: email,
+        name: displayName,
+        socialMedia: 'Google',
+        manufacturer: manufacturer,
+        model: model,
+        osVersionRelease: osVersionRelease,
+        appVersion: appVersion,
+        fcmToken: fcmToken.isNotEmpty ? fcmToken : idToken,
+        osType: Platform.isAndroid ? 'Android' : 'iOS',
+        deviceId: deviceId,
+      );
+
+      final cubit = context.read<AuthenticationCubit>();
+      if (widget.isBuyer) {
+        cubit.fmcgBuyerSocialSignIn(params);
+      } else {
+        cubit.fmcgSellerSocialSignIn(params);
+      }
+    } catch (_) {
+      if (!mounted) return;
+      CommonToast.error('Google sign-in failed');
+    }
+  }
+
   @override
   void dispose() {
     textEmailController.dispose();
@@ -134,7 +195,10 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
           listener: (context, state) async {
             if (state is FmcgSellerSigninSuccess) {
               Constants.isFmcg = true;
+              Constants.isBuyer = widget.isBuyer;
               secureStorageService.write(AppStrings.isFmcg, "true");
+              secureStorageService.write(
+                  AppStrings.isBuyer, widget.isBuyer.toString());
               if (state.data.fmcgUserDetail?.fromDate != "-" &&
                   state.data.fmcgUserDetail?.toDate != "-") {
                 Constants().hideSensitiveData = Constants().isTodayInRange(
@@ -143,24 +207,18 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
               } else {
                 Constants().hideSensitiveData = true;
               }
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                Routes.fmcgMainScreen,
-                (route) => false,
-              );
+              navigateToFmcgMainAfterLogin(context);
             }
             if (state is FmcgSellerSigninError) {
               CommonToast.showFailureToast(state.failure);
             }
             if (state is FmcgBuyerSigninSuccess) {
               Constants.isFmcg = true;
+              Constants.isBuyer = widget.isBuyer;
               secureStorageService.write(AppStrings.isFmcg, "true");
-
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                Routes.fmcgMainScreen,
-                (route) => false,
-              );
+              secureStorageService.write(
+                  AppStrings.isBuyer, widget.isBuyer.toString());
+              navigateToFmcgMainAfterLogin(context);
             }
             if (state is FmcgBuyerSigninError) {
               CommonToast.showFailureToast(state.failure);
@@ -281,7 +339,7 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
                                             FocusManager.instance.primaryFocus
                                                 ?.unfocus();
 
-                                            Constants.isBuyer == true
+                                            widget.isBuyer
                                                 ? BlocProvider.of<
                                                             AuthenticationCubit>(
                                                         context)
@@ -299,59 +357,40 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
                                           color: AppColors.white,
                                         ),
                                       ),
-                                      SizedBox(height: 20),
-                                      InkWell(
-                                        onTap: widget.isBuyer == true
-                                            ? () {
-                                                sl<NavigationService>().pushNamed(
-                                                    Routes
-                                                        .fmcgRegisterSellerDistributorForm,
-                                                    arguments: true);
-                                              }
-                                            : () {
-                                                sl<NavigationService>().pushNamed(
-                                                    Routes
-                                                        .fmcgRegisterSellerDistributorForm,
-                                                    arguments: false);
-                                              },
-                                        child: Center(
-                                          child: Constants.isBuyer == true
-                                              ? RichText(
-                                                  text: TextSpan(
-                                                    text:
-                                                        "Don't have an account? ",
-                                                    style: TextStyleConstants
-                                                        .regular(
-                                                      context,
-                                                      fontSize: 16,
-                                                      color:
-                                                          AppColors.defaultText,
-                                                    ),
-                                                    children: [
-                                                      TextSpan(
-                                                        text: "Register Now",
-                                                        style:
-                                                            TextStyleConstants
-                                                                .semiBold(
-                                                          context,
-                                                          fontSize: 16,
-                                                          color: AppColors.blue,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                )
-                                              : CommonText(
-                                                  "Register New Brand",
-                                                  style: TextStyleConstants
-                                                      .semiBold(
-                                                    context,
-                                                    fontSize: 16,
-                                                    color: AppColors.blue,
-                                                  ),
-                                                ),
+                                      if (Platform.isAndroid) ...[
+                                        SizedBox(height: 20),
+                                        Center(
+                                          child: CommonText(
+                                            'OR',
+                                            style: TextStyleConstants.regular(
+                                              context,
+                                              fontSize: 16,
+                                              color: AppColors.defaultText,
+                                            ),
+                                          ),
                                         ),
-                                      ),
+                                        SizedBox(height: 20),
+                                        SizedBox(
+                                          width:
+                                              r.isTablet ? 420 : double.infinity,
+                                          child: CommonButton(
+                                            onPressed: _signInWithGoogle,
+                                            text: 'Continue with Gmail',
+                                            backgroundColor: AppColors.white,
+                                            borderSide: BorderSide(
+                                              color: AppColors.red,
+                                              width: 2,
+                                            ),
+                                            icon: Image.asset(ImgAssets.google),
+                                            textStyle:
+                                                TextStyleConstants.medium(
+                                              context,
+                                              fontSize: 16,
+                                              color: AppColors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                       SizedBox(height: 20),
                                       SizedBox(
                                         width:
@@ -382,6 +421,59 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
                                             context,
                                             fontSize: 16,
                                             color: AppColors.black,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: 20),
+                                      InkWell(
+                                        onTap: widget.isBuyer == true
+                                            ? () {
+                                          sl<NavigationService>().pushNamed(
+                                              Routes
+                                                  .fmcgRegisterSellerDistributorForm,
+                                              arguments: true);
+                                        }
+                                            : () {
+                                          sl<NavigationService>().pushNamed(
+                                              Routes
+                                                  .fmcgRegisterSellerDistributorForm,
+                                              arguments: false);
+                                        },
+                                        child: Center(
+                                          child: Constants.isBuyer == true
+                                              ? RichText(
+                                            text: TextSpan(
+                                              text:
+                                              "Don't have an account? ",
+                                              style: TextStyleConstants
+                                                  .regular(
+                                                context,
+                                                fontSize: 16,
+                                                color:
+                                                AppColors.defaultText,
+                                              ),
+                                              children: [
+                                                TextSpan(
+                                                  text: "Register Now",
+                                                  style:
+                                                  TextStyleConstants
+                                                      .semiBold(
+                                                    context,
+                                                    fontSize: 16,
+                                                    color: AppColors.blue,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                              : CommonText(
+                                            "Register New Brand",
+                                            style: TextStyleConstants
+                                                .semiBold(
+                                              context,
+                                              fontSize: 16,
+                                              color: AppColors.blue,
+                                            ),
                                           ),
                                         ),
                                       ),

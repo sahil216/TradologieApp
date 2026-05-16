@@ -5,12 +5,15 @@ class ResponseWrapper<T> extends Equatable {
   final int? code;
   final bool success;
   final String message;
+  /// Present on some supplier APIs (e.g. GetLiveAuctionList) as `IsMemberShip`.
+  final bool? isMemberShip;
 
   const ResponseWrapper({
     required this.data,
     required this.code,
     required this.message,
     required this.success,
+    this.isMemberShip,
   });
 
   @override
@@ -19,12 +22,14 @@ class ResponseWrapper<T> extends Equatable {
         code,
         success,
         message,
+        isMemberShip,
       ];
   Map<String, dynamic> toJson() => {
         "data": data,
         "code": code,
         "success": success,
         "message": message,
+        if (isMemberShip != null) "isMemberShip": isMemberShip,
       };
 }
 /*

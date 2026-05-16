@@ -41,6 +41,7 @@ import '../../../../core/error/failures.dart';
 import '../../../../core/error/user_failure.dart';
 import '../../../../core/utils/app_strings.dart';
 import '../../../../core/utils/constants.dart';
+import '../../../../core/utils/phone_number_utils.dart';
 import '../../../../core/utils/secure_storage_service.dart';
 import '../../domain/entities/login_success.dart';
 import '../../domain/entities/verify_otp_fmcg_seller.dart';
@@ -96,8 +97,19 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
         await secureStorage.write(AppStrings.apiVerificationCode,
             response.data["APIVerificationCode"] ?? "");
 
-        await secureStorage.write(
-            AppStrings.mobileNo, response.data["mobileNo"] ?? "");
+        final mobile = readApiMobileField(
+          response.data,
+          fallback: params.mobileNo,
+        );
+        await secureStorage.write(AppStrings.mobileNo, mobile);
+
+        var countryCode = normalizeCountryCodeForStorage(params.CountryCode);
+        if (countryCode.isEmpty && mobile.isNotEmpty) {
+          countryCode = parseHintPhoneNumber(mobile).countryCode;
+        }
+        if (countryCode.isNotEmpty) {
+          await secureStorage.write(AppStrings.countryCode, countryCode);
+        }
 
         await secureStorage.write(AppStrings.registrationStatus,
             response.data["RegistrationStatus"] ?? "");
@@ -337,6 +349,93 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
             AppStrings.loginId, data.quotationUserId.toString());
 
         await secureStorage.write(AppStrings.brandId, data.brandId.toString());
+
+        return Right(data);
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, FmcgBuyerLoginSuccess>> fmcgBuyerLoginWithSocialMedia(
+      SupplierSocialLoginParams params) async {
+    try {
+      final response = await authenticationRemoteDataSource
+          .fmcgBuyerLoginWithSocialMedia(params);
+      if (response != null && response.success) {
+        Constants.isLogin = true;
+        SecureStorageService secureStorage = SecureStorageService();
+        final detail =
+            Map<String, dynamic>.from(response.data as Map<dynamic, dynamic>);
+        FmcgBuyerLoginSuccess data =
+            FmcgBuyerLoginSuccessModel.fromJson(detail);
+
+        await secureStorage.write(AppStrings.appSession, "true");
+        Constants.token = data.apiVerificationCode ?? "";
+
+        await secureStorage.write(
+            AppStrings.apiVerificationCode, data.apiVerificationCode ?? "");
+
+        await secureStorage.write(AppStrings.mobileNo, data.mobile ?? "");
+
+        await secureStorage.write(AppStrings.userId, data.userId ?? "");
+
+        await secureStorage.write(AppStrings.fmcgName, data.name ?? "");
+
+        await secureStorage.write(
+            AppStrings.loginId, data.quotationUserId.toString());
+
+        await secureStorage.write(AppStrings.brandId, data.brandId.toString());
+
+        return Right(data);
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, FmcgSellerSigninResponse>>
+      fmcgSellerLoginWithSocialMedia(SupplierSocialLoginParams params) async {
+    try {
+      final response = await authenticationRemoteDataSource
+          .fmcgSellerLoginWithSocialMedia(params);
+      if (response != null && response.success) {
+        Constants.isLogin = true;
+        SecureStorageService secureStorage = SecureStorageService();
+        final detail =
+            Map<String, dynamic>.from(response.data as Map<dynamic, dynamic>);
+        FmcgSellerSigninResponse data =
+            FmcgSellerSigninResponseModel.fromJson(detail);
+
+        await secureStorage.write(AppStrings.appSession, "true");
+        Constants.token = data.fmcgUserDetail?.apiVerificationCode ?? "";
+
+        await secureStorage.write(AppStrings.apiVerificationCode,
+            data.fmcgUserDetail?.apiVerificationCode ?? "");
+
+        await secureStorage.write(
+            AppStrings.mobileNo, data.fmcgUserDetail?.mobile ?? "");
+
+        await secureStorage.write(
+            AppStrings.userId, data.fmcgUserDetail?.userId ?? "");
+
+        await secureStorage.write(
+            AppStrings.fmcgName, data.fmcgUserDetail?.fullName ?? "");
+
+        await secureStorage.write(
+            AppStrings.loginId, data.fmcgUserDetail?.loginId ?? "");
+
+        await secureStorage.write(
+            AppStrings.brandId, data.fmcgUserDetail?.brandId ?? "");
+        await secureStorage.write(
+            AppStrings.brandName, data.fmcgUserDetail?.brandName ?? "");
+        await secureStorage.write(
+            AppStrings.analyticsUrl, data.fmcgUserDetail?.analyticsUrl ?? "");
+        Constants.analyticsUrl = data.fmcgUserDetail?.analyticsUrl ?? "";
 
         return Right(data);
       }
@@ -862,7 +961,24 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
         await secureStorage.write(
             AppStrings.apiVerificationCode, data.apiVerificationCode ?? "");
 
-        await secureStorage.write(AppStrings.mobileNo, data.mobile ?? "");
+        final mobile = data.mobile?.trim().isNotEmpty == true
+            ? data.mobile!.trim()
+            : readApiMobileField(
+                Map<dynamic, dynamic>.from(response.data as Map),
+                fallback: params.mobileNo,
+              );
+
+        await secureStorage.write(AppStrings.mobileNo, mobile);
+
+        var countryCode = normalizeCountryCodeForStorage(
+          data.countryCode ?? params.CountryCode,
+        );
+        if (countryCode.isEmpty && mobile.isNotEmpty) {
+          countryCode = parseHintPhoneNumber(mobile).countryCode;
+        }
+        if (countryCode.isNotEmpty) {
+          await secureStorage.write(AppStrings.countryCode, countryCode);
+        }
 
         await secureStorage.write(AppStrings.userId, data.userId ?? "");
 

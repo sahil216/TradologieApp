@@ -31,6 +31,7 @@ import 'package:tradologie_app/features/authentication/domain/entities/fmcg_sell
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_service_label_list.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_register_distributor_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_register_seller_usecase.dart';
+import 'package:tradologie_app/features/fmcg/presentation/fmcg_login_navigation.dart';
 
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/widgets/common_loader.dart';
@@ -312,7 +313,9 @@ class _FmcgRegisterSellerDistributorFormState
           listener: (context, state) async {
             if (state is FmcgRegisterSellerSuccess) {
               Constants.isFmcg = true;
+              Constants.isBuyer = false;
               secureStorageService.write(AppStrings.isFmcg, "true");
+              secureStorageService.write(AppStrings.isBuyer, "false");
               if (state.data.fmcgUserDetail?.fromDate != "-" &&
                   state.data.fmcgUserDetail?.toDate != "-") {
                 Constants().hideSensitiveData = Constants().isTodayInRange(
@@ -322,11 +325,7 @@ class _FmcgRegisterSellerDistributorFormState
                 Constants().hideSensitiveData = true;
               }
 
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                Routes.fmcgMainScreen,
-                (route) => false,
-              );
+              navigateToFmcgMainAfterLogin(context);
               clearForm();
 
               CommonToast.success(
@@ -337,12 +336,10 @@ class _FmcgRegisterSellerDistributorFormState
             }
             if (state is FmcgRegisterDistributorSuccess) {
               Constants.isFmcg = true;
+              Constants.isBuyer = true;
               secureStorageService.write(AppStrings.isFmcg, "true");
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                Routes.fmcgMainScreen,
-                (route) => false,
-              );
+              secureStorageService.write(AppStrings.isBuyer, "true");
+              navigateToFmcgMainAfterLogin(context);
               clearForm();
 
               CommonToast.success(

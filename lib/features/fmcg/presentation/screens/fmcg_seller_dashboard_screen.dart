@@ -6,6 +6,7 @@ import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
+import 'package:tradologie_app/core/utils/dashboard_mobile_flow.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_appbar.dart';
@@ -17,8 +18,10 @@ import 'package:tradologie_app/features/app/injection_container_app.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_buyer_category_list.dart';
 import 'package:tradologie_app/features/authentication/presentation/cubit/authentication_cubit.dart';
 import 'package:tradologie_app/features/fmcg/domain/entities/distributor_enquiry_list.dart';
+import 'package:tradologie_app/features/fmcg/domain/entities/fmcg_get_seller_profile.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/add_distributor_interest_usecase.dart';
 import 'package:tradologie_app/features/fmcg/domain/usecases/get_distributor_list_usecase.dart';
+import 'package:tradologie_app/features/fmcg/domain/usecases/get_seller_profile_usecase.dart';
 import 'package:tradologie_app/features/fmcg/presentation/cubit/chat_cubit.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_distributor_enq.dart';
 import 'package:tradologie_app/features/fmcg/presentation/widgets/category_filter_sheet.dart';
@@ -45,14 +48,18 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen> {
 
   AuthenticationCubit get authenticationCubit => BlocProvider.of(context);
 
-  SecureStorageService secureStorage = SecureStorageService();
+  final SecureStorageService _secureStorage = SecureStorageService();
+
+  String _countryCode = '';
+  String _mobileNumber = '';
+  bool _postDashboardFlowHandled = false;
 
   Future<void> getDistributorList({
     String search = "",
     Set<String>? categories,
   }) async {
     GetDistributorListParams params = GetDistributorListParams(
-      token: await secureStorage.read(AppStrings.apiVerificationCode) ?? "",
+      token: await _secureStorage.read(AppStrings.apiVerificationCode) ?? "",
       deviceID: Constants.deviceID,
       searchText: search,
       category: categories == null || categories.isEmpty
@@ -73,6 +80,85 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen> {
     _searchController.addListener(() {
       setState(() => _searchQuery = _searchController.text.toLowerCase());
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _loadMobileFromStorage();
+      if (mounted) await _loadPhoneFromSellerProfile();
+    });
+  }
+
+  Future<void> _loadPhoneFromSellerProfile() async {
+    final params = GetSellerProfileParams(
+      token: await _secureStorage.read(AppStrings.apiVerificationCode) ?? "",
+      loginID: await _secureStorage.read(AppStrings.loginId) ?? "",
+      deviceID: Constants.deviceID,
+    );
+    await chatCubit.getSellerProfile(params);
+  }
+
+  Future<void> _applySellerProfilePhone(FmcgGetSellerProfile profile) async {
+    final phone = DashboardMobileFlow.phoneFromProfile(
+      mobile: profile.mobile,
+      countryCode: profile.countryCode,
+    );
+    if (phone == null) return;
+
+    await DashboardMobileFlow.persist(_secureStorage, phone);
+    if (!mounted) return;
+    setState(() {
+      _countryCode = phone.countryCode;
+      _mobileNumber = phone.mobileNumber;
+    });
+  }
+
+  Future<void> _loadMobileFromStorage() async {
+    final phone = await DashboardMobileFlow.loadFromStorage(_secureStorage);
+    if (!mounted) return;
+    setState(() {
+      _countryCode = phone.countryCode;
+      _mobileNumber = phone.mobileNumber;
+    });
+  }
+
+  /// Google hint (Android) prefill → mobile number dialog.
+  Future<void> _runPostDashboardFlow() async {
+    if (_postDashboardFlowHandled) return;
+    _postDashboardFlowHandled = true;
+
+    await Future<void>.delayed(const Duration(milliseconds: 300));
+    if (!mounted) return;
+
+    final saved = await DashboardMobileFlow.collectMobileIfNeeded(
+      context: context,
+      countryCode: _countryCode,
+      mobileNumber: _mobileNumber,
+    );
+
+    if (!mounted) return;
+
+    if (saved != null) {
+      await _saveAndSyncMobile(saved);
+    }
+  }
+
+  Future<void> _saveAndSyncMobile(StoredPhone saved) async {
+    await DashboardMobileFlow.persist(_secureStorage, saved);
+    if (!mounted) return;
+    setState(() {
+      _countryCode = saved.countryCode;
+      _mobileNumber = saved.mobileNumber;
+    });
+
+    final message = await DashboardMobileFlow.syncMobileToServer(
+      storage: _secureStorage,
+      type: DashboardMobileType.fmcgSeller,
+      phone: saved,
+    );
+    if (!mounted) return;
+    if (message != null && message.isNotEmpty) {
+      CommonToast.success(message);
+    } else {
+      CommonToast.error('Could not update mobile number');
+    }
   }
 
   void _onSearchChanged(String query) {
@@ -130,6 +216,13 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen> {
               }
               if (state is AddDistributorInterestError) {
                 CommonToast.showFailureToast(state.failure);
+              }
+              if (state is GetSellerProfileSuccess) {
+                await _applySellerProfilePhone(state.data);
+                if (mounted) await _runPostDashboardFlow();
+              }
+              if (state is GetSellerProfileError) {
+                if (mounted) await _runPostDashboardFlow();
               }
             },
           ),
@@ -273,12 +366,12 @@ class _FmcgSellerDashboardScreenState extends State<FmcgSellerDashboardScreen> {
               sl<NavigationService>().pop();
               AddDistributorInterestParams params =
                   AddDistributorInterestParams(
-                      token: await secureStorage
+                      token: await _secureStorage
                               .read(AppStrings.apiVerificationCode) ??
                           "",
                       deviceID: Constants.deviceID,
                       sellerID:
-                          await secureStorage.read(AppStrings.loginId) ?? "",
+                          await _secureStorage.read(AppStrings.loginId) ?? "",
                       distributorID: distributorID);
               chatCubit.addDistributorInterest(params);
             },

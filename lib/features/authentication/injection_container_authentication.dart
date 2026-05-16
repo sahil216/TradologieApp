@@ -15,6 +15,7 @@ import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_sell
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_product_category_list_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_service_label_list_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_signin_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_social_login_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/get_country_code_list_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/sign_out_usecase.dart';
 import 'data/datasources/authentication_remote_data_source.dart';
@@ -68,6 +69,8 @@ Future<void> init() async {
         fmcgCountryCodeListUsecase: sl(),
         fmcgBrandsListUsecase: sl(),
         fmcgBuyerLoginUsecase: sl(),
+        fmcgBuyerSocialLoginUsecase: sl(),
+        fmcgSellerSocialLoginUsecase: sl(),
         fmcgBuyerBrandPartnershipTypeListUsecase: sl(),
         fmcgBuyerCategoryListUsecase: sl(),
         fmcgBuyerDistributionCoverageListUsecase: sl(),
@@ -136,6 +139,10 @@ Future<void> init() async {
       () => FmcgSellerSigninUsecase(authenticationRepository: sl()));
   sl.registerLazySingleton<FmcgBuyerLoginUsecase>(
       () => FmcgBuyerLoginUsecase(authenticationRepository: sl()));
+  sl.registerLazySingleton<FmcgBuyerSocialLoginUsecase>(
+      () => FmcgBuyerSocialLoginUsecase(authenticationRepository: sl()));
+  sl.registerLazySingleton<FmcgSellerSocialLoginUsecase>(
+      () => FmcgSellerSocialLoginUsecase(authenticationRepository: sl()));
   sl.registerLazySingleton<FmcgRegisterSellerUsecase>(
       () => FmcgRegisterSellerUsecase(authenticationRepository: sl()));
   sl.registerLazySingleton<FmcgRegisterDistributorUsecase>(

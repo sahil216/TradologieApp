@@ -6,6 +6,7 @@ import 'package:tradologie_app/features/dashboard/domain/usecases/get_all_list_u
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_dashboard_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_vendor_stock_listing_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/post_vendor_stock_requirement.dart';
+import 'package:tradologie_app/features/dashboard/domain/usecases/update_agro_fmcg_mobile_detail_usecase.dart';
 
 import '../../../../core/api/api_consumer.dart';
 import '../../../../core/api/end_points.dart';
@@ -24,6 +25,8 @@ abstract class DashboardRemoteDataSource {
   Future<ResponseWrapper<dynamic>?> getAuctionUnit(String params);
   Future<ResponseWrapper<dynamic>?> addVendorStockEnquiry(
       AddVendorStockEnquiryParams params);
+  Future<ResponseWrapper<dynamic>?> updateAgroFmcgMobileDetail(
+      UpdateAgroFmcgMobileDetailParams params);
 }
 
 class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
@@ -96,6 +99,15 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
       AddVendorStockEnquiryParams params) async {
     return await apiConsumer.post(
       EndPoints.addVendorStockEnquiry,
+      body: params.toJson(),
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> updateAgroFmcgMobileDetail(
+      UpdateAgroFmcgMobileDetailParams params) async {
+    return await apiConsumer.post(
+      EndPoints.agroFmcgUpdateMobileDetail,
       body: params.toJson(),
     );
   }

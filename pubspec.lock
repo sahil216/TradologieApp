@@ -1261,6 +1261,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.2"
+  phone_hint_android:
+    dependency: "direct main"
+    description:
+      name: phone_hint_android
+      sha256: "8a3a230d4faf9b373e78e04e181849db859ec0727764cdb81120531d8a4fbe65"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.0"
   pinput:
     dependency: "direct main"
     description:

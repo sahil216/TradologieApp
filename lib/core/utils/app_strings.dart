@@ -15,6 +15,7 @@ class AppStrings {
   static const String imageExist = 'image_exist';
   static const String sellerTimeZone = 'seller_time_zone';
   static const String mobileNo = 'mobile_no';
+  static const String countryCode = 'country_code';
   static const String registrationStatus = 'registration_status';
   static const String projectType = 'project_Type';
   static const String password = 'password';

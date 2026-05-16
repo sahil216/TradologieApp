@@ -46,6 +46,10 @@ abstract class AuthenticationRemoteDataSource {
       FmcgSellerSigninParams params);
   Future<ResponseWrapper<dynamic>?> fmcgBuyerSignIn(
       FmcgSellerSigninParams params);
+  Future<ResponseWrapper<dynamic>?> fmcgBuyerLoginWithSocialMedia(
+      SupplierSocialLoginParams params);
+  Future<ResponseWrapper<dynamic>?> fmcgSellerLoginWithSocialMedia(
+      SupplierSocialLoginParams params);
   Future<ResponseWrapper<dynamic>?> fmcgRegisterSeller(
       FmcgRegisterSellerParams params);
   Future<ResponseWrapper<dynamic>?> fmcgRegisterDistributor(
@@ -227,6 +231,24 @@ class AuthenticationRemoteDataSourceImpl
     return await apiConsumer.post(
       EndPoints.fmcgBuyerSignin,
       body: await params.toJson(),
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> fmcgBuyerLoginWithSocialMedia(
+      SupplierSocialLoginParams params) async {
+    return await apiConsumer.post(
+      EndPoints.fmcgBuyerLoginWithSocialMedia,
+      body: params.toJson(),
+    );
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> fmcgSellerLoginWithSocialMedia(
+      SupplierSocialLoginParams params) async {
+    return await apiConsumer.post(
+      EndPoints.fmcgSellerLoginWithSocialMedia,
+      body: params.toJson(),
     );
   }
 

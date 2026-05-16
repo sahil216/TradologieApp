@@ -94,9 +94,23 @@ class DioConsumer implements ApiConsumer {
     }
   }
 
+  bool? _parseOptionalBool(dynamic value) {
+    if (value == null) return null;
+    if (value is bool) return value;
+    if (value is int) return value == 1;
+    if (value is String) {
+      final v = value.toLowerCase();
+      if (v == 'true') return true;
+      if (v == 'false') return false;
+    }
+    return null;
+  }
+
   dynamic _handleResponseAsJson(Response<dynamic> response) {
     late ResponseWrapper<dynamic> res;
     final responseJson = jsonDecode(response.data.toString());
+    final membershipFlag =
+        _parseOptionalBool(responseJson["IsMemberShip"]);
     if ((response.statusCode == 200 || response.statusCode == 201) &&
         responseJson["success"] == 1) {
       if (responseJson["totalPages"] != null) {
@@ -105,6 +119,7 @@ class DioConsumer implements ApiConsumer {
           code: response.statusCode,
           message: responseJson["message"] ?? "",
           success: true,
+          isMemberShip: membershipFlag,
         );
       } else {
         res = ResponseWrapper<dynamic>(
@@ -112,6 +127,7 @@ class DioConsumer implements ApiConsumer {
           code: response.statusCode,
           message: responseJson["message"] ?? "",
           success: true,
+          isMemberShip: membershipFlag,
         );
       }
     } else {
@@ -120,6 +136,7 @@ class DioConsumer implements ApiConsumer {
         code: response.statusCode,
         message: responseJson["message"] ?? "",
         success: false,
+        isMemberShip: membershipFlag,
       );
     }
     return res;

@@ -51,6 +51,10 @@ class EndPoints {
   // FMCG
   static String fmcgSellerSignin = "$baseUrl/FMCG/FMCGSellerLogin";
   static String fmcgBuyerSignin = "$baseUrl/FMCG/FMCGBuyerLogin";
+  static String fmcgBuyerLoginWithSocialMedia =
+      "$baseUrl/FMCG/BuyerLoginWithSocialMedia";
+  static String fmcgSellerLoginWithSocialMedia =
+      "$baseUrl/FMCG/SellerLoginWithSocialMedia";
   static String fmcgSendBuyerOtpForLogin =
       "$baseUrl/FMCG/SendBuyerOTPForLogin";
   static String fmcgVerifyBuyerOtpForLogin =
@@ -114,6 +118,9 @@ class EndPoints {
   }
 
   // Dashboard Data
+  static String agroFmcgUpdateMobileDetail =
+      '$baseUrlSupplier/AgroFMCGUpdateMobileDetail';
+
   static String getLiveAuctionDashboard = '$baseUrlSupplier/GetLiveAuctionList';
 
   static String getCommodityList = '$baseUrlBuyer/CategoryForBuyer';

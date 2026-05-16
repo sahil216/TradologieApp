@@ -1,23 +1,30 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/config/routes/app_router.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
+import 'package:tradologie_app/core/api/end_points.dart';
 import 'package:tradologie_app/core/error/network_failure.dart';
 import 'package:tradologie_app/core/error/user_failure.dart';
 import 'package:tradologie_app/core/utils/app_Colors.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
+import 'package:tradologie_app/core/utils/constants.dart';
+import 'package:tradologie_app/core/utils/dashboard_mobile_flow.dart';
 import 'package:tradologie_app/core/utils/responsive.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
+import 'package:tradologie_app/core/widgets/custom_button.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
 import 'package:tradologie_app/features/app/presentation/cubit/app_cubit.dart';
 import 'package:tradologie_app/features/dashboard/domain/entities/dashboard_result.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_dashboard_usecase.dart';
 import 'package:tradologie_app/features/dashboard/presentation/cubit/dashboard_cubit.dart';
+import 'package:tradologie_app/features/webview/presentation/screens/viewmodel/webview_params.dart';
 
 import '../../../../injection_container.dart';
 import '../widgets/dashboard_card.dart';
@@ -37,6 +44,11 @@ class _DashboardScreenState extends State<DashboardScreen>
   int currentPage = 0;
 
   late AppCubit _appCubit;
+  final SecureStorageService _secureStorage = SecureStorageService();
+
+  String _countryCode = '';
+  String _mobileNumber = '';
+  bool _postDashboardFlowHandled = false;
 
   DashboardCubit get dashboardCubit => BlocProvider.of<DashboardCubit>(context);
 
@@ -53,6 +65,205 @@ class _DashboardScreenState extends State<DashboardScreen>
     GetDashboardParams params = GetDashboardParams(
         token: await secureStorage.read(AppStrings.apiVerificationCode) ?? "");
     await dashboardCubit.getDashboardData(params);
+  }
+
+  Future<void> _openMembershipPlansWebView() async {
+    final token =
+        await SecureStorageService().read(AppStrings.apiVerificationCode) ??
+            "";
+    final url = Uri.parse(
+            "${EndPoints.supplierImageurl}/supplier/MembershipTypeDetailForAPI.aspx?")
+        .replace(queryParameters: {"Token": token}).toString();
+
+    if (!mounted) return;
+    if (Constants.isAndroid14OrBelow && Platform.isAndroid) {
+      sl<NavigationService>().pushNamed(
+        Routes.inAppWebViewRoute,
+        arguments: WebviewParams(
+          url: url,
+          canPop: true,
+          isAppBar: true,
+        ),
+      );
+    } else {
+      sl<NavigationService>().pushNamed(
+        Routes.webViewRoute,
+        arguments: WebviewParams(
+          url: url,
+          canPop: true,
+          isAppBar: true,
+        ),
+      );
+    }
+  }
+
+  Future<void> _showPremiumMembershipDialog() async {
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withValues(alpha: 0.45),
+      builder: (dialogContext) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 22, vertical: 36),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 380),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.14),
+                    blurRadius: 28,
+                    offset: const Offset(0, 12),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.fromLTRB(
+                            20,
+                            36,
+                            20,
+                            22,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                AppColors.blueExtraLight,
+                                AppColors.blueLight,
+                              ],
+                            ),
+                          ),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.center,
+                            child: Text(
+                              '🚀 UNLOCK PREMIUM MEMBERSHIP',
+                              maxLines: 1,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                fontSize: 18,
+                                letterSpacing: -0.2,
+                                color: AppColors.blueDark,
+                                height: 1.15,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 1,
+                          right: 10,
+                          child: Material(
+                            color: AppColors.white,
+                            elevation: 1,
+                            shadowColor:
+                                Colors.black.withValues(alpha: 0.08),
+                            shape: const CircleBorder(),
+                            child: InkWell(
+                              customBorder: const CircleBorder(),
+                              onTap: () =>
+                                  Navigator.of(dialogContext).pop(),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8),
+                                child: Icon(
+                                  Icons.close_rounded,
+                                  size: 20,
+                                  color: AppColors.grayText,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SingleChildScrollView(
+                        padding: const EdgeInsets.fromLTRB(22, 20, 22, 24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Benefits:',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 13,
+                                letterSpacing: 0.6,
+                                color: AppColors.grayText,
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                            _premiumBenefitRow(
+                              'Get Daily Live Buyer Requirements',
+                            ),
+                            _premiumBenefitRow(
+                              'Negotiate Directly with Buyers',
+                            ),
+                            _premiumBenefitRow(
+                              'Close Deals Faster & Grow Your Business',
+                            ),
+                            const SizedBox(height: 8),
+                            CommonButton(
+                              text: '🔓 Upgrade Now',
+                              width: double.infinity,
+                              onPressed: () async {
+                                Navigator.of(dialogContext).pop();
+                                await _openMembershipPlansWebView();
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _premiumBenefitRow(String line) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 1),
+            child: Icon(
+              Icons.check_circle_rounded,
+              size: 22,
+              color: AppColors.primary,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              line,
+              style: TextStyle(
+                fontSize: 15,
+                height: 1.4,
+                color: AppColors.defaultText,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   // @override
@@ -80,6 +291,64 @@ class _DashboardScreenState extends State<DashboardScreen>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(const Duration(seconds: 4), _autoScroll);
+      _loadMobileFromStorage();
+    });
+  }
+
+  /// Google hint (Android) prefill → mobile alert → membership alert.
+  Future<void> _runPostDashboardFlow({required bool isMemberShip}) async {
+    if (_postDashboardFlowHandled) return;
+    _postDashboardFlowHandled = true;
+
+    await Future<void>.delayed(const Duration(milliseconds: 300));
+    if (!mounted) return;
+
+    final saved = await DashboardMobileFlow.collectMobileIfNeeded(
+      context: context,
+      countryCode: _countryCode,
+      mobileNumber: _mobileNumber,
+    );
+
+    if (!mounted) return;
+
+    if (saved != null) {
+      await _saveAndSyncMobile(saved);
+    }
+
+    if (!mounted) return;
+
+    if (!isMemberShip) {
+      await _showPremiumMembershipDialog();
+    }
+  }
+
+  Future<void> _saveAndSyncMobile(StoredPhone saved) async {
+    await DashboardMobileFlow.persist(_secureStorage, saved);
+    if (!mounted) return;
+    setState(() {
+      _countryCode = saved.countryCode;
+      _mobileNumber = saved.mobileNumber;
+    });
+
+    final message = await DashboardMobileFlow.syncMobileToServer(
+      storage: _secureStorage,
+      type: DashboardMobileType.agroSeller,
+      phone: saved,
+    );
+    if (!mounted) return;
+    if (message != null && message.isNotEmpty) {
+      CommonToast.success(message);
+    } else {
+      CommonToast.error('Could not update mobile number');
+    }
+  }
+
+  Future<void> _loadMobileFromStorage() async {
+    final phone = await DashboardMobileFlow.loadFromStorage(_secureStorage);
+    if (!mounted) return;
+    setState(() {
+      _countryCode = phone.countryCode;
+      _mobileNumber = phone.mobileNumber;
     });
   }
 
@@ -124,6 +393,10 @@ class _DashboardScreenState extends State<DashboardScreen>
             if (state is GetDashboardSuccess) {
               dashboardData = state.data;
               setState(() {});
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!context.mounted) return;
+                _runPostDashboardFlow(isMemberShip: state.isMemberShip);
+              });
             }
             if (state is GetDashboardError) {
               CommonToast.showFailureToast(state.failure);

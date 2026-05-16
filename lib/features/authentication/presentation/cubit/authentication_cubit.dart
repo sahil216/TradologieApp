@@ -36,6 +36,7 @@ import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_sell
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_product_category_list_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_service_label_list_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_signin_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_social_login_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/get_country_code_list_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/sign_out_usecase.dart';
 
@@ -74,6 +75,8 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   final GetCountryCodeListUsecase getCountryCodeListUsecase;
   final FmcgSellerSigninUsecase fmcgSellerSigninUsecase;
   final FmcgBuyerLoginUsecase fmcgBuyerLoginUsecase;
+  final FmcgBuyerSocialLoginUsecase fmcgBuyerSocialLoginUsecase;
+  final FmcgSellerSocialLoginUsecase fmcgSellerSocialLoginUsecase;
   final FmcgRegisterDistributorUsecase fmcgRegisterDistributorUsecase;
   final FmcgRegisterSellerUsecase fmcgRegisterSellerUsecase;
   final FmcgCountryCodeListUsecase fmcgCountryCodeListUsecase;
@@ -115,6 +118,8 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     required this.fmcgCountryCodeListUsecase,
     required this.fmcgBrandsListUsecase,
     required this.fmcgBuyerLoginUsecase,
+    required this.fmcgBuyerSocialLoginUsecase,
+    required this.fmcgSellerSocialLoginUsecase,
     required this.fmcgBuyerBrandPartnershipTypeListUsecase,
     required this.fmcgBuyerCategoryListUsecase,
     required this.fmcgBuyerDistributionCoverageListUsecase,
@@ -147,6 +152,26 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       (res) => FmcgBuyerSigninSuccess(
         data: res,
       ),
+    ));
+  }
+
+  Future<void> fmcgBuyerSocialSignIn(SupplierSocialLoginParams params) async {
+    emit(FmcgBuyerSigninIsLoading());
+    final Either<Failure, FmcgBuyerLoginSuccess> response =
+        await fmcgBuyerSocialLoginUsecase(params);
+    emit(response.fold(
+      (failure) => FmcgBuyerSigninError(failure: failure),
+      (res) => FmcgBuyerSigninSuccess(data: res),
+    ));
+  }
+
+  Future<void> fmcgSellerSocialSignIn(SupplierSocialLoginParams params) async {
+    emit(FmcgSellerSigninIsLoading());
+    final Either<Failure, FmcgSellerSigninResponse> response =
+        await fmcgSellerSocialLoginUsecase(params);
+    emit(response.fold(
+      (failure) => FmcgSellerSigninError(failure: failure),
+      (res) => FmcgSellerSigninSuccess(data: res),
     ));
   }
 

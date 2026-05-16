@@ -19,6 +19,7 @@ import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/verify_otp_usecase.dart';
+import 'package:tradologie_app/features/fmcg/presentation/fmcg_login_navigation.dart';
 
 import '../../../../config/routes/app_router.dart';
 import '../../../../core/utils/app_colors.dart';
@@ -188,11 +189,11 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen>
             }
             if (state is VerifyOtpSuccessFMCGBuyer) {
               AnalyticsService.logEvent("fmcg_buyer_otp_login_success");
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                Routes.fmcgMainScreen,
-                (route) => false,
-              );
+              Constants.isFmcg = true;
+              Constants.isBuyer = true;
+              secureStorageService.write(AppStrings.isFmcg, "true");
+              secureStorageService.write(AppStrings.isBuyer, "true");
+              navigateToFmcgMainAfterLogin(context);
             }
 
 
@@ -219,11 +220,11 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen>
               //   ).toString(),
               // );
             if (state is VerifyOtpSuccessFMCGSeller) {
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                Routes.fmcgMainScreen,
-                (route) => false,
-              );
+              Constants.isFmcg = true;
+              Constants.isBuyer = false;
+              secureStorageService.write(AppStrings.isFmcg, "true");
+              secureStorageService.write(AppStrings.isBuyer, "false");
+              navigateToFmcgMainAfterLogin(context);
             }
             if (state is VerifyOtpError) {
               CommonToast.showFailureToast(state.failure);

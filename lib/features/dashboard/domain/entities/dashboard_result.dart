@@ -1,5 +1,19 @@
 import 'package:equatable/equatable.dart';
 
+/// Supplier live-auction dashboard payload: list plus membership flag from API.
+class SupplierDashboardData extends Equatable {
+  final List<DashboardResult> auctions;
+  final bool isMemberShip;
+
+  const SupplierDashboardData({
+    required this.auctions,
+    required this.isMemberShip,
+  });
+
+  @override
+  List<Object?> get props => [auctions, isMemberShip];
+}
+
 class DashboardResult extends Equatable {
   final String? auctionId;
   final String? customerId;

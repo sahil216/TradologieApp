@@ -143,9 +143,8 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen>
           listener: (context, state) {
             if (state is BuyerNegotiationSuccess) {
               setState(() {
-                negotiationData?.clear();
                 negotiation = state.data;
-                negotiationData = state.data.detail;
+                negotiationData = state.data.detail ?? [];
               });
             }
             if (state is BuyerNegotiationError) {
@@ -243,51 +242,9 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen>
             } else if (state.failure is UserFailure) {
               if (state.failure.msg?.toLowerCase().trim() ==
                   "no record found!") {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        color: AppColors.red,
-                        size: 200,
-                      ),
-                      CommonText(
-                        state.failure.msg ?? '',
-                        textAlign: TextAlign.center,
-                        style: TextStyleConstants.semiBold(
-                          context,
-                          color: AppColors.black,
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      CommonButton(
-                        onPressed: () {
-                          sl<NavigationService>().pushNamed(
-                            Routes.supplierListScreen,
-                          );
-                        },
-                        text: 'Add Negotiation',
-                      ),
-                      const SizedBox(height: 24),
-                      CustomIconButton(
-                        onPressed: () {
-                          getNegotiationData();
-                        },
-                        backgroundColor: AppColors.white,
-                        shape: BoxShape.circle,
-                        iconHeight: 50,
-                        iconColor: AppColors.red,
-                        widget: Icon(
-                          Icons.rotate_right,
-                          size: 24,
-                        ),
-                      ),
-                    ],
-                  ),
+                return _buildNoRecordsEmptyState(
+                  context,
+                  state.failure.msg ?? 'No record found!',
                 );
               }
               return CustomErrorWidget(
@@ -297,6 +254,14 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen>
                 errorText: state.failure.msg,
               );
             }
+          }
+
+          if (state is BuyerNegotiationSuccess &&
+              (negotiationData == null || negotiationData!.isEmpty)) {
+            return _buildNoRecordsEmptyState(
+              context,
+              negotiation?.message ?? 'No record found!',
+            );
           }
 
           return CustomScrollView(
@@ -591,6 +556,69 @@ class _BuyerNegotiationScreenState extends State<BuyerNegotiationScreen>
         bottomNavigationBar: SizedBox(
           height: 70,
         ),
+      ),
+    );
+  }
+
+  Widget _buildNoRecordsEmptyState(BuildContext context, String message) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Icon(
+            Icons.error_outline,
+            color: AppColors.red,
+            size: 200,
+          ),
+          CommonText(
+            message,
+            textAlign: TextAlign.center,
+            style: TextStyleConstants.semiBold(
+              context,
+              color: AppColors.black,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 24),
+          CommonButton(
+            onPressed: () {
+              sl<NavigationService>().pushNamed(
+                Routes.supplierListScreen,
+              );
+            },
+            text: 'Add Negotiation',
+          ),
+          const SizedBox(height: 12),
+          CommonButton(
+            onPressed: () {
+              sl<NavigationService>().pushNamed(
+                Routes.buyerPostRequirementRoute,
+              );
+            },
+            text: 'My Catalogue',
+            backgroundColor: AppColors.white,
+            textStyle: TextStyleConstants.semiBold(
+              context,
+              color: AppColors.primary,
+            ),
+          ),
+          const SizedBox(height: 24),
+          CustomIconButton(
+            onPressed: () {
+              getNegotiationData();
+            },
+            backgroundColor: AppColors.white,
+            shape: BoxShape.circle,
+            iconHeight: 50,
+            iconColor: AppColors.red,
+            widget: const Icon(
+              Icons.rotate_right,
+              size: 24,
+            ),
+          ),
+        ],
       ),
     );
   }

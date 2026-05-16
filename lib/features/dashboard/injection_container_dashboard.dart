@@ -9,6 +9,7 @@ import 'package:tradologie_app/features/dashboard/domain/usecases/get_commodity_
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_dashboard_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_vendor_stock_listing_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/post_vendor_stock_requirement.dart';
+import 'package:tradologie_app/features/dashboard/domain/usecases/update_agro_fmcg_mobile_detail_usecase.dart';
 import 'data/repositories/dashboard_repository_impl.dart';
 import 'presentation/cubit/dashboard_cubit.dart';
 
@@ -44,6 +45,8 @@ Future<void> init() async {
       () => GetAuctionUnitUsecase(dasboardRepository: sl()));
   sl.registerLazySingleton<AddVendorStockEnquiryUsecase>(
       () => AddVendorStockEnquiryUsecase(dasboardRepository: sl()));
+  sl.registerLazySingleton<UpdateAgroFmcgMobileDetailUsecase>(
+      () => UpdateAgroFmcgMobileDetailUsecase(dasboardRepository: sl()));
 
   //! Repository
   sl.registerLazySingleton<DashboardRepository>(() => DashboardRepositoryImpl(

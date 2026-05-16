@@ -7,7 +7,9 @@ import 'package:tradologie_app/config/routes/app_router.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
+import 'package:tradologie_app/core/utils/dashboard_mobile_flow.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
+import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_fmcg_appbar.dart';
@@ -38,7 +40,11 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
   // Search & Filter state
   final TextEditingController _searchController = TextEditingController();
   String searchQuery = '';
-  SecureStorageService secureStorage = SecureStorageService();
+  final SecureStorageService _secureStorage = SecureStorageService();
+
+  String _countryCode = '';
+  String _mobileNumber = '';
+  bool _postDashboardFlowHandled = false;
 
   ChatCubit get chatCubit => BlocProvider.of(context);
 
@@ -48,9 +54,9 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
     String search = "",
   }) async {
     GetBuyerBrandsListParams params = GetBuyerBrandsListParams(
-      token: await secureStorage.read(AppStrings.apiVerificationCode) ?? "",
+      token: await _secureStorage.read(AppStrings.apiVerificationCode) ?? "",
       deviceID: Constants.deviceID,
-      distributorID: await secureStorage.read(AppStrings.loginId) ?? "",
+      distributorID: await _secureStorage.read(AppStrings.loginId) ?? "",
       searchText: search,
     );
     await chatCubit.getBuyerBrandsList(params);
@@ -76,6 +82,60 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
     _searchController.addListener(() {
       setState(() => searchQuery = _searchController.text.toLowerCase());
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _loadMobileFromStorage();
+      if (mounted) await _runPostDashboardFlow();
+    });
+  }
+
+  Future<void> _loadMobileFromStorage() async {
+    final phone = await DashboardMobileFlow.loadFromStorage(_secureStorage);
+    if (!mounted) return;
+    setState(() {
+      _countryCode = phone.countryCode;
+      _mobileNumber = phone.mobileNumber;
+    });
+  }
+
+  Future<void> _runPostDashboardFlow() async {
+    if (_postDashboardFlowHandled) return;
+    _postDashboardFlowHandled = true;
+
+    await Future<void>.delayed(const Duration(milliseconds: 300));
+    if (!mounted) return;
+
+    final saved = await DashboardMobileFlow.collectMobileIfNeeded(
+      context: context,
+      countryCode: _countryCode,
+      mobileNumber: _mobileNumber,
+    );
+
+    if (!mounted) return;
+
+    if (saved != null) {
+      await _saveAndSyncMobile(saved);
+    }
+  }
+
+  Future<void> _saveAndSyncMobile(StoredPhone saved) async {
+    await DashboardMobileFlow.persist(_secureStorage, saved);
+    if (!mounted) return;
+    setState(() {
+      _countryCode = saved.countryCode;
+      _mobileNumber = saved.mobileNumber;
+    });
+
+    final message = await DashboardMobileFlow.syncMobileToServer(
+      storage: _secureStorage,
+      type: DashboardMobileType.fmcgBuyer,
+      phone: saved,
+    );
+    if (!mounted) return;
+    if (message != null && message.isNotEmpty) {
+      CommonToast.success(message);
+    } else {
+      CommonToast.error('Could not update mobile number');
+    }
   }
 
   @override
@@ -108,7 +168,7 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
           if (state is GetInitialChatIdSuccess) {
             selectedChat.sellerId = state.data.sellerId.toString();
             selectedChat.quotationUserId =
-                await secureStorage.read(AppStrings.loginId) ?? "";
+                await _secureStorage.read(AppStrings.loginId) ?? "";
 
             Navigator.push(
               context,
@@ -294,13 +354,13 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
                     ? () {}
                     : () async {
                         final params = AddBuyerBrandInterestParams(
-                          token: await secureStorage
+                          token: await _secureStorage
                                   .read(AppStrings.apiVerificationCode) ??
                               "",
                           deviceID: Constants.deviceID,
                           brandID: enquiry.brandId.toString(),
                           distributorID:
-                              await secureStorage.read(AppStrings.loginId) ??
+                              await _secureStorage.read(AppStrings.loginId) ??
                                   "",
                         );
                         chatCubit.addBuyerBrandInterest(params);
@@ -371,11 +431,11 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
                   selectedChat.userId = enquiry.brandName;
 
                   chatCubit.getInitialChatId(GetInitialChatIdParams(
-                    token: await secureStorage
+                    token: await _secureStorage
                             .read(AppStrings.apiVerificationCode) ??
                         "",
                     deviceId: Constants.deviceID,
-                    buyerId: await secureStorage.read(AppStrings.loginId) ?? "",
+                    buyerId: await _secureStorage.read(AppStrings.loginId) ?? "",
                     brandId: enquiry.brandId.toString(),
                   ));
                 },

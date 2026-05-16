@@ -12,12 +12,16 @@ class DashboardInitial extends DashboardState {}
 class GetDashboardIsLoading extends DashboardState {}
 
 class GetDashboardSuccess extends DashboardState {
-  final List<DashboardResult> data;
+  final SupplierDashboardData result;
 
-  const GetDashboardSuccess({required this.data});
+  const GetDashboardSuccess({required this.result});
+
+  List<DashboardResult> get data => result.auctions;
+
+  bool get isMemberShip => result.isMemberShip;
 
   @override
-  List<Object> get props => [data];
+  List<Object> get props => [result];
 }
 
 class GetDashboardError extends DashboardState {

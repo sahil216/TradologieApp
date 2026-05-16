@@ -34,6 +34,8 @@ import '../../../../core/widgets/common_social_icons.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../injection_container.dart';
+import 'package:tradologie_app/features/fmcg/presentation/fmcg_login_navigation.dart';
+
 import '../cubit/authentication_cubit.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -41,6 +43,9 @@ class SignInScreen extends StatefulWidget {
 
   /// Set to `true` when you want the Facebook login button visible.
   static const bool showFacebookLogin = false;
+
+  /// Gmail / Google sign-in is enabled on Android only.
+  static bool get showGmailLogin => Platform.isAndroid;
 
   @override
   State<SignInScreen> createState() => _SignInScreenState();
@@ -123,6 +128,9 @@ class _SignInScreenState extends State<SignInScreen>
   final formKey = GlobalKey<FormState>();
 
   Future<void> _signInWithGoogle() async {
+    if (!Platform.isAndroid) {
+      return;
+    }
     try {
       final google = GoogleSignIn.instance;
       await google.initialize();
@@ -138,9 +146,36 @@ class _SignInScreenState extends State<SignInScreen>
       if (!mounted) return;
 
       if (Constants.isFmcg) {
+        final firebaseUser = FirebaseAuth.instance.currentUser;
+        final idToken = await firebaseUser?.getIdToken();
+        final email = firebaseUser?.email ?? googleUser.email;
+        final displayName =
+            firebaseUser?.displayName ?? googleUser.displayName ?? '';
+        if (idToken == null || idToken.isEmpty || email.trim().isEmpty) {
+          CommonToast.error("Google sign-in failed");
+          return;
+        }
+        final fcmToken =
+            await secureStorageService.read(AppStrings.fcmToken) ?? '';
+        if (!mounted) return;
+        final params = SupplierSocialLoginParams(
+          token: "2018APR031848",
+          userId: email,
+          name: displayName,
+          socialMedia: 'Google',
+          manufacturer: manufacturer,
+          model: model,
+          osVersionRelease: osVersionRelease,
+          appVersion: appVersion,
+          fcmToken: fcmToken.isNotEmpty ? fcmToken : idToken,
+          osType: Platform.isAndroid ? 'Android' : 'iOS',
+          deviceId: deviceId,
+        );
+        final cubit = BlocProvider.of<AuthenticationCubit>(context);
         if (Constants.isBuyer) {
+          cubit.fmcgBuyerSocialSignIn(params);
         } else {
-
+          cubit.fmcgSellerSocialSignIn(params);
         }
       } else {
         if (Constants.isBuyer) {
@@ -149,10 +184,7 @@ class _SignInScreenState extends State<SignInScreen>
           final email = firebaseUser?.email ?? googleUser.email;
           final displayName =
               firebaseUser?.displayName ?? googleUser.displayName ?? '';
-          if (idToken == null ||
-              idToken.isEmpty ||
-              email == null ||
-              email.isEmpty) {
+          if (idToken == null || idToken.isEmpty || email.trim().isEmpty) {
             CommonToast.error("Google sign-in failed");
             return;
           }
@@ -182,10 +214,7 @@ class _SignInScreenState extends State<SignInScreen>
           final email = firebaseUser?.email ?? googleUser.email;
           final displayName =
               firebaseUser?.displayName ?? googleUser.displayName ?? '';
-          if (idToken == null ||
-              idToken.isEmpty ||
-              email == null ||
-              email.isEmpty) {
+          if (idToken == null || idToken.isEmpty || email.trim().isEmpty) {
             CommonToast.error("Google sign-in failed");
             return;
           }
@@ -316,6 +345,34 @@ class _SignInScreenState extends State<SignInScreen>
                 Routes.mainRoute,
                 (route) => false,
               );
+            }
+            if (state is FmcgSellerSigninSuccess) {
+              Constants.isFmcg = true;
+              Constants.isBuyer = false;
+              secureStorageService.write(AppStrings.isFmcg, "true");
+              secureStorageService.write(AppStrings.isBuyer, "false");
+              if (state.data.fmcgUserDetail?.fromDate != "-" &&
+                  state.data.fmcgUserDetail?.toDate != "-") {
+                Constants().hideSensitiveData = Constants().isTodayInRange(
+                    DateTime.parse(state.data.fmcgUserDetail?.fromDate ?? ""),
+                    DateTime.parse(state.data.fmcgUserDetail?.toDate ?? ""));
+              } else {
+                Constants().hideSensitiveData = true;
+              }
+              navigateToFmcgMainAfterLogin(context);
+            }
+            if (state is FmcgSellerSigninError) {
+              CommonToast.showFailureToast(state.failure);
+            }
+            if (state is FmcgBuyerSigninSuccess) {
+              Constants.isFmcg = true;
+              Constants.isBuyer = true;
+              secureStorageService.write(AppStrings.isFmcg, "true");
+              secureStorageService.write(AppStrings.isBuyer, "true");
+              navigateToFmcgMainAfterLogin(context);
+            }
+            if (state is FmcgBuyerSigninError) {
+              CommonToast.showFailureToast(state.failure);
             }
           },
           child: Stack(
@@ -472,37 +529,41 @@ class _SignInScreenState extends State<SignInScreen>
                                           color: AppColors.white,
                                         ),
                                       ),
-                                      SizedBox(height: 20),
-                                      Center(
-                                        child: CommonText(
-                                          "OR",
-                                          style: TextStyleConstants.regular(
-                                            context,
-                                            fontSize: 16,
-                                            color: AppColors.defaultText,
+                                      if (SignInScreen.showGmailLogin) ...[
+                                        SizedBox(height: 20),
+                                        Center(
+                                          child: CommonText(
+                                            "OR",
+                                            style: TextStyleConstants.regular(
+                                              context,
+                                              fontSize: 16,
+                                              color: AppColors.defaultText,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      SizedBox(height: 20),
-                                      SizedBox(
-                                        width:
-                                            r.isTablet ? 420 : double.infinity,
-                                        child: CommonButton(
-                                          onPressed: _signInWithGoogle,
-                                          text: "Continue with Gmail",
-                                          backgroundColor: AppColors.white,
-                                          borderSide: BorderSide(
-                                            color: AppColors.red,
-                                            width: 2,
-                                          ),
-                                          icon: Image.asset(ImgAssets.google),
-                                          textStyle: TextStyleConstants.medium(
-                                            context,
-                                            fontSize: 16,
-                                            color: AppColors.black,
+                                        SizedBox(height: 20),
+                                        SizedBox(
+                                          width: r.isTablet
+                                              ? 420
+                                              : double.infinity,
+                                          child: CommonButton(
+                                            onPressed: _signInWithGoogle,
+                                            text: "Continue with Gmail",
+                                            backgroundColor: AppColors.white,
+                                            borderSide: BorderSide(
+                                              color: AppColors.red,
+                                              width: 2,
+                                            ),
+                                            icon: Image.asset(ImgAssets.google),
+                                            textStyle:
+                                                TextStyleConstants.medium(
+                                              context,
+                                              fontSize: 16,
+                                              color: AppColors.black,
+                                            ),
                                           ),
                                         ),
-                                      ),
+                                      ],
                                       if (SignInScreen.showFacebookLogin) ...[
                                         SizedBox(height: 12),
                                         SizedBox(
@@ -570,7 +631,9 @@ class _SignInScreenState extends State<SignInScreen>
                   }),
               BlocBuilder<AuthenticationCubit, AuthenticationState>(
                 builder: (context, state) {
-                  if (state is SigninIsLoading) {
+                  if (state is SigninIsLoading ||
+                      state is FmcgSellerSigninIsLoading ||
+                      state is FmcgBuyerSigninIsLoading) {
                     return Positioned.fill(child: const CommonLoader());
                   }
                   return SizedBox.shrink();

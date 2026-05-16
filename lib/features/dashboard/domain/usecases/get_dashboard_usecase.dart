@@ -7,12 +7,12 @@ import '../../../../core/usecases/usecase.dart';
 import '../respositories/dashboard_repository.dart';
 
 class GetDashboardUsecase
-    implements UseCase<List<DashboardResult>, GetDashboardParams> {
+    implements UseCase<SupplierDashboardData, GetDashboardParams> {
   final DashboardRepository dasboardRepository;
 
   GetDashboardUsecase({required this.dasboardRepository});
   @override
-  Future<Either<Failure, List<DashboardResult>>> call(
+  Future<Either<Failure, SupplierDashboardData>> call(
           GetDashboardParams params) =>
       dasboardRepository.getDashboardData(params);
 }

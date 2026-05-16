@@ -10,12 +10,13 @@ import 'package:tradologie_app/features/dashboard/domain/usecases/get_all_list_u
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_dashboard_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_vendor_stock_listing_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/post_vendor_stock_requirement.dart';
+import 'package:tradologie_app/features/dashboard/domain/usecases/update_agro_fmcg_mobile_detail_usecase.dart';
 
 import '../../../../core/error/failures.dart';
 import '../entities/commodity_list.dart';
 
 abstract class DashboardRepository {
-  Future<Either<Failure, List<DashboardResult>>> getDashboardData(
+  Future<Either<Failure, SupplierDashboardData>> getDashboardData(
       GetDashboardParams params);
   Future<Either<Failure, bool>> addCustomerRequirement(
       AddCustomerRequirementParams params);
@@ -29,4 +30,6 @@ abstract class DashboardRepository {
   Future<Either<Failure, List<AuctionUnitList>>> getAuctionUnit(String params);
   Future<Either<Failure, bool>> addVendorStockEnquiry(
       AddVendorStockEnquiryParams params);
+  Future<Either<Failure, String>> updateAgroFmcgMobileDetail(
+      UpdateAgroFmcgMobileDetailParams params);
 }

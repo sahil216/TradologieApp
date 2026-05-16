@@ -6,6 +6,7 @@ class ResponseWrapperModel<T> extends ResponseWrapper {
     required super.code,
     required super.success,
     required super.message,
+    super.isMemberShip,
   });
 
   factory ResponseWrapperModel.fromJson(Map<String, dynamic> json) =>
@@ -14,5 +15,6 @@ class ResponseWrapperModel<T> extends ResponseWrapper {
         code: json["code"],
         success: json["success"],
         message: json["message"],
+        isMemberShip: json["isMemberShip"] as bool?,
       );
 }

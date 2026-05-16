@@ -18,6 +18,7 @@ import 'package:tradologie_app/features/dashboard/domain/usecases/get_all_list_u
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_dashboard_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/get_vendor_stock_listing_usecase.dart';
 import 'package:tradologie_app/features/dashboard/domain/usecases/post_vendor_stock_requirement.dart';
+import 'package:tradologie_app/features/dashboard/domain/usecases/update_agro_fmcg_mobile_detail_usecase.dart';
 
 import '../../../../core/error/user_failure.dart';
 import '../../domain/respositories/dashboard_repository.dart';
@@ -30,14 +31,20 @@ class DashboardRepositoryImpl implements DashboardRepository {
   });
 
   @override
-  Future<Either<Failure, List<DashboardResult>>> getDashboardData(
+  Future<Either<Failure, SupplierDashboardData>> getDashboardData(
       GetDashboardParams params) async {
     try {
       final response = await dashboardRemoteDataSource.getDashboardData(params);
       if (response != null && response.success) {
-        return Right((response.data as List)
+        final list = (response.data as List)
             .map((e) => DashboardResultModel.fromJson(e))
-            .toList());
+            .toList();
+        // Only treat as member when API sends IsMemberShip: true; missing/false → show upgrade UI.
+        final isMemberShip = response.isMemberShip ?? false;
+        return Right(SupplierDashboardData(
+          auctions: list,
+          isMemberShip: isMemberShip,
+        ));
       }
       return Left(UserFailure(response?.message, response?.code));
     } on Failure catch (e) {
@@ -146,6 +153,21 @@ class DashboardRepositoryImpl implements DashboardRepository {
           await dashboardRemoteDataSource.addVendorStockEnquiry(params);
       if (response != null && response.success) {
         return Right(response.data);
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> updateAgroFmcgMobileDetail(
+      UpdateAgroFmcgMobileDetailParams params) async {
+    try {
+      final response =
+          await dashboardRemoteDataSource.updateAgroFmcgMobileDetail(params);
+      if (response != null && response.success) {
+        return Right(response.message);
       }
       return Left(UserFailure(response?.message, response?.code));
     } on Failure catch (e) {

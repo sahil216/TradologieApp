@@ -51,6 +51,10 @@ abstract class AuthenticationRepository {
       FmcgSellerSigninParams params);
   Future<Either<Failure, FmcgBuyerLoginSuccess>> fmcgBuyerSignin(
       FmcgSellerSigninParams params);
+  Future<Either<Failure, FmcgBuyerLoginSuccess>> fmcgBuyerLoginWithSocialMedia(
+      SupplierSocialLoginParams params);
+  Future<Either<Failure, FmcgSellerSigninResponse>>
+      fmcgSellerLoginWithSocialMedia(SupplierSocialLoginParams params);
   Future<Either<Failure, bool>> deleteAccount(DeleteAccountParams params);
   Future<Either<Failure, List<CountryCodeList>>> getCountryCodeList(
       NoParams params);

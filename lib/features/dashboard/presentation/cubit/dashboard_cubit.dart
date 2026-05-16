@@ -42,11 +42,11 @@ class DashboardCubit extends Cubit<DashboardState> {
 
   Future<void> getDashboardData(GetDashboardParams params) async {
     emit(GetDashboardIsLoading());
-    Either<Failure, List<DashboardResult>> response =
+    Either<Failure, SupplierDashboardData> response =
         await dashboardUsecase(params);
     emit(response.fold(
       (failure) => GetDashboardError(failure: failure),
-      (res) => GetDashboardSuccess(data: res),
+      (res) => GetDashboardSuccess(result: res),
     ));
   }
 
