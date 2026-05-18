@@ -25,17 +25,13 @@ abstract class AuthenticationRemoteDataSource {
   Future<ResponseWrapper<dynamic>?> buyerSignIn(SigninParams params);
   Future<ResponseWrapper<dynamic>?> register(RegisterParams params);
 
-
-
   Future<ResponseWrapper<dynamic>?> sendOtp(SendOtpParams params);
   Future<ResponseWrapper<dynamic>?> sendFMCGSellerOtp(SendOtpParams params);
   Future<ResponseWrapper<dynamic>?> sendFMCGBuyerOtp(SendOtpParams params);
 
-
   Future<ResponseWrapper<dynamic>?> verifyOtp(VerifyOtpParams params);
   Future<ResponseWrapper<dynamic>?> verifyOtpFMCGSeller(VerifyOtpParams params);
   Future<ResponseWrapper<dynamic>?> verifyOtpFMCGBuyer(VerifyOtpParams params);
-
 
   Future<ResponseWrapper<dynamic>?> sendOtpBuyer(SendOtpParams params);
   Future<ResponseWrapper<dynamic>?> verifyOtpBuyer(VerifyOtpParams params);

@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +10,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tradologie_app/core/utils/get_device_id.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
+import 'package:tradologie_app/core/utils/notification_badge_service.dart';
 import 'package:tradologie_app/core/widgets/notifications_service.dart';
 import 'app_lifecycle_observer.dart';
 import 'bloc_observer.dart';
@@ -48,7 +48,7 @@ import 'core/utils/constants.dart';
 
 final sl = GetIt.instance;
 
-Future<void> init(Future<void> Function(RemoteMessage) handler) async {
+Future<void> init() async {
   SecureStorageService secureStorage = SecureStorageService();
   //! init
   WidgetsFlutterBinding.ensureInitialized();
@@ -84,9 +84,13 @@ Future<void> init(Future<void> Function(RemoteMessage) handler) async {
         packageInfo: sl(),
       ));
 
+  sl.registerLazySingleton(
+    () => NotificationBadgeService(sl<SharedPreferences>()),
+  );
+
   final notificationService = FirebaseNotificationService(
     navigationService: sl(),
-    handler: handler,
+    badgeService: sl(),
   );
   sl.registerLazySingleton(() => notificationService);
 

@@ -20,6 +20,7 @@ class AppStrings {
   static const String projectType = 'project_Type';
   static const String password = 'password';
   static const String fcmToken = 'fcm_token';
+  static const String pushNotificationBadgeCount = 'push_notification_badge_count';
   static const String customerId = 'customer_id';
   static const String customerName = 'customer_name';
   static const String fmcgName = 'fmcg_name';

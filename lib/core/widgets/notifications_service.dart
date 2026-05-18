@@ -1,22 +1,24 @@
 import 'dart:developer';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
+import 'package:tradologie_app/core/utils/notification_badge_service.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 
-typedef NotificationTapHandler = void Function(RemoteMessage message);
-
-/// Background message handler
+/// Background message handler (must be top-level).
+@pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
+  await NotificationBadgeService.incrementInBackground();
   log("📩 Background message received: ${message.messageId}");
 }
 
 class FirebaseNotificationService {
   final NavigationService navigationService;
-  final NotificationTapHandler? handler;
+  final NotificationBadgeService badgeService;
 
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _localNotifications =
@@ -24,23 +26,22 @@ class FirebaseNotificationService {
 
   FirebaseNotificationService({
     required this.navigationService,
-    this.handler,
+    required this.badgeService,
   });
 
   SecureStorageService storage = SecureStorageService();
 
   /// Initialize notification service
   Future<void> init() async {
-    // Request permissions
     await _requestPermissions();
-
-    // Initialize local notifications
     await _initLocalNotifications();
+    await badgeService.syncFromStorage();
 
-    // Foreground messages
-    FirebaseMessaging.onMessage.listen(_showNotification);
+    FirebaseMessaging.onMessage.listen((message) async {
+      await badgeService.increment();
+      await _showNotification(message);
+    });
 
-    // Tapped notifications (app opened from background/terminated)
     FirebaseMessaging.onMessageOpenedApp.listen(_handleMessageTap);
 
     await FirebaseMessaging.instance
@@ -50,16 +51,18 @@ class FirebaseNotificationService {
       sound: true,
     );
 
-    // Background messages
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
-    // FCM token
+    final initialMessage = await _messaging.getInitialMessage();
+    if (initialMessage != null) {
+      await _handleMessageTap(initialMessage);
+    }
+
     final token = await _messaging.getToken();
     log("🔥 FCM Token: $token");
     storage.write(AppStrings.fcmToken, token ?? "");
   }
 
-  /// Request notification permissions (iOS & Android 13+)
   Future<void> _requestPermissions() async {
     final settings = await _messaging.requestPermission(
       alert: true,
@@ -81,7 +84,6 @@ class FirebaseNotificationService {
     }
   }
 
-  /// Initialize local notification plugin
   Future<void> _initLocalNotifications() async {
     const androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -100,19 +102,25 @@ class FirebaseNotificationService {
     );
   }
 
-  /// Show a notification (foreground messages or local test)
   Future<void> _showNotification(RemoteMessage message) async {
     final notification = message.notification;
-    if (notification == null) return; // nothing to show
+    if (notification == null) return;
 
     const androidDetails = AndroidNotificationDetails(
-      'default_channel', // channel id
-      'General Notifications', // channel name
+      'default_channel',
+      'General Notifications',
       importance: Importance.max,
       priority: Priority.high,
     );
 
-    const details = NotificationDetails(android: androidDetails);
+    final iosDetails = DarwinNotificationDetails(
+      badgeNumber: badgeService.count,
+    );
+
+    final details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
 
     await _localNotifications.show(
       id: message.hashCode,
@@ -123,7 +131,6 @@ class FirebaseNotificationService {
     );
   }
 
-  /// Handle tap from local notification
   void _onNotificationTap(NotificationResponse response) {
     final payload = response.payload ?? '';
     final message = RemoteMessage(
@@ -134,16 +141,14 @@ class FirebaseNotificationService {
     _handleMessageTap(message);
   }
 
-  /// Handle tapped notification
-  void _handleMessageTap(RemoteMessage message) {
-    if (handler != null) {
-      handler!(message);
-    } else if (message.data.containsKey('route')) {
+  Future<void> _handleMessageTap(RemoteMessage message) async {
+    await badgeService.clear();
+
+    if (message.data.containsKey('route')) {
       navigationService.navigateTo(message.data['route']);
     }
   }
 
-  /// Public helper: send a test notification (no backend needed)
   Future<void> sendTestNotification({
     String title = 'Test Notification',
     String body = 'This is a test notification!',
@@ -153,6 +158,7 @@ class FirebaseNotificationService {
       notification: RemoteNotification(title: title, body: body),
       data: {'route': route},
     );
+    await badgeService.increment();
     await _showNotification(message);
   }
 }

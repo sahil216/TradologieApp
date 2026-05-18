@@ -6,6 +6,8 @@ import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
 import 'package:tradologie_app/features/notification/presentation/cubit/notification_cubit.dart';
+import 'package:tradologie_app/core/utils/notification_badge_service.dart';
+import 'package:tradologie_app/injection_container.dart';
 
 import '../../../../core/error/network_failure.dart';
 import '../../../../core/error/user_failure.dart';
@@ -36,6 +38,7 @@ class _NotificationScreenState extends State<NotificationScreen>
   @override
   void initState() {
     super.initState();
+    sl<NotificationBadgeService>().clear();
     getInformation();
   }
 

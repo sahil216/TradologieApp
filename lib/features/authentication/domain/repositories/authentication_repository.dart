@@ -32,10 +32,6 @@ import '../usecases/supplier_social_login_usecase.dart';
 
 abstract class AuthenticationRepository {
 
-
-
-
-
   Future<Either<Failure, SendOtpResult>> sendOtpBuyer(SendOtpParams params);
   Future<Either<Failure, VerifyOtpResult>> verifyOtpBuyer(
       VerifyOtpParams params);
