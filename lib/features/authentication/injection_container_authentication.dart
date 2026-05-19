@@ -25,6 +25,8 @@ import 'domain/repositories/authentication_repository.dart';
 import '../../features/authentication/presentation/cubit/authentication_cubit.dart';
 import 'domain/usecases/buyer_send_otp_usecase.dart';
 import 'domain/usecases/buyer_verify_otp_usecase.dart';
+import 'domain/usecases/admin_login_usecase.dart';
+import 'domain/usecases/forgotpasswordsendotpusecase.dart';
 import 'domain/usecases/verify_otp_usecase.dart';
 import 'domain/usecases/register_usecase.dart';
 import 'domain/usecases/send_otp_usecase.dart';
@@ -44,7 +46,6 @@ Future<void> init() async {
 
 
 
-
         sendOtpUsecase: sl(),
         sendOtpUsecaseFMCGseller: sl(),
         sendOtpUsecaseFMCGbuyer: sl(),
@@ -52,6 +53,15 @@ Future<void> init() async {
         verifyOtpUsecase: sl(),
         verifyOtpUsecaseFMCGSeller: sl(),
         verifyOtpUsecaseFMCGbuyer: sl(),
+
+
+        forgotPasswordSendOtpUsecase: sl(),
+        adminLoginUsecase: sl(),
+
+
+
+
+
 
 
 
@@ -87,9 +97,6 @@ Future<void> init() async {
 
 
 
-
-
-
   sl.registerLazySingleton<SendOtpUsecase>(
       () => SendOtpUsecase(authenticationRepository: sl()));
   sl.registerLazySingleton<SendOtpUsecaseFMCGseller>(
@@ -101,8 +108,20 @@ Future<void> init() async {
           () => VerifyOtpUsecase(authenticationRepository: sl()));
   sl.registerLazySingleton<VerifyOtpUsecaseFMCGSeller>(
           () => VerifyOtpUsecaseFMCGSeller(authenticationRepository: sl()));
+
+
+
   sl.registerLazySingleton<VerifyOtpUsecaseFMCGbuyer>(
       () => VerifyOtpUsecaseFMCGbuyer(authenticationRepository: sl()));
+
+
+
+  sl.registerLazySingleton<ForgotpasswordUsecase>(
+      () => ForgotpasswordUsecase(authenticationRepository: sl()));
+  sl.registerLazySingleton<AdminLoginUsecase>(
+      () => AdminLoginUsecase(authenticationRepository: sl()));
+
+
 
 
 

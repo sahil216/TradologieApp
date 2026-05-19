@@ -100,6 +100,46 @@ class RegisterError extends AuthenticationState {
   List<Object> get props => [failure];
 }
 
+class AdminLoginIsLoading extends AuthenticationState {}
+
+class AdminSignInSuccess extends AuthenticationState {
+  final AdminLoginSuccess data;
+
+  const AdminSignInSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class AdminLoginError extends AuthenticationState {
+  final Failure failure;
+
+  const AdminLoginError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
+class ForgotPasswordSendOtpIsLoading extends AuthenticationState {}
+
+class ForgotPasswordSendOtpSuccess extends AuthenticationState {
+  final ForgotpasswordsendotpSuccess data;
+
+  const ForgotPasswordSendOtpSuccess({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
+
+class ForgotPasswordSendOtpError extends AuthenticationState {
+  final Failure failure;
+
+  const ForgotPasswordSendOtpError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
 class SigninIsLoading extends AuthenticationState {}
 
 class SigninSuccess extends AuthenticationState {

@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:package_info_plus/package_info_plus.dart';
@@ -36,6 +37,7 @@ import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../injection_container.dart';
 import 'package:tradologie_app/features/fmcg/presentation/fmcg_login_navigation.dart';
 
+import '../../domain/usecases/forgotpasswordsendotpusecase.dart';
 import '../cubit/authentication_cubit.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -192,8 +194,8 @@ class _SignInScreenState extends State<SignInScreen>
               await secureStorageService.read(AppStrings.fcmToken) ?? '';
           if (!mounted) return;
 
-         // CommonToast.normal("id is $displayName");
-         BlocProvider.of<AuthenticationCubit>(context).buyerSocialSignIn(
+          // CommonToast.normal("id is $displayName");
+          BlocProvider.of<AuthenticationCubit>(context).buyerSocialSignIn(
             SupplierSocialLoginParams(
               token: "2018APR031848",
               userId: email,
@@ -254,7 +256,8 @@ class _SignInScreenState extends State<SignInScreen>
   Future<void> _signInWithFacebook() async {
     if (!Platform.isAndroid && !Platform.isIOS) {
       if (!mounted) return;
-      CommonToast.error("Facebook sign-in is only available on Android and iOS");
+      CommonToast.error(
+          "Facebook sign-in is only available on Android and iOS");
       return;
     }
     try {
@@ -336,6 +339,17 @@ class _SignInScreenState extends State<SignInScreen>
               // );
             }
             if (state is SigninError) {
+              CommonToast.showFailureToast(state.failure);
+            }
+            if (state is ForgotPasswordSendOtpSuccess) {
+              final message = state.data.message?.trim();
+              CommonToast.success(
+                message?.isNotEmpty == true
+                    ? message!
+                    : 'OTP sent successfully',
+              );
+            }
+            if (state is ForgotPasswordSendOtpError) {
               CommonToast.showFailureToast(state.failure);
             }
             if (state is BuyerSigninSuccess) {
@@ -458,24 +472,38 @@ class _SignInScreenState extends State<SignInScreen>
                                           return null;
                                         },
                                       ),
-                                      // SizedBox(height: 12),
-                                      // Align(
-                                      //   alignment: Alignment.centerRight,
-                                      //   child: GestureDetector(
-                                      //     onTap: () {},
-                                      //     child: Text(
-                                      //       CommonStrings.forgotPassword,
-                                      //       style: TextStyleConstants.regular(
-                                      //         context,
-                                      //         fontSize: 14,
-                                      //         decoration:
-                                      //             TextDecoration.underline,
-                                      //         color: AppColors.orange,
-                                      //       ),
-                                      //     ),
-                                      //   ),
-                                      // ),
-                                      SizedBox(height: 20),
+                                      GestureDetector(
+                                        onTap: () {
+                                          final userId =
+                                              textEmailController.text.trim();
+                                          if (userId.isEmpty) {
+                                            CommonToast.error(
+                                              "Please enter your User ID or mobile number",
+                                            );
+                                            return;
+                                          }
+                                          BlocProvider.of<AuthenticationCubit>(
+                                                  context)
+                                              .forgotPasswordSendOtp(
+                                            ForgotPasswordSendOtpParams(
+                                              userId: userId,
+                                              token: '2018APR031848',
+                                            ),
+                                          );
+                                        },
+                                        child: Container(
+                                          child: Text(
+                                            "Forgot Password",
+                                            style: GoogleFonts.dmSans(
+                                                fontSize: 17,
+                                                fontWeight: FontWeight.w500,
+                                                color: Color(0xFFF16522)),
+                                          ),
+                                          alignment: Alignment.topRight,
+                                          margin: EdgeInsets.only(top: 10),
+                                        ),
+                                      ),
+                                      SizedBox(height: 15),
                                       CommonButton(
                                         onPressed: () async {
                                           late SigninParams params;
@@ -531,15 +559,33 @@ class _SignInScreenState extends State<SignInScreen>
                                       ),
                                       if (SignInScreen.showGmailLogin) ...[
                                         SizedBox(height: 20),
-                                        Center(
-                                          child: CommonText(
-                                            "OR",
-                                            style: TextStyleConstants.regular(
-                                              context,
-                                              fontSize: 16,
-                                              color: AppColors.defaultText,
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Divider(
+                                                color: Colors.grey,
+                                                thickness: 1,
+                                              ),
                                             ),
-                                          ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 12),
+                                              child: CommonText(
+                                                "or continue with",
+                                                style: GoogleFonts.dmSans(
+                                                  fontSize: 16,
+                                                  color: AppColors.defaultText,
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: Divider(
+                                                color: Colors.grey,
+                                                thickness: 1,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                         SizedBox(height: 20),
                                         SizedBox(
@@ -632,6 +678,7 @@ class _SignInScreenState extends State<SignInScreen>
               BlocBuilder<AuthenticationCubit, AuthenticationState>(
                 builder: (context, state) {
                   if (state is SigninIsLoading ||
+                      state is ForgotPasswordSendOtpIsLoading ||
                       state is FmcgSellerSigninIsLoading ||
                       state is FmcgBuyerSigninIsLoading) {
                     return Positioned.fill(child: const CommonLoader());

@@ -25,7 +25,11 @@ import 'package:tradologie_app/features/authentication/domain/usecases/send_otp_
 import 'package:tradologie_app/features/authentication/domain/usecases/verify_otp_usecase.dart';
 
 import '../../../../core/error/failures.dart';
+import '../entities/ForgotpasswordsendotpSucess.dart';
 import '../entities/verify_otp_fmcg_seller.dart';
+import '../entities/admin_login_success.dart';
+import '../usecases/admin_login_usecase.dart';
+import '../usecases/forgotpasswordsendotpusecase.dart';
 import '../usecases/register_usecase.dart';
 import '../usecases/sign_in_usecase.dart';
 import '../usecases/supplier_social_login_usecase.dart';
@@ -35,7 +39,15 @@ abstract class AuthenticationRepository {
   Future<Either<Failure, SendOtpResult>> sendOtpBuyer(SendOtpParams params);
   Future<Either<Failure, VerifyOtpResult>> verifyOtpBuyer(
       VerifyOtpParams params);
+
+
+  Future<Either<Failure, AdminLoginSuccess>> adminLogin(AdminLoginParams params);
   Future<Either<Failure, LoginSuccess?>> signIn(SigninParams params);
+
+  Future<Either<Failure, ForgotpasswordsendotpSuccess>> forgotpasswordsendotp(
+      ForgotPasswordSendOtpParams params);
+
+
   Future<Either<Failure, LoginSuccess?>> supplierLoginWithSocialMedia(
       SupplierSocialLoginParams params);
   Future<Either<Failure, BuyerLoginSuccess?>> buyerLoginWithSocialMedia(

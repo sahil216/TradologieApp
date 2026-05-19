@@ -47,6 +47,10 @@ class EndPoints {
   static String getProductsListForSeller =
       '$baseUrl/FMCG/FMCGBrandProuctListForSeller';
 
+  static const String adminLogin = '$baseUrl/Admin/Login';
+  static const String forgotpasswordsendotp = "$baseUrl/Supplier/ForgotPasswordSendOTP";
+
+
   static String countryCodeList = '$baseUrlSupplier/GetOTPCountry';
   // FMCG
   static String fmcgSellerSignin = "$baseUrl/FMCG/FMCGSellerLogin";

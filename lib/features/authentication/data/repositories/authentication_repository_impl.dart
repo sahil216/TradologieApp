@@ -43,10 +43,14 @@ import '../../../../core/utils/app_strings.dart';
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/phone_number_utils.dart';
 import '../../../../core/utils/secure_storage_service.dart';
+import '../../domain/entities/ForgotpasswordsendotpSucess.dart';
 import '../../domain/entities/login_success.dart';
 import '../../domain/entities/verify_otp_fmcg_seller.dart';
 import '../../domain/entities/verify_otp_result.dart';
 import '../../domain/repositories/authentication_repository.dart';
+import '../../domain/entities/admin_login_success.dart';
+import '../../domain/usecases/admin_login_usecase.dart';
+import '../../domain/usecases/forgotpasswordsendotpusecase.dart';
 import '../../domain/usecases/register_usecase.dart';
 import '../../domain/usecases/send_otp_usecase.dart';
 import '../../domain/usecases/sign_in_usecase.dart';
@@ -54,6 +58,8 @@ import '../../domain/usecases/supplier_social_login_usecase.dart';
 import '../../domain/usecases/verify_otp_usecase.dart';
 import '../datasources/authentication_remote_data_source.dart';
 import '../models/buyer_login_success_model.dart';
+import '../models/admin_login_success_model.dart';
+import '../models/forgot_password_send_otp_result_model.dart';
 import '../models/verify_otp_fmcgseller_model.dart';
 
 class AuthenticationRepositoryImpl implements AuthenticationRepository {
@@ -65,6 +71,63 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     required this.sharedPreferences,
   });
 
+
+  @override
+  Future<Either<Failure, AdminLoginSuccess>> adminLogin(
+      AdminLoginParams params) async {
+    try {
+      final response =
+          await authenticationRemoteDataSource.adminLogin(params);
+      if (response != null && response.success) {
+        Constants.isLogin = true;
+        Constants.isBuyer = false;
+        Constants.isFmcg = false;
+
+        final data = AdminLoginSuccessModel.fromJson(
+            Map<String, dynamic>.from(response.data as Map));
+        final secureStorage = SecureStorageService();
+
+        await secureStorage.write(AppStrings.appSession, 'true');
+        await secureStorage.write(AppStrings.isBuyer, 'false');
+        await secureStorage.write(AppStrings.isFmcg, 'false');
+
+        Constants.token = data.apiVerificationCode ?? '';
+        await secureStorage.write(
+          AppStrings.apiVerificationCode,
+          data.apiVerificationCode ?? '',
+        );
+        await secureStorage.write(
+          AppStrings.loginId,
+          data.loginId?.toString() ?? '',
+        );
+        await secureStorage.write(
+          AppStrings.userId,
+          params.userId,
+        );
+
+        return Right(data);
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, ForgotpasswordsendotpSuccess>> forgotpasswordsendotp(
+      ForgotPasswordSendOtpParams params) async {
+    try {
+      final response =
+          await authenticationRemoteDataSource.forgotpasswordsendotp(params);
+      if (response != null && response.success) {
+        return Right(
+            ForgotPasswordSendOtpResultModel.fromJson(response.data));
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
 
   @override
   Future<Either<Failure, SendOtpResult>> sendOtpBuyer(

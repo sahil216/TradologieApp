@@ -29,6 +29,7 @@ import '../../core/utils/app_strings.dart';
 import '../../features/app/presentation/screens/onboarding_screen.dart';
 import '../../features/app/presentation/screens/splash_screen.dart';
 import '../../features/app/presentation/screens/terms_screen.dart';
+import '../../features/authentication/presentation/screens/admin_login.dart';
 import '../../features/authentication/presentation/screens/send_otp_screen.dart';
 import '../../features/authentication/presentation/screens/sign_in_screen.dart';
 import '../../features/authentication/presentation/screens/sign_up_screen.dart';
@@ -58,6 +59,7 @@ class Routes {
   static const String signinRoute = '/signin';
   static const String signupRoute = '/signup';
   static const String fmcgSignIn = '/fmcgsignin';
+  static const String adminSignin = '/adminSignin';
   static const String fmcgRegisterSellerDistributorForm =
       '/fmcgRegisterSellerDistributorForm';
 
@@ -131,6 +133,8 @@ class AppRoutes {
         return CupertinoPageRoute(builder: (context) {
           return const SignInScreen();
         });
+
+
       case Routes.fmcgSignIn:
         return CupertinoPageRoute(builder: (context) {
           final data = routeSettings.arguments as bool;
@@ -138,6 +142,19 @@ class AppRoutes {
             isBuyer: data,
           );
         });
+
+
+
+      case Routes.adminSignin:
+        return CupertinoPageRoute(builder: (context) {
+          return AdminSignin(
+          );
+        });
+
+
+
+
+
       case Routes.signupRoute:
         return CupertinoPageRoute(builder: (context) {
           return SignupScreen();

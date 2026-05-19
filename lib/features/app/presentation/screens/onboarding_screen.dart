@@ -35,6 +35,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
   String? selectedProduct;
   String? selectedUserType;
+  bool showadmin = true;
 
   TradeType? selectedTradeType;
   @override
@@ -180,6 +181,21 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         AnalyticsService.logEvent("fmcg_buyer_button_clicked");
                       },
                     ),
+
+
+                    if(showadmin)
+                      BusinessCard(
+                        title: "Admin Sign In",
+                        subtitle: "Admin access for Tradologie Internal Team",
+                        image: "assets/images/app_logo.png",
+                        onTap: () async {
+                          sl<NavigationService>()
+                              .pushNamed(Routes.adminSignin);
+                          AnalyticsService.logEvent("admin_login_button_clicked");
+                        },
+                      ),
+
+
                     // BusinessCard(
                     //   title: "Chat",
                     //   subtitle: "Register/Login as Distributor.",

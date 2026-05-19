@@ -43,6 +43,10 @@ import 'package:tradologie_app/features/authentication/domain/usecases/sign_out_
 import '../../../../core/error/failures.dart';
 import '../../domain/entities/verify_otp_fmcg_seller.dart';
 import '../../domain/entities/verify_otp_result.dart';
+import '../../domain/entities/ForgotpasswordsendotpSucess.dart';
+import '../../domain/entities/admin_login_success.dart';
+import '../../domain/usecases/admin_login_usecase.dart';
+import '../../domain/usecases/forgotpasswordsendotpusecase.dart';
 import '../../domain/usecases/verify_otp_usecase.dart';
 import '../../domain/usecases/register_usecase.dart';
 import '../../domain/usecases/send_otp_usecase.dart';
@@ -68,6 +72,12 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   final BuyerSocialLoginUsecase buyerSocialLoginUsecase;
   final RegisterUsecase registerUsecase;
   final BuyerSigninUsecase buyerSigninUsecase;
+
+
+  final ForgotpasswordUsecase forgotPasswordSendOtpUsecase;
+  final AdminLoginUsecase adminLoginUsecase;
+
+
   final SignOutUsecase signOutUsecase;
   final BuyerSendOtpUsecase buyerSendOtpUsecase;
   final BuyerVerifyOtpUsecase buyerVerifyOtpUsecase;
@@ -107,6 +117,8 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     required this.verifyOtpUsecaseFMCGSeller,
     required this.verifyOtpUsecaseFMCGbuyer,
     required this.buyerSigninUsecase,
+    required this.forgotPasswordSendOtpUsecase,
+    required this.adminLoginUsecase,
     required this.signOutUsecase,
     required this.buyerSendOtpUsecase,
     required this.buyerVerifyOtpUsecase,
@@ -211,6 +223,15 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     ));
   }
 
+  Future<void> adminLogin(AdminLoginParams params) async {
+    emit(AdminLoginIsLoading());
+    final response = await adminLoginUsecase(params);
+    emit(response.fold(
+      (failure) => AdminLoginError(failure: failure),
+      (res) => AdminSignInSuccess(data: res),
+    ));
+  }
+
 
 
 
@@ -249,6 +270,28 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       (res) => BuyerSigninSuccess(data: res),
     ));
   }
+
+
+
+
+
+
+
+
+  Future<void> forgotPasswordSendOtp(ForgotPasswordSendOtpParams params) async {
+    emit(ForgotPasswordSendOtpIsLoading());
+    final response = await forgotPasswordSendOtpUsecase(params);
+    emit(response.fold(
+      (failure) => ForgotPasswordSendOtpError(failure: failure),
+      (res) => ForgotPasswordSendOtpSuccess(data: res),
+    ));
+  }
+
+
+
+
+
+
 
   Future<void> register(RegisterParams params) async {
     emit(RegisterIsLoading());

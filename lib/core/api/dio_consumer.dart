@@ -67,6 +67,16 @@ class DioConsumer implements ApiConsumer {
   }
 
   @override
+  Future postSupplierResult(String path, {Map<String, dynamic>? body}) async {
+    try {
+      final response = await client.post(path, data: body);
+      return _handleSupplierResultResponse(response);
+    } on DioException catch (error) {
+      _handleDioError(error);
+    }
+  }
+
+  @override
   Future put(String path,
       {Map<String, dynamic>? body,
       Map<String, dynamic>? queryParameters}) async {
@@ -104,6 +114,30 @@ class DioConsumer implements ApiConsumer {
       if (v == 'false') return false;
     }
     return null;
+  }
+
+  ResponseWrapper<dynamic> _handleSupplierResultResponse(
+      Response<dynamic> response) {
+    final responseJson = jsonDecode(response.data.toString());
+    final result = responseJson["Result"];
+    if (result is! Map<String, dynamic>) {
+      return ResponseWrapper<dynamic>(
+        data: null,
+        code: response.statusCode,
+        message: "Invalid response",
+        success: false,
+      );
+    }
+
+    final resultSuccess = result["success"];
+    final isSuccess = resultSuccess == 1 || resultSuccess == true;
+
+    return ResponseWrapper<dynamic>(
+      data: result,
+      code: response.statusCode,
+      message: result["message"]?.toString() ?? "",
+      success: isSuccess,
+    );
   }
 
   dynamic _handleResponseAsJson(Response<dynamic> response) {

@@ -11,12 +11,15 @@ import '../../../../core/api/api_consumer.dart';
 import '../../../../core/api/end_points.dart';
 import '../../../../core/response_wrapper/response_wrapper.dart';
 import '../../../../core/utils/secure_storage_service.dart';
+import '../../domain/usecases/admin_login_usecase.dart';
+import '../../domain/usecases/forgotpasswordsendotpusecase.dart';
 import '../../domain/usecases/register_usecase.dart';
 import '../../domain/usecases/send_otp_usecase.dart';
 import '../../domain/usecases/sign_in_usecase.dart';
 import '../../domain/usecases/supplier_social_login_usecase.dart';
 
 abstract class AuthenticationRemoteDataSource {
+  Future<ResponseWrapper<dynamic>?> adminLogin(AdminLoginParams params);
   Future<ResponseWrapper<dynamic>?> signIn(SigninParams params);
   Future<ResponseWrapper<dynamic>?> supplierLoginWithSocialMedia(
       SupplierSocialLoginParams params);
@@ -25,6 +28,8 @@ abstract class AuthenticationRemoteDataSource {
   Future<ResponseWrapper<dynamic>?> buyerSignIn(SigninParams params);
   Future<ResponseWrapper<dynamic>?> register(RegisterParams params);
 
+  Future<ResponseWrapper<dynamic>?> forgotpasswordsendotp(
+      ForgotPasswordSendOtpParams params);
   Future<ResponseWrapper<dynamic>?> sendOtp(SendOtpParams params);
   Future<ResponseWrapper<dynamic>?> sendFMCGSellerOtp(SendOtpParams params);
   Future<ResponseWrapper<dynamic>?> sendFMCGBuyerOtp(SendOtpParams params);
@@ -73,6 +78,14 @@ class AuthenticationRemoteDataSourceImpl
   ApiConsumer apiConsumer;
 
   AuthenticationRemoteDataSourceImpl({required this.apiConsumer});
+
+  @override
+  Future<ResponseWrapper<dynamic>?> adminLogin(AdminLoginParams params) async {
+    return await apiConsumer.post(
+      EndPoints.adminLogin,
+      body: params.toJson(),
+    );
+  }
 
   @override
   Future<ResponseWrapper<dynamic>?> signIn(SigninParams params) async {
@@ -358,6 +371,15 @@ class AuthenticationRemoteDataSourceImpl
 
 
 
+
+  @override
+  Future<ResponseWrapper<dynamic>?> forgotpasswordsendotp(
+      ForgotPasswordSendOtpParams params) async {
+    return await apiConsumer.postSupplierResult(
+      EndPoints.forgotpasswordsendotp,
+      body: params.toJson(),
+    );
+  }
 
   @override
   Future<ResponseWrapper<dynamic>?> sendOtp(SendOtpParams params) async {
