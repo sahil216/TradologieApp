@@ -72,6 +72,10 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   });
 
 
+
+
+
+
   @override
   Future<Either<Failure, AdminLoginSuccess>> adminLogin(
       AdminLoginParams params) async {
@@ -82,6 +86,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
         Constants.isLogin = true;
         Constants.isBuyer = false;
         Constants.isFmcg = false;
+        Constants.isAdmin = true;
 
         final data = AdminLoginSuccessModel.fromJson(
             Map<String, dynamic>.from(response.data as Map));
@@ -90,6 +95,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
         await secureStorage.write(AppStrings.appSession, 'true');
         await secureStorage.write(AppStrings.isBuyer, 'false');
         await secureStorage.write(AppStrings.isFmcg, 'false');
+        await secureStorage.write(AppStrings.isAdmin, 'true');
 
         Constants.token = data.apiVerificationCode ?? '';
         await secureStorage.write(
@@ -112,6 +118,13 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       return Left(e);
     }
   }
+
+
+
+
+
+
+
 
   @override
   Future<Either<Failure, ForgotpasswordsendotpSuccess>> forgotpasswordsendotp(
@@ -153,6 +166,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       if (response != null && response.success) {
         Constants.isLogin = true;
         SecureStorageService secureStorage = SecureStorageService();
+        await _clearAdminSession(secureStorage);
 
         await secureStorage.write(AppStrings.appSession, "true");
         Constants.token = response.data["APIVerificationCode"] ?? "";
@@ -205,6 +219,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       if (response != null && response.success) {
         Constants.isLogin = true;
         SecureStorageService secureStorage = SecureStorageService();
+        await _clearAdminSession(secureStorage);
 
         await secureStorage.write(AppStrings.appSession, "true");
         Constants.token = response.data["APIVerificationCode"] ?? "";
@@ -253,6 +268,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       if (response != null && response.success) {
         Constants.isLogin = true;
         SecureStorageService secureStorage = SecureStorageService();
+        await _clearAdminSession(secureStorage);
 
         await secureStorage.write(AppStrings.appSession, "true");
         Constants.token = response.data["APIVerificationCode"] ?? "";
@@ -301,6 +317,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       if (response != null && response.success) {
         Constants.isLogin = true;
         SecureStorageService secureStorage = SecureStorageService();
+        await _clearAdminSession(secureStorage);
         final d = response.data;
 
         await secureStorage.write(AppStrings.appSession, "true");
@@ -347,6 +364,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       if (response != null && response.success) {
         Constants.isLogin = true;
         SecureStorageService secureStorage = SecureStorageService();
+        await _clearAdminSession(secureStorage);
         FmcgSellerSigninResponse data =
             FmcgSellerSigninResponseModel.fromJson(response.data);
 
@@ -393,6 +411,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       if (response != null && response.success) {
         Constants.isLogin = true;
         SecureStorageService secureStorage = SecureStorageService();
+        await _clearAdminSession(secureStorage);
         FmcgBuyerLoginSuccess data =
             FmcgBuyerLoginSuccessModel.fromJson(response.data);
 
@@ -430,6 +449,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       if (response != null && response.success) {
         Constants.isLogin = true;
         SecureStorageService secureStorage = SecureStorageService();
+        await _clearAdminSession(secureStorage);
         final detail =
             Map<String, dynamic>.from(response.data as Map<dynamic, dynamic>);
         FmcgBuyerLoginSuccess data =
@@ -469,6 +489,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       if (response != null && response.success) {
         Constants.isLogin = true;
         SecureStorageService secureStorage = SecureStorageService();
+        await _clearAdminSession(secureStorage);
         final detail =
             Map<String, dynamic>.from(response.data as Map<dynamic, dynamic>);
         FmcgSellerSigninResponse data =
@@ -516,6 +537,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       if (response != null && response.success) {
         Constants.isLogin = true;
         SecureStorageService secureStorage = SecureStorageService();
+        await _clearAdminSession(secureStorage);
 
         await secureStorage.write(AppStrings.appSession, "true");
         Constants.token = response.data["APIVerificationCode"] ?? "";
@@ -592,6 +614,41 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     }
   }
 
+
+
+
+
+
+  @override
+  Future<Either<Failure, String>> adminLogout(NoParams params) async {
+    try {
+      final response =
+          await authenticationRemoteDataSource.adminLogout(params);
+      if (response != null && response.success) {
+        final secureStorage = SecureStorageService();
+        Constants.isLogin = false;
+        Constants.token = '';
+        await _clearAdminSession(secureStorage);
+        await secureStorage.delete(AppStrings.apiVerificationCode);
+        await secureStorage.write(AppStrings.appSession, 'false');
+        await secureStorage.write(AppStrings.isBuyer, 'false');
+        await secureStorage.write(AppStrings.isFmcg, 'false');
+        final message = response.message.trim();
+        return Right(
+          message.isNotEmpty ? message : 'Admin logout successfully!',
+        );
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+
+
+
+
+
   @override
   Future<Either<Failure, List<CountryCodeList>>> getCountryCodeList(
       NoParams params) async {
@@ -618,6 +675,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       if (response != null && response.success) {
         Constants.isLogin = true;
         SecureStorageService secureStorage = SecureStorageService();
+        await _clearAdminSession(secureStorage);
         FmcgSellerSigninResponse data =
             FmcgSellerSigninResponseModel.fromJson(response.data);
 
@@ -695,6 +753,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       if (response != null && response.success) {
         Constants.isLogin = true;
         SecureStorageService secureStorage = SecureStorageService();
+        await _clearAdminSession(secureStorage);
         FmcgBuyerLoginSuccess data =
             FmcgBuyerLoginSuccessModel.fromJson(response.data);
 
@@ -923,6 +982,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
         Constants.isLogin = true;
         Constants.token = response.data["APIVerificationCode"] ?? "";
         SecureStorageService secureStorage = SecureStorageService();
+        await _clearAdminSession(secureStorage);
 
         await secureStorage.write(AppStrings.appSession, "true");
 
@@ -970,6 +1030,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
         Constants.isLogin = true;
         Constants.token = response.data["FMCGUserDetail"]["ApiVerificationCode"] ?? "";
         SecureStorageService secureStorage = SecureStorageService();
+        await _clearAdminSession(secureStorage);
 
         await secureStorage.write(AppStrings.appSession, "true");
 
@@ -1016,6 +1077,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       if (response != null && response.success) {
         Constants.isLogin = true;
         SecureStorageService secureStorage = SecureStorageService();
+        await _clearAdminSession(secureStorage);
         final data = FmcgBuyerLoginSuccessModel.fromJson(response.data);
 
         await secureStorage.write(AppStrings.appSession, "true");
@@ -1060,8 +1122,8 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     }
   }
 
-
-
-
-
+  Future<void> _clearAdminSession(SecureStorageService secureStorage) async {
+    Constants.isAdmin = false;
+    await secureStorage.write(AppStrings.isAdmin, 'false');
+  }
 }

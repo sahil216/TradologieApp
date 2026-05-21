@@ -21,6 +21,7 @@ class Constants {
   static bool isLogin = false;
   static bool isBuyer = false;
   static bool isFmcg = false;
+  static bool isAdmin = false;
   static String token = "";
   static String deviceID = "";
   static String analyticsUrl = "";

@@ -15,7 +15,20 @@ class NotificationDetailModel extends NotificationDetail {
     super.startDateTime,
     super.updatedDate,
     super.userType,
+    super.isRead,
   });
+
+  static bool? _parseIsRead(dynamic value) {
+    if (value == null) return null;
+    if (value is bool) return value;
+    if (value is int) return value == 1;
+    if (value is String) {
+      final normalized = value.toLowerCase();
+      if (normalized == 'true' || normalized == '1') return true;
+      if (normalized == 'false' || normalized == '0') return false;
+    }
+    return null;
+  }
 
   factory NotificationDetailModel.fromJson(Map<String, dynamic> json) =>
       NotificationDetailModel(
@@ -32,5 +45,6 @@ class NotificationDetailModel extends NotificationDetail {
         startDateTime: json["StartDateTime"].toString(),
         updatedDate: json["UpdatedDate"],
         userType: json["UserType"],
+        isRead: _parseIsRead(json["IsRead"]),
       );
 }

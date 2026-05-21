@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -8,12 +9,98 @@ import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/notification_badge_service.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 
+const _jsonEncoder = JsonEncoder.withIndent('  ');
+
+/// Recursively converts values to JSON-safe primitives (enums → name, etc.).
+dynamic _toJsonSafe(dynamic value) {
+  if (value == null) return null;
+  if (value is String || value is num || value is bool) return value;
+  if (value is DateTime) return value.toIso8601String();
+  if (value is Enum) return value.name;
+  if (value is Map) {
+    return value.map(
+      (key, val) => MapEntry(key.toString(), _toJsonSafe(val)),
+    );
+  }
+  if (value is Iterable) {
+    return value.map(_toJsonSafe).toList();
+  }
+  return value.toString();
+}
+
+/// Logs the full FCM payload as formatted JSON (debug / console).
+void logPushNotificationPayload(String source, RemoteMessage message) {
+  try {
+    final payload = _toJsonSafe(_remoteMessageToJson(message));
+    log(
+      '📩 Push notification [$source]\n${_jsonEncoder.convert(payload)}',
+      name: 'FCM',
+    );
+  } catch (e, st) {
+    log(
+      '📩 Push notification [$source] (serialize error: $e)\n$st',
+      name: 'FCM',
+    );
+  }
+}
+
+Map<String, dynamic> _remoteMessageToJson(RemoteMessage message) {
+  final notification = message.notification;
+  return {
+    'messageId': message.messageId,
+    'senderId': message.senderId,
+    'from': message.from,
+    'category': message.category,
+    'collapseKey': message.collapseKey,
+    'contentAvailable': message.contentAvailable,
+    'messageType': message.messageType,
+    'mutableContent': message.mutableContent,
+    'sentTime': message.sentTime?.toIso8601String(),
+    'threadId': message.threadId,
+    'ttl': message.ttl,
+    'data': Map<String, dynamic>.from(message.data),
+    'notification': notification == null
+        ? null
+        : {
+            'title': notification.title,
+            'body': notification.body,
+            'titleLocKey': notification.titleLocKey,
+            'titleLocArgs': notification.titleLocArgs,
+            'bodyLocKey': notification.bodyLocKey,
+            'bodyLocArgs': notification.bodyLocArgs,
+            'android': notification.android == null
+                ? null
+                : {
+                    'channelId': notification.android!.channelId,
+                    'clickAction': notification.android!.clickAction,
+                    'color': notification.android!.color,
+                    'count': notification.android!.count,
+                    'imageUrl': notification.android!.imageUrl,
+                    'link': notification.android!.link,
+                    'priority': notification.android!.priority,
+                    'smallIcon': notification.android!.smallIcon,
+                    'sound': notification.android!.sound,
+                    'ticker': notification.android!.ticker,
+                    'visibility': notification.android!.visibility,
+                  },
+            'apple': notification.apple == null
+                ? null
+                : {
+                    'badge': notification.apple!.badge,
+                    'imageUrl': notification.apple!.imageUrl,
+                    'sound': notification.apple!.sound,
+                    'subtitle': notification.apple!.subtitle,
+                  },
+          },
+  };
+}
+
 /// Background message handler (must be top-level).
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
+  logPushNotificationPayload('background', message);
   await NotificationBadgeService.incrementInBackground();
-  log("📩 Background message received: ${message.messageId}");
 }
 
 class FirebaseNotificationService {
@@ -38,11 +125,15 @@ class FirebaseNotificationService {
     await badgeService.syncFromStorage();
 
     FirebaseMessaging.onMessage.listen((message) async {
+      logPushNotificationPayload('foreground', message);
       await badgeService.increment();
       await _showNotification(message);
     });
 
-    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessageTap);
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      logPushNotificationPayload('opened_from_background', message);
+      _handleMessageTap(message);
+    });
 
     await FirebaseMessaging.instance
         .setForegroundNotificationPresentationOptions(
@@ -55,6 +146,7 @@ class FirebaseNotificationService {
 
     final initialMessage = await _messaging.getInitialMessage();
     if (initialMessage != null) {
+      logPushNotificationPayload('opened_from_terminated', initialMessage);
       await _handleMessageTap(initialMessage);
     }
 
@@ -132,6 +224,18 @@ class FirebaseNotificationService {
   }
 
   void _onNotificationTap(NotificationResponse response) {
+    log(
+      '📩 Push notification [local_tap]\n${_jsonEncoder.convert({
+        'id': response.id,
+        'actionId': response.actionId,
+        'input': response.input,
+        'payload': response.payload,
+        'notificationResponseType':
+            response.notificationResponseType.name,
+      })}',
+      name: 'FCM',
+    );
+
     final payload = response.payload ?? '';
     final message = RemoteMessage(
       notification: RemoteNotification(title: 'Notification', body: payload),

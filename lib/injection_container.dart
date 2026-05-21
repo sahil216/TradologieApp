@@ -42,6 +42,7 @@ import 'features/notification/injection_container_notification.dart'
     as di_notification;
 import 'features/fmcg/injection_container_chat.dart' as di_chat;
 import 'features/socket/injection_container_chats.dart' as di_chats;
+import 'features/admin/injection_container_admin.dart' as di_admin;
 
 import 'core/utils/app_strings.dart';
 import 'core/utils/constants.dart';
@@ -58,7 +59,6 @@ Future<void> init() async {
   if (kDebugMode) {
     Bloc.observer = AppBlocObserver();
   }
-  AppLifecycleObserver().startObserving();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
@@ -96,6 +96,14 @@ Future<void> init() async {
 
   await notificationService.init();
 
+  AppLifecycleObserver().startObserving(
+    onResumed: () {
+      if (sl.isRegistered<NotificationBadgeService>()) {
+        sl<NotificationBadgeService>().refresh();
+      }
+    },
+  );
+
   sl.registerLazySingleton(() => LogInterceptor(
       request: true,
       requestBody: true,
@@ -117,6 +125,7 @@ Future<void> init() async {
   await di_add_negotiation.init();
   await di_chat.init();
   await di_chats.init();
+  await di_admin.init();
 
   //! init variable
   Constants.isLogin = bool.tryParse(
@@ -128,6 +137,9 @@ Future<void> init() async {
           false;
   Constants.isFmcg =
       bool.tryParse(await secureStorage.read(AppStrings.isFmcg) ?? "false") ??
+          false;
+  Constants.isAdmin =
+      bool.tryParse(await secureStorage.read(AppStrings.isAdmin) ?? "false") ??
           false;
 
   Constants.name = Constants.isFmcg == true

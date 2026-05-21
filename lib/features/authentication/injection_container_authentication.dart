@@ -26,6 +26,7 @@ import '../../features/authentication/presentation/cubit/authentication_cubit.da
 import 'domain/usecases/buyer_send_otp_usecase.dart';
 import 'domain/usecases/buyer_verify_otp_usecase.dart';
 import 'domain/usecases/admin_login_usecase.dart';
+import 'domain/usecases/admin_logout_usecase.dart';
 import 'domain/usecases/forgotpasswordsendotpusecase.dart';
 import 'domain/usecases/verify_otp_usecase.dart';
 import 'domain/usecases/register_usecase.dart';
@@ -57,6 +58,7 @@ Future<void> init() async {
 
         forgotPasswordSendOtpUsecase: sl(),
         adminLoginUsecase: sl(),
+        adminLogoutUsecase: sl(),
 
 
 
@@ -120,6 +122,8 @@ Future<void> init() async {
       () => ForgotpasswordUsecase(authenticationRepository: sl()));
   sl.registerLazySingleton<AdminLoginUsecase>(
       () => AdminLoginUsecase(authenticationRepository: sl()));
+  sl.registerLazySingleton<AdminLogoutUsecase>(
+      () => AdminLogoutUsecase(authenticationRepository: sl()));
 
 
 

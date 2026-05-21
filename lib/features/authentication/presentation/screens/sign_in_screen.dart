@@ -29,16 +29,14 @@ import 'package:tradologie_app/features/authentication/domain/usecases/supplier_
 
 import '../../../../config/routes/app_router.dart';
 import '../../../../core/utils/app_colors.dart';
-import '../../../../core/utils/responsive.dart';
 import '../../../../core/widgets/common_loader.dart';
-import '../../../../core/widgets/common_social_icons.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../injection_container.dart';
 import 'package:tradologie_app/features/fmcg/presentation/fmcg_login_navigation.dart';
 
-import '../../domain/usecases/forgotpasswordsendotpusecase.dart';
 import '../cubit/authentication_cubit.dart';
+import '../widget/youtube_player.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -46,11 +44,13 @@ class SignInScreen extends StatefulWidget {
   /// Set to `true` when you want the Facebook login button visible.
   static const bool showFacebookLogin = false;
 
-  /// Gmail / Google sign-in is enabled on Android only.
-  static bool get showGmailLogin => Platform.isAndroid;
+  /// Gmail / Google sign-in on Android and iOS.
+  static bool get showGmailLogin =>
+      Platform.isAndroid || Platform.isIOS;
 
   @override
   State<SignInScreen> createState() => _SignInScreenState();
+
 }
 
 class _SignInScreenState extends State<SignInScreen>
@@ -69,6 +69,7 @@ class _SignInScreenState extends State<SignInScreen>
   String deviceId = '';
   String manufacturer = '';
   String appVersion = '';
+  bool showforgotpassword = false;
 
   @override
   void initState() {
@@ -130,7 +131,7 @@ class _SignInScreenState extends State<SignInScreen>
   final formKey = GlobalKey<FormState>();
 
   Future<void> _signInWithGoogle() async {
-    if (!Platform.isAndroid) {
+    if (!Platform.isAndroid && !Platform.isIOS) {
       return;
     }
     try {
@@ -297,9 +298,136 @@ class _SignInScreenState extends State<SignInScreen>
     super.dispose();
   }
 
+  Widget _buildSocialLoginSection(BuildContext context) {
+    final screenW = MediaQuery.sizeOf(context).width;
+    final buttonW = screenW > 520 ? 400.0 : screenW - 32.0;
+    final hasGoogle = SignInScreen.showGmailLogin;
+    final hasFacebook = SignInScreen.showFacebookLogin;
+    final showOrBridge = hasGoogle || hasFacebook;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(height: 10),
+        if (showOrBridge) ...[
+          Row(
+            children: [
+              Expanded(
+                child: Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: AppColors.grayText.withValues(alpha: 0.2),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Text(
+                  'or continue with',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.grayText,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: AppColors.grayText.withValues(alpha: 0.2),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+        ],
+        if (hasGoogle)
+          SizedBox(
+            width: buttonW,
+            child: CommonButton(
+              onPressed: _signInWithGoogle,
+              text: 'Continue with Google',
+              height: 44,
+              backgroundColor: Colors.white,
+              borderSide: BorderSide(
+                color: AppColors.defaultText.withValues(alpha: 0.12),
+                width: 1,
+              ),
+              elevation: 0,
+              radius: 12,
+              icon: Image.asset(
+                ImgAssets.google,
+                width: 20,
+                height: 20,
+              ),
+              textStyle: TextStyleConstants.medium(
+                context,
+                fontSize: 14,
+                color: AppColors.defaultText,
+              ),
+            ),
+          ),
+        if (hasGoogle && hasFacebook) const SizedBox(height: 8),
+        if (hasFacebook)
+          SizedBox(
+            width: buttonW,
+            child: CommonButton(
+              onPressed: _signInWithFacebook,
+              text: 'Continue with Facebook',
+              height: 44,
+              backgroundColor: const Color(0xFF1877F2),
+              borderSide: BorderSide.none,
+              elevation: 0,
+              radius: 12,
+              icon: Image.asset(
+                ImgAssets.facebook,
+                width: 20,
+                height: 20,
+              ),
+              textStyle: TextStyleConstants.medium(
+                context,
+                fontSize: 14,
+                color: AppColors.white,
+              ),
+            ),
+          ),
+        if (hasGoogle || hasFacebook) const SizedBox(height: 8),
+        SizedBox(
+          width: buttonW,
+          child: CommonButton(
+            onPressed: () {
+              sl<NavigationService>().pushNamed(Routes.sendOtpScreen);
+            },
+            text: Constants.isFmcg && Constants.isBuyer
+                ? CommonStrings.loginViaWhatsapp
+                : CommonStrings.sendOtpViaWhatsapp,
+            height: 44,
+            backgroundColor: AppColors.white,
+            borderSide: BorderSide(
+              color: AppColors.defaultText.withValues(alpha: 0.12),
+              width: 1,
+            ),
+            elevation: 0,
+            radius: 12,
+            icon: Image.asset(
+              ImgAssets.whatsappIcon,
+              width: 20,
+              height: 20,
+            ),
+            textStyle: TextStyleConstants.medium(
+              context,
+              fontSize: 14,
+              color: AppColors.black,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final r = Responsive(context);
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: AdaptiveScaffold(
@@ -405,12 +533,12 @@ class _SignInScreenState extends State<SignInScreen>
                           title: CommonStrings.signIn,
                           showBackButton: true,
                           showNotification: false,
+                          expandedHeight: 64,
                         ),
                         SliverToBoxAdapter(
                           child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20),
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 Form(
@@ -419,9 +547,7 @@ class _SignInScreenState extends State<SignInScreen>
                                     crossAxisAlignment:
                                         CrossAxisAlignment.stretch,
                                     children: [
-                                      SizedBox(
-                                        height: 20,
-                                      ),
+                                      const SizedBox(height: 8),
                                       CommonTextField(
                                         titleText: CommonStrings.emailId,
                                         hintText: CommonStrings.enterEmail,
@@ -441,7 +567,7 @@ class _SignInScreenState extends State<SignInScreen>
                                           return null;
                                         },
                                       ),
-                                      SizedBox(height: 12),
+                                      const SizedBox(height: 8),
                                       CommonTextField(
                                         titleText: CommonStrings.password,
                                         hintText: CommonStrings.enterPassword,
@@ -472,39 +598,34 @@ class _SignInScreenState extends State<SignInScreen>
                                           return null;
                                         },
                                       ),
+
+                                      if(showforgotpassword)
                                       GestureDetector(
                                         onTap: () {
-                                          final userId =
-                                              textEmailController.text.trim();
-                                          if (userId.isEmpty) {
-                                            CommonToast.error(
-                                              "Please enter your User ID or mobile number",
-                                            );
-                                            return;
-                                          }
-                                          BlocProvider.of<AuthenticationCubit>(
-                                                  context)
-                                              .forgotPasswordSendOtp(
-                                            ForgotPasswordSendOtpParams(
-                                              userId: userId,
-                                              token: '2018APR031848',
-                                            ),
+                                          Navigator.pushNamed(
+                                            context,
+                                            Routes.forgotPasswordRoute,
                                           );
                                         },
-                                        child: Container(
-                                          child: Text(
-                                            "Forgot Password",
-                                            style: GoogleFonts.dmSans(
-                                                fontSize: 17,
+                                        child: Align(
+                                          alignment: Alignment.centerRight,
+                                          child: Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 4),
+                                            child: Text(
+                                              "Forgot Password",
+                                              style: GoogleFonts.dmSans(
+                                                fontSize: 14,
                                                 fontWeight: FontWeight.w500,
-                                                color: Color(0xFFF16522)),
+                                                color: Color(0xFFF16522),
+                                              ),
+                                            ),
                                           ),
-                                          alignment: Alignment.topRight,
-                                          margin: EdgeInsets.only(top: 10),
                                         ),
                                       ),
-                                      SizedBox(height: 15),
+                                      const SizedBox(height: 12),
                                       CommonButton(
+                                        height: 46,
                                         onPressed: () async {
                                           late SigninParams params;
                                           if (textEmailController
@@ -553,121 +674,22 @@ class _SignInScreenState extends State<SignInScreen>
                                         text: CommonStrings.login,
                                         textStyle: TextStyleConstants.medium(
                                           context,
-                                          fontSize: 16,
+                                          fontSize: 15,
                                           color: AppColors.white,
                                         ),
                                       ),
-                                      if (SignInScreen.showGmailLogin) ...[
-                                        SizedBox(height: 20),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Divider(
-                                                color: Colors.grey,
-                                                thickness: 1,
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 12),
-                                              child: CommonText(
-                                                "or continue with",
-                                                style: GoogleFonts.dmSans(
-                                                  fontSize: 16,
-                                                  color: AppColors.defaultText,
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Divider(
-                                                color: Colors.grey,
-                                                thickness: 1,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 20),
-                                        SizedBox(
-                                          width: r.isTablet
-                                              ? 420
-                                              : double.infinity,
-                                          child: CommonButton(
-                                            onPressed: _signInWithGoogle,
-                                            text: "Continue with Gmail",
-                                            backgroundColor: AppColors.white,
-                                            borderSide: BorderSide(
-                                              color: AppColors.red,
-                                              width: 2,
-                                            ),
-                                            icon: Image.asset(ImgAssets.google),
-                                            textStyle:
-                                                TextStyleConstants.medium(
-                                              context,
-                                              fontSize: 16,
-                                              color: AppColors.black,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                      if (SignInScreen.showFacebookLogin) ...[
-                                        SizedBox(height: 12),
-                                        SizedBox(
-                                          width: r.isTablet
-                                              ? 420
-                                              : double.infinity,
-                                          child: CommonButton(
-                                            onPressed: _signInWithFacebook,
-                                            text: "Continue with Facebook",
-                                            backgroundColor: AppColors.white,
-                                            borderSide: BorderSide(
-                                              color: AppColors.defaultText,
-                                              width: 2,
-                                            ),
-                                            icon:
-                                                Image.asset(ImgAssets.facebook),
-                                            textStyle:
-                                                TextStyleConstants.medium(
-                                              context,
-                                              fontSize: 16,
-                                              color: AppColors.black,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                      SizedBox(height: 12),
-                                      SizedBox(
-                                        width:
-                                            r.isTablet ? 420 : double.infinity,
-                                        child: CommonButton(
-                                          onPressed: () {
-                                            sl<NavigationService>().pushNamed(
-                                                Routes.sendOtpScreen);
-                                          },
-                                          text: Constants.isFmcg &&
-                                                  Constants.isBuyer
-                                              ? CommonStrings.loginViaWhatsapp
-                                              : CommonStrings
-                                                  .sendOtpViaWhatsapp,
-                                          backgroundColor: AppColors.white,
-                                          borderSide: BorderSide(
-                                            color: AppColors
-                                                .green, // or any color you want
-                                            width: 2,
-                                          ),
-                                          icon: Image.asset(
-                                              ImgAssets.whatsappIcon),
-                                          textStyle: TextStyleConstants.medium(
-                                            context,
-                                            fontSize: 16,
-                                            color: AppColors.black,
-                                          ),
-                                        ),
-                                      ),
+                                      _buildSocialLoginSection(context),
                                     ],
                                   ),
                                 ),
-                                CommonSocialIcons(),
+                                if (!Constants.isBuyer) ...[
+                                  const SizedBox(height: 16),
+                                  const YoutubeVideoPage(
+                                    heading: 'Benefits for Agro Exporter',
+                                    videoUrl:
+                                        'https://www.youtube.com/watch?v=W3dmyVCqUVA',
+                                  ),
+                                ],
                               ],
                             ),
                           ),
@@ -678,7 +700,6 @@ class _SignInScreenState extends State<SignInScreen>
               BlocBuilder<AuthenticationCubit, AuthenticationState>(
                 builder: (context, state) {
                   if (state is SigninIsLoading ||
-                      state is ForgotPasswordSendOtpIsLoading ||
                       state is FmcgSellerSigninIsLoading ||
                       state is FmcgBuyerSigninIsLoading) {
                     return Positioned.fill(child: const CommonLoader());

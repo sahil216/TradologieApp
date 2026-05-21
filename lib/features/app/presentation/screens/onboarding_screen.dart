@@ -35,7 +35,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
   String? selectedProduct;
   String? selectedUserType;
-  bool showadmin = true;
+  bool showadmin = false;
 
   TradeType? selectedTradeType;
   @override
@@ -128,8 +128,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                             SecureStorageService();
                         Constants.isBuyer = false;
                         Constants.isFmcg = false;
+                        Constants.isAdmin = false;
                         await secureStorage.write(AppStrings.isBuyer, "false");
                         await secureStorage.write(AppStrings.isFmcg, "false");
+                        await secureStorage.write(AppStrings.isAdmin, "false");
                         sl<NavigationService>().pushNamed(Routes.signinRoute);
                         AnalyticsService.logEvent("seller_button_clicked");
                       },
@@ -143,8 +145,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                             SecureStorageService();
                         Constants.isBuyer = true;
                         Constants.isFmcg = false;
+                        Constants.isAdmin = false;
                         await secureStorage.write(AppStrings.isBuyer, "true");
                         await secureStorage.write(AppStrings.isFmcg, "false");
+                        await secureStorage.write(AppStrings.isAdmin, "false");
                         sl<NavigationService>().pushNamed(Routes.signinRoute);
                         AnalyticsService.logEvent("buyer_button_clicked");
                       },
@@ -158,8 +162,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                             SecureStorageService();
                         Constants.isBuyer = false;
                         Constants.isFmcg = true;
+                        Constants.isAdmin = false;
                         await secureStorage.write(AppStrings.isFmcg, "true");
                         await secureStorage.write(AppStrings.isBuyer, "false");
+                        await secureStorage.write(AppStrings.isAdmin, "false");
                         sl<NavigationService>()
                             .pushNamed(Routes.fmcgSignIn, arguments: false);
                         AnalyticsService.logEvent("fmcg_seller_button_clicked");
@@ -174,8 +180,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                             SecureStorageService();
                         Constants.isBuyer = true;
                         Constants.isFmcg = true;
+                        Constants.isAdmin = false;
                         await secureStorage.write(AppStrings.isFmcg, "true");
                         await secureStorage.write(AppStrings.isBuyer, "true");
+                        await secureStorage.write(AppStrings.isAdmin, "false");
                         sl<NavigationService>()
                             .pushNamed(Routes.fmcgSignIn, arguments: true);
                         AnalyticsService.logEvent("fmcg_buyer_button_clicked");
@@ -189,6 +197,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         subtitle: "Admin access for Tradologie Internal Team",
                         image: "assets/images/app_logo.png",
                         onTap: () async {
+
                           sl<NavigationService>()
                               .pushNamed(Routes.adminSignin);
                           AnalyticsService.logEvent("admin_login_button_clicked");
@@ -431,12 +440,19 @@ class _BusinessCardState extends State<BusinessCard> {
           /// 🌈 Outer subtle glow border
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 12,
-                ),
-              ]
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+              BoxShadow(
+                color: Colors.white.withValues(alpha: 0.65),
+                blurRadius: 10,
+                spreadRadius: -2,
+                offset: const Offset(-2, -2),
+              ),
+            ],
               // gradient: LinearGradient(
               //   colors: [
               //     Colors.white.withValues(alpha: 0.6),
@@ -473,6 +489,8 @@ class _BusinessCardState extends State<BusinessCard> {
                       width: 1,
                     ),
 
+
+
                     // boxShadow: [
                     //   /// outer soft shadow
                     //   BoxShadow(
@@ -489,6 +507,9 @@ class _BusinessCardState extends State<BusinessCard> {
                     //     offset: const Offset(-2, -2),
                     //   ),
                     // ],
+
+
+
                   ),
                   child: Material(
                     color: Colors.transparent,
@@ -537,7 +558,7 @@ class _BusinessCardState extends State<BusinessCard> {
                                     widget.subtitle,
                                     style: TextStyle(
                                       fontSize: 13,
-                                      color: Colors.grey.shade700,
+                                      color: Colors.deepOrange,
                                     ),
                                   ),
                                 ],

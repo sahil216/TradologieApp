@@ -14,6 +14,7 @@ class NotificationDetail extends Equatable {
   final String? startDateTime;
   final String? updatedDate;
   final String? userType;
+  final bool? isRead;
 
   const NotificationDetail({
     this.contentText,
@@ -29,7 +30,11 @@ class NotificationDetail extends Equatable {
     this.startDateTime,
     this.updatedDate,
     this.userType,
+    this.isRead,
   });
+
+  /// `IsRead == false` means notification still needs to be read.
+  bool get isUnread => isRead != true;
 
   @override
   List<Object?> get props {
@@ -47,6 +52,7 @@ class NotificationDetail extends Equatable {
       startDateTime,
       updatedDate,
       userType,
+      isRead,
     ];
   }
 }

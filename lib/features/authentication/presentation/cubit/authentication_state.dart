@@ -120,6 +120,26 @@ class AdminLoginError extends AuthenticationState {
   List<Object> get props => [failure];
 }
 
+class AdminLogoutIsLoading extends AuthenticationState {}
+
+class AdminLogoutSuccess extends AuthenticationState {
+  final String message;
+
+  const AdminLogoutSuccess({this.message = 'Logged out successfully'});
+
+  @override
+  List<Object> get props => [message];
+}
+
+class AdminLogoutError extends AuthenticationState {
+  final Failure failure;
+
+  const AdminLogoutError({required this.failure});
+
+  @override
+  List<Object> get props => [failure];
+}
+
 class ForgotPasswordSendOtpIsLoading extends AuthenticationState {}
 
 class ForgotPasswordSendOtpSuccess extends AuthenticationState {

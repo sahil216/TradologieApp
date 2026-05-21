@@ -7,15 +7,11 @@ class EndPoints {
       'https://supplier.tradologie.com/supplier';
 
   static const String supplierImageurl = 'https://supplier.tradologie.com';
-
   static const String baseUrlSupplier = 'https://api.tradologie.com/supplier';
   static const String baseUrlBuyer = 'https://api.tradologie.com/buyer';
   static const String baseUrl = 'https://api.tradologie.com';
-
   static const String buyerUrlWeb = 'https://buyer.tradologie.com';
-
   static const String termsUrl = 'https://www.tradologie.com/terms-of-use';
-
   static const String privacyUrl = 'https://www.tradologie.com/privacy-policy';
 
   // Register
@@ -48,6 +44,10 @@ class EndPoints {
       '$baseUrl/FMCG/FMCGBrandProuctListForSeller';
 
   static const String adminLogin = '$baseUrl/Admin/Login';
+  static const String adminLogout = '$baseUrl/Admin/Logout';
+  static const String adminVendorList = '$baseUrl/Admin/VendorList';
+  static const String adminAgroSellerChatList =
+      '$baseUrl/Admin/AgroSellerChatList';
   static const String forgotpasswordsendotp = "$baseUrl/Supplier/ForgotPasswordSendOTP";
 
 

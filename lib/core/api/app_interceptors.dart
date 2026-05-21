@@ -60,6 +60,8 @@ class AppIntercepters extends Interceptor {
       secureStorage.delete(AppStrings.appSession);
       Constants.token = "";
       Constants.isLogin = false;
+      Constants.isAdmin = false;
+      secureStorage.write(AppStrings.isAdmin, 'false');
       navigationService.pushNamedAndRemoveUntil(Routes.onboardingRoute);
 
       CommonToast.error(AppStrings.sessionExpired);

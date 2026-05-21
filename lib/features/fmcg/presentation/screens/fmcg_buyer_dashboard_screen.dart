@@ -146,6 +146,14 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
 
   Future<void> _refreshChats() async => getBuyerBrandsList();
 
+  /// Taller cards on small screens so Connect / catalogue actions are not clipped.
+  double _gridChildAspectRatio(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    if (size.height < 700 || size.width < 360) return 0.50;
+    if (size.height < 800) return 0.56;
+    return 0.62;
+  }
+
   @override
   Widget build(BuildContext context) {
     return AdaptiveScaffold(
@@ -224,11 +232,11 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
                           padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
                           sliver: SliverGrid(
                             gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
                               crossAxisSpacing: 12,
                               mainAxisSpacing: 12,
-                              childAspectRatio: 0.7,
+                              childAspectRatio: _gridChildAspectRatio(context),
                             ),
                             delegate: SliverChildBuilderDelegate(
                               (context, i) => GestureDetector(
@@ -296,6 +304,11 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
   }
 
   Widget enquiryCard(FmcgBuyerBrandsList enquiry) {
+    final interestedCount = enquiry.totalInterestedDistributors ?? 0;
+    final interestedLabel = interestedCount > 0
+        ? 'Interested ($interestedCount)'
+        : 'Interested';
+
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFFF5F7FA),
@@ -304,216 +317,211 @@ class _FmcgBuyerDashboardScreenState extends State<FmcgBuyerDashboardScreen> {
           color: const Color(0xFF0A9FED).withValues(alpha: 0.4),
         ),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          /// 🔴 BRAND NAME (AMUL STYLE)
           CachedNetworkImage(
-            imageUrl: enquiry.localInternalPath ?? "",
-            height: 50,
-            placeholder: (context, url) => CommonLoader(),
+            imageUrl: enquiry.localInternalPath ?? '',
+            height: 44,
+            fit: BoxFit.contain,
+            placeholder: (context, url) => const SizedBox(
+              height: 44,
+              child: Center(child: CommonLoader()),
+            ),
             errorWidget: (context, url, error) {
-              debugPrint("Image load failed: $error");
-              return const Icon(Icons.broken_image);
+              debugPrint('Image load failed: $error');
+              return const SizedBox(
+                height: 44,
+                child: Icon(Icons.broken_image, size: 28),
+              );
             },
             httpHeaders: const {
-              "Connection": "keep-alive",
+              'Connection': 'keep-alive',
             },
           ),
-
           const SizedBox(height: 6),
-
-          /// 👤 NAME
           Text(
-            enquiry.brandName ?? "—",
+            enquiry.brandName ?? '—',
             maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: FontWeight.w600,
               color: Color(0xFF2B2B2B),
+              height: 1.2,
             ),
           ),
-
-          const SizedBox(height: 12),
-
-          /// 🔹 DIVIDER
-          Container(
-            height: 1,
-            color: const Color(0xFF0A9FED),
-          ),
-
-          const SizedBox(height: 16),
-
-          /// 🔻 ACTION ROW
+          const SizedBox(height: 8),
+          Container(height: 1, color: const Color(0xFF0A9FED)),
+          const SizedBox(height: 8),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              /// 👍 INTERESTED BUTTON
-              GestureDetector(
-                onTap: enquiry.isInterested == true
-                    ? () {}
-                    : () async {
-                        final params = AddBuyerBrandInterestParams(
-                          token: await _secureStorage
-                                  .read(AppStrings.apiVerificationCode) ??
-                              "",
-                          deviceID: Constants.deviceID,
-                          brandID: enquiry.brandId.toString(),
-                          distributorID:
-                              await _secureStorage.read(AppStrings.loginId) ??
-                                  "",
-                        );
-                        chatCubit.addBuyerBrandInterest(params);
-                      },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: enquiry.isInterested == true
-                        ? const Color(0xFF0A9FED).withValues(alpha: 0.15)
-                        : Colors.transparent,
-                    border: Border.all(
-                      color: enquiry.isInterested == true
-                          ? const Color(0xFF0A9FED)
-                          : Colors.grey.shade400,
+              Expanded(
+                child: GestureDetector(
+                  onTap: enquiry.isInterested == true
+                      ? null
+                      : () async {
+                          final params = AddBuyerBrandInterestParams(
+                            token: await _secureStorage
+                                    .read(AppStrings.apiVerificationCode) ??
+                                '',
+                            deviceID: Constants.deviceID,
+                            brandID: enquiry.brandId.toString(),
+                            distributorID: await _secureStorage
+                                    .read(AppStrings.loginId) ??
+                                '',
+                          );
+                          chatCubit.addBuyerBrandInterest(params);
+                        },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 5,
                     ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.thumb_up,
-                        size: 18,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: enquiry.isInterested == true
+                          ? const Color(0xFF0A9FED).withValues(alpha: 0.15)
+                          : Colors.transparent,
+                      border: Border.all(
                         color: enquiry.isInterested == true
                             ? const Color(0xFF0A9FED)
-                            : Colors.grey,
+                            : Colors.grey.shade400,
                       ),
-                      const SizedBox(width: 6),
-                      Text(
-                        enquiry.isInterested == true
-                            ? "Interested - ${enquiry.totalInterestedDistributors == 0 ? "" : enquiry.totalInterestedDistributors}"
-                            : "Interested - ${enquiry.totalInterestedDistributors == 0 ? "" : enquiry.totalInterestedDistributors}",
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.thumb_up,
+                          size: 16,
                           color: enquiry.isInterested == true
                               ? const Color(0xFF0A9FED)
                               : Colors.grey,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            interestedLabel,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
+                              color: enquiry.isInterested == true
+                                  ? const Color(0xFF0A9FED)
+                                  : Colors.grey,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-
-              /// ℹ️ TOOLTIP ICON
               Tooltip(
                 message: enquiry.isInterested == true
-                    ? "You have already shown interest"
-                    : "Tap to show interest",
-                child: const Icon(
-                  Icons.info_outline,
-                  color: Colors.black,
-                  size: 18,
+                    ? 'You have already shown interest'
+                    : 'Tap to show interest',
+                child: const Padding(
+                  padding: EdgeInsets.only(left: 4),
+                  child: Icon(
+                    Icons.info_outline,
+                    color: Colors.black,
+                    size: 16,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Expanded(
-            child: Center(
-              child: GestureDetector(
-                onTap: () async {
-                  selectedChat.brandId = enquiry.brandId.toString();
-                  selectedChat.userId = enquiry.brandName;
+          const Spacer(),
+          _BrandCardActionButton(
+            label: 'Connect',
+            filled: true,
+            onTap: () async {
+              selectedChat.brandId = enquiry.brandId.toString();
+              selectedChat.userId = enquiry.brandName;
 
-                  chatCubit.getInitialChatId(GetInitialChatIdParams(
-                    token: await _secureStorage
-                            .read(AppStrings.apiVerificationCode) ??
-                        "",
-                    deviceId: Constants.deviceID,
-                    buyerId: await _secureStorage.read(AppStrings.loginId) ?? "",
-                    brandId: enquiry.brandId.toString(),
-                  ));
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(25),
-                    gradient: const LinearGradient(
-                      colors: [
-                        Color(0xFF2DAAE1),
-                        Color(0xFF1B8ED1),
-                      ],
-                    ),
-                  ),
-                  child: const Text(
-                    "Connect",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+              chatCubit.getInitialChatId(
+                GetInitialChatIdParams(
+                  token: await _secureStorage
+                          .read(AppStrings.apiVerificationCode) ??
+                      '',
+                  deviceId: Constants.deviceID,
+                  buyerId:
+                      await _secureStorage.read(AppStrings.loginId) ?? '',
+                  brandId: enquiry.brandId.toString(),
                 ),
-              ),
-            ),
+              );
+            },
           ),
-          Expanded(
-            child: Center(
-              child: GestureDetector(
-                onTap: () async {
-                  NavBarVisibility.of(context).show();
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => FmcgProductsScreen(
-                        params: ProductsListParams(
-                          brandId: enquiry.brandId.toString(),
-                          brandName: enquiry.brandName.toString(),
-                        ),
-                      ),
-                    ),
-                  );
-
-                  // sl<NavigationService>().pushNamed(
-                  //   Routes.fmcgProductCatalogueRoute,
-                  //   arguments: ProductsListParams(
-                  //     brandId: enquiry.brandId.toString(),
-                  //     brandName: enquiry.brandName.toString(),
-                  //   ),
-                  // );
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  child: const Text(
-                    "View Catalogue",
-                    maxLines: 1,
-                    style: TextStyle(
-                      color: Colors.black,
-                      overflow: TextOverflow.ellipsis,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      decoration: TextDecoration.underline,
+          const SizedBox(height: 8),
+          _BrandCardActionButton(
+            label: 'View Catalogue',
+            filled: false,
+            onTap: () async {
+              NavBarVisibility.of(context).show();
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => FmcgProductsScreen(
+                    params: ProductsListParams(
+                      brandId: enquiry.brandId.toString(),
+                      brandName: enquiry.brandName.toString(),
                     ),
                   ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _BrandCardActionButton extends StatelessWidget {
+  final String label;
+  final bool filled;
+  final VoidCallback onTap;
+
+  const _BrandCardActionButton({
+    required this.label,
+    required this.filled,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(22),
+          gradient: filled
+              ? const LinearGradient(
+                  colors: [Color(0xFF2DAAE1), Color(0xFF1B8ED1)],
+                )
+              : null,
+        ),
+        child: Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: filled ? Colors.white : Colors.black,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            decoration: filled ? null : TextDecoration.underline,
+          ),
+        ),
       ),
     );
   }

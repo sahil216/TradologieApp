@@ -12,6 +12,7 @@ import 'package:tradologie_app/injection_container.dart';
 import '../../../../core/error/network_failure.dart';
 import '../../../../core/error/user_failure.dart';
 import '../../../../core/usecases/usecase.dart';
+import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/constants.dart';
 import '../../../../core/widgets/common_loader.dart';
 import '../../../../core/widgets/custom_error_network_widget.dart';
@@ -52,14 +53,16 @@ class _NotificationScreenState extends State<NotificationScreen>
             if (state is NotificationSuccess) {
               data = [...state.data];
 
-              /// ⭐ SORT BY DATE DESCENDING (LATEST FIRST)
+              /// Unread first, then latest date.
               data!.sort((a, b) {
-                final DateTime dateA =
-                    DateTime.tryParse(a.updatedDate ?? "") ?? DateTime(1970);
-                final DateTime dateB =
-                    DateTime.tryParse(b.updatedDate ?? "") ?? DateTime(1970);
-
-                return dateB.compareTo(dateA); // 👈 DESCENDING
+                if (a.isUnread != b.isUnread) {
+                  return a.isUnread ? -1 : 1;
+                }
+                final dateA =
+                    DateTime.tryParse(a.updatedDate ?? '') ?? DateTime(1970);
+                final dateB =
+                    DateTime.tryParse(b.updatedDate ?? '') ?? DateTime(1970);
+                return dateB.compareTo(dateA);
               });
             }
             if (state is NotificationError) {
@@ -134,112 +137,191 @@ class _NotificationScreenState extends State<NotificationScreen>
   }
 
   Widget _notificationTile(NotificationDetail notification) {
-    // final bool isUnread = !(notification.isRead ?? true);
+    final isUnread = notification.isUnread;
+    final titleColor =
+        isUnread ? AppColors.defaultText : AppColors.grayText;
+    final bodyColor =
+        isUnread ? AppColors.blackApp : AppColors.grayText;
 
     return RepaintBoundary(
-      child: TweenAnimationBuilder<double>(
-        duration: const Duration(milliseconds: 450),
-        tween: Tween(begin: 0.95, end: 1),
-        curve: Curves.easeOutCubic,
-        builder: (context, scale, child) {
-          return Transform.scale(scale: scale, child: child);
-        },
+      child: Material(
+        color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(16),
           onTap: () {},
-          child: Container(
-            padding: const EdgeInsets.all(14),
+          child: Ink(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18),
-
-              /// 💎 ULTRA GLASS BACKGROUND
-              color: Colors.white.withValues(alpha: .85),
-
+              borderRadius: BorderRadius.circular(16),
+              color: isUnread
+                  ? AppColors.blueExtraLight
+                  : Colors.white.withValues(alpha: 0.9),
+              border: Border.all(
+                color: isUnread
+                    ? AppColors.primary.withValues(alpha: 0.35)
+                    : Colors.black.withValues(alpha: 0.06),
+                width: isUnread ? 1.5 : 1,
+              ),
               boxShadow: [
                 BoxShadow(
-                  blurRadius: 18,
-                  offset: const Offset(0, 10),
-                  color: Colors.black.withValues(alpha: .05),
+                  blurRadius: isUnread ? 12 : 6,
+                  offset: const Offset(0, 4),
+                  color: isUnread
+                      ? AppColors.primary.withValues(alpha: 0.12)
+                      : Colors.black.withValues(alpha: 0.04),
                 ),
               ],
-
-              border: Border.all(
-                color: Colors.black.withValues(alpha: .04),
-              ),
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /// 🔵 UNREAD DOT (ANIMATED)
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  margin: const EdgeInsets.only(top: 6, right: 10),
-                  // width: isUnread ? 10 : 0,
-                  // height: isUnread ? 10 : 0,
-                  decoration: const BoxDecoration(
-                    color: Colors.blue,
-                    shape: BoxShape.circle,
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    width: 4,
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.horizontal(
+                        left: Radius.circular(16),
+                      ),
+                      color: isUnread
+                          ? AppColors.orange
+                          : Colors.transparent,
+                    ),
                   ),
-                ),
-
-                /// 📄 CONTENT
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CommonText(
-                        notification.contentTitle ?? "",
-                        style: TextStyleConstants.semiBold(
-                          context,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      CommonText(
-                        notification.contentText ?? "",
-                        style: TextStyleConstants.medium(
-                          context,
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(
-                            Icons.schedule,
-                            size: 14,
-                            color: Colors.grey,
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: isUnread
+                                  ? AppColors.primary.withValues(alpha: 0.12)
+                                  : AppColors.defaultBaseShimmer,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              isUnread
+                                  ? Icons.notifications_active_outlined
+                                  : Icons.notifications_none_outlined,
+                              size: 22,
+                              color: isUnread
+                                  ? AppColors.primary
+                                  : AppColors.grayText,
+                            ),
                           ),
-                          const SizedBox(width: 6),
-                          CommonText(
-                            Constants.dateFormat(
-                              DateTime.parse(
-                                notification.updatedDate ?? "",
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: CommonText(
+                                        notification.contentTitle ?? '',
+                                        style: isUnread
+                                            ? TextStyleConstants.semiBold(
+                                                context,
+                                                fontSize: 16,
+                                                color: titleColor,
+                                              )
+                                            : TextStyleConstants.medium(
+                                                context,
+                                                fontSize: 16,
+                                                color: titleColor,
+                                              ),
+                                      ),
+                                    ),
+                                    if (isUnread) _unreadChip(),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                CommonText(
+                                  notification.contentText ?? '',
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyleConstants.regular(
+                                    context,
+                                    fontSize: 14,
+                                    color: bodyColor,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.schedule,
+                                      size: 14,
+                                      color: isUnread
+                                          ? AppColors.primary
+                                          : AppColors.grayText,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    CommonText(
+                                      _formatDate(notification.updatedDate),
+                                      style: TextStyleConstants.regular(
+                                        context,
+                                        fontSize: 12,
+                                        color: isUnread
+                                            ? AppColors.blueDark
+                                            : AppColors.grayText,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (isUnread) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              width: 10,
+                              height: 10,
+                              margin: const EdgeInsets.only(top: 6),
+                              decoration: BoxDecoration(
+                                color: AppColors.orange,
+                                shape: BoxShape.circle,
                               ),
                             ),
-                            style: TextStyleConstants.regular(
-                              context,
-                              fontSize: 12,
-                            ),
-                          ),
+                          ],
                         ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-
-                /// 👉 CHEVRON (ULTRA STYLE)
-                const Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 14,
-                  color: Colors.black38,
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  Widget _unreadChip() {
+    return Container(
+      margin: const EdgeInsets.only(left: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: AppColors.orange.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        'Unread',
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: AppColors.orange,
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(String? raw) {
+    final parsed = DateTime.tryParse(raw ?? '');
+    if (parsed == null) return raw ?? '';
+    return Constants.dateFormat(parsed);
   }
 
   Widget _emptyState() {

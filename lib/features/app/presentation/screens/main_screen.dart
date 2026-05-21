@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -266,40 +265,27 @@ class _MainScreenState extends State<MainScreen>
           },
           child: AdaptiveScaffold(
             extendBodyBehindAppBar: true,
-            body: Stack(
-              children: [
-                /// 🔥 CURRENT PAGE
-                CustomScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  slivers: [
-                    SliverFillRemaining(
-                      hasScrollBody: true,
-                      child: Builder(
-                        builder: (_) {
-                          final tabs = Constants.isBuyer == true
-                              ? buyerTabsList
-                              : supplierTabsList;
+            body: Builder(
+              builder: (_) {
+                final tabs = Constants.isBuyer == true
+                    ? buyerTabsList
+                    : supplierTabsList;
 
-                          return KeyedSubtree(
-                              key: ValueKey(_appCubit.bottomNavIndex),
-                              child: tabs.isEmpty
-                                  ? Container()
-                                  : tabs[_appCubit.bottomNavIndex].page);
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-
-                CommonFloatingNavBar(
-                  index: _appCubit.bottomNavIndex,
-                  onTap: (i) {
-                    HapticFeedback.selectionClick();
-                    _appCubit.changeTab(i);
-                  },
-                  showDemo: Constants.isBuyer != true,
-                ),
-              ],
+                return KeyedSubtree(
+                  key: ValueKey(_appCubit.bottomNavIndex),
+                  child: tabs.isEmpty
+                      ? const SizedBox.shrink()
+                      : tabs[_appCubit.bottomNavIndex].page,
+                );
+              },
+            ),
+            bottomNavigationBar: CommonFloatingNavBar(
+              index: _appCubit.bottomNavIndex,
+              onTap: (i) {
+                HapticFeedback.selectionClick();
+                _appCubit.changeTab(i);
+              },
+              showDemo: Constants.isBuyer != true,
             ),
           ),
         );
@@ -320,147 +306,86 @@ class CommonFloatingNavBar extends StatelessWidget {
     required this.showDemo,
   });
 
+  static const Color _activeColor = Color(0xFF0A9FED);
+  static const Color _inactiveColor = Colors.black87;
+
   @override
   Widget build(BuildContext context) {
     final int demoIndex = 3;
     final int moreIndex = showDemo ? 4 : 3;
 
-    return Positioned(
-      left: 20,
-      right: 20,
-      bottom: 5,
-      child: SafeArea(
-        top: false,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(40),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 10,
+    return Container(
+      height: 70 + MediaQuery.of(context).padding.bottom,
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).padding.bottom,
+      ),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _item(0, Icons.dashboard_outlined, 'Dashboard'),
+          _item(1, Icons.description_outlined, 'Negotiation'),
+          _item(2, Icons.person_outline, 'Account'),
+          if (showDemo)
+            _item(
+              demoIndex,
+              Icons.play_circle_outline,
+              'Demo',
+              leading: Image.asset(
+                'assets/images/demo_logo.png',
+                width: 20,
+                height: 20,
+                color: index == demoIndex ? _activeColor : _inactiveColor,
               ),
+            ),
+          _item(moreIndex, Icons.menu_rounded, 'More'),
+        ],
+      ),
+    );
+  }
+
+  Widget _item(
+    int i,
+    IconData icon,
+    String label, {
+    Widget? leading,
+  }) {
+    final bool selected = i == index;
+
+    return Expanded(
+      child: InkWell(
+        onTap: () => onTap(i),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              height: 3,
+              width: selected ? 20 : 0,
+              margin: const EdgeInsets.only(bottom: 6),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: .75),
-                borderRadius: BorderRadius.circular(40),
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 20,
-                    color: Colors.black.withValues(alpha: .08),
-                  ),
-                ],
-              ),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    physics: const BouncingScrollPhysics(),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minWidth: constraints.maxWidth,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _item(0, Icons.dashboard_outlined, "Dashboard"),
-                          _item(1, Icons.description_outlined, "Negotiation"),
-                          _item(2, Icons.person_outline, "Account"),
-
-                          if (showDemo)
-                            _itemWidget(
-                              demoIndex,
-                              Image.asset(
-                                "assets/images/demo_logo.png",
-                                width: 22,
-                                height: 22,
-                                color: index == demoIndex
-                                    ? Colors.white
-                                    : Colors.black54,
-                              ),
-                              "Demo",
-                            ),
-                          _item(moreIndex, Icons.menu, "More"),
-                        ],
-                      ),
-                    ),
-                  );
-                },
+                color: _activeColor,
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _item(int i, IconData icon, String label) {
-    final bool active = i == index;
-
-    return GestureDetector(
-      onTap: () => onTap(i),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        padding: EdgeInsets.symmetric(
-          horizontal: active ? 16 : 12,
-          vertical: 8,
-        ),
-        decoration: BoxDecoration(
-          color: active ? Colors.black : Colors.transparent,
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 22,
-              color: active ? Colors.white : Colors.black54,
+            leading ??
+                Icon(
+                  icon,
+                  size: 20,
+                  color: selected ? _activeColor : _inactiveColor,
+                ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                color: selected ? _activeColor : _inactiveColor,
+              ),
             ),
-            if (active) ...[
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ]
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _itemWidget(int i, Widget icon, String label) {
-    final bool active = i == index;
-
-    return GestureDetector(
-      onTap: () => onTap(i),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        padding: EdgeInsets.symmetric(
-          horizontal: active ? 16 : 12,
-          vertical: 8,
-        ),
-        decoration: BoxDecoration(
-          color: active ? Colors.black : Colors.transparent,
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: Row(
-          children: [
-            icon,
-            if (active) ...[
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ]
           ],
         ),
       ),

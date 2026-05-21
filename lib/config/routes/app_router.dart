@@ -26,12 +26,18 @@ import 'package:tradologie_app/features/negotiation/presentation/screens/buyer_n
 import 'package:tradologie_app/features/negotiation/presentation/screens/negotiation_screen.dart';
 
 import '../../core/utils/app_strings.dart';
+import '../../features/admin/presentation/screens/admin_vendor_chat_screen.dart';
+import '../../features/admin/presentation/screens/select_vendor_chat.dart';
+import '../../features/admin/presentation/viewmodel/admin_vendor_chat_args.dart';
 import '../../features/app/presentation/screens/onboarding_screen.dart';
 import '../../features/app/presentation/screens/splash_screen.dart';
 import '../../features/app/presentation/screens/terms_screen.dart';
 import '../../features/authentication/presentation/screens/admin_login.dart';
+import '../../features/authentication/presentation/screens/forgot_password_screen.dart';
+import '../../features/authentication/presentation/screens/forgot_password_verify_otp_screen.dart';
 import '../../features/authentication/presentation/screens/send_otp_screen.dart';
 import '../../features/authentication/presentation/screens/sign_in_screen.dart';
+import '../../features/authentication/presentation/viewmodel/forgot_password_verify_otp_args.dart';
 import '../../features/authentication/presentation/screens/sign_up_screen.dart';
 import '../../features/authentication/presentation/screens/verify_otp_screen.dart';
 import '../../features/fmcg/presentation/screens/ChatbotQueryScreen.dart';
@@ -52,11 +58,15 @@ class Routes {
   //! app
   static const String initialRoute = '/';
   static const String mainRoute = '/main';
+  static const String selectVendorforChat = '/selectVendorforChat';
+  static const String adminVendorChat = '/adminVendorChat';
   static const String termsRoute = '/terms';
   static const String onboardingRoute = '/onboarding';
   //! authentication
   static const String otpRoute = '/otp';
   static const String signinRoute = '/signin';
+  static const String forgotPasswordRoute = '/forgotPassword';
+  static const String forgotPasswordVerifyOtpRoute = '/forgotPasswordVerifyOtp';
   static const String signupRoute = '/signup';
   static const String fmcgSignIn = '/fmcgsignin';
   static const String adminSignin = '/adminSignin';
@@ -119,10 +129,31 @@ class AppRoutes {
         return CupertinoPageRoute(builder: (context) {
           return const SplashScreen();
         });
+
+
+
+
       case Routes.mainRoute:
         return CupertinoPageRoute(builder: (context) {
           return MainScreen();
         });
+
+
+
+      case Routes.selectVendorforChat:
+        return CupertinoPageRoute(builder: (context) {
+          return SelectVendorforChat();
+        });
+
+      case Routes.adminVendorChat:
+        return CupertinoPageRoute(builder: (context) {
+          final args = routeSettings.arguments as AdminVendorChatArgs;
+          return AdminVendorChatScreen(args: args);
+        });
+
+
+
+
       case Routes.onboardingRoute:
         return CupertinoPageRoute(builder: (context) {
           return const OnboardingScreen();
@@ -134,6 +165,16 @@ class AppRoutes {
           return const SignInScreen();
         });
 
+      case Routes.forgotPasswordRoute:
+        return CupertinoPageRoute(builder: (context) {
+          return const ForgotPasswordScreen();
+        });
+
+      case Routes.forgotPasswordVerifyOtpRoute:
+        return CupertinoPageRoute(builder: (context) {
+          final args = routeSettings.arguments as ForgotPasswordVerifyOtpArgs;
+          return ForgotPasswordVerifyOtpScreen(args: args);
+        });
 
       case Routes.fmcgSignIn:
         return CupertinoPageRoute(builder: (context) {

@@ -93,10 +93,12 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
                 CommonToast.success("Signed Out Successfully");
                 Constants.isLogin = false;
                 Constants.isFmcg = false;
+                Constants.isAdmin = false;
                 SecureStorageService secureStorage = SecureStorageService();
                 secureStorage.delete(AppStrings.apiVerificationCode);
                 Constants.token = "";
                 secureStorage.write(AppStrings.isFmcg, false.toString());
+                secureStorage.write(AppStrings.isAdmin, 'false');
 
                 secureStorage.write(AppStrings.appSession, false.toString());
 

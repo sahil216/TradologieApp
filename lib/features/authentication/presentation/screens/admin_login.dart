@@ -129,7 +129,7 @@ class _AdminSigninState extends State<AdminSignin> {
             if (state is AdminSignInSuccess) {
               Navigator.pushNamedAndRemoveUntil(
                 context,
-                Routes.mainRoute,
+                Routes.selectVendorforChat,
                 (route) => false,
               );
             }

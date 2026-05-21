@@ -6,12 +6,18 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 import '../../../../core/utils/assets_manager.dart';
-import '../../../../core/utils/responsive.dart';
+import '../../../../core/utils/app_colors.dart';
+import '../../../../core/widgets/common_loader.dart';
+import '../../../../core/widgets/custom_button.dart';
+import '../../../../core/widgets/custom_text_field.dart';
+import '../cubit/authentication_cubit.dart';
+import '../widget/youtube_player.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
@@ -26,12 +32,6 @@ import 'package:tradologie_app/features/fmcg/presentation/fmcg_login_navigation.
 import 'package:tradologie_app/injection_container.dart';
 
 import '../../../../config/routes/app_router.dart';
-import '../../../../core/utils/app_colors.dart';
-import '../../../../core/widgets/common_loader.dart';
-import '../../../../core/widgets/common_social_icons.dart';
-import '../../../../core/widgets/custom_button.dart';
-import '../../../../core/widgets/custom_text_field.dart';
-import '../cubit/authentication_cubit.dart';
 
 class FmcgSellerSignin extends StatefulWidget {
   final bool isBuyer;
@@ -119,7 +119,7 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
   final formKey = GlobalKey<FormState>();
 
   Future<void> _signInWithGoogle() async {
-    if (!Platform.isAndroid) {
+    if (!Platform.isAndroid && !Platform.isIOS) {
       return;
     }
     try {
@@ -179,14 +179,161 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
   void dispose() {
     textEmailController.dispose();
     textPasswordController.dispose();
-
     super.dispose();
+  }
+
+  Widget _buildSocialLoginSection(BuildContext context) {
+    final screenW = MediaQuery.sizeOf(context).width;
+    final buttonW = screenW > 520 ? 400.0 : screenW - 32.0;
+    final hasGoogle = Platform.isAndroid || Platform.isIOS;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(height: 10),
+        if (hasGoogle) ...[
+          Row(
+            children: [
+              Expanded(
+                child: Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: AppColors.grayText.withValues(alpha: 0.2),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Text(
+                  'or continue with',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.grayText,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: AppColors.grayText.withValues(alpha: 0.2),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            width: buttonW,
+            child: CommonButton(
+              onPressed: _signInWithGoogle,
+              text: 'Continue with Google',
+              height: 44,
+              backgroundColor: Colors.white,
+              borderSide: BorderSide(
+                color: AppColors.defaultText.withValues(alpha: 0.12),
+                width: 1,
+              ),
+              elevation: 0,
+              radius: 12,
+              icon: Image.asset(
+                ImgAssets.google,
+                width: 20,
+                height: 20,
+              ),
+              textStyle: TextStyleConstants.medium(
+                context,
+                fontSize: 14,
+                color: AppColors.defaultText,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+        SizedBox(
+          width: buttonW,
+          child: CommonButton(
+            onPressed: () {
+              sl<NavigationService>().pushNamed(Routes.sendOtpScreen);
+            },
+            text: widget.isBuyer
+                ? CommonStrings.loginViaWhatsapp
+                : CommonStrings.sendOtpViaWhatsapp,
+            height: 44,
+            backgroundColor: AppColors.white,
+            borderSide: BorderSide(
+              color: AppColors.defaultText.withValues(alpha: 0.12),
+              width: 1,
+            ),
+            elevation: 0,
+            radius: 12,
+            icon: Image.asset(
+              ImgAssets.whatsappIcon,
+              width: 20,
+              height: 20,
+            ),
+            textStyle: TextStyleConstants.medium(
+              context,
+              fontSize: 14,
+              color: AppColors.black,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRegisterLink(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 14),
+      child: InkWell(
+        onTap: () {
+          sl<NavigationService>().pushNamed(
+            Routes.fmcgRegisterSellerDistributorForm,
+            arguments: widget.isBuyer,
+          );
+        },
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Center(
+            child: widget.isBuyer
+                ? RichText(
+                    text: TextSpan(
+                      text: "Don't have an account? ",
+                      style: TextStyleConstants.regular(
+                        context,
+                        fontSize: 14,
+                        color: AppColors.defaultText,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: 'Register Now',
+                          style: TextStyleConstants.semiBold(
+                            context,
+                            fontSize: 14,
+                            color: AppColors.blue,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : CommonText(
+                    'Register New Brand',
+                    style: TextStyleConstants.semiBold(
+                      context,
+                      fontSize: 14,
+                      color: AppColors.blue,
+                    ),
+                  ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final r = Responsive(context);
-
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: AdaptiveScaffold(
@@ -240,12 +387,12 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
                           title: CommonStrings.signIn,
                           showBackButton: true,
                           showNotification: false,
+                          expandedHeight: 64,
                         ),
                         SliverToBoxAdapter(
                           child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20),
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 Form(
@@ -254,9 +401,7 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
                                     crossAxisAlignment:
                                         CrossAxisAlignment.stretch,
                                     children: [
-                                      SizedBox(
-                                        height: 20,
-                                      ),
+                                      const SizedBox(height: 8),
                                       CommonTextField(
                                         titleText: CommonStrings.emailId,
                                         hintText: CommonStrings.enterEmail,
@@ -274,7 +419,7 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
                                           return null;
                                         },
                                       ),
-                                      SizedBox(height: 12),
+                                      const SizedBox(height: 8),
                                       CommonTextField(
                                         titleText: CommonStrings.password,
                                         hintText: CommonStrings.enterPassword,
@@ -305,8 +450,9 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
                                           return null;
                                         },
                                       ),
-                                      SizedBox(height: 20),
+                                      const SizedBox(height: 12),
                                       CommonButton(
+                                        height: 46,
                                         onPressed: () async {
                                           late FmcgSellerSigninParams params;
                                           if (textEmailController
@@ -353,134 +499,23 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
                                         text: CommonStrings.login,
                                         textStyle: TextStyleConstants.medium(
                                           context,
-                                          fontSize: 16,
+                                          fontSize: 15,
                                           color: AppColors.white,
                                         ),
                                       ),
-                                      if (Platform.isAndroid) ...[
-                                        SizedBox(height: 20),
-                                        Center(
-                                          child: CommonText(
-                                            'OR',
-                                            style: TextStyleConstants.regular(
-                                              context,
-                                              fontSize: 16,
-                                              color: AppColors.defaultText,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(height: 20),
-                                        SizedBox(
-                                          width:
-                                              r.isTablet ? 420 : double.infinity,
-                                          child: CommonButton(
-                                            onPressed: _signInWithGoogle,
-                                            text: 'Continue with Gmail',
-                                            backgroundColor: AppColors.white,
-                                            borderSide: BorderSide(
-                                              color: AppColors.red,
-                                              width: 2,
-                                            ),
-                                            icon: Image.asset(ImgAssets.google),
-                                            textStyle:
-                                                TextStyleConstants.medium(
-                                              context,
-                                              fontSize: 16,
-                                              color: AppColors.black,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                      SizedBox(height: 20),
-                                      SizedBox(
-                                        width:
-                                            r.isTablet ? 420 : double.infinity,
-                                        child: CommonButton(
-                                          onPressed: () {
-                                            //  Navigator.pop(context);
-
-                                            // code by Gopal
-
-                                            sl<NavigationService>().pushNamed(
-                                                Routes.sendOtpScreen);
-                                          },
-                                          text: Constants.isFmcg &&
-                                                  Constants.isBuyer
-                                              ? CommonStrings.loginViaWhatsapp
-                                              : CommonStrings
-                                                  .sendOtpViaWhatsapp,
-                                          backgroundColor: AppColors.white,
-                                          borderSide: BorderSide(
-                                            color: AppColors
-                                                .green, // or any color you want
-                                            width: 2,
-                                          ),
-                                          icon: Image.asset(
-                                              ImgAssets.whatsappIcon),
-                                          textStyle: TextStyleConstants.medium(
-                                            context,
-                                            fontSize: 16,
-                                            color: AppColors.black,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(height: 20),
-                                      InkWell(
-                                        onTap: widget.isBuyer == true
-                                            ? () {
-                                          sl<NavigationService>().pushNamed(
-                                              Routes
-                                                  .fmcgRegisterSellerDistributorForm,
-                                              arguments: true);
-                                        }
-                                            : () {
-                                          sl<NavigationService>().pushNamed(
-                                              Routes
-                                                  .fmcgRegisterSellerDistributorForm,
-                                              arguments: false);
-                                        },
-                                        child: Center(
-                                          child: Constants.isBuyer == true
-                                              ? RichText(
-                                            text: TextSpan(
-                                              text:
-                                              "Don't have an account? ",
-                                              style: TextStyleConstants
-                                                  .regular(
-                                                context,
-                                                fontSize: 16,
-                                                color:
-                                                AppColors.defaultText,
-                                              ),
-                                              children: [
-                                                TextSpan(
-                                                  text: "Register Now",
-                                                  style:
-                                                  TextStyleConstants
-                                                      .semiBold(
-                                                    context,
-                                                    fontSize: 16,
-                                                    color: AppColors.blue,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                              : CommonText(
-                                            "Register New Brand",
-                                            style: TextStyleConstants
-                                                .semiBold(
-                                              context,
-                                              fontSize: 16,
-                                              color: AppColors.blue,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
+                                      _buildSocialLoginSection(context),
+                                      _buildRegisterLink(context),
                                     ],
                                   ),
                                 ),
-                                CommonSocialIcons(),
+                                if (!widget.isBuyer) ...[
+                                  const SizedBox(height: 16),
+                                  const YoutubeVideoPage(
+                                    heading: 'Benefits for FMCG Exporter',
+                                    videoUrl:
+                                        'https://www.youtube.com/watch?v=3FB376QcYuE',
+                                  ),
+                                ],
                               ],
                             ),
                           ),

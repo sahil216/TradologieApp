@@ -20,6 +20,7 @@ import '../../domain/usecases/supplier_social_login_usecase.dart';
 
 abstract class AuthenticationRemoteDataSource {
   Future<ResponseWrapper<dynamic>?> adminLogin(AdminLoginParams params);
+  Future<ResponseWrapper<dynamic>?> adminLogout(NoParams params);
   Future<ResponseWrapper<dynamic>?> signIn(SigninParams params);
   Future<ResponseWrapper<dynamic>?> supplierLoginWithSocialMedia(
       SupplierSocialLoginParams params);
@@ -86,6 +87,36 @@ class AuthenticationRemoteDataSourceImpl
       body: params.toJson(),
     );
   }
+
+
+  @override
+  Future<ResponseWrapper<dynamic>?> adminLogout(NoParams params) async {
+    final storage = SecureStorageService();
+    final token =
+        await storage.read(AppStrings.apiVerificationCode) ?? Constants.token;
+    final loginIdStr = await storage.read(AppStrings.loginId) ?? '';
+    final loginId = int.tryParse(loginIdStr);
+    final deviceId = Constants.deviceID.isNotEmpty
+        ? Constants.deviceID
+        : await storage.read(AppStrings.deviceId) ?? '';
+
+    return await apiConsumer.post(
+      EndPoints.adminLogout,
+      body: {
+        'Token': token,
+        'LoginID': loginId,
+        'DeviceID': deviceId,
+      },
+    );
+  }
+
+
+
+
+
+
+
+
 
   @override
   Future<ResponseWrapper<dynamic>?> signIn(SigninParams params) async {

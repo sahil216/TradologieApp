@@ -146,6 +146,7 @@ class DashboardMobileFlow {
     var country = countryCode;
     var mobile = mobileNumber;
 
+    // Google Phone Hint is Android-only; iOS goes straight to the dialog.
     if (Platform.isAndroid) {
       try {
         final parsed = await requestGooglePhoneHint();

@@ -260,7 +260,7 @@ class _NegotiationScreenState extends State<NegotiationScreen>
                           Expanded(
                             flex: 3,
                             child: Text(
-                              "Date",
+                              "Start Date",
                               textAlign: TextAlign.center,
                               style: GoogleFonts.dmSans(
                                 color: Color(0xFF1B5AB2),
@@ -375,12 +375,7 @@ class _NegotiationScreenState extends State<NegotiationScreen>
                                               Expanded(
                                                 flex: 3,
                                                 child: Text(
-                                                  Constants.dateFormat(
-                                                    DateTime.tryParse(
-                                                            row.startDate ??
-                                                                "") ??
-                                                        DateTime.now(),
-                                                  ),
+                                                  row.startDate ?? " ",
                                                   textAlign: TextAlign.end,
 
                                                   // gopal
@@ -460,32 +455,20 @@ class _NegotiationScreenState extends State<NegotiationScreen>
                                               ),
                                               _detail(
                                                   "Start Date ",
-                                                  Constants.dateFormat(
-                                                    DateTime.tryParse(
-                                                            row.startDate ??
-                                                                "") ??
-                                                        DateTime.now(),
-                                                  ),
+                                                  row.startDate ??
+                                                      "",
                                                   false,
                                                   null),
                                               _detail(
                                                   "End Date ",
-                                                  Constants.dateFormat(
-                                                    DateTime.tryParse(
-                                                            row.endDate ??
-                                                                "") ??
-                                                        DateTime.now(),
-                                                  ),
+                                                  row.endDate ??
+                                                      "",
                                                   false,
                                                   null),
                                               _detail(
                                                   "Preferred Date ",
-                                                  Constants.dateFormat(
-                                                    DateTime.tryParse(
-                                                            row.preferredDate ??
-                                                                "") ??
-                                                        DateTime.now(),
-                                                  ),
+                                                  row.preferredDate ??
+                                                      "",
                                                   false,
                                                   null),
                                               _detail(

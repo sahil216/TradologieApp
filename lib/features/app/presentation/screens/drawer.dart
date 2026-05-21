@@ -92,11 +92,13 @@ class _TradologieDrawerState extends State<TradologieDrawer> {
                       "Signed Out Successfully",
                     );
                     Constants.isLogin = false;
+                    Constants.isAdmin = false;
                     SecureStorageService secureStorage = SecureStorageService();
                     secureStorage.delete(AppStrings.apiVerificationCode);
                     Constants.token = "";
                     secureStorage.write(
                         AppStrings.appSession, false.toString());
+                    secureStorage.write(AppStrings.isAdmin, 'false');
 
                     sl<NavigationService>().pushNamedAndRemoveUntil(
                       Routes.onboardingRoute,

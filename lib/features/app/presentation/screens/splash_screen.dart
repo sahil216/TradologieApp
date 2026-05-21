@@ -125,7 +125,10 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _goNext(BuildContext context) async {
     nameUpdate();
     if (Constants.isLogin) {
-      if (Constants.isFmcg == true) {
+      if (Constants.isAdmin) {
+        sl<NavigationService>()
+            .pushNamedAndRemoveUntil(Routes.selectVendorforChat);
+      } else if (Constants.isFmcg == true) {
         sl<NavigationService>().pushNamedAndRemoveUntil(Routes.fmcgMainScreen);
       } else {
         sl<NavigationService>().pushNamedAndRemoveUntil(Routes.mainRoute);

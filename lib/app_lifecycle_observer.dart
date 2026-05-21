@@ -3,7 +3,10 @@ import 'package:flutter/widgets.dart';
 class AppLifecycleObserver with WidgetsBindingObserver {
   static AppLifecycleState? currentState;
 
-  void startObserving() {
+  VoidCallback? _onResumed;
+
+  void startObserving({VoidCallback? onResumed}) {
+    _onResumed = onResumed;
     WidgetsBinding.instance.addObserver(this);
     currentState = WidgetsBinding.instance.lifecycleState;
   }
@@ -15,6 +18,9 @@ class AppLifecycleObserver with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     currentState = state;
+    if (state == AppLifecycleState.resumed) {
+      _onResumed?.call();
+    }
   }
 
   static bool get isInForeground =>

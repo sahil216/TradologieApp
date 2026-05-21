@@ -4,7 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:tradologie_app/config/routes/app_router.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/utils/assets_manager.dart';
-import 'package:tradologie_app/features/app/injection_container_app.dart';
+import 'package:tradologie_app/core/utils/app_colors.dart';
+import 'package:tradologie_app/core/utils/notification_badge_service.dart';
+import 'package:tradologie_app/injection_container.dart';
 
 class CommonAppbar extends StatelessWidget {
   final String title;
@@ -53,9 +55,10 @@ class CommonAppbar extends StatelessWidget {
         builder: (context, constraints) {
           final double topSafe = MediaQuery.of(context).padding.top;
           final double min = kToolbarHeight;
-          final double percent =
-              ((constraints.maxHeight - min) / (expandedHeight - min))
-                  .clamp(0.0, 1.0);
+          final double expandRange = expandedHeight - min;
+          final double percent = expandRange <= 0
+              ? 1.0
+              : ((constraints.maxHeight - min) / expandRange).clamp(0.0, 1.0);
 
           final ease = Curves.easeOutQuart.transform(percent);
           final scale = 0.88 + (ease * .12);
@@ -151,17 +154,27 @@ class CommonAppbar extends StatelessWidget {
                         Positioned(
                           right: 12,
                           bottom: baseline,
-                          child: GestureDetector(
-                            onTap: () {
-                              sl<NavigationService>()
-                                  .pushNamed(Routes.notificationScreen);
+                          child: ListenableBuilder(
+                            listenable: sl<NotificationBadgeService>(),
+                            builder: (context, _) {
+                              final badgeCount =
+                                  sl<NotificationBadgeService>().count;
+                              return GestureDetector(
+                                onTap: () async {
+                                  await sl<NotificationBadgeService>().clear();
+                                  if (onNotificationTap != null) {
+                                    onNotificationTap!();
+                                  } else {
+                                    sl<NavigationService>().pushNamed(
+                                      Routes.notificationScreen,
+                                    );
+                                  }
+                                },
+                                child: _glassActionWrapper(
+                                  _notificationIcon(badgeCount),
+                                ),
+                              );
                             },
-                            child: _glassActionWrapper(
-                              const Icon(
-                                Icons.notifications_none,
-                                color: Colors.black,
-                              ),
-                            ),
                           ),
                         ),
 
@@ -181,6 +194,42 @@ class CommonAppbar extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+
+  Widget _notificationIcon(int badgeCount) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        const Icon(
+          Icons.notifications_none,
+          color: Colors.black,
+        ),
+        if (badgeCount > 0)
+          Positioned(
+            right: -4,
+            top: -4,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+              constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+              decoration: BoxDecoration(
+                color: AppColors.orange,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.white, width: 1.5),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                badgeCount > 99 ? '99+' : '$badgeCount',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  height: 1,
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 

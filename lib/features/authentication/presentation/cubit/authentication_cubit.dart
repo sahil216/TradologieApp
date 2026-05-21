@@ -46,6 +46,7 @@ import '../../domain/entities/verify_otp_result.dart';
 import '../../domain/entities/ForgotpasswordsendotpSucess.dart';
 import '../../domain/entities/admin_login_success.dart';
 import '../../domain/usecases/admin_login_usecase.dart';
+import '../../domain/usecases/admin_logout_usecase.dart';
 import '../../domain/usecases/forgotpasswordsendotpusecase.dart';
 import '../../domain/usecases/verify_otp_usecase.dart';
 import '../../domain/usecases/register_usecase.dart';
@@ -76,7 +77,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
 
   final ForgotpasswordUsecase forgotPasswordSendOtpUsecase;
   final AdminLoginUsecase adminLoginUsecase;
-
+  final AdminLogoutUsecase adminLogoutUsecase;
 
   final SignOutUsecase signOutUsecase;
   final BuyerSendOtpUsecase buyerSendOtpUsecase;
@@ -119,6 +120,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     required this.buyerSigninUsecase,
     required this.forgotPasswordSendOtpUsecase,
     required this.adminLoginUsecase,
+    required this.adminLogoutUsecase,
     required this.signOutUsecase,
     required this.buyerSendOtpUsecase,
     required this.buyerVerifyOtpUsecase,
@@ -229,6 +231,15 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     emit(response.fold(
       (failure) => AdminLoginError(failure: failure),
       (res) => AdminSignInSuccess(data: res),
+    ));
+  }
+
+  Future<void> adminLogout(NoParams params) async {
+    emit(AdminLogoutIsLoading());
+    final response = await adminLogoutUsecase(params);
+    emit(response.fold(
+      (failure) => AdminLogoutError(failure: failure),
+      (message) => AdminLogoutSuccess(message: message),
     ));
   }
 
