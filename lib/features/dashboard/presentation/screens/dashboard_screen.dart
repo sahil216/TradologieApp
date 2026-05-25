@@ -424,6 +424,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             /// ⭐ ULTRA COMMON APPBAR
             CommonAppbar(
               title: "Dashboard",
+              showMenuButton: !Constants.isBuyer,
               showNotification: true,
               onNotificationTap: () {
                 sl<NavigationService>().pushNamed(

@@ -36,7 +36,8 @@ import '../../../../injection_container.dart';
 import 'package:tradologie_app/features/fmcg/presentation/fmcg_login_navigation.dart';
 
 import '../cubit/authentication_cubit.dart';
-import '../widget/youtube_player.dart';
+import '../widget/login_video_section.dart';
+import 'package:tradologie_app/core/utils/login_video_constants.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -684,10 +685,10 @@ class _SignInScreenState extends State<SignInScreen>
                                 ),
                                 if (!Constants.isBuyer) ...[
                                   const SizedBox(height: 16),
-                                  const YoutubeVideoPage(
+                                  const LoginVideoSection(
                                     heading: 'Benefits for Agro Exporter',
-                                    videoUrl:
-                                        'https://www.youtube.com/watch?v=W3dmyVCqUVA',
+                                    linkType:
+                                        LoginVideoConstants.linkTypeAgroSeller,
                                   ),
                                 ],
                               ],

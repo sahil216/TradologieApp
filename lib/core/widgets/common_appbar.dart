@@ -6,6 +6,7 @@ import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/utils/assets_manager.dart';
 import 'package:tradologie_app/core/utils/app_colors.dart';
 import 'package:tradologie_app/core/utils/notification_badge_service.dart';
+import 'package:tradologie_app/core/widgets/seller_drawer_menu_button.dart';
 import 'package:tradologie_app/injection_container.dart';
 
 class CommonAppbar extends StatelessWidget {
@@ -13,6 +14,7 @@ class CommonAppbar extends StatelessWidget {
   final double expandedHeight;
 
   final bool showBackButton;
+  final bool showMenuButton;
   final bool showNotification;
   final bool? showLogo;
   final bool showWebview;
@@ -31,6 +33,7 @@ class CommonAppbar extends StatelessWidget {
     required this.title,
     this.expandedHeight = 80,
     this.showBackButton = false,
+    this.showMenuButton = false,
     this.showNotification = false,
     this.onBackTap,
     this.onNotificationTap,
@@ -96,7 +99,13 @@ class CommonAppbar extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 8.0),
                   child: Stack(
                     children: [
-                      if (showBackButton)
+                      if (showMenuButton)
+                        Positioned(
+                          left: 12,
+                          bottom: baseline - 4,
+                          child: SellerDrawerMenuButton(iconColor: Colors.black),
+                        )
+                      else if (showBackButton)
                         Positioned(
                           left: 12,
                           bottom: baseline,

@@ -108,7 +108,11 @@ class _AdminVendorChatBodyState extends State<_AdminVendorChatBody> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => AdminVendorConversationScreen(vendor: vendor),
+        builder: (_) => AdminVendorConversationScreen(
+          vendor: vendor,
+          chatType1: widget.args.signalRType1,
+          chatType2: widget.args.signalRType2,
+        ),
       ),
     );
   }

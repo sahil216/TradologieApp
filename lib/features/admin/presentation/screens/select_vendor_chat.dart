@@ -11,8 +11,10 @@ import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
+import 'package:tradologie_app/features/admin/presentation/viewmodel/admin_connect_chat_config.dart';
 import 'package:tradologie_app/features/admin/presentation/viewmodel/admin_vendor_chat_args.dart';
 import 'package:tradologie_app/features/authentication/presentation/cubit/authentication_cubit.dart';
+import 'package:tradologie_app/core/widgets/notifications_service.dart';
 import 'package:tradologie_app/injection_container.dart';
 
 class SelectVendorforChat extends StatefulWidget {
@@ -23,14 +25,30 @@ class SelectVendorforChat extends StatefulWidget {
 }
 
 class _SelectVendorforChatState extends State<SelectVendorforChat> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      sl<FirebaseNotificationService>().markAppShellReady();
+    });
+  }
+
   void _onLogoutTap() {
     context.read<AuthenticationCubit>().adminLogout(NoParams());
   }
 
-  void _openVendorChat(String categoryTitle) {
+  void _openVendorChat(
+    String categoryTitle, {
+    String signalRType1 = AdminChatConfig.type1,
+    String signalRType2 = AdminChatConfig.type2,
+  }) {
     sl<NavigationService>().pushNamed(
       Routes.adminVendorChat,
-      arguments: AdminVendorChatArgs(categoryTitle: categoryTitle),
+      arguments: AdminVendorChatArgs(
+        categoryTitle: categoryTitle,
+        signalRType1: signalRType1,
+        signalRType2: signalRType2,
+      ),
     );
   }
 

@@ -2,7 +2,7 @@ name: tradologie_app
 description: "A new tradologie flutter project."
 publish_to: 'none'
 
-version: 1.4.6+55
+version: 1.4.8+57
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -50,7 +50,6 @@ dependencies:
   cached_network_image: ^3.3.1
   flutter_spinkit: ^5.2.1
   pull_to_refresh: ^2.0.0
- 
   pinput: ^6.0.1
   webview_flutter: ^4.13.0
   webview_flutter_android: ^4.10.11

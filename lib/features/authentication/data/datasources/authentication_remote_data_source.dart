@@ -15,6 +15,8 @@ import '../../domain/usecases/admin_login_usecase.dart';
 import '../../domain/usecases/forgotpasswordsendotpusecase.dart';
 import '../../domain/usecases/register_usecase.dart';
 import '../../domain/usecases/send_otp_usecase.dart';
+import '../../domain/usecases/get_login_video_link_usecase.dart';
+import '../../domain/usecases/log_video_link_usecase.dart';
 import '../../domain/usecases/sign_in_usecase.dart';
 import '../../domain/usecases/supplier_social_login_usecase.dart';
 
@@ -72,6 +74,9 @@ abstract class AuthenticationRemoteDataSource {
   Future<ResponseWrapper<dynamic>?> fmcgSellerServiceLabelList(NoParams params);
   Future<ResponseWrapper<dynamic>?> fmcgSellerExportingProductsList(
       NoParams params);
+  Future<ResponseWrapper<dynamic>?> getLoginVideoLink(
+      GetLoginVideoLinkParams params);
+  Future<ResponseWrapper<dynamic>?> logVideoLink(LogVideoLinkParams params);
 }
 
 class AuthenticationRemoteDataSourceImpl
@@ -436,5 +441,21 @@ class AuthenticationRemoteDataSourceImpl
     );
   }
 
+  @override
+  Future<ResponseWrapper<dynamic>?> getLoginVideoLink(
+      GetLoginVideoLinkParams params) async {
+    return await apiConsumer.post(
+      EndPoints.loginVideoLink,
+      body: params.toJson(),
+    );
+  }
 
+  @override
+  Future<ResponseWrapper<dynamic>?> logVideoLink(
+      LogVideoLinkParams params) async {
+    return await apiConsumer.post(
+      EndPoints.videoLinkLog,
+      body: params.toJson(),
+    );
+  }
 }

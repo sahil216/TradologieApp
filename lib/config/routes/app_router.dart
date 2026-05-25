@@ -27,8 +27,11 @@ import 'package:tradologie_app/features/negotiation/presentation/screens/negotia
 
 import '../../core/utils/app_strings.dart';
 import '../../features/admin/presentation/screens/admin_vendor_chat_screen.dart';
+import '../../features/admin/presentation/screens/admin_vendor_conversation_screen.dart';
 import '../../features/admin/presentation/screens/select_vendor_chat.dart';
+import '../../features/admin/presentation/viewmodel/admin_connect_chat_config.dart';
 import '../../features/admin/presentation/viewmodel/admin_vendor_chat_args.dart';
+import '../../features/admin/presentation/viewmodel/admin_vendor_conversation_args.dart';
 import '../../features/app/presentation/screens/onboarding_screen.dart';
 import '../../features/app/presentation/screens/splash_screen.dart';
 import '../../features/app/presentation/screens/terms_screen.dart';
@@ -60,6 +63,8 @@ class Routes {
   static const String mainRoute = '/main';
   static const String selectVendorforChat = '/selectVendorforChat';
   static const String adminVendorChat = '/adminVendorChat';
+  static const String adminVendorConversation = '/adminVendorConversation';
+  static const String adminDirectConnectChat = '/adminDirectConnectChat';
   static const String termsRoute = '/terms';
   static const String onboardingRoute = '/onboarding';
   //! authentication
@@ -149,6 +154,28 @@ class AppRoutes {
         return CupertinoPageRoute(builder: (context) {
           final args = routeSettings.arguments as AdminVendorChatArgs;
           return AdminVendorChatScreen(args: args);
+        });
+
+      case Routes.adminVendorConversation:
+        return CupertinoPageRoute(builder: (context) {
+          final args =
+              routeSettings.arguments as AdminVendorConversationArgs;
+          return AdminVendorConversationScreen(
+            vendor: args.vendor,
+            chatType1: args.chatType1,
+            chatType2: args.chatType2,
+            isConnectChat: args.isConnectChat,
+          );
+        });
+
+      case Routes.adminDirectConnectChat:
+        return CupertinoPageRoute(builder: (context) {
+          return const AdminVendorConversationScreen(
+            vendor: AdminConnectChatConfig.displayVendor,
+            chatType1: AdminConnectChatConfig.type1,
+            chatType2: AdminConnectChatConfig.type2,
+            isConnectChat: true,
+          );
         });
 
 

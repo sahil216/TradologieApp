@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:tradologie_app/core/utils/app_colors.dart';
-import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 /// Compact embeddable YouTube player for sign-in (no nested [Scaffold]).
 class YoutubeVideoPage extends StatefulWidget {
   final String heading;
   final String videoUrl;
+  final Future<void> Function()? onFirstPlay;
 
   const YoutubeVideoPage({
     super.key,
     required this.heading,
     required this.videoUrl,
+    this.onFirstPlay,
   });
 
 
@@ -60,8 +61,7 @@ class _YoutubeVideoPageState extends State<YoutubeVideoPage> {
   }
 
   void _onFirstPlay() {
-    //CommonToast.success('Video played');
-    // TODO: call analytics / API when ready
+    widget.onFirstPlay?.call();
   }
 
   @override

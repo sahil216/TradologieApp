@@ -17,7 +17,8 @@ import '../../../../core/widgets/common_loader.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../cubit/authentication_cubit.dart';
-import '../widget/youtube_player.dart';
+import '../widget/login_video_section.dart';
+import 'package:tradologie_app/core/utils/login_video_constants.dart';
 import 'package:tradologie_app/core/utils/common_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
@@ -510,10 +511,10 @@ class _FmcgSellerSigninState extends State<FmcgSellerSignin>
                                 ),
                                 if (!widget.isBuyer) ...[
                                   const SizedBox(height: 16),
-                                  const YoutubeVideoPage(
+                                  const LoginVideoSection(
                                     heading: 'Benefits for FMCG Exporter',
-                                    videoUrl:
-                                        'https://www.youtube.com/watch?v=3FB376QcYuE',
+                                    linkType:
+                                        LoginVideoConstants.linkTypeFmcgSeller,
                                   ),
                                 ],
                               ],

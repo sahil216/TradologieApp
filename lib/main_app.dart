@@ -19,10 +19,23 @@ import 'features/authentication/presentation/cubit/authentication_cubit.dart';
 import 'features/dashboard/presentation/cubit/dashboard_cubit.dart';
 // import 'features/negotiation/presentation/cubit/negotiation_cubit.dart';
 import 'features/negotiation/presentation/cubit/negotiation_cubit.dart';
+import 'core/navigation/admin_chat_route_observer.dart';
+import 'core/widgets/notifications_service.dart';
 import 'injection_container.dart';
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   const MainApp({super.key});
+
+  @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+  @override
+  void initState() {
+    super.initState();
+    sl<FirebaseNotificationService>().schedulePendingNavigation();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,8 +87,10 @@ class MainApp extends StatelessWidget {
                 navigatorKey: sl<NavigationService>().navigationKey,
                 navigatorObservers: [
                   AnalyticsObserver(),
+                  adminChatRouteObserver,
                 ],
                 builder: (context, child) {
+                  sl<FirebaseNotificationService>().schedulePendingNavigation();
                   return MediaQuery(
                     data: MediaQuery.of(context)
                         .copyWith(textScaler: const TextScaler.linear(1)),

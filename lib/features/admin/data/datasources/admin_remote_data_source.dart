@@ -6,6 +6,7 @@ import '../../../../core/response_wrapper/response_wrapper.dart';
 import '../../../../core/utils/app_strings.dart';
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/secure_storage_service.dart';
+import '../../domain/usecases/get_admin_chat_history_usecase.dart';
 import '../../domain/usecases/get_admin_vendor_list_usecase.dart';
 
 abstract class AdminRemoteDataSource {
@@ -14,6 +15,10 @@ abstract class AdminRemoteDataSource {
   );
 
   Future<ResponseWrapper<dynamic>?> getAgroSellerChatList(NoParams params);
+
+  Future<ResponseWrapper<dynamic>?> getChatHistory(
+    GetAdminChatHistoryParams params,
+  );
 }
 
 class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
@@ -46,6 +51,16 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
     return (await apiConsumer.post(
       EndPoints.adminAgroSellerChatList,
       body: {'Token': token},
+    )) as ResponseWrapper<dynamic>?;
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> getChatHistory(
+    GetAdminChatHistoryParams params,
+  ) async {
+    return (await apiConsumer.get(
+      EndPoints.connectChatHistory,
+      queryParameters: params.toQueryParameters(),
     )) as ResponseWrapper<dynamic>?;
   }
 }

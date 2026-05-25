@@ -1,9 +1,6 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:tradologie_app/config/routes/app_router.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
@@ -19,13 +16,12 @@ import 'package:tradologie_app/core/widgets/common_social_icons.dart';
 import 'package:tradologie_app/core/widgets/comon_toast_system.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text/text_style_constants.dart';
-import 'package:tradologie_app/features/app/domain/usecases/check_force_update_usecase.dart';
 import 'package:tradologie_app/features/app/presentation/cubit/app_cubit.dart';
+import 'package:tradologie_app/features/my_account/presentation/screens/my_account_screen.dart';
 import 'package:tradologie_app/features/app/presentation/widgets/input_dialog.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/delete_account_usecase.dart';
+import 'package:tradologie_app/features/admin/presentation/widgets/blinking_online_dot.dart';
 import 'package:tradologie_app/features/authentication/presentation/cubit/authentication_cubit.dart';
-import 'package:url_launcher/url_launcher.dart';
-
 import '../../injection_container.dart';
 import '../fmcg/presentation/screens/fmcg_products_mycatalogue.dart';
 
@@ -41,8 +37,6 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
   SecureStorageService secureStorage = SecureStorageService();
 
   String name = "";
-  bool showUpdate = false;
-
   late AppCubit _appCubit;
 
   @override
@@ -51,24 +45,8 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
     _appCubit = BlocProvider.of<AppCubit>(context);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      _checkVersion();
       getName();
     });
-  }
-
-  Future<void> _checkVersion() async {
-    final version = await getAppVersion();
-    _appCubit.checkForceUpdate(
-      ForceUpdateParams(
-          token: "2018APR031848",
-          appVersion: version,
-          isAndroid: Platform.isAndroid ? true : false),
-    );
-  }
-
-  Future<String> getAppVersion() async {
-    final info = await PackageInfo.fromPlatform();
-    return info.version;
   }
 
   Future<String> getName() async {
@@ -115,17 +93,6 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
               }
               if (state is DeleteAccountError) {
                 CommonToast.showFailureToast(state.failure);
-              }
-            },
-          ),
-          BlocListener<AppCubit, AppState>(
-            listenWhen: (previous, current) => previous != current,
-            listener: (context, state) {
-              if (state is CheckForceUpdateSuccess) {
-                setState(() => showUpdate = false);
-              }
-              if (state is CheckForceUpdateError) {
-                setState(() => showUpdate = true);
               }
             },
           ),
@@ -176,6 +143,18 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
                                           .pushNamed(Routes.contactUsScreen);
                                     },
                                     showDivider: true),
+                                if (!Constants.isFmcg && !Constants.isBuyer)
+                                  _ultraTile(
+                                    icon: Icons.connect_without_contact,
+                                    title: "Dedicated Support",
+                                    showOnlineDot: true,
+                                    onTap: () {
+                                      sl<NavigationService>().pushNamed(
+                                        Routes.adminDirectConnectChat,
+                                      );
+                                    },
+                                    showDivider: true,
+                                  ),
                                 if (Constants.isFmcg && !Constants.isBuyer) ...{
                                   _ultraTile(
                                       icon: Icons.query_stats_outlined,
@@ -306,25 +285,6 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
 
 
                         const SizedBox(height: 28),
-
-                        /// UPDATE CTA
-                        if (showUpdate)
-                          Center(
-                            child: GestureDetector(
-                              onTap: () => _showUpdateDialog(context, false),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  CommonText(
-                                    'Newer App Version Available',
-                                    style: TextStyleConstants.semiBold(context),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  const Icon(Icons.arrow_forward_ios, size: 14),
-                                ],
-                              ),
-                            ),
-                          ),
                       ],
                     ),
                   ),
@@ -361,53 +321,6 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
     );
   }
 
-  void _showUpdateDialog(BuildContext context, bool isForce) {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (_) => AlertDialog(
-        title: CommonText(
-          "Update Available",
-          style: TextStyleConstants.semiBold(context),
-        ),
-        content: CommonText(
-          "A newer version of the app is available.",
-          style: TextStyleConstants.medium(context),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: CommonText(
-              "Later",
-              style: TextStyleConstants.medium(context),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (Platform.isAndroid) {
-                launchUrl(
-                    Uri.parse(
-                        "https://play.google.com/store/apps/details?id=com.tradologie.app"),
-                    mode: LaunchMode.externalApplication);
-              }
-
-              if (Platform.isIOS) {
-                launchUrl(
-                    Uri.parse(
-                        "https://apps.apple.com/app/tradologie/id6758596323"),
-                    mode: LaunchMode.externalApplication);
-              }
-            },
-            child: CommonText(
-              "Update",
-              style: TextStyleConstants.semiBold(context),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _profileHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -434,7 +347,14 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
             ),
           ),
           IconButton(
-            onPressed: Constants.isFmcg ? null : () => _appCubit.changeTab(2),
+            onPressed: Constants.isFmcg
+                ? null
+                : () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => MyAccountScreen()),
+                    );
+                  },
             icon: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
           ),
         ],
@@ -500,6 +420,7 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
     required VoidCallback onTap,
     Color? color,
     required bool showDivider,
+    bool showOnlineDot = false,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -518,10 +439,22 @@ class _MoreOptionsScreenState extends State<MoreOptionsScreen>
                     Icon(icon, size: 22, color: color ?? Colors.black87),
                     const SizedBox(width: 14),
                     Expanded(
-                      child: Text(
-                        title,
-                        style: GoogleFonts.manrope(
-                            fontSize: 14, fontWeight: FontWeight.w600),
+                      child: Row(
+                        children: [
+                          if (showOnlineDot) ...[
+                            const BlinkingOnlineDot(size: 9),
+                            const SizedBox(width: 8),
+                          ],
+                          Expanded(
+                            child: Text(
+                              title,
+                              style: GoogleFonts.manrope(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const Icon(

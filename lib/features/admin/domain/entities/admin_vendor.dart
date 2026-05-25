@@ -23,6 +23,24 @@ class AdminVendor extends Equatable {
     this.lastChatDate = '',
   });
 
+  /// Minimal vendor from FCM push (`fromid` + `name`).
+  factory AdminVendor.fromPushNotification({
+    required String vendorId,
+    required String vendorName,
+  }) {
+    final id = int.tryParse(vendorId.trim()) ?? 0;
+    final name = vendorName.trim();
+    return AdminVendor(
+      vendorId: id,
+      vendorCode: '',
+      vendorName: name.isNotEmpty ? name : 'Vendor',
+      mobileNo: '',
+      countryName: '',
+      emailId: '',
+      registrationDate: '',
+    );
+  }
+
   String get displayName =>
       vendorName.trim().isNotEmpty ? vendorName.trim() : vendorCode;
 

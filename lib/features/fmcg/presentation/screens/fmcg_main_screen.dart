@@ -15,7 +15,9 @@ import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_my_accoun
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_seller_dashboard_screen.dart';
 import 'package:tradologie_app/features/webview/presentation/screens/in_app_webview_screen.dart';
 import 'package:tradologie_app/features/webview/presentation/screens/viewmodel/webview_params.dart';
+import 'package:tradologie_app/core/widgets/notifications_service.dart';
 import 'package:tradologie_app/features/webview/presentation/screens/webview_screen.dart';
+import 'package:tradologie_app/injection_container.dart';
 
 // ── Nav bar visibility controller ─────────────────────────────────────────────
 // Any child screen can show/hide the bottom bar by calling:
@@ -206,6 +208,9 @@ class _FMCGMainScreenState extends State<FMCGMainScreen> {
     super.initState();
     nameUpdate();
     analyticsUpdate();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      sl<FirebaseNotificationService>().markAppShellReady();
+    });
   }
 
   // ── Root screens (one per tab) ─────────────────────────────────────────────

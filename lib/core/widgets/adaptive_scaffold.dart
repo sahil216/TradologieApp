@@ -6,6 +6,7 @@ class AdaptiveScaffold extends StatelessWidget {
   final PreferredSizeWidget? appBar;
   final Widget? drawer;
   final Widget? bottomNavigationBar;
+  final Key? scaffoldKey;
 
   /// Layout
   final bool useSafeArea;
@@ -23,6 +24,7 @@ class AdaptiveScaffold extends StatelessWidget {
     this.appBar,
     this.drawer,
     this.bottomNavigationBar,
+    this.scaffoldKey,
     this.extendBodyBehindAppBar = false,
     this.useSafeArea = true,
     this.resizeToAvoidBottomInset = true,
@@ -36,6 +38,7 @@ class AdaptiveScaffold extends StatelessWidget {
     final r = Responsive(context);
 
     return Scaffold(
+      key: scaffoldKey,
       backgroundColor: scaffoldBackgroundColor,
       appBar: appBar,
       drawer: drawer,

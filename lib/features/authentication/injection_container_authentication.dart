@@ -28,11 +28,13 @@ import 'domain/usecases/buyer_verify_otp_usecase.dart';
 import 'domain/usecases/admin_login_usecase.dart';
 import 'domain/usecases/admin_logout_usecase.dart';
 import 'domain/usecases/forgotpasswordsendotpusecase.dart';
+import 'domain/usecases/sign_in_usecase.dart';
 import 'domain/usecases/verify_otp_usecase.dart';
 import 'domain/usecases/register_usecase.dart';
 import 'domain/usecases/send_otp_usecase.dart';
 import 'domain/usecases/buyer_social_login_usecase.dart';
-import 'domain/usecases/sign_in_usecase.dart';
+import 'domain/usecases/get_login_video_link_usecase.dart';
+import 'domain/usecases/log_video_link_usecase.dart';
 import 'domain/usecases/supplier_social_login_usecase.dart';
 
 final sl = GetIt.instance;
@@ -158,6 +160,10 @@ Future<void> init() async {
       () => DeleteAccountUsecase(authenticationRepository: sl()));
   sl.registerLazySingleton<GetCountryCodeListUsecase>(
       () => GetCountryCodeListUsecase(authenticationRepository: sl()));
+  sl.registerLazySingleton<GetLoginVideoLinkUsecase>(
+      () => GetLoginVideoLinkUsecase(authenticationRepository: sl()));
+  sl.registerLazySingleton<LogVideoLinkUsecase>(
+      () => LogVideoLinkUsecase(authenticationRepository: sl()));
   sl.registerLazySingleton<FmcgSellerSigninUsecase>(
       () => FmcgSellerSigninUsecase(authenticationRepository: sl()));
   sl.registerLazySingleton<FmcgBuyerLoginUsecase>(

@@ -4,8 +4,13 @@ import 'package:tradologie_app/features/socket/data/model/message_model.dart';
 
 class MessageBubble extends StatelessWidget {
   final ChatMessage message;
+  final bool hideLeadingAvatar;
 
-  const MessageBubble({super.key, required this.message});
+  const MessageBubble({
+    super.key,
+    required this.message,
+    this.hideLeadingAvatar = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +23,7 @@ class MessageBubble extends StatelessWidget {
             isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          if (!isMe) ...[
+          if (!isMe && !hideLeadingAvatar) ...[
             const CircleAvatar(
               radius: 14,
               backgroundColor: Color(0xFFE0E0E0),

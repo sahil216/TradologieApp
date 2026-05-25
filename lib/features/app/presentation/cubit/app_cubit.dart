@@ -29,6 +29,11 @@ class AppCubit extends Cubit<AppState> {
 
   int bottomNavIndex = 0;
 
+  /// Opens the seller main-shell drawer (set from [MainScreen]).
+  VoidCallback? onOpenSellerDrawer;
+
+  void openSellerDrawer() => onOpenSellerDrawer?.call();
+
   Future<void> changeTab(int tab) async {
     if (bottomNavIndex == tab) return;
 

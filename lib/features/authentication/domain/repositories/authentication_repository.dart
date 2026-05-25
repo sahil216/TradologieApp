@@ -28,6 +28,9 @@ import '../../../../core/error/failures.dart';
 import '../entities/ForgotpasswordsendotpSucess.dart';
 import '../entities/verify_otp_fmcg_seller.dart';
 import '../entities/admin_login_success.dart';
+import '../entities/login_video_link.dart';
+import '../usecases/get_login_video_link_usecase.dart';
+import '../usecases/log_video_link_usecase.dart';
 import '../usecases/admin_login_usecase.dart';
 import '../usecases/forgotpasswordsendotpusecase.dart';
 import '../usecases/register_usecase.dart';
@@ -96,5 +99,9 @@ abstract class AuthenticationRepository {
   Future<Either<Failure, FMCGSellerUserDetail>> verifyOtpFMCGSeller(VerifyOtpParams params);
   Future<Either<Failure, FmcgBuyerLoginSuccess>> verifyOtpFMCGbuyer(
       VerifyOtpParams params);
+
+  Future<Either<Failure, LoginVideoLink>> getLoginVideoLink(
+      GetLoginVideoLinkParams params);
+  Future<Either<Failure, bool>> logVideoLink(LogVideoLinkParams params);
 
 }

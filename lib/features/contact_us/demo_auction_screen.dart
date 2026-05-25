@@ -12,6 +12,7 @@ import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
+import 'package:tradologie_app/core/widgets/seller_drawer_menu_button.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
@@ -294,14 +295,19 @@ class _DemoAuctionScreenState extends State<DemoAuctionScreen>
                   ),
                 ),
               ),
-              leading: IconButton(
-                onPressed: () => Navigator.maybePop(context),
-                icon: const Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: Colors.white,
-                  size: 18,
-                ),
-              ),
+              leading: Navigator.canPop(context)
+                  ? IconButton(
+                      onPressed: () => Navigator.maybePop(context),
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                    )
+                  : const SellerDrawerMenuButton(
+                      iconColor: Colors.white,
+                      iconSize: 22,
+                    ),
               title: const Text(
                 "Negotiation Demo",
                 style: TextStyle(

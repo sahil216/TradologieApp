@@ -14,7 +14,9 @@ import 'package:tradologie_app/core/widgets/common_no_record_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_network_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_error_widget.dart';
 import 'package:tradologie_app/core/widgets/custom_text/common_text_widget.dart';
+import 'package:tradologie_app/core/widgets/seller_drawer_menu_button.dart';
 import 'package:tradologie_app/features/app/presentation/cubit/app_cubit.dart';
+import 'package:tradologie_app/features/my_account/presentation/screens/my_account_screen.dart';
 import 'package:tradologie_app/features/negotiation/domain/entities/negotiation_result.dart';
 import 'package:tradologie_app/features/negotiation/presentation/cubit/negotiation_cubit.dart';
 import 'package:tradologie_app/core/utils/constants.dart';
@@ -149,7 +151,12 @@ class _NegotiationScreenState extends State<NegotiationScreen>
                   if (state.failure.msg?.toLowerCase() == "no record found!") {
                     return CommonNoRecordWidget(
                       onTap: () {
-                        _appCubit.changeTab(2);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => MyAccountScreen(),
+                          ),
+                        );
                       },
                       text:
                           "No negotiations are assigned to your account, please get verified your account. If you need any assistance, contact us at info@tradologie.com or call us at +91-8595957412",
@@ -186,14 +193,19 @@ class _NegotiationScreenState extends State<NegotiationScreen>
                         ),
                       ),
                     ),
-                    leading: IconButton(
-                      onPressed: () => Navigator.maybePop(context),
-                      icon: const Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        color: Colors.white,
-                        size: 18,
-                      ),
-                    ),
+                    leading: Navigator.canPop(context)
+                        ? IconButton(
+                            onPressed: () => Navigator.maybePop(context),
+                            icon: const Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              color: Colors.white,
+                              size: 18,
+                            ),
+                          )
+                        : SellerDrawerMenuButton(
+                            iconColor: Colors.white,
+                            iconSize: 22,
+                          ),
                     title: Text(
                       "Negotiation List",
                      /* style: TextStyle(

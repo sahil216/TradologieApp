@@ -19,6 +19,7 @@ import 'package:tradologie_app/features/app/presentation/cubit/app_cubit.dart';
 import '../../../../config/routes/app_router.dart';
 import '../../../../config/routes/navigation_service.dart';
 import '../../../../core/utils/constants.dart';
+import '../../../../core/widgets/notifications_service.dart';
 import '../../../../injection_container.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -136,6 +137,12 @@ class _SplashScreenState extends State<SplashScreen>
     } else {
       sl<NavigationService>().pushNamedAndRemoveUntil(Routes.onboardingRoute);
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Constants.isLogin) {
+        sl<FirebaseNotificationService>().markAppShellReady();
+      }
+    });
   }
 
   @override

@@ -1,10 +1,15 @@
+import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
+import 'dart:developer' as developer;
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter/scheduler.dart' show SchedulerBinding;
 import 'package:tradologie_app/config/routes/navigation_service.dart';
+import 'package:tradologie_app/core/notifications/fcm_data_normalizer.dart';
+import 'package:tradologie_app/core/notifications/push_chat_navigation.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
 import 'package:tradologie_app/core/utils/notification_badge_service.dart';
 import 'package:tradologie_app/core/utils/secure_storage_service.dart';
@@ -28,24 +33,65 @@ dynamic _toJsonSafe(dynamic value) {
   return value.toString();
 }
 
-/// Logs the full FCM payload as formatted JSON (debug / console).
+/// Prints long strings in chunks so nothing is truncated in the Flutter console.
+void _debugPrintLong(String header, String body) {
+  const chunkSize = 900;
+  debugPrint('');
+  debugPrint('╔══════════════════════════════════════════════════════════');
+  debugPrint('║ $header');
+  debugPrint('╠══════════════════════════════════════════════════════════');
+  if (body.length <= chunkSize) {
+    debugPrint(body);
+  } else {
+    for (var i = 0; i < body.length; i += chunkSize) {
+      final end =
+          i + chunkSize < body.length ? i + chunkSize : body.length;
+      debugPrint(body.substring(i, end));
+    }
+  }
+  debugPrint('╚══════════════════════════════════════════════════════════');
+  debugPrint('');
+}
+
+/// Logs the full FCM [RemoteMessage] (data + notification + metadata).
 void logPushNotificationPayload(String source, RemoteMessage message) {
   try {
     final payload = _toJsonSafe(_remoteMessageToJson(message));
-    log(
-      '📩 Push notification [$source]\n${_jsonEncoder.convert(payload)}',
+    final jsonText = _jsonEncoder.convert(payload);
+
+    _debugPrintLong('📩 FCM push [$source]', jsonText);
+
+    developer.log(
+      'FCM push [$source] (${jsonText.length} chars)',
       name: 'FCM',
     );
   } catch (e, st) {
-    log(
-      '📩 Push notification [$source] (serialize error: $e)\n$st',
-      name: 'FCM',
+    _debugPrintLong(
+      '📩 FCM push [$source] — serialize error',
+      '$e\n\n$st\n\nmessage.toString():\n$message',
     );
   }
 }
 
 Map<String, dynamic> _remoteMessageToJson(RemoteMessage message) {
   final notification = message.notification;
+
+  final data = Map<String, dynamic>.from(message.data);
+  final parsedData = <String, dynamic>{};
+  for (final entry in data.entries) {
+    final key = entry.key;
+    final raw = entry.value;
+    parsedData[key] = raw;
+    final trimmed = raw.trim();
+    if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+      try {
+        parsedData['${key}__parsed'] = jsonDecode(trimmed);
+      } catch (_) {
+        // Keep string only.
+      }
+    }
+  }
+
   return {
     'messageId': message.messageId,
     'senderId': message.senderId,
@@ -58,7 +104,8 @@ Map<String, dynamic> _remoteMessageToJson(RemoteMessage message) {
     'sentTime': message.sentTime?.toIso8601String(),
     'threadId': message.threadId,
     'ttl': message.ttl,
-    'data': Map<String, dynamic>.from(message.data),
+    'data': data,
+    'data_parsed': parsedData,
     'notification': notification == null
         ? null
         : {
@@ -77,11 +124,11 @@ Map<String, dynamic> _remoteMessageToJson(RemoteMessage message) {
                     'count': notification.android!.count,
                     'imageUrl': notification.android!.imageUrl,
                     'link': notification.android!.link,
-                    'priority': notification.android!.priority,
+                    'priority': notification.android!.priority?.name,
                     'smallIcon': notification.android!.smallIcon,
                     'sound': notification.android!.sound,
                     'ticker': notification.android!.ticker,
-                    'visibility': notification.android!.visibility,
+                    'visibility': notification.android!.visibility?.name,
                   },
             'apple': notification.apple == null
                 ? null
@@ -106,6 +153,12 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 class FirebaseNotificationService {
   final NavigationService navigationService;
   final NotificationBadgeService badgeService;
+
+  RemoteMessage? _pendingChatTap;
+  bool _pendingNavigationScheduled = false;
+
+  /// True after splash/main (or admin home) has replaced the initial route.
+  bool _appShellReady = false;
 
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _localNotifications =
@@ -132,7 +185,7 @@ class FirebaseNotificationService {
 
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
       logPushNotificationPayload('opened_from_background', message);
-      _handleMessageTap(message);
+      unawaited(_handleMessageTap(message));
     });
 
     await FirebaseMessaging.instance
@@ -147,12 +200,19 @@ class FirebaseNotificationService {
     final initialMessage = await _messaging.getInitialMessage();
     if (initialMessage != null) {
       logPushNotificationPayload('opened_from_terminated', initialMessage);
-      await _handleMessageTap(initialMessage);
+      _deferMessageTap(initialMessage);
+    } else {
+      debugPrint('[FCM] No initial message (app not opened from notification)');
     }
 
     final token = await _messaging.getToken();
-    log("🔥 FCM Token: $token");
-    storage.write(AppStrings.fcmToken, token ?? "");
+    debugPrint('🔥 FCM Token: $token');
+    storage.write(AppStrings.fcmToken, token ?? '');
+
+    _messaging.onTokenRefresh.listen((newToken) {
+      debugPrint('🔥 FCM Token refreshed: $newToken');
+      storage.write(AppStrings.fcmToken, newToken);
+    });
   }
 
   Future<void> _requestPermissions() async {
@@ -166,14 +226,9 @@ class FirebaseNotificationService {
       provisional: false,
     );
 
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      log("✅ Notification permission granted");
-    } else if (settings.authorizationStatus ==
-        AuthorizationStatus.provisional) {
-      log("ℹ️ Provisional permission granted");
-    } else {
-      log("❌ Notification permission denied");
-    }
+    debugPrint(
+      '[FCM] permission: ${settings.authorizationStatus.name}',
+    );
   }
 
   Future<void> _initLocalNotifications() async {
@@ -196,7 +251,13 @@ class FirebaseNotificationService {
 
   Future<void> _showNotification(RemoteMessage message) async {
     final notification = message.notification;
-    if (notification == null) return;
+
+    if (notification == null) {
+      debugPrint(
+        '[FCM] Data-only message (no notification block) — data keys: ${message.data.keys.toList()}',
+      );
+      return;
+    }
 
     const androidDetails = AndroidNotificationDetails(
       'default_channel',
@@ -219,37 +280,117 @@ class FirebaseNotificationService {
       title: notification.title ?? 'Notification',
       body: notification.body ?? '',
       notificationDetails: details,
-      payload: message.data['route'],
+      payload: jsonEncode(message.data),
     );
   }
 
   void _onNotificationTap(NotificationResponse response) {
-    log(
-      '📩 Push notification [local_tap]\n${_jsonEncoder.convert({
+    _debugPrintLong(
+      '📩 FCM local notification tap',
+      _jsonEncoder.convert(_toJsonSafe({
         'id': response.id,
         'actionId': response.actionId,
         'input': response.input,
         'payload': response.payload,
         'notificationResponseType':
             response.notificationResponseType.name,
-      })}',
-      name: 'FCM',
+      })),
     );
 
-    final payload = response.payload ?? '';
-    final message = RemoteMessage(
-      notification: RemoteNotification(title: 'Notification', body: payload),
-      data: {'route': payload},
-    );
+    final raw = response.payload ?? '';
+    Map<String, dynamic> data = {};
+    if (raw.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(raw);
+        if (decoded is Map) {
+          data = decoded.map(
+            (key, value) => MapEntry(key.toString(), value?.toString() ?? ''),
+          );
+        }
+      } catch (_) {
+        if (raw.startsWith('/')) {
+          data = {'route': raw};
+        }
+      }
+    }
 
-    _handleMessageTap(message);
+    unawaited(_handleMessageTap(RemoteMessage(data: data)));
+  }
+
+  /// Call from [MainScreen] / admin home after login shell is visible.
+  void markAppShellReady() {
+    if (_appShellReady) {
+      processPendingNavigation();
+      return;
+    }
+    _appShellReady = true;
+    debugPrint('[FCM] app shell ready — processing pending notification');
+    processPendingNavigation();
+  }
+
+  bool get _canNavigateToChat =>
+      _appShellReady && navigationService.navigationKey.currentState != null;
+
+  /// Call once main route is active (e.g. after splash on cold start).
+  void processPendingNavigation() {
+    final pending = _pendingChatTap;
+    if (pending == null) return;
+
+    if (!_canNavigateToChat) {
+      debugPrint('[FCM] pending chat nav — waiting for app shell');
+      schedulePendingNavigation();
+      return;
+    }
+
+    _pendingChatTap = null;
+    unawaited(_handleMessageTap(pending));
+  }
+
+  void schedulePendingNavigation() {
+    if (_pendingChatTap == null || _pendingNavigationScheduled) return;
+    _pendingNavigationScheduled = true;
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _pendingNavigationScheduled = false;
+      processPendingNavigation();
+    });
+  }
+
+  void _deferMessageTap(RemoteMessage message) {
+    _pendingChatTap = message;
+    schedulePendingNavigation();
+  }
+
+  RemoteMessage _normalizeMessage(RemoteMessage message) {
+    final data = normalizeFcmData(Map<String, dynamic>.from(message.data));
+    return RemoteMessage(
+      messageId: message.messageId,
+      data: data,
+      notification: message.notification,
+    );
   }
 
   Future<void> _handleMessageTap(RemoteMessage message) async {
+    final normalized = _normalizeMessage(message);
+    debugPrint('[FCM] handleMessageTap data=${normalized.data}');
+
+    if (!_canNavigateToChat) {
+      debugPrint('[FCM] deferring chat tap until app shell is ready');
+      _deferMessageTap(normalized);
+      return;
+    }
+
     await badgeService.clear();
 
-    if (message.data.containsKey('route')) {
-      navigationService.navigateTo(message.data['route']);
+    final handled = PushChatNavigation.tryNavigate(
+      normalized,
+      navigationService,
+      onDeferred: _deferMessageTap,
+    );
+    if (handled) return;
+
+    final route = normalized.data['route'];
+    if (route != null && route.isNotEmpty) {
+      navigationService.navigateTo(route);
     }
   }
 
@@ -262,6 +403,7 @@ class FirebaseNotificationService {
       notification: RemoteNotification(title: title, body: body),
       data: {'route': route},
     );
+    logPushNotificationPayload('test_local', message);
     await badgeService.increment();
     await _showNotification(message);
   }

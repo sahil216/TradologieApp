@@ -32,7 +32,10 @@ import 'package:tradologie_app/features/authentication/domain/entities/fmcg_sell
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_service_label_list.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/fmcg_seller_signin_response.dart';
 import 'package:tradologie_app/features/authentication/domain/entities/send_otp_result.dart';
-import 'package:tradologie_app/features/authentication/domain/usecases/delete_account_usecase.dart';
+import 'package:tradologie_app/features/authentication/data/models/login_video_link_model.dart';
+import 'package:tradologie_app/features/authentication/domain/entities/login_video_link.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/get_login_video_link_usecase.dart';
+import 'package:tradologie_app/features/authentication/domain/usecases/log_video_link_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_register_distributor_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_register_seller_usecase.dart';
 import 'package:tradologie_app/features/authentication/domain/usecases/fmcg_seller_signin_usecase.dart';
@@ -50,6 +53,7 @@ import '../../domain/entities/verify_otp_result.dart';
 import '../../domain/repositories/authentication_repository.dart';
 import '../../domain/entities/admin_login_success.dart';
 import '../../domain/usecases/admin_login_usecase.dart';
+import '../../domain/usecases/delete_account_usecase.dart';
 import '../../domain/usecases/forgotpasswordsendotpusecase.dart';
 import '../../domain/usecases/register_usecase.dart';
 import '../../domain/usecases/send_otp_usecase.dart';
@@ -1125,5 +1129,43 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   Future<void> _clearAdminSession(SecureStorageService secureStorage) async {
     Constants.isAdmin = false;
     await secureStorage.write(AppStrings.isAdmin, 'false');
+  }
+
+  @override
+  Future<Either<Failure, LoginVideoLink>> getLoginVideoLink(
+      GetLoginVideoLinkParams params) async {
+    try {
+      final response =
+          await authenticationRemoteDataSource.getLoginVideoLink(params);
+      if (response != null && response.success) {
+        final data = response.data;
+        if (data is Map) {
+          final link = LoginVideoLinkModel.fromJson(
+            Map<String, dynamic>.from(data),
+          );
+          if (link.linkUrl.trim().isEmpty) {
+            return Left(UserFailure('Video link not available', response.code));
+          }
+          return Right(link);
+        }
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> logVideoLink(LogVideoLinkParams params) async {
+    try {
+      final response =
+          await authenticationRemoteDataSource.logVideoLink(params);
+      if (response != null && response.success) {
+        return const Right(true);
+      }
+      return Left(UserFailure(response?.message, response?.code));
+    } on Failure catch (e) {
+      return Left(e);
+    }
   }
 }

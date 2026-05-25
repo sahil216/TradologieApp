@@ -28,6 +28,9 @@ class EndPoints {
   // Get File URL
   static String getFileUrl = 'https://connect.tradologie.com/api/chat/file';
 
+  static const String connectChatHistory =
+      'https://connect.tradologie.com/api/chat/history';
+
   // Login
   static String signIn(UserType userType) {
     return '$baseUrl/${userType.name}/login';
@@ -48,6 +51,8 @@ class EndPoints {
   static const String adminVendorList = '$baseUrl/Admin/VendorList';
   static const String adminAgroSellerChatList =
       '$baseUrl/Admin/AgroSellerChatList';
+  static const String loginVideoLink = '$baseUrl/Admin/LoginVideoLink';
+  static const String videoLinkLog = '$baseUrl/Admin/VideoLinkLog';
   static const String forgotpasswordsendotp = "$baseUrl/Supplier/ForgotPasswordSendOTP";
 
 

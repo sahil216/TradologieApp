@@ -91,7 +91,8 @@ class ChatMessage {
 
   // ── Display helpers ────────────────────────────────────────────────────────
   String get formattedTime {
-    final t = timestamp ?? DateTime.now();
+    // Server sends UTC (e.g. ...Z); show device-local wall clock.
+    final t = (timestamp ?? DateTime.now()).toLocal();
     final h = t.hour.toString().padLeft(2, '0');
     final m = t.minute.toString().padLeft(2, '0');
     return '$h:$m';

@@ -35,7 +35,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
   String? selectedProduct;
   String? selectedUserType;
-  bool showadmin = false;
+  bool showadmin = true;
 
   TradeType? selectedTradeType;
   @override
