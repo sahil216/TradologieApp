@@ -64,10 +64,18 @@ class _WebViewScreenState extends State<WebViewScreen>
           onWebResourceError: (error) {
             debugPrint('❌ WebView error: ${error.description}');
           },
+          onUrlChange: (change) {
+            final url = change.url;
+            if (url != null && url.isNotEmpty) {
+              widget.params.onUrlChanged?.call(url);
+            }
+          },
           onPageStarted: (url) {
+            widget.params.onUrlChanged?.call(url);
             context.read<WebViewCubit>().onPageStarted(url);
           },
           onPageFinished: (url) {
+            widget.params.onUrlChanged?.call(url);
             context.read<WebViewCubit>().onPageFinished(url);
           },
         ),

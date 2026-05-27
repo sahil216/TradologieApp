@@ -31,6 +31,9 @@ class EndPoints {
   static const String connectChatHistory =
       'https://connect.tradologie.com/api/chat/history';
 
+  static const String adminUnreadChatCount =
+      'https://connect.tradologie.com/api/chat/AdminUnreadChatCount';
+
   // Login
   static String signIn(UserType userType) {
     return '$baseUrl/${userType.name}/login';

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:logging/logging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:signalr_netcore/http_connection_options.dart';
 import 'package:signalr_netcore/hub_connection.dart';
@@ -12,6 +13,9 @@ import 'package:tradologie_app/features/socket/data/model/message_model.dart';
 
 /// Connect chat hub on connect.tradologie.com (negotiated transport).
 class AdminSignalRService {
+  static final Logger _signalrPackageLogger = Logger('AdminSignalR');
+  static bool _signalrPackageLoggerHooked = false;
+
   HubConnection? hub;
 
   /// Hub built and starting; not promoted to [hub] until start + invoke succeed.
@@ -151,14 +155,28 @@ class AdminSignalRService {
     }
   }
 
+  void _hookSignalrPackageLogger() {
+    if (_signalrPackageLoggerHooked) return;
+    _signalrPackageLoggerHooked = true;
+    _signalrPackageLogger.onRecord.listen((record) {
+      if (kDebugMode) {
+        debugPrint('[SIGNALR] ${record.level.name} -> ${record.message}');
+      }
+    });
+  }
+
   /// Long Polling is reliable on connect.tradologie.com (WS often fails on device).
   HttpConnectionOptions _hubConnectionOptions() {
+    _hookSignalrPackageLogger();
     return HttpConnectionOptions(
-      transport: HttpTransportType.LongPolling,
+      transport: HttpTransportType.WebSockets,
+      skipNegotiation: false,
       accessTokenFactory: () async => _apiCode,
-      requestTimeout: 30000,
+      requestTimeout: 15000,
+      logger: _signalrPackageLogger,
     );
   }
+
 
   void _trackHub(HubConnection connection) {
     _trackedHubs.add(connection);

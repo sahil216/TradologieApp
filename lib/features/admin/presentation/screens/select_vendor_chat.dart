@@ -1,11 +1,13 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradologie_app/config/routes/app_router.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/assets_manager.dart';
+import 'package:tradologie_app/features/admin/data/datasources/admin_remote_data_source.dart';
 import 'package:tradologie_app/core/widgets/adaptive_scaffold.dart';
 import 'package:tradologie_app/core/widgets/common_appbar.dart';
 import 'package:tradologie_app/core/widgets/common_loader.dart';
@@ -25,24 +27,76 @@ class SelectVendorforChat extends StatefulWidget {
 }
 
 class _SelectVendorforChatState extends State<SelectVendorforChat> {
+  int _agroSellerUnreadCount = 0;
+  bool _loadingUnreadCount = false;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       sl<FirebaseNotificationService>().markAppShellReady();
+      _loadAgroSellerUnreadCount();
     });
+  }
+
+  int _parseUnreadCount(dynamic data) {
+    if (data is! Map) return 0;
+    final raw = data['count'] ?? data['Count'] ?? data['unreadCount'];
+    if (raw is int) return raw.clamp(0, 1 << 30);
+    if (raw is String) return (int.tryParse(raw) ?? 0).clamp(0, 1 << 30);
+    return 0;
+  }
+
+  Future<void> _loadAgroSellerUnreadCount() async {
+    if (_loadingUnreadCount) return;
+    _loadingUnreadCount = true;
+
+    try {
+      // Backend now returns unread count alongside the chat list payload.
+      // We read `count` from that response and show it on the first card.
+      final response =
+          await sl<AdminRemoteDataSource>().getAgroSellerChatList(NoParams());
+
+      if (kDebugMode) {
+        debugPrint(
+          '[SelectVendorforChat] AgroSellerChatList '
+          'success=${response?.success} message=${response?.message} '
+          'data=${response?.data}',
+        );
+      }
+
+      if (!mounted) return;
+
+      if (response != null && response.success) {
+        final data = response.data;
+
+        if (data is Map) {
+          setState(() => _agroSellerUnreadCount = _parseUnreadCount(data));
+        } else {
+          // If backend returns a pure list, we can't compute a total badge.
+          setState(() => _agroSellerUnreadCount = 0);
+        }
+      }
+    } catch (e, st) {
+      if (kDebugMode) {
+        debugPrint('[SelectVendorforChat] AgroSellerChatList failed: $e');
+        debugPrint('$st');
+      }
+    } finally {
+      _loadingUnreadCount = false;
+    }
   }
 
   void _onLogoutTap() {
     context.read<AuthenticationCubit>().adminLogout(NoParams());
   }
 
-  void _openVendorChat(
+  Future<void> _openVendorChat(
     String categoryTitle, {
     String signalRType1 = AdminChatConfig.type1,
     String signalRType2 = AdminChatConfig.type2,
-  }) {
-    sl<NavigationService>().pushNamed(
+  }) async {
+    await sl<NavigationService>().pushNamed(
       Routes.adminVendorChat,
       arguments: AdminVendorChatArgs(
         categoryTitle: categoryTitle,
@@ -50,6 +104,8 @@ class _SelectVendorforChatState extends State<SelectVendorforChat> {
         signalRType2: signalRType2,
       ),
     );
+    if (!mounted) return;
+    await _loadAgroSellerUnreadCount();
   }
 
   @override
@@ -146,6 +202,7 @@ class _SelectVendorforChatState extends State<SelectVendorforChat> {
                           title: 'Agro Commodity',
                           subtitle: 'Connect with Agro Seller.',
                           image: 'assets/images/agro_image.png',
+                          unreadCount: _agroSellerUnreadCount,
                           onTap: () => _openVendorChat(
                             'Connect with Agro Seller',
                           ),
@@ -203,6 +260,7 @@ class BusinessCard extends StatefulWidget {
   final String subtitle;
   final String image;
   final VoidCallback? onTap;
+  final int unreadCount;
 
   const BusinessCard({
     super.key,
@@ -210,6 +268,7 @@ class BusinessCard extends StatefulWidget {
     required this.subtitle,
     required this.image,
     this.onTap,
+    this.unreadCount = 0,
   });
 
   @override
@@ -315,10 +374,44 @@ class _BusinessCardState extends State<BusinessCard> {
                                 ],
                               ),
                             ),
-                            Icon(
-                              Icons.chat_outlined,
-                              size: 20,
-                              color: Colors.grey.shade600,
+                            Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Icon(
+                                  Icons.chat_outlined,
+                                  size: 20,
+                                  color: Colors.grey.shade600,
+                                ),
+                                if (widget.unreadCount > 0)
+                                  Positioned(
+                                    right: -6,
+                                    top: -8,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.redAccent,
+                                        borderRadius: BorderRadius.circular(999),
+                                        border: Border.all(
+                                          color: Colors.white,
+                                          width: 1.5,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        widget.unreadCount > 99
+                                            ? '99+'
+                                            : widget.unreadCount.toString(),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
                           ],
                         ),

@@ -39,7 +39,11 @@ class _ChatViewState extends State<ChatView> {
     Future.microtask(() {
       context
           .read<ChatBloc>()
-          .add(ChatConnectEvent(widget.myUserId, role: widget.role));
+          .add(ChatConnectEvent(
+            widget.myUserId,
+            otherUserId: widget.toUserId,
+            role: widget.role,
+          ));
     });
   }
 
@@ -127,7 +131,11 @@ class _ChatViewState extends State<ChatView> {
                     color: Colors.red,
                     showRetry: true,
                     onRetry: () => context.read<ChatBloc>().add(
-                        ChatConnectEvent(widget.myUserId, role: widget.role)),
+                        ChatConnectEvent(
+                          widget.myUserId,
+                          otherUserId: widget.toUserId,
+                          role: widget.role,
+                        )),
                   );
                 } else if (state is ChatError) {
                   return ConnectionBanner(
@@ -135,7 +143,11 @@ class _ChatViewState extends State<ChatView> {
                     color: Colors.red,
                     showRetry: true,
                     onRetry: () => context.read<ChatBloc>().add(
-                        ChatConnectEvent(widget.myUserId, role: widget.role)),
+                        ChatConnectEvent(
+                          widget.myUserId,
+                          otherUserId: widget.toUserId,
+                          role: widget.role,
+                        )),
                   );
                 }
                 return const SizedBox.shrink();

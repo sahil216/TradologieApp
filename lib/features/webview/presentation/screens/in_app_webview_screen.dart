@@ -94,14 +94,17 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen>
                       );
                     },
                     onLoadStart: (controller, url) {
-                      context
-                          .read<WebViewCubit>()
-                          .onPageStarted(url.toString());
+                      final urlString = url?.toString() ?? '';
+                      widget.params.onUrlChanged?.call(urlString);
+                      context.read<WebViewCubit>().onPageStarted(urlString);
                     },
                     onLoadStop: (controller, url) {
-                      context
-                          .read<WebViewCubit>()
-                          .onPageFinished(url.toString());
+                      final urlString = url?.toString() ?? '';
+                      widget.params.onUrlChanged?.call(urlString);
+                      context.read<WebViewCubit>().onPageFinished(urlString);
+                    },
+                    onUpdateVisitedHistory: (controller, url, _) {
+                      widget.params.onUrlChanged?.call(url.toString());
                     },
                   ),
                 ),

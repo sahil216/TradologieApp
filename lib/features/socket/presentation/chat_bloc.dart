@@ -43,7 +43,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       ChatConnectEvent event, Emitter<ChatState> emit) async {
     emit(const ChatConnecting());
     try {
-      await _service.connect(event.userId, role: event.role);
+      await _service.connect(
+        event.userId,
+        role: event.role,
+        otherUserId: event.otherUserId,
+      );
 
       _msgSub = _service.messageStream.listen((msg) {
         add(ChatMessageReceivedEvent(msg));
@@ -63,6 +67,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   Future<void> _onDisconnect(
       ChatDisconnectEvent event, Emitter<ChatState> emit) async {
+    await _service.clearActiveChat();
     await _service.disconnect();
     emit(const ChatDisconnected());
   }

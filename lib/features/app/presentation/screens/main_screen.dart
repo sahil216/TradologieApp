@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:tradologie_app/core/api/end_points.dart';
 import 'package:tradologie_app/core/usecases/usecase.dart';
 import 'package:tradologie_app/core/utils/app_strings.dart';
@@ -76,7 +77,8 @@ class _MainScreenState extends State<MainScreen>
         icon: _appCubit.bottomNavIndex == 3
             ? Icon(Icons.support_agent)
             : Icon(Icons.support_agent_outlined),
-        name: 'Dedicated Support',
+      //  name: 'Dedicated Support',
+        name: 'Support',
         height: 20,
         page: const AdminVendorConversationScreen(
           vendor: AdminConnectChatConfig.displayVendor,
@@ -321,7 +323,7 @@ class CommonFloatingNavBar extends StatelessWidget {
   });
 
   static const Color _activeColor = Color(0xFF0A9FED);
-  static const Color _inactiveColor = Colors.black87;
+  static const Color _inactiveColor = Color(0xFF576680);
 
   @override
   Widget build(BuildContext context) {
@@ -343,22 +345,28 @@ class CommonFloatingNavBar extends StatelessWidget {
   List<Widget> _sellerItems() {
     return [
       _item(0, Icons.dashboard_outlined, 'Dashboard'),
-      _item(1, Icons.description_outlined, 'Negotiation'),
+      _item(1, Icons.description_outlined, 'Negotiation',leading: Image.asset(
+        'assets/images/assignment.png',
+        width: 20,
+        height: 20,
+        color: index == 1 ? _activeColor : _inactiveColor,
+      )),
       _item(
         2,
-        Icons.play_circle_outline,
+        Icons.pan_tool_alt_outlined,
         'Demo',
-        leading: Image.asset(
+        /*leading: Image.asset(
           'assets/images/demo_logo.png',
           width: 20,
           height: 20,
           color: index == 2 ? _activeColor : _inactiveColor,
-        ),
+        ),*/
       ),
       _item(
         3,
-        Icons.support_agent_outlined,
-        'Dedicated\nSupport',
+        Icons.support_agent,
+       // 'Dedicated\nSupport',
+        'Support',
         showOnlineDot: true,
       ),
     ];
@@ -401,7 +409,7 @@ class CommonFloatingNavBar extends StatelessWidget {
             leading ??
                 Icon(
                   icon,
-                  size: 20,
+                  size: 25,
                   color: selected ? _activeColor : _inactiveColor,
                 ),
             const SizedBox(height: 4),
@@ -417,9 +425,9 @@ class CommonFloatingNavBar extends StatelessWidget {
                     label,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                       color: selected ? _activeColor : _inactiveColor,
                     ),
                   ),

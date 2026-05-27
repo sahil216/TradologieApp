@@ -54,7 +54,12 @@ class _MyAccountTabBarDelegate extends SliverPersistentHeaderDelegate {
 }
 
 class MyAccountScreen extends StatefulWidget {
-  const MyAccountScreen({super.key});
+  final int initialTabIndex;
+
+  const MyAccountScreen({
+    super.key,
+    this.initialTabIndex = 0,
+  });
 
   @override
   State<MyAccountScreen> createState() => _MyAccountScreenState();
@@ -65,8 +70,11 @@ class _MyAccountScreenState extends State<MyAccountScreen>
   final SecureStorageService _secureStorage = SecureStorageService();
   String? token;
   CompanyDetails? companyDetails;
+  bool _companyFormSubmitSuccess = false;
   late TabController _tabController;
   int _previousIndex = 0;
+
+  static const int _membershipTabIndex = 9;
 
   MyAccountCubit get cubit => BlocProvider.of<MyAccountCubit>(context);
 
@@ -80,7 +88,12 @@ class _MyAccountScreenState extends State<MyAccountScreen>
     _loadToken();
     getCompanyDetails();
     Constants().checkAndroidVersion();
-    _tabController = TabController(length: 11, vsync: this);
+    _tabController = TabController(
+      length: 11,
+      vsync: this,
+      initialIndex: widget.initialTabIndex.clamp(0, 10),
+    );
+    _previousIndex = _tabController.index;
 
     _tabController.addListener(() {
       if (_tabController.indexIsChanging) {
@@ -125,8 +138,42 @@ class _MyAccountScreenState extends State<MyAccountScreen>
     }
   }
 
+  bool get _isMembershipTabEnabled =>
+      _companyFormSubmitSuccess || (companyDetails?.countryId ?? 0) != 0;
+
+  static bool isCompanyFormSubmitSuccessUrl(String url) {
+    final uri = Uri.tryParse(url);
+    if (uri != null) {
+      for (final entry in uri.queryParameters.entries) {
+        if (entry.key.toLowerCase() == 'formsubmit' &&
+            entry.value.toLowerCase() == 'success') {
+          return true;
+        }
+      }
+    }
+    return url.toLowerCase().contains('formsubmit=success');
+  }
+
+  void _onCompanyDetailsUrlChanged(String url) {
+    if (!isCompanyFormSubmitSuccessUrl(url)) return;
+    if (_companyFormSubmitSuccess) return;
+    setState(() => _companyFormSubmitSuccess = true);
+    getCompanyDetails();
+  }
+
+  WebviewParams _companyDetailsWebviewParams() {
+    return WebviewParams(
+      isAppBar: false,
+      canPop: true,
+      onUrlChanged: _onCompanyDetailsUrlChanged,
+      url: Uri.parse(
+              "${EndPoints.supplierImageurl}/supplier/VendorCompanyDetailForAPI.aspx?")
+          .replace(queryParameters: {"Token": token}).toString(),
+    );
+  }
+
   bool _canOpenTab(int index) {
-    if (index == 9 && companyDetails?.countryId == 0) {
+    if (index == _membershipTabIndex && !_isMembershipTabEnabled) {
       return false;
     }
     return true;
@@ -162,7 +209,14 @@ class _MyAccountScreenState extends State<MyAccountScreen>
             listenWhen: (previous, current) => previous != current,
             listener: (context, state) {
               if (state is CompanyDetailsSuccess) {
-                companyDetails = state.data;
+                final data = state.data;
+                final enableMembership = (data.countryId ?? 0) != 0;
+                setState(() {
+                  companyDetails = data;
+                  if (enableMembership) {
+                    _companyFormSubmitSuccess = true;
+                  }
+                });
               }
               if (state is CompanyDetailsError) {
                 CommonToast.showFailureToast(state.failure);
@@ -272,8 +326,8 @@ class _MyAccountScreenState extends State<MyAccountScreen>
                       "Commodity",
                     ],
                     isEnabled: (index) {
-                      if (index == 9 && companyDetails?.countryId == 0) {
-                        return false;
+                      if (index == _membershipTabIndex) {
+                        return _isMembershipTabEnabled;
                       }
                       return true;
                     },
@@ -371,30 +425,10 @@ class _MyAccountScreenState extends State<MyAccountScreen>
                         // InformationTab(),
                         Constants.isAndroid14OrBelow && Platform.isAndroid
                             ? InAppWebViewScreen(
-                                params: WebviewParams(
-                                  isAppBar: false,
-                                  canPop: true,
-                                  url: Uri.parse(
-                                          "${EndPoints.supplierImageurl}/supplier/VendorCompanyDetailForAPI.aspx?")
-                                      .replace(
-                                    queryParameters: {
-                                      "Token": token,
-                                    },
-                                  ).toString(),
-                                ),
+                                params: _companyDetailsWebviewParams(),
                               )
                             : WebViewScreen(
-                                params: WebviewParams(
-                                  isAppBar: false,
-                                  canPop: true,
-                                  url: Uri.parse(
-                                          "${EndPoints.supplierImageurl}/supplier/VendorCompanyDetailForAPI.aspx?")
-                                      .replace(
-                                    queryParameters: {
-                                      "Token": token,
-                                    },
-                                  ).toString(),
-                                ),
+                                params: _companyDetailsWebviewParams(),
                               ),
                         // CompanyDetailTab(),
                         Constants.isAndroid14OrBelow && Platform.isAndroid
@@ -566,7 +600,7 @@ class _MyAccountScreenState extends State<MyAccountScreen>
                                 ),
                               ),
                         // BulkAndRetailTab(),
-                        companyDetails?.countryId == 0
+                        !_isMembershipTabEnabled
                             ? Container()
                             : Constants.isAndroid14OrBelow && Platform.isAndroid
                                 ? InAppWebViewScreen(

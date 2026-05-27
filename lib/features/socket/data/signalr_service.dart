@@ -16,6 +16,8 @@ class SignalRService {
   /// The role of the current user as expected by the backend: "Seller", "Buyer", etc.
   String senderRole = "";
 
+  String _activeOtherUserId = '';
+
   // final _messageController = StreamController<ChatMessage>.broadcast();
   // Stream<ChatMessage> get messageStream => _messageController.stream;
 
@@ -48,11 +50,32 @@ class SignalRService {
     }
   }
 
-  Future<void> connect(String userId, {String role = ""}) async {
-    _ensureControllersOpen(); // ← add this at the top
+  Future<void> _invokeSetActiveChat(
+    String currentUserId,
+    String otherUserId,
+  ) async {
+    final active = hub;
+    if (active == null || active.state != HubConnectionState.Connected) {
+      return;
+    }
+    final otherId = otherUserId.trim();
+    if (otherId.isEmpty) return;
+    await active.invoke(
+      'SetActiveChat',
+      args: [currentUserId.toString(), otherId],
+    );
+  }
+
+  Future<void> connect(
+    String userId, {
+    String role = '',
+    String otherUserId = '',
+  }) async {
+    _ensureControllersOpen();
 
     myUserId = userId;
     senderRole = role;
+    _activeOtherUserId = otherUserId.trim();
 
     hub = HubConnectionBuilder()
         .withUrl(
@@ -74,19 +97,33 @@ class SignalRService {
       }
     });
 
-    hub!.onreconnected(({String? connectionId}) {
+    hub!.onreconnected(({String? connectionId}) async {
       if (!_connectionController.isClosed) {
         _connectionController.add(true);
       }
-      hub!.invoke("Connect", args: [userId]);
+      await hub!.invoke('Connect', args: [userId]);
+      await _invokeSetActiveChat(userId, _activeOtherUserId);
     });
 
     await hub!.start();
-    await hub!.invoke("Connect", args: [userId]);
+    await hub!.invoke('Connect', args: [userId]);
+    await _invokeSetActiveChat(userId, _activeOtherUserId);
 
     if (!_connectionController.isClosed) {
       _connectionController.add(true);
     }
+  }
+
+  /// Marks this conversation active on the server (read/unread, routing).
+  Future<void> setActiveChat(String currentUserId, String otherUserId) {
+    _activeOtherUserId = otherUserId.trim();
+    return _invokeSetActiveChat(currentUserId, otherUserId);
+  }
+
+  /// Clears active chat when leaving (server uses `0` as none).
+  Future<void> clearActiveChat() {
+    if (myUserId.trim().isEmpty) return Future.value();
+    return _invokeSetActiveChat(myUserId, '0');
   }
 
   /// Plain text message
@@ -172,6 +209,9 @@ class SignalRService {
   }
 
   Future<void> disconnect() async {
+    try {
+      await clearActiveChat();
+    } catch (_) {}
     await hub?.stop();
 
     // Guard before adding to a potentially closed stream

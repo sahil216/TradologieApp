@@ -19,6 +19,10 @@ abstract class AdminRemoteDataSource {
   Future<ResponseWrapper<dynamic>?> getChatHistory(
     GetAdminChatHistoryParams params,
   );
+
+  Future<ResponseWrapper<dynamic>?> getAdminUnreadChatCount({
+    required String type,
+  });
 }
 
 class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
@@ -61,6 +65,26 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
     return (await apiConsumer.get(
       EndPoints.connectChatHistory,
       queryParameters: params.toQueryParameters(),
+    )) as ResponseWrapper<dynamic>?;
+  }
+
+  @override
+  Future<ResponseWrapper<dynamic>?> getAdminUnreadChatCount({
+    required String type,
+  }) async {
+    final storage = SecureStorageService();
+    final token =
+        await storage.read(AppStrings.apiVerificationCode) ?? Constants.token;
+    final apiCode = token.trim();
+    if (apiCode.isEmpty) return null;
+
+    return (await apiConsumer.get(
+      EndPoints.adminUnreadChatCount,
+      queryParameters: {
+        'ApiCode': apiCode,
+        'Type': type,
+        'Token': apiCode,
+      },
     )) as ResponseWrapper<dynamic>?;
   }
 }

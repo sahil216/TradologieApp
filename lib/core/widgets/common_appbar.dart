@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:tradologie_app/config/routes/app_router.dart';
 import 'package:tradologie_app/config/routes/navigation_service.dart';
 import 'package:tradologie_app/core/utils/assets_manager.dart';
@@ -138,14 +139,14 @@ class CommonAppbar extends StatelessWidget {
                                 )
                               : Padding(
                                   padding: const EdgeInsets.only(bottom: 8.0),
-                                  child: Text(
-                                    title,
-                                    style: const TextStyle(
-                                      fontSize: 24,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
+                            child: Text(
+                              title,
+                              style: GoogleFonts.roboto(
+                                fontSize: 22,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500
+                              ),
+                            ),
                                 ),
                         ),
                       ),

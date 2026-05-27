@@ -16,6 +16,7 @@ import 'package:tradologie_app/features/authentication/domain/usecases/delete_ac
 import 'package:tradologie_app/features/authentication/presentation/cubit/authentication_cubit.dart';
 import 'package:tradologie_app/features/fmcg/presentation/screens/fmcg_products_mycatalogue.dart';
 import 'package:tradologie_app/features/my_account/presentation/screens/my_account_screen.dart';
+import 'package:tradologie_app/features/my_account/presentation/screens/agro_seller_account_screen.dart';
 import '../../../../config/routes/app_router.dart';
 import '../../../../core/utils/app_strings.dart';
 import '../../../../core/utils/constants.dart';
@@ -255,7 +256,16 @@ class _SellerSideDrawerState extends State<SellerSideDrawer> {
     Navigator.pop(context);
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => MyAccountScreen()),
+      MaterialPageRoute(
+        builder: (_) {
+          final isAgroSeller =
+              !Constants.isBuyer && !Constants.isFmcg && !Constants.isAdmin;
+          if (isAgroSeller) {
+            return const AgroSellerAccountScreen();
+          }
+          return const MyAccountScreen();
+        },
+      ),
     );
   }
 

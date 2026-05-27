@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:tradologie_app/core/api/end_points.dart';
 import 'package:tradologie_app/core/utils/app_colors.dart';
 import 'package:tradologie_app/core/utils/assets_manager.dart';
@@ -59,24 +60,21 @@ class DashboardCard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               item.groupName ?? "",
-              style: TextStyleConstants.medium(
-                context,
-                fontSize: 24,
-                color: AppColors.defaultText,
-              ),
+              style: GoogleFonts.roboto(
+                  fontWeight: FontWeight.w400,
+                  fontSize: 23,
+                  color: Colors.black),
             ),
             const SizedBox(height: 4),
             Center(
-              child: Text(
-                item.auctionName ?? '',
-                overflow: TextOverflow.ellipsis,
-                style: TextStyleConstants.regular(
-                  context,
-                  fontSize: 16,
-                  color: AppColors.defaultText,
-                ),
-              ),
-            ),
+                child: Text(
+              item.auctionName ?? '',
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.roboto(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                  color: Color(0XFF576680)),
+            )),
             const SizedBox(height: 16),
             _infoRow(context, 'Code', item.auctionCode ?? ''),
             _infoRow(context, 'Currency', item.currencyName ?? ''),
@@ -89,7 +87,7 @@ class DashboardCard extends StatelessWidget {
             SizedBox(height: 12),
             CommonButton(
               onPressed: onParticipateNowPressed,
-              text: 'Participate Now',
+              text: 'Participate Now',textStyle: GoogleFonts.roboto(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w500),
               width: double.infinity,
             ),
             // const Spacer(),
@@ -100,8 +98,7 @@ class DashboardCard extends StatelessWidget {
               icon: SvgPicture.asset(ImgAssets.postStockListingIcon,
                   colorFilter:
                       ColorFilter.mode(AppColors.primary, BlendMode.srcIn)),
-              textStyle: TextStyleConstants.semiBold(context,
-                  fontSize: 16, color: AppColors.primary),
+              textStyle: GoogleFonts.roboto(fontSize: 16,color: AppColors.primary,fontWeight: FontWeight.w500),
               backgroundColor: AppColors.transparent,
               width: double.infinity,
             ),
@@ -127,15 +124,20 @@ class DashboardCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title,
-              style: TextStyleConstants.semiBold(context,
-                  fontSize: 16, color: AppColors.defaultText)),
+              style: /*TextStyleConstants.semiBold(context,
+                  fontSize: 16, color: AppColors.defaultText)*/
+
+                  GoogleFonts.roboto(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                      color: AppColors.defaultText)),
           Flexible(
-            child: Text(
-              value,
-              textAlign: TextAlign.end,
-              style: TextStyleConstants.regular(context,
-                  fontSize: 16, color: AppColors.defaultText),
-            ),
+            child: Text(value,
+                textAlign: TextAlign.end,
+                style: GoogleFonts.roboto(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 14,
+                    color: Color(0XFF576680))),
           ),
         ],
       ),

@@ -48,7 +48,21 @@ class AdminRepositoryImpl implements AdminRepository {
       final response =
           await adminRemoteDataSource.getAgroSellerChatList(params);
       if (response != null && response.success) {
-        final list = response.data as List;
+        final data = response.data;
+        final List list;
+        if (data is List) {
+          list = data;
+        } else if (data is Map) {
+          // Backend may wrap list + unread count in a map.
+          final dynamic candidate = data['list'] ??
+              data['data'] ??
+              data['vendors'] ??
+              data['VendorList'] ??
+              data['ChatList'];
+          list = candidate is List ? candidate : const [];
+        } else {
+          list = const [];
+        }
         return Right(
           list
               .map((e) => AdminVendorModel.fromChatListJson(

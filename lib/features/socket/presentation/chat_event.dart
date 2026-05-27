@@ -11,11 +11,16 @@ abstract class ChatEvent extends Equatable {
 
 class ChatConnectEvent extends ChatEvent {
   final String userId;
+  final String otherUserId;
   final String role; // "Seller", "Buyer", etc.
-  const ChatConnectEvent(this.userId, {this.role = ""});
+  const ChatConnectEvent(
+    this.userId, {
+    this.otherUserId = '',
+    this.role = '',
+  });
 
   @override
-  List<Object?> get props => [userId, role];
+  List<Object?> get props => [userId, otherUserId, role];
 }
 
 class ChatDisconnectEvent extends ChatEvent {
